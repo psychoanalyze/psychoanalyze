@@ -1,2 +1,4 @@
 site_name: PsychoAnalyze
 site_url: https://github.com/schlich/psychoanalyze
+theme:
+    name: readthedocs
