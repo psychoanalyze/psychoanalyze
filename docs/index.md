@@ -16,3 +16,4 @@ $ pip install psychoanalyze
 >>> import psychoanalyze as pa
 >>> trials_df = pa.fake()
 >>> curve_df = pa.curve(trials_df)
+```
