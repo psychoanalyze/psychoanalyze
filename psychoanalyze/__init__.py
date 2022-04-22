@@ -21,6 +21,7 @@ def weber_coefficient(curves: pd.DataFrame) -> float:
 
 
 def psi() -> pd.Series:
+    """Basic sigmoid psychometric function psi (Ψ) = expit/logistic"""
     expected_x = np.linspace(-3, 3)
     expected_y = expit(expected_x)
     return pd.Series(expected_y, index=expected_x)
