@@ -12,19 +12,8 @@ $ pip install psychoanalyze
 
 ## Usage 
 
-```python
->>> import psychoanalyze as pa
->>> trials_df = pa.fake()
->>> curve_df = pa.curve(trials_df)
-```
+See examples of PsychoAnalyze in use in our [demo notebook](notebook.ipynb).
 
-## Functions
+## API
 
-### curve
-::: psychoanalyze.curve
-
-### weber_coefficient
-::: psychoanalyze.weber_coefficient
-
-### psi
-::: psychoanalyze.psi
+Learn about functions and classes provided by PsychoAnalyze in our [API docs](reference)

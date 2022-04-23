@@ -6,13 +6,14 @@ plugins:
  - search
  - gen-files:
     scripts:
-    - docs/gen_ref_pages.py
+    - gen_ref_pages.py
  - mkdocstrings:
     watch:
     - psychoanalyze
  - mkdocs-jupyter:
     include_source: True
-nav:
- - Notebook: notebook.ipynb
+# nav:
+#  - Notebook: notebook.ipynb
+#  - API: reference
 repo_url: https://github.com/schlich/psychoanalyze
 edit_uri: edit/main/docs/
