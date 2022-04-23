@@ -16,6 +16,7 @@ numpy = "^1.22.3"
 mkdocstrings = "^0.18.1"
 mkdocs-gen-files = "^0.3.4"
 mkdocs-jupyter = "^0.20.1"
+matplotlib = "^3.5.1"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.2.0"
