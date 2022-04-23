@@ -3,7 +3,7 @@ on: [push]
 
 jobs:
   badges:
-    name:Badge Job
+    name: Badge Job
     runs-on: ubuntu-latest
     steps:
       - name: Checkout first
