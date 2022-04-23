@@ -10,7 +10,7 @@ def fake(n: int, x: set) -> pd.DataFrame:
     """Generate a small set of trial data"""
     return pd.DataFrame(
         {
-            "Result": [np.random.binomial(1, 0.5) for _ in range(n)],
+            "Result": np.random.binomial(1, 0.5, size=n),
             "x": random.choices(list(x), k=n),
         }
     )
