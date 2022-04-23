@@ -2,14 +2,8 @@ from psychoanalyze import __version__
 import psychoanalyze as pa
 import pandas as pd
 import datatest as dt
-import pytest
 import numpy as np
 from scipy.special import expit
-
-
-@pytest.fixture
-def trials() -> pd.DataFrame:
-    return pd.DataFrame({"Result": [0, 1], "x": [1, 1]}, index=[1, 2])
 
 
 def test_version():
@@ -20,8 +14,8 @@ def test_faker():
     assert all(pa.fake()["Result"].isin({0, 1}))
 
 
-def test_curve(trials: pd.DataFrame):
-    df = pd.DataFrame(trials)
+def test_curve():
+    df = pd.DataFrame({"Result": [0, 1], "x": [1, 1]}, index=[1, 2])
     dt.validate(pa.curve(df), pd.Series([0.5], index=pd.Index([1], name="x")))
 
 
