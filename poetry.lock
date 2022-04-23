@@ -278,6 +278,63 @@ watchdog = ">=2.0"
 i18n = ["babel (>=2.9.0)"]
 
 [[package]]
+name = "mkdocs-autorefs"
+version = "0.4.1"
+description = "Automatically link across pages in MkDocs."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+Markdown = ">=3.3"
+mkdocs = ">=1.1"
+
+[[package]]
+name = "mkdocs-gen-files"
+version = "0.3.4"
+description = "MkDocs plugin to programmatically generate documentation pages during the build"
+category = "main"
+optional = false
+python-versions = ">=3.7,<4.0"
+
+[package.dependencies]
+mkdocs = ">=1.0.3,<2.0.0"
+
+[[package]]
+name = "mkdocstrings"
+version = "0.18.1"
+description = "Automatic documentation from sources, for MkDocs."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+Jinja2 = ">=2.11.1"
+Markdown = ">=3.3"
+MarkupSafe = ">=1.1"
+mkdocs = ">=1.2"
+mkdocs-autorefs = ">=0.3.1"
+mkdocstrings-python-legacy = ">=0.2"
+pymdown-extensions = ">=6.3"
+
+[package.extras]
+crystal = ["mkdocstrings-crystal (>=0.3.4)"]
+python = ["mkdocstrings-python (>=0.5.2)"]
+python-legacy = ["mkdocstrings-python-legacy (>=0.2.1)"]
+
+[[package]]
+name = "mkdocstrings-python-legacy"
+version = "0.2.2"
+description = "A legacy Python handler for mkdocstrings."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+mkdocstrings = ">=0.18"
+pytkdocs = ">=0.14"
+
+[[package]]
 name = "mypy-extensions"
 version = "0.4.3"
 description = "Experimental type system extensions for programs checked with the mypy typechecker."
@@ -430,6 +487,17 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "pymdown-extensions"
+version = "9.3"
+description = "Extension pack for Python Markdown."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+Markdown = ">=3.2"
+
+[[package]]
 name = "pyparsing"
 version = "3.0.8"
 description = "pyparsing module - Classes and methods to define and execute parsing grammars"
@@ -471,6 +539,17 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 
 [package.dependencies]
 six = ">=1.5"
+
+[[package]]
+name = "pytkdocs"
+version = "0.16.1"
+description = "Load Python objects documentation."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+numpy-style = ["docstring_parser (>=0.7)"]
 
 [[package]]
 name = "pytz"
@@ -587,7 +666,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.10,<3.11"
-content-hash = "ec2d949c0f6afa60e9499738f0522852d60752f4fb2c22c5c26c9c5c1b3a1d23"
+content-hash = "633afba7314eb71245880f792535cc27ec50b9ac1aa97e6bad6f660041a63ea6"
 
 [metadata.files]
 appnope = [
@@ -737,6 +816,22 @@ mkdocs = [
     {file = "mkdocs-1.3.0-py3-none-any.whl", hash = "sha256:26bd2b03d739ac57a3e6eed0b7bcc86168703b719c27b99ad6ca91dc439aacde"},
     {file = "mkdocs-1.3.0.tar.gz", hash = "sha256:b504405b04da38795fec9b2e5e28f6aa3a73bb0960cb6d5d27ead28952bd35ea"},
 ]
+mkdocs-autorefs = [
+    {file = "mkdocs-autorefs-0.4.1.tar.gz", hash = "sha256:70748a7bd025f9ecd6d6feeba8ba63f8e891a1af55f48e366d6d6e78493aba84"},
+    {file = "mkdocs_autorefs-0.4.1-py3-none-any.whl", hash = "sha256:a2248a9501b29dc0cc8ba4c09f4f47ff121945f6ce33d760f145d6f89d313f5b"},
+]
+mkdocs-gen-files = [
+    {file = "mkdocs-gen-files-0.3.4.tar.gz", hash = "sha256:c69188486bdc1e74bd2b9b7ebbde9f9eb21052ae7762f1b35420cfbfc6d7122e"},
+    {file = "mkdocs_gen_files-0.3.4-py3-none-any.whl", hash = "sha256:07f43245c87a03cfb03884e767655c2a61def24d07e47fb3a8d26b1581524d6a"},
+]
+mkdocstrings = [
+    {file = "mkdocstrings-0.18.1-py3-none-any.whl", hash = "sha256:4053929356df8cd69ed32eef71d8f676a472ef72980c9ffd4f933ead1debcdad"},
+    {file = "mkdocstrings-0.18.1.tar.gz", hash = "sha256:fb7c91ce7e3ab70488d3fa6c073a4f827cdc319042f682ef8ea95459790d64fc"},
+]
+mkdocstrings-python-legacy = [
+    {file = "mkdocstrings-python-legacy-0.2.2.tar.gz", hash = "sha256:f0e7ec6a19750581b752acb38f6b32fcd1efe006f14f6703125d2c2c9a5c6f02"},
+    {file = "mkdocstrings_python_legacy-0.2.2-py3-none-any.whl", hash = "sha256:379107a3a5b8db9b462efc4493c122efe21e825e3702425dbd404621302a563a"},
+]
 mypy-extensions = [
     {file = "mypy_extensions-0.4.3-py2.py3-none-any.whl", hash = "sha256:090fedd75945a69ae91ce1303b5824f428daf5a028d2f6ab8a299250a846f15d"},
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
@@ -833,6 +928,10 @@ pygments = [
     {file = "Pygments-2.11.2-py3-none-any.whl", hash = "sha256:44238f1b60a76d78fc8ca0528ee429702aae011c265fe6a8dd8b63049ae41c65"},
     {file = "Pygments-2.11.2.tar.gz", hash = "sha256:4e426f72023d88d03b2fa258de560726ce890ff3b630f88c21cbb8b2503b8c6a"},
 ]
+pymdown-extensions = [
+    {file = "pymdown-extensions-9.3.tar.gz", hash = "sha256:a80553b243d3ed2d6c27723bcd64ca9887e560e6f4808baa96f36e93061eaf90"},
+    {file = "pymdown_extensions-9.3-py3-none-any.whl", hash = "sha256:b37461a181c1c8103cfe1660081726a0361a8294cbfda88e5b02cefe976f0546"},
+]
 pyparsing = [
     {file = "pyparsing-3.0.8-py3-none-any.whl", hash = "sha256:ef7b523f6356f763771559412c0d7134753f037822dad1b16945b7b846f7ad06"},
     {file = "pyparsing-3.0.8.tar.gz", hash = "sha256:7bf433498c016c4314268d95df76c81b842a4cb2b276fa3312cfb1e1d85f6954"},
@@ -844,6 +943,10 @@ pytest = [
 python-dateutil = [
     {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
     {file = "python_dateutil-2.8.2-py2.py3-none-any.whl", hash = "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"},
+]
+pytkdocs = [
+    {file = "pytkdocs-0.16.1-py3-none-any.whl", hash = "sha256:a8c3f46ecef0b92864cc598e9101e9c4cf832ebbf228f50c84aa5dd850aac379"},
+    {file = "pytkdocs-0.16.1.tar.gz", hash = "sha256:e2ccf6dfe9dbbceb09818673f040f1a7c32ed0bffb2d709b06be6453c4026045"},
 ]
 pytz = [
     {file = "pytz-2022.1-py2.py3-none-any.whl", hash = "sha256:e68985985296d9a66a881eb3193b0906246245294a881e7c8afe623866ac6a5c"},

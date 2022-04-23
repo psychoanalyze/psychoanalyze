@@ -13,6 +13,8 @@ datatest = "^0.11.1"
 pytest = "^7.1.1"
 scipy = "^1.8.0"
 numpy = "^1.22.3"
+mkdocstrings = "^0.18.1"
+mkdocs-gen-files = "^0.3.4"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.2.0"

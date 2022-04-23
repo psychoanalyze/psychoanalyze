@@ -17,3 +17,14 @@ $ pip install psychoanalyze
 >>> trials_df = pa.fake()
 >>> curve_df = pa.curve(trials_df)
 ```
+
+## Functions
+
+### curve
+::: psychoanalyze.curve
+
+### weber_coefficient
+::: psychoanalyze.weber_coefficient
+
+### psi
+::: psychoanalyze.psi
