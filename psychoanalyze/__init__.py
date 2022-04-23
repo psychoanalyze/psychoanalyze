@@ -8,10 +8,12 @@ __version__ = "0.1.0"
 
 def fake(n: int, x: set) -> pd.DataFrame:
     """Generate a small set of trial data"""
+    X = random.choices(list(x), k=n)
+    result = [np.random.binomial(1, x / max(X)) for x in X]
     return pd.DataFrame(
         {
-            "Result": np.random.binomial(1, 0.5, size=n),
-            "x": random.choices(list(x), k=n),
+            "Result": result,
+            "x": X,
         }
     )
 
