@@ -15,7 +15,7 @@ def fake(n=100) -> pd.DataFrame:
 
 def curve(trials: pd.DataFrame) -> pd.Series:
     """Arrange *method of constant stimuli* performance curves using trial data"""
-    return trials.groupby("x").mean()
+    return trials.groupby("x").mean().rename(columns={"Result": "Hit Rate"})
 
 
 def weber_coefficient(curves: pd.DataFrame) -> float:
