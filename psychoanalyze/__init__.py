@@ -1,15 +1,18 @@
 import pandas as pd
 import numpy as np
+import random
 from scipy.special import expit
-import psychoanalyze as pa
 
 __version__ = "0.1.0"
 
 
-def fake(n=100) -> pd.DataFrame:
+def fake(n: int, x: set) -> pd.DataFrame:
     """Generate a small set of trial data"""
     return pd.DataFrame(
-        {"Result": [np.random.binomial(1, 0.5) for _ in range(n)], "x": [1] * n}
+        {
+            "Result": [np.random.binomial(1, 0.5) for _ in range(n)],
+            "x": random.choices(list(x), k=n),
+        }
     )
 
 

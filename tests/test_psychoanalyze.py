@@ -11,11 +11,15 @@ def test_version():
 
 
 def test_faker():
-    assert all(pa.fake()["Result"].isin({0, 1}))
+    assert all(pa.fake(100, set(range(8)))["Result"].isin({0, 1}))
 
 
 def test_faker_size():
-    assert len(pa.fake(100)) == 100
+    assert len(pa.fake(100, set(range(8)))) == 100
+
+
+def test_faker_x_values():
+    dt.validate(pa.fake(100, set(range(8)))["x"], set(range(8)))
 
 
 def test_curve():
