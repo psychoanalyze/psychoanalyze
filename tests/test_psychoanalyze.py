@@ -9,17 +9,15 @@ from scipy.special import expit
 
 @pytest.fixture
 def trials() -> pd.DataFrame:
-    return pd.DataFrame(
-        {"Result": [0, 1], "x": [1, 1]}, index=pd.Index([1, 2], name="Trial")
-    )
+    return pd.DataFrame({"Result": [0, 1], "x": [1, 1]}, index=[1, 2])
 
 
 def test_version():
     assert __version__ == "0.1.0"
 
 
-def test_faker(trials: pd.DataFrame):
-    assert pa.fake().equals(trials)
+def test_faker():
+    assert all(pa.fake()["Result"].isin({0, 1}))
 
 
 def test_curve(trials: pd.DataFrame):
