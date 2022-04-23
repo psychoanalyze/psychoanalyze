@@ -14,4 +14,4 @@ plugins:
     include_source: True
 nav:
  - Notebook: notebook.ipynb
-repo_url: schlich/psychoanalyze
+repo_url: https://github.com/schlich/psychoanalyze
