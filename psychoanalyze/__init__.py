@@ -6,11 +6,10 @@ import psychoanalyze as pa
 __version__ = "0.1.0"
 
 
-def fake() -> pd.DataFrame:
+def fake(n=100) -> pd.DataFrame:
     """Generate a small set of trial data"""
     return pd.DataFrame(
-        {"Result": [np.random.binomial(1, 0.5) for _ in range(2)], "x": [1, 1]},
-        index=pd.Index([1, 2], name="Trial"),
+        {"Result": [np.random.binomial(1, 0.5) for _ in range(n)], "x": [1] * n}
     )
 
 

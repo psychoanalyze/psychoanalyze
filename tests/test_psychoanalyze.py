@@ -14,6 +14,10 @@ def test_faker():
     assert all(pa.fake()["Result"].isin({0, 1}))
 
 
+def test_faker_size():
+    assert len(pa.fake(100)) == 100
+
+
 def test_curve():
     df = pd.DataFrame({"Result": [0, 1], "x": [1, 1]}, index=[1, 2])
     dt.validate(pa.curve(df), pd.Series([0.5], index=pd.Index([1], name="x")))
