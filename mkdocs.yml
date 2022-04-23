@@ -14,3 +14,4 @@ plugins:
     include_source: True
 nav:
  - Notebook: notebook.ipynb
+repo_url: https://github.com/squidfunk/mkdocs-material
