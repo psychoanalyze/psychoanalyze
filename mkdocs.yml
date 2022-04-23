@@ -10,6 +10,7 @@ plugins:
  - mkdocstrings:
     watch:
     - psychoanalyze
- - mkdocs-jupyter
+ - mkdocs-jupyter:
+    include_source: True
 nav:
  - Notebook: notebook.ipynb
