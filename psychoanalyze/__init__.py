@@ -3,6 +3,8 @@ import numpy as np
 import random
 from scipy.special import expit
 
+pd.options.plotting.backend = "plotly"
+
 __version__ = "0.1.0"
 
 
