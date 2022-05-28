@@ -61,6 +61,6 @@ def test_curve_fit():
 
 
 def test_curve_fit_fields():
-    points = pd.DataFrame({"Hit Rate": [0, 2]}, index=pd.Index([0, 2], name="x"))
+    points = pd.Series([0, 2], name="Hit Rate", index=pd.Index([0, 2], name="x"))
     fit = pa.fit(points)
     assert fit.keys() == {"location", "width", "gamma", "lambda"}
