@@ -9,7 +9,7 @@ from scipy.special import expit
 
 @pytest.fixture
 def trials():
-    return pa.fake(100, set(range(8)))
+    return pa.trials.fake(100, set(range(8)))
 
 
 def test_version():
@@ -64,3 +64,8 @@ def test_curve_fit_fields():
     points = pd.Series([0, 2], name="Hit Rate", index=pd.Index([0, 2], name="x"))
     fit = pa.fit(points)
     assert fit.keys() == {"location", "width", "gamma", "lambda"}
+
+
+def test_plot_fit():
+    fit = pd.DataFrame({"Hit Rate": []})
+    assert pa.plot(fit)

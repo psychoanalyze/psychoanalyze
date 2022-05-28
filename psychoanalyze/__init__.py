@@ -1,25 +1,13 @@
 import pandas as pd
 import numpy as np
-import random
 import plotly.express as px
 from plotly import graph_objects as go
 from scipy.special import expit
+from psychoanalyze import trials
 
 pd.options.plotting.backend = "plotly"
 
 __version__ = "0.1.0"
-
-
-def fake(n: int, x: set) -> pd.DataFrame:
-    """Generate a small set of trial data"""
-    X = random.choices(list(x), k=n)
-    result = [np.random.binomial(1, x / max(X)) for x in X]
-    return pd.DataFrame(
-        {
-            "Result": result,
-            "x": X,
-        }
-    )
 
 
 def curve(trials: pd.DataFrame) -> pd.Series:
