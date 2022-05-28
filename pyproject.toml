@@ -18,6 +18,7 @@ mkdocs-gen-files = "^0.3.4"
 mkdocs-jupyter = "^0.20.1"
 matplotlib = "^3.5.1"
 plotly = "^5.7.0"
+jupyterlab = "^3.4.2"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.2.0"
