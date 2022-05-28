@@ -52,3 +52,15 @@ def test_plot_curve_points(trials):
     curve = pa.curve(trials)
     fig = pa.plot(curve)
     assert fig.layout.yaxis.title.text == "Hit Rate"
+
+
+def test_curve_fit():
+    points = pd.DataFrame({"Hit Rate": [0, 2], "x": [0, 2]})
+    fit = pa.fit(points)
+    assert fit["location"] == 1
+
+
+def test_curve_fit_fields():
+    points = pd.DataFrame({"Hit Rate": [0, 2], "x": [0, 2]})
+    fit = pa.fit(points)
+    assert fit.keys() == {"location", "width", "gamma", "lambda"}

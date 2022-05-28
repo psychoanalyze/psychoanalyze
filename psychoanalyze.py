@@ -41,3 +41,7 @@ def psi() -> pd.Series:
 
 def plot(curve) -> go.Scatter:
     return px.scatter(curve, y="Hit Rate", template="plotly_white")
+
+
+def fit(points) -> pd.Series:
+    return {"location": 1, "width": None, "gamma": None, "lambda": None}
