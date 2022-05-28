@@ -3,23 +3,29 @@ import psychoanalyze as pa
 import pandas as pd
 import datatest as dt
 import numpy as np
+import pytest
 from scipy.special import expit
+
+
+@pytest.fixture
+def trials():
+    return pa.fake(100, set(range(8)))
 
 
 def test_version():
     assert __version__ == "0.1.0"
 
 
-def test_faker():
-    assert all(pa.fake(100, set(range(8)))["Result"].isin({0, 1}))
+def test_faker(trials):
+    assert all(trials["Result"].isin({0, 1}))
 
 
-def test_faker_size():
-    assert len(pa.fake(100, set(range(8)))) == 100
+def test_faker_size(trials):
+    assert len(trials) == 100
 
 
-def test_faker_x_values():
-    dt.validate(pa.fake(100, set(range(8)))["x"], set(range(8)))
+def test_faker_x_values(trials):
+    dt.validate(trials["x"], set(range(8)))
 
 
 def test_curve():
@@ -39,3 +45,10 @@ def test_psi():
     expected_x = np.linspace(-3, 3)
     expected_y = expit(expected_x)
     dt.validate(pa.psi(), pd.Series(expected_y, index=expected_x))
+
+
+def test_plot_curve_points(trials):
+    trials = trials
+    curve = pa.curve(trials)
+    fig = pa.plot(curve)
+    assert fig.layout.yaxis.title.text == "Hit Rate"
