@@ -1,4 +1,5 @@
 import plotly.express as px
+import pandas as pd
 
 
 def thresholds(data):
@@ -13,3 +14,7 @@ def thresholds(data):
 
 def curve(points):
     return px.scatter(points, y="Hit Rate", template="plotly_white")
+
+
+def curves(points):
+    return px.scatter(points, x="x", y="Hit Rate")

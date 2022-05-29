@@ -1,7 +1,10 @@
 import pandas as pd
+import random
 
 
-def generate(n_subjects=None):
+def generate(n_subjects=2, n_sessions=10):
     subjects = list("ABCDEFG"[:n_subjects])
-    records = [{"Day": 1, "Subject": subject, "Threshold": 1} for subject in subjects]
-    return pd.DataFrame.from_records(records)
+    index = pd.MultiIndex.from_product(
+        [subjects, list(range(n_sessions))], names=["Subject", "Day"]
+    )
+    return pd.DataFrame([{"Threshold": random.random()} for _ in index], index=index)

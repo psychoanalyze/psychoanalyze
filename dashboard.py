@@ -1,20 +1,45 @@
-from dash import Dash, dcc
+from dash import Dash, dcc, html, Output, Input
 import dash_bootstrap_components as dbc
 import pandas as pd
 import psychoanalyze as pa
+from numpy.random import binomial
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 
-data = pd.DataFrame(
-    {"Threshold": [1, 2], "Day": [1, 2]}, index=pd.Index(["A", "B"], name="Subject")
-)
+subjects_input = [
+    dbc.Label("Number of Subjects:"),
+    dbc.Input(id="subjects", value=2, type="number"),
+]
+
+n_sessions_input = [
+    dbc.Label("Number of Sessions:"),
+    dbc.Input(id="sessions", value=10, type="number"),
+]
 
 app.layout = dbc.Container(
-    [
-        dbc.Input(id="subjects", value=2, type="number"),
-        dcc.Graph(id="time-thresholds", figure=pa.plot.thresholds(data)),
+    subjects_input
+    + n_sessions_input
+    + [
+        dbc.Row(
+            [
+                dbc.Col(dcc.Graph(id="time-thresholds")),
+                dbc.Col(dcc.Graph(figure=pa.plot.curves())),
+            ]
+        ),
+        dbc.Table(id="data"),
     ]
 )
+
+
+@app.callback(
+    [Output("data", "children"), Output("time-thresholds", "figure")],
+    [Input("subjects", "value"), Input("sessions", "value")],
+)
+def generate_data(n_subjects, n_sessions):
+    data = pa.data.generate(n_subjects=n_subjects, n_sessions=n_sessions).reset_index()
+    table = dbc.Table.from_dataframe(data)
+    return table.children, pa.plot.thresholds(data)
+
 
 if __name__ == "__main__":
     app.run_server(debug=True)

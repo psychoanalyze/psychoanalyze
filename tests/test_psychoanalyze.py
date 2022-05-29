@@ -47,13 +47,6 @@ def test_psi():
     dt.validate(pa.psi(), pd.Series(expected_y, index=expected_x))
 
 
-def test_plot_curve_points(trials):
-    trials = trials
-    curve = pa.curve(trials)
-    fig = pa.plot.curve(curve)
-    assert fig.layout.yaxis.title.text == "Hit Rate"
-
-
 def test_curve_fit():
     points = pd.DataFrame({"Hit Rate": [0, 2], "x": [0, 2]})
     fit = pa.fit(points)
@@ -66,32 +59,16 @@ def test_curve_fit_fields():
     assert fit.keys() == {"location", "width", "gamma", "lambda"}
 
 
-def test_plot_fit():
-    fit = pd.DataFrame({"Hit Rate": []})
-    assert pa.plot.curve(fit)
-
-
-def test_plot_thresholds():
-    data = pd.DataFrame(
-        {"Threshold": [1, 2], "Day": [1, 2]}, index=pd.Index(["A", "B"], name="Subject")
-    )
-    fig = pa.plot.thresholds(data)
-    subjects = {trace["legendgroup"] for trace in fig.data}
-    assert subjects == {"A", "B"}
-    assert fig.layout.xaxis.title.text == "Day"
-    assert fig.layout.yaxis.title.text == "Threshold"
-
-
 def test_generate_data():
     data = pa.data.generate()
-    assert set(data.columns) == {"Threshold", "Day", "Subject"}
+    assert set(data.columns) == {"Threshold"}
 
 
-def test_generate_data_two_subjects():
-    data = pa.data.generate(n_subjects=2)
-    assert data["Subject"].nunique() == 2
+@pytest.mark.parametrize("n", [2, 3])
+def test_generate_data_n_subjects(n):
+    data = pa.data.generate(n_subjects=n)
+    assert data.index.get_level_values("Subject").nunique() == n
 
 
-def test_generate_data_three_subjects():
-    data = pa.data.generate(n_subjects=3)
-    assert data["Subject"].nunique() == 3
+def test_generate_data_n_trials():
+    data = pa.data.generate(n_sessions=10)

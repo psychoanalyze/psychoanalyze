@@ -21,6 +21,7 @@ plotly = "^5.7.0"
 jupyterlab = "^3.4.2"
 dash = "^2.4.1"
 dash-bootstrap-components = "^1.1.0"
+pytest-sugar = "^0.9.4"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.2.0"
