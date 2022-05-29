@@ -72,5 +72,9 @@ def test_plot_fit():
 
 
 def test_plot_thresholds():
-    data = pd.DataFrame(index=pd.Index(["A"], name="Subject"))
+    data = pd.DataFrame(
+        {"Threshold": [1, 2]}, index=pd.Index(["A", "B"], name="Subject")
+    )
     fig = pa.plot.thresholds(data)
+    subjects = {trace["legendgroup"] for trace in fig.data}
+    assert subjects == {"A", "B"}
