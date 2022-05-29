@@ -12,15 +12,12 @@ def thresholds(data):
     )
 
 
-def curve(points):
-    return px.scatter(points, y="Hit Rate", template="plotly_white")
-
-
 def curves(points):
     return px.scatter(
         points.reset_index(),
         x="x",
         y="Hit Rate",
         color="Subject",
+        symbol="Day",
         template="plotly_white",
     )

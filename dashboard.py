@@ -20,11 +20,15 @@ app.layout = dbc.Container(
     + [
         dbc.Row(
             [
-                dbc.Col(dcc.Graph(id="time-thresholds")),
+                dbc.Col(
+                    [
+                        dcc.Graph(id="time-thresholds"),
+                        dbc.Table(id="data"),
+                    ]
+                ),
                 dbc.Col(dcc.Graph(id="curves")),
             ]
         ),
-        dbc.Table(id="data"),
     ]
 )
 
@@ -39,12 +43,10 @@ app.layout = dbc.Container(
 )
 def generate_data(n_subjects, n_sessions):
     subjects = pa.data.subjects(n_subjects=n_subjects)
-    data = pa.data.generate(
-        subjects, n=n_sessions, x="Day", y="Threshold"
-    ).reset_index()
-    curves_data = pa.data.generate(subjects, n=8, x="x", y="Hit Rate").reset_index()
+    curves_data = pa.data.generate(subjects, n=n_sessions, y="Hit Rate").reset_index()
+    data = pa.data.thresholds(curves_data).rename(columns={"Hit Rate": "Threshold"})
     table = dbc.Table.from_dataframe(data)
-    return table.children, pa.plot.thresholds(data), pa.plot.curves(curves_data)
+    return (table.children, pa.plot.thresholds(data), pa.plot.curves(curves_data))
 
 
 if __name__ == "__main__":

@@ -23,8 +23,9 @@ def test_thresholds():
 def test_curves():
     n_subjects = 2
     subjects = list("ABCDEFG"[:n_subjects])
+    subj_index = pd.MultiIndex.from_product([subjects, list(range(10))])
     index = pd.MultiIndex.from_product(
-        [subjects, list(range(8))], names=["Subject", "x"]
+        [subjects, list(range(8)), list(range(10))], names=["Subject", "x", "Day"]
     )
     points = pd.DataFrame(
         {
@@ -35,15 +36,4 @@ def test_curves():
     fig = pa.plot.curves(points)
     assert fig.layout.xaxis.title.text == "x"
     assert fig.layout.yaxis.title.text == "Hit Rate"
-
-
-def test_fit():
-    fit = pd.DataFrame({"Hit Rate": []})
-    assert pa.plot.curve(fit)
-
-
-def test_curve_points(trials):
-    trials = trials
-    curve = pa.curve(trials)
-    fig = pa.plot.curve(curve)
-    assert fig.layout.yaxis.title.text == "Hit Rate"
+    assert len(fig.data) == len(subj_index)
