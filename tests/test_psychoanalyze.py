@@ -59,20 +59,17 @@ def test_curve_fit_fields():
     assert fit.keys() == {"location", "width", "gamma", "lambda"}
 
 
-def test_generate_data():
-    data = pa.data.generate()
+@pytest.mark.parametrize("n", [2, 3])
+def test_generate_data_n_subjects(n):
+    subjects = pa.data.subjects(n_subjects=n)
+    data = pa.data.generate(subjects=subjects)
+    assert set(data.index.names) == {"Subject", "Day"}
+    assert data.index.get_level_values("Subject").nunique() == n
     assert set(data.columns) == {"Threshold"}
 
 
-@pytest.mark.parametrize("n", [2, 3])
-def test_generate_data_n_subjects(n):
-    data = pa.data.generate(n_subjects=n)
-    assert set(data.index.names) == {"Subject", "Day"}
-    assert data.index.get_level_values("Subject").nunique() == n
-
-
 def test_generate_data_n_trials():
-    data = pa.data.generate(n_sessions=10)
+    data = pa.data.generate(subjects=["A", "B"], n_sessions=10)
 
 
 def test_generate_curve_data():
