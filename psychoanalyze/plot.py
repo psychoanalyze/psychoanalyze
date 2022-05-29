@@ -23,5 +23,7 @@ def curves(points):
     )
 
 
-def logistic(s):
-    return px.line(s, y="Hit Rate", template="plotly_white")
+def logistic(data):
+    return px.line(
+        data.reset_index(), x="x", y="Hit Rate", color="Type", template="plotly_white"
+    )

@@ -41,6 +41,15 @@ def test_curves():
 
 def test_standard_logistic():
     s = pa.data.logistic()
-    fig = pa.plot.logistic(s)
+    df = s.to_frame()
+    df["Type"] = "Generated"
+    fig = pa.plot.logistic(df)
     assert fig.layout.xaxis.title.text == "x"
     assert fig.layout.yaxis.title.text == "Hit Rate"
+
+
+def test_combine_logistics():
+    s1 = pa.data.logistic(threshold=0)
+    s2 = pa.data.logistic(threshold=1)
+    df = pd.concat([s1, s2], keys=["0", "1"], names=["Type"])
+    assert len(pa.plot.logistic(df.reset_index()).data) == 2

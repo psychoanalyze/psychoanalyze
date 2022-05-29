@@ -1,6 +1,7 @@
 from dash import Dash, dcc, Output, Input
 import dash_bootstrap_components as dbc
 import psychoanalyze as pa
+import pandas as pd
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 
@@ -8,14 +9,14 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 subjects_input = dbc.Col(
     [
         dbc.Label("Number of subjects:"),
-        dbc.Input(id="subjects", value=2, type="number"),
+        dbc.Input(id="subjects", value=1, type="number"),
     ]
 )
 
 n_sessions_input = dbc.Col(
     [
         dbc.Label("Number of sessions:"),
-        dbc.Input(id="sessions", value=10, type="number"),
+        dbc.Input(id="sessions", value=1, type="number"),
     ]
 )
 
@@ -29,7 +30,14 @@ n_trials_input = dbc.Col(
 true_thresh_input = dbc.Col(
     [
         dbc.Label("True threshold value:"),
-        dbc.Input(id="location", value=0, type="number"),
+        dbc.Input(id="true-thresh", value=0, type="number"),
+    ]
+)
+
+true_scale_input = dbc.Col(
+    [
+        dbc.Label("True scale parameter value:"),
+        dbc.Input(id="true-scale", value=1, type="number"),
     ]
 )
 
@@ -43,14 +51,22 @@ threshold_column = dbc.Col(
 curves_column = dbc.Col(
     [
         dcc.Graph(id="curves"),
-        dcc.Graph(id="logistic", figure=pa.plot.logistic(pa.data.logistic())),
+        dcc.Graph(id="sigmoid"),
         dbc.Table(id="curve-data"),
     ]
 )
 
 app.layout = dbc.Container(
     [
-        dbc.Row([subjects_input, n_sessions_input, n_trials_input, true_thresh_input]),
+        dbc.Row(
+            [
+                subjects_input,
+                n_sessions_input,
+                n_trials_input,
+                true_thresh_input,
+                true_scale_input,
+            ]
+        ),
         dbc.Row([threshold_column, curves_column]),
     ]
 )
@@ -63,15 +79,24 @@ app.layout = dbc.Container(
         Output("curves", "figure"),
         Output("curve-data", "children"),
     ],
-    [Input("subjects", "value"), Input("sessions", "value"), Input("trials", "value")],
+    [
+        Input("subjects", "value"),
+        Input("sessions", "value"),
+        Input("trials", "value"),
+        Input("true-thresh", "value"),
+        Input("true-scale", "value"),
+    ],
 )
-def generate_data(n_subjects, n_sessions, n_trials):
+def generate_data(n_subjects, n_sessions, n_trials, thresh, scale):
     subjects = pa.data.subjects(n_subjects=n_subjects)
     curves_data = pa.data.generate(
         subjects,
         n_sessions=n_sessions,
         y="Hit Rate",
         n_trials_per_stim_level=n_trials,
+        X=list(range(-4, 5)),
+        threshold=thresh,
+        scale=scale,
     ).reset_index()
     data = pa.data.thresholds(curves_data).rename(columns={"Hit Rate": "Threshold"})
     table = dbc.Table.from_dataframe(data)
@@ -82,6 +107,22 @@ def generate_data(n_subjects, n_sessions, n_trials):
         pa.plot.curves(curves_data),
         curve_table.children,
     )
+
+
+@app.callback(
+    Output("sigmoid", "figure"),
+    Input("true-thresh", "value"),
+    Input("true-scale", "value"),
+)
+def generate_sigmoid(thresh, scale):
+    s1 = pa.data.logistic(thresh, scale)
+    df1 = s1.to_frame()
+    df1["Type"] = "Generated"
+    s2 = pa.data.logistic(thresh + 0.5, scale)
+    df2 = s2.to_frame()
+    df2["Type"] = "Fitted"
+    df = pd.concat([df1, df2])
+    return pa.plot.logistic(df)
 
 
 if __name__ == "__main__":
