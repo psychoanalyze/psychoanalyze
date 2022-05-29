@@ -6,17 +6,21 @@ def subjects(n_subjects):
     return list("ABCDEFG"[:n_subjects])
 
 
-def generate(subjects, n, y, n_trials_per_stim_level):
+def generate(subjects, n_sessions, y, n_trials_per_stim_level):
     X = list(range(8))
-    day = list(range(n))
+    day = list(range(n_sessions))
     index = pd.MultiIndex.from_product(
         [subjects, day, X], names=["Subject", "Day", "x"]
     )
     return pd.DataFrame(
         {
-            y: np.random.binomial(10, index.get_level_values("x") / max(X), len(index))
-            / 10,
-            "n": [10] * len(index),
+            y: np.random.binomial(
+                n_trials_per_stim_level,
+                index.get_level_values("x") / max(X),
+                len(index),
+            )
+            / n_trials_per_stim_level,
+            "n": [n_trials_per_stim_level] * len(index),
         },
         index=index,
     )

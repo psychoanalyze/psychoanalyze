@@ -9,14 +9,14 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 subjects_input = dbc.Col(
     [
         dbc.Label("Number of subjects:"),
-        dbc.Input(id="subjects", value=1, type="number"),
+        dbc.Input(id="subjects", value=2, type="number"),
     ]
 )
 
 n_sessions_input = dbc.Col(
     [
         dbc.Label("Number of sessions:"),
-        dbc.Input(id="sessions", value=1, type="number"),
+        dbc.Input(id="sessions", value=2, type="number"),
     ]
 )
 
@@ -27,25 +27,24 @@ n_trials_input = dbc.Col(
     ]
 )
 
+threshold_column = dbc.Col(
+    [
+        dcc.Graph(id="time-thresholds"),
+        dbc.Table(id="thresh-data"),
+    ]
+)
+
+curves_column = dbc.Col(
+    [
+        dcc.Graph(id="curves"),
+        dbc.Table(id="curve-data"),
+    ]
+)
+
 app.layout = dbc.Container(
-    [dbc.Row([subjects_input, n_sessions_input, n_trials_input])]
-    + [
-        dbc.Row(
-            [
-                dbc.Col(
-                    [
-                        dcc.Graph(id="time-thresholds"),
-                        dbc.Table(id="thresh-data"),
-                    ]
-                ),
-                dbc.Col(
-                    [
-                        dcc.Graph(id="curves"),
-                        dbc.Table(id="curve-data"),
-                    ]
-                ),
-            ]
-        ),
+    [
+        dbc.Row([subjects_input, n_sessions_input, n_trials_input]),
+        dbc.Row([threshold_column, curves_column]),
     ]
 )
 
@@ -57,11 +56,16 @@ app.layout = dbc.Container(
         Output("curves", "figure"),
         Output("curve-data", "children"),
     ],
-    [Input("subjects", "value"), Input("sessions", "value")],
+    [Input("subjects", "value"), Input("sessions", "value"), Input("trials", "value")],
 )
-def generate_data(n_subjects, n_sessions):
+def generate_data(n_subjects, n_sessions, n_trials):
     subjects = pa.data.subjects(n_subjects=n_subjects)
-    curves_data = pa.data.generate(subjects, n=n_sessions, y="Hit Rate").reset_index()
+    curves_data = pa.data.generate(
+        subjects,
+        n_sessions=n_sessions,
+        y="Hit Rate",
+        n_trials_per_stim_level=n_trials,
+    ).reset_index()
     data = pa.data.thresholds(curves_data).rename(columns={"Hit Rate": "Threshold"})
     table = dbc.Table.from_dataframe(data)
     curve_table = dbc.Table.from_dataframe(curves_data)

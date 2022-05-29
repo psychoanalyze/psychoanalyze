@@ -1,6 +1,5 @@
 import psychoanalyze as pa
 import pytest
-import datatest as dt
 
 
 @pytest.fixture
@@ -24,7 +23,7 @@ def test_generate_threshold_data_dashboard(subjects):
 
 def test_generate_curve(subjects):
     data = pa.data.generate(
-        subjects=subjects, n=8, y="Hit Rate", n_trials_per_stim_level=10
+        subjects=subjects, n_sessions=8, y="Hit Rate", n_trials_per_stim_level=10
     )
     assert data.index.get_level_values("Subject").nunique() == 2
     assert set(data.index.names) == {"Subject", "Day", "x"}
@@ -35,17 +34,33 @@ def test_generate_curve(subjects):
 def test_generate_n_subjects(n):
     subjects = pa.data.subjects(n_subjects=n)
     data = pa.data.generate(
-        y="Threshold", n=10, subjects=subjects, n_trials_per_stim_level=10
+        y="Threshold", n_sessions=10, subjects=subjects, n_trials_per_stim_level=10
     )
     assert {"Subject", "Day"} <= set(data.index.names)
     assert data.index.get_level_values("Subject").nunique() == n
     assert "Threshold" in set(data.columns)
 
 
-def test_generate_n_trials(subjects):
-    n = 10
+def test_generate_10_trials(subjects):
+    n_sessions = 10
     data = pa.data.generate(
-        subjects=subjects, n=n, y="Threshold", n_trials_per_stim_level=10
+        subjects=subjects,
+        n_sessions=n_sessions,
+        y="Threshold",
+        n_trials_per_stim_level=10,
     )
     assert "Threshold" in set(data.columns)
-    assert len(data) == n * len(subjects) * 8
+    assert len(data) == n_sessions * len(subjects) * 8
+
+
+def test_generate_11_trials(subjects):
+    n_sessions = 10
+    data = pa.data.generate(
+        subjects=subjects,
+        n_sessions=n_sessions,
+        y="Threshold",
+        n_trials_per_stim_level=11,
+    )
+    assert "Threshold" in set(data.columns)
+    assert len(data) == n_sessions * len(subjects) * 8
+    assert all(data["n"] == 11)
