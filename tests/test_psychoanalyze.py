@@ -80,3 +80,8 @@ def test_plot_thresholds():
     assert subjects == {"A", "B"}
     assert fig.layout.xaxis.title.text == "Day"
     assert fig.layout.yaxis.title.text == "Threshold"
+
+
+def test_generate_data():
+    data = pa.data.generate()
+    assert set(data.columns) == {"Threshold", "Day", "Subject"}

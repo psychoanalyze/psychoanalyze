@@ -3,7 +3,7 @@ import numpy as np
 import plotly.express as px
 from plotly import graph_objects as go
 from scipy.special import expit
-from psychoanalyze import trials, plot
+from psychoanalyze import trials, plot, data
 
 pd.options.plotting.backend = "plotly"
 
