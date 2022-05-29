@@ -24,4 +24,4 @@ def curves(points):
 
 
 def logistic(s):
-    return px.scatter(s)
+    return px.line(s, y="Hit Rate", template="plotly_white")

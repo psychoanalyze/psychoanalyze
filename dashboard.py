@@ -29,7 +29,7 @@ n_trials_input = dbc.Col(
 true_thresh_input = dbc.Col(
     [
         dbc.Label("True threshold value:"),
-        dbc.Input(id="location", value=10, type="number"),
+        dbc.Input(id="location", value=0, type="number"),
     ]
 )
 
@@ -43,6 +43,7 @@ threshold_column = dbc.Col(
 curves_column = dbc.Col(
     [
         dcc.Graph(id="curves"),
+        dcc.Graph(id="logistic", figure=pa.plot.logistic(pa.data.logistic())),
         dbc.Table(id="curve-data"),
     ]
 )

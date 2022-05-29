@@ -42,3 +42,5 @@ def test_curves():
 def test_standard_logistic():
     s = pa.data.logistic()
     fig = pa.plot.logistic(s)
+    assert fig.layout.xaxis.title.text == "x"
+    assert fig.layout.yaxis.title.text == "Hit Rate"

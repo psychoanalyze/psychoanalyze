@@ -32,5 +32,5 @@ def thresholds(data):
 
 
 def logistic():
-    index = np.linspace(-6, 6)
-    return pd.Series(expit(index), index=index)
+    index = pd.Index(np.linspace(-6, 6), name="x")
+    return pd.Series(expit(index), index=index, name="Hit Rate")
