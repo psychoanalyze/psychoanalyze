@@ -6,7 +6,7 @@ def subjects(n_subjects):
     return list("ABCDEFG"[:n_subjects])
 
 
-def generate(subjects, n, y):
+def generate(subjects, n, y, n_trials_per_stim_level):
     X = list(range(8))
     day = list(range(n))
     index = pd.MultiIndex.from_product(

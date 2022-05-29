@@ -8,21 +8,27 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 
 subjects_input = dbc.Col(
     [
-        dbc.Label("Number of Subjects:"),
+        dbc.Label("Number of subjects:"),
         dbc.Input(id="subjects", value=1, type="number"),
     ]
 )
 
 n_sessions_input = dbc.Col(
     [
-        dbc.Label("Number of Sessions:"),
+        dbc.Label("Number of sessions:"),
         dbc.Input(id="sessions", value=1, type="number"),
     ]
 )
 
+n_trials_input = dbc.Col(
+    [
+        dbc.Label("Number of trials per session:"),
+        dbc.Input(id="trials", value=10, type="number"),
+    ]
+)
+
 app.layout = dbc.Container(
-    [dbc.Row([subjects_input, n_sessions_input])]
-    + [dbc.Label("Number of trials generated:"), html.P(id="n_trials")]
+    [dbc.Row([subjects_input, n_sessions_input, n_trials_input])]
     + [
         dbc.Row(
             [
@@ -46,7 +52,6 @@ app.layout = dbc.Container(
 
 @app.callback(
     [
-        Output("n_trials", "children"),
         Output("thresh-data", "children"),
         Output("time-thresholds", "figure"),
         Output("curves", "figure"),
@@ -61,7 +66,6 @@ def generate_data(n_subjects, n_sessions):
     table = dbc.Table.from_dataframe(data)
     curve_table = dbc.Table.from_dataframe(curves_data)
     return (
-        sum(curves_data["n"]),
         table.children,
         pa.plot.thresholds(data),
         pa.plot.curves(curves_data),
