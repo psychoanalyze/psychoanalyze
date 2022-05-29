@@ -5,7 +5,9 @@ import psychoanalyze as pa
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 
-data = pd.DataFrame({"Threshold": [1, 2]}, index=pd.Index(["A", "B"], name="Subject"))
+data = pd.DataFrame(
+    {"Threshold": [1, 2], "Day": [1, 2]}, index=pd.Index(["A", "B"], name="Subject")
+)
 
 app.layout = dbc.Container(
     [
