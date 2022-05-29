@@ -50,7 +50,7 @@ def test_psi():
 def test_plot_curve_points(trials):
     trials = trials
     curve = pa.curve(trials)
-    fig = pa.plot(curve)
+    fig = pa.plot.curve(curve)
     assert fig.layout.yaxis.title.text == "Hit Rate"
 
 
@@ -68,4 +68,9 @@ def test_curve_fit_fields():
 
 def test_plot_fit():
     fit = pd.DataFrame({"Hit Rate": []})
-    assert pa.plot(fit)
+    assert pa.plot.curve(fit)
+
+
+def test_plot_thresholds():
+    data = pd.DataFrame()
+    fig = pa.plot.thresholds(data)

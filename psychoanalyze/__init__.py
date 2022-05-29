@@ -3,7 +3,7 @@ import numpy as np
 import plotly.express as px
 from plotly import graph_objects as go
 from scipy.special import expit
-from psychoanalyze import trials
+from psychoanalyze import trials, plot
 
 pd.options.plotting.backend = "plotly"
 
@@ -25,10 +25,6 @@ def psi() -> pd.Series:
     expected_x = np.linspace(-3, 3)
     expected_y = expit(expected_x)
     return pd.Series(expected_y, index=expected_x)
-
-
-def plot(curve) -> go.Scatter:
-    return px.scatter(curve, y="Hit Rate", template="plotly_white")
 
 
 def fit(points):
