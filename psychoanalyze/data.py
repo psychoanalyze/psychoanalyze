@@ -6,21 +6,13 @@ def subjects(n_subjects):
     return list("ABCDEFG"[:n_subjects])
 
 
-def generate(subjects, n_sessions=10):
+def generate(subjects, n, name, label):
     index = pd.MultiIndex.from_product(
-        [subjects, list(range(n_sessions))], names=["Subject", "Day"]
-    )
-    return pd.DataFrame([{"Threshold": random.random()} for _ in index], index=index)
-
-
-def generate_curves(n_subjects):
-    subjects = list("ABCDEFG"[:n_subjects])
-    index = pd.MultiIndex.from_product(
-        [subjects, list(range(8))], names=["Subject", "x"]
+        [subjects, list(range(n))], names=["Subject", name]
     )
     return pd.DataFrame(
         {
-            "Hit Rate": [random.random() for _ in index],
+            label: [random.random() for _ in index],
         },
         index=index,
     )

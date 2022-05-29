@@ -1,9 +1,6 @@
-from tkinter import N
-from dash import Dash, dcc, html, Output, Input
+from dash import Dash, dcc, Output, Input
 import dash_bootstrap_components as dbc
-import pandas as pd
 import psychoanalyze as pa
-from numpy.random import binomial
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 
@@ -42,8 +39,12 @@ app.layout = dbc.Container(
 )
 def generate_data(n_subjects, n_sessions):
     subjects = pa.data.subjects(n_subjects=n_subjects)
-    data = pa.data.generate(subjects=subjects, n_sessions=n_sessions).reset_index()
-    curves_data = pa.data.generate_curves(n_subjects=n_subjects).reset_index()
+    data = pa.data.generate(
+        subjects, n=n_sessions, name="Day", label="Threshold"
+    ).reset_index()
+    curves_data = pa.data.generate(
+        subjects, n=8, name="x", label="Hit Rate"
+    ).reset_index()
     table = dbc.Table.from_dataframe(data)
     return table.children, pa.plot.thresholds(data), pa.plot.curves(curves_data)
 
