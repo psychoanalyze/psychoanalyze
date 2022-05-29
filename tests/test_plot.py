@@ -1,6 +1,7 @@
 import pandas as pd
 import psychoanalyze as pa
 import pytest
+import random
 
 
 @pytest.fixture
@@ -20,9 +21,20 @@ def test_thresholds():
 
 
 def test_curves():
-    points = pd.DataFrame({"x": [], "Hit Rate": []})
+    n_subjects = 2
+    subjects = list("ABCDEFG"[:n_subjects])
+    index = pd.MultiIndex.from_product(
+        [subjects, list(range(8))], names=["Subject", "x"]
+    )
+    points = pd.DataFrame(
+        {
+            "Hit Rate": [random.random() for _ in index],
+        },
+        index=index,
+    )
     fig = pa.plot.curves(points)
     assert fig.layout.xaxis.title.text == "x"
+    assert fig.layout.yaxis.title.text == "Hit Rate"
 
 
 def test_fit():

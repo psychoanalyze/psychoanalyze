@@ -67,8 +67,16 @@ def test_generate_data():
 @pytest.mark.parametrize("n", [2, 3])
 def test_generate_data_n_subjects(n):
     data = pa.data.generate(n_subjects=n)
+    assert set(data.index.names) == {"Subject", "Day"}
     assert data.index.get_level_values("Subject").nunique() == n
 
 
 def test_generate_data_n_trials():
     data = pa.data.generate(n_sessions=10)
+
+
+def test_generate_curve_data():
+    data = pa.data.generate_curves(n_subjects=2)
+    assert data.index.get_level_values("Subject").nunique() == 2
+    assert set(data.index.names) == {"Subject", "x"}
+    assert set(data.columns) == {"Hit Rate"}

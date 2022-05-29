@@ -17,4 +17,10 @@ def curve(points):
 
 
 def curves(points):
-    return px.scatter(points, x="x", y="Hit Rate")
+    return px.scatter(
+        points.reset_index(),
+        x="x",
+        y="Hit Rate",
+        color="Subject",
+        template="plotly_white",
+    )
