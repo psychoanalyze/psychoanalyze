@@ -85,3 +85,13 @@ def test_plot_thresholds():
 def test_generate_data():
     data = pa.data.generate()
     assert set(data.columns) == {"Threshold", "Day", "Subject"}
+
+
+def test_generate_data_two_subjects():
+    data = pa.data.generate(n_subjects=2)
+    assert data["Subject"].nunique() == 2
+
+
+def test_generate_data_three_subjects():
+    data = pa.data.generate(n_subjects=3)
+    assert data["Subject"].nunique() == 3
