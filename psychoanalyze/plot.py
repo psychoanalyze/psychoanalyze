@@ -2,7 +2,7 @@ import plotly.express as px
 
 
 def thresholds(data):
-    return px.scatter(data.reset_index(), color="Subject")
+    return px.scatter(data.reset_index(), x="Day", y="Threshold", color="Subject")
 
 
 def curve(points):
