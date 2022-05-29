@@ -64,3 +64,11 @@ def test_generate_11_trials(subjects):
     assert "Threshold" in set(data.columns)
     assert len(data) == n_sessions * len(subjects) * 8
     assert all(data["n"] == 11)
+
+
+def test_standard_logistic():
+    s = pa.data.logistic()
+    assert min(s.index) == -6
+    assert max(s.index) == 6
+    assert min(s) > 0
+    assert max(s) < 1

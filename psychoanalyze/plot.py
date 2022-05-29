@@ -21,3 +21,7 @@ def curves(points):
         symbol="Day",
         template="plotly_white",
     )
+
+
+def logistic(s):
+    return px.scatter(s)

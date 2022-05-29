@@ -1,7 +1,6 @@
-from dash import Dash, dcc, html, Output, Input
+from dash import Dash, dcc, Output, Input
 import dash_bootstrap_components as dbc
 import psychoanalyze as pa
-import pandas as pd
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 
@@ -16,14 +15,21 @@ subjects_input = dbc.Col(
 n_sessions_input = dbc.Col(
     [
         dbc.Label("Number of sessions:"),
-        dbc.Input(id="sessions", value=2, type="number"),
+        dbc.Input(id="sessions", value=10, type="number"),
     ]
 )
 
 n_trials_input = dbc.Col(
     [
         dbc.Label("Number of trials per session:"),
-        dbc.Input(id="trials", value=10, type="number"),
+        dbc.Input(id="trials", value=100, type="number"),
+    ]
+)
+
+true_thresh_input = dbc.Col(
+    [
+        dbc.Label("True threshold value:"),
+        dbc.Input(id="location", value=10, type="number"),
     ]
 )
 
@@ -43,7 +49,7 @@ curves_column = dbc.Col(
 
 app.layout = dbc.Container(
     [
-        dbc.Row([subjects_input, n_sessions_input, n_trials_input]),
+        dbc.Row([subjects_input, n_sessions_input, n_trials_input, true_thresh_input]),
         dbc.Row([threshold_column, curves_column]),
     ]
 )

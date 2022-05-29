@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from scipy.special import expit
 
 
 def subjects(n_subjects):
@@ -28,3 +29,8 @@ def generate(subjects, n_sessions, y, n_trials_per_stim_level):
 
 def thresholds(data):
     return data.groupby(["Subject", "Day"]).mean().reset_index()
+
+
+def logistic():
+    index = np.linspace(-6, 6)
+    return pd.Series(expit(index), index=index)
