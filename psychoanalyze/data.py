@@ -1,5 +1,5 @@
 import pandas as pd
-import random
+import numpy as np
 
 
 def subjects(n_subjects):
@@ -7,11 +7,17 @@ def subjects(n_subjects):
 
 
 def generate(subjects, n, y):
+    X = list(range(8))
+    day = list(range(n))
     index = pd.MultiIndex.from_product(
-        [subjects, list(range(n)), list(range(8))], names=["Subject", "Day", "x"]
+        [subjects, day, X], names=["Subject", "Day", "x"]
     )
     return pd.DataFrame(
-        {y: [random.random() for _ in index]},
+        {
+            y: np.random.binomial(10, index.get_level_values("x") / max(X), len(index))
+            / 10,
+            "n": [10] * len(index),
+        },
         index=index,
     )
 

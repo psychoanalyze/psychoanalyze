@@ -1,9 +1,7 @@
 import pandas as pd
 import numpy as np
-import plotly.express as px
-from plotly import graph_objects as go
 from scipy.special import expit
-from psychoanalyze import trials, plot, data
+from psychoanalyze import plot, data
 
 pd.options.plotting.backend = "plotly"
 
@@ -12,7 +10,8 @@ __version__ = "0.1.0"
 
 def curve(trials: pd.DataFrame) -> pd.Series:
     """Arrange *method of constant stimuli* performance curves using trial data"""
-    return trials.groupby("x").mean().rename(columns={"Result": "Hit Rate"})
+    df = trials.groupby("x").mean().rename(columns={"Result": "Hit Rate"})
+    return df
 
 
 def weber_coefficient(curves: pd.DataFrame) -> float:

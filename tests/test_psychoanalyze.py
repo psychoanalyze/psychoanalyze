@@ -3,33 +3,24 @@ import psychoanalyze as pa
 import pandas as pd
 import datatest as dt
 import numpy as np
-import pytest
 from scipy.special import expit
-
-
-@pytest.fixture
-def trials():
-    return pa.trials.fake(100, set(range(8)))
 
 
 def test_version():
     assert __version__ == "0.1.0"
 
 
-def test_faker(trials):
-    assert all(trials["Result"].isin({0, 1}))
-
-
-def test_faker_size(trials):
-    assert len(trials) == 100
-
-
-def test_faker_x_values(trials):
-    dt.validate(trials["x"], set(range(8)))
-
-
 def test_curve():
-    df = pd.DataFrame({"Result": [0, 1], "x": [1, 1]}, index=[1, 2])
+    df = pd.DataFrame(
+        {"Result": [0, 1], "Subject": ["A", "A"], "x": [1, 1]}, index=[1, 2]
+    )
+    dt.validate(pa.curve(df), pd.Series([0.5], index=pd.Index([1], name="x")))
+
+
+def test_curve_multiple_subjects():
+    df = pd.DataFrame(
+        {"Result": [0, 1], "Subject": ["A", "B"], "x": [1, 1]}, index=[1, 2]
+    )
     dt.validate(pa.curve(df), pd.Series([0.5], index=pd.Index([1], name="x")))
 
 

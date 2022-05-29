@@ -1,10 +1,28 @@
 import psychoanalyze as pa
 import pytest
+import datatest as dt
 
 
 @pytest.fixture
 def subjects():
     return ["A", "B"]
+
+
+@pytest.fixture
+def trials():
+    return pa.data.trials(100, set(range(8)))
+
+
+def test_faker(trials):
+    assert all(trials["Result"].isin({0, 1}))
+
+
+def test_faker_size(trials):
+    assert len(trials) == 100
+
+
+def test_faker_x_values(trials):
+    dt.validate(trials["x"], set(range(8)))
 
 
 def test_generate_threshold_data(subjects):
@@ -38,5 +56,7 @@ def test_generate_n_subjects(n):
 
 
 def test_generate_n_trials(subjects):
-    data = pa.data.generate(subjects=subjects, n=10, y="Threshold")
+    n = 10
+    data = pa.data.generate(subjects=subjects, n=n, y="Threshold")
     assert "Threshold" in set(data.columns)
+    assert len(data) == n * len(subjects) * 8
