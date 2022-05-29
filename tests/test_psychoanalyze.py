@@ -72,5 +72,5 @@ def test_plot_fit():
 
 
 def test_plot_thresholds():
-    data = pd.DataFrame()
+    data = pd.DataFrame(index=pd.Index(["A"], name="Subject"))
     fig = pa.plot.thresholds(data)
