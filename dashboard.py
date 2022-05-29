@@ -40,11 +40,9 @@ app.layout = dbc.Container(
 def generate_data(n_subjects, n_sessions):
     subjects = pa.data.subjects(n_subjects=n_subjects)
     data = pa.data.generate(
-        subjects, n=n_sessions, name="Day", label="Threshold"
+        subjects, n=n_sessions, x="Day", y="Threshold"
     ).reset_index()
-    curves_data = pa.data.generate(
-        subjects, n=8, name="x", label="Hit Rate"
-    ).reset_index()
+    curves_data = pa.data.generate(subjects, n=8, x="x", y="Hit Rate").reset_index()
     table = dbc.Table.from_dataframe(data)
     return table.children, pa.plot.thresholds(data), pa.plot.curves(curves_data)
 

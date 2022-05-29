@@ -6,13 +6,11 @@ def subjects(n_subjects):
     return list("ABCDEFG"[:n_subjects])
 
 
-def generate(subjects, n, name, label):
-    index = pd.MultiIndex.from_product(
-        [subjects, list(range(n))], names=["Subject", name]
-    )
+def generate(subjects, n, x, y):
+    index = pd.MultiIndex.from_product([subjects, list(range(n))], names=["Subject", x])
     return pd.DataFrame(
         {
-            label: [random.random() for _ in index],
+            y: [random.random() for _ in index],
         },
         index=index,
     )

@@ -57,33 +57,3 @@ def test_curve_fit_fields():
     points = pd.Series([0, 2], name="Hit Rate", index=pd.Index([0, 2], name="x"))
     fit = pa.fit(points)
     assert fit.keys() == {"location", "width", "gamma", "lambda"}
-
-
-@pytest.mark.parametrize("n", [2, 3])
-def test_generate_data_n_subjects(n):
-    subjects = pa.data.subjects(n_subjects=n)
-    data = pa.data.generate(label="Threshold", name="Day", n=10, subjects=subjects)
-    assert set(data.index.names) == {"Subject", "Day"}
-    assert data.index.get_level_values("Subject").nunique() == n
-    assert set(data.columns) == {"Threshold"}
-
-
-def test_data_index():
-    index = pa.data.generate(subjects=["A", "B"], n=10, name="Day", label="Threshold")
-    assert len(index) == 20
-
-
-def test_generate_data_n_trials():
-    n_sessions = 10
-    subjects = ["A", "B"]
-    days = list(range(n_sessions))
-    index = pd.MultiIndex.from_product([subjects, days], names=["Subject", "Day"])
-    data = pa.data.generate(subjects=["A", "B"], n=10, name="Day", label="Threshold")
-    assert set(data.columns) == {"Threshold"}
-
-
-def test_generate_curve_data():
-    data = pa.data.generate(subjects=["A", "B"], n=8, name="x", label="Hit Rate")
-    assert data.index.get_level_values("Subject").nunique() == 2
-    assert set(data.index.names) == {"Subject", "x"}
-    assert set(data.columns) == {"Hit Rate"}
