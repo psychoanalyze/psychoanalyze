@@ -30,11 +30,13 @@ def generate(subjects, n_sessions, y, n_trials_per_stim_level, X, threshold=0, s
     )
 
 
-def logistic(threshold=0, scale=1):
+def logistic(threshold=0, scale=1, gamma=0):
     x = np.linspace(scipy_logistic.ppf(0.01), scipy_logistic.ppf(0.99), 100)
     index = pd.Index(x, name="x")
     return pd.Series(
-        scipy_logistic.cdf(x, threshold, scale), index=index, name="Hit Rate"
+        gamma + (1 - gamma) * scipy_logistic.cdf(x, threshold, scale),
+        index=index,
+        name="Hit Rate",
     )
 
 

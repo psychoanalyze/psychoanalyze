@@ -21,7 +21,7 @@ n_sessions_input = input_pair("Number of sessions:", "sessions", 1)
 n_trials_input = input_pair("Number of trials per session:", "trials", 100)
 true_thresh_input = input_pair("Simulated threshold value:", "true-thresh", 0)
 true_scale_input = input_pair("Simulated scale parameter value:", "true-scale", 1)
-true_gamma_input = input_pair("Simulated gamma value:", "true-gamma", 0.1)
+true_gamma_input = input_pair("Simulated gamma value:", "true-gamma", 0.2)
 
 threshold_column = dbc.Col(
     [
@@ -33,7 +33,6 @@ threshold_column = dbc.Col(
 curves_column = dbc.Col(
     [
         dcc.Graph(id="curves"),
-        dcc.Graph(id="bayes"),
         dcc.Graph(id="sigmoid"),
         dbc.Table(id="curve-data"),
     ]
@@ -62,7 +61,6 @@ app.layout = dbc.Container(
         Output("time-thresholds", "figure"),
         Output("curves", "figure"),
         Output("curve-data", "children"),
-        # Output("bayes", "figure"),
     ],
     [
         Input("subjects", "value"),
@@ -100,15 +98,10 @@ def generate_data(n_subjects, n_sessions, n_trials, thresh, scale):
     Output("sigmoid", "figure"),
     Input("true-thresh", "value"),
     Input("true-scale", "value"),
+    Input("true-gamma", "value"),
 )
-def generate_sigmoid(thresh, scale):
-    s1 = pa.data.logistic(thresh, scale)
-    df1 = s1.to_frame()
-    df1["Type"] = "Generated"
-    s2 = pa.data.logistic(thresh + 0.5, scale)
-    df2 = s2.to_frame()
-    df2["Type"] = "Fitted"
-    df = pd.concat([df1, df2])
+def generate_sigmoid(thresh, scale, gamma):
+    df = pa.data.logistic(thresh, scale, gamma).to_frame()
     return pa.plot.logistic(df)
 
 

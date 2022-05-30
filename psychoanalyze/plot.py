@@ -29,8 +29,9 @@ def curves(points):
 
 
 def logistic(data):
+    df = data.reset_index()
     return px.line(
-        data.reset_index(), x="x", y="Hit Rate", color="Type", template="plotly_white"
+        df, x="x", y="Hit Rate", color=df.get("Type"), template="plotly_white"
     )
 
 
