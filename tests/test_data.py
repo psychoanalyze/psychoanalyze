@@ -81,12 +81,6 @@ def test_estimates_from_fit():
     assert len(estimates) == 9
 
 
-def test_mu_groups():
-    data = pd.DataFrame({"x": [], "n": [], "Hits": [], "Subject": [], "Day": []})
-    output = data.groupby(["Subject", "Day"]).apply(pa.data.mu)
-    assert len(output) == 0
-
-
 def test_mu_two_groups():
     data = pd.DataFrame(
         {
