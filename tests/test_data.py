@@ -49,12 +49,6 @@ def test_generate_n_trials(n_trials, subjects):
     assert all(data["n"] == n_trials)
 
 
-def test_standard_logistic():
-    s = pa.data.logistic()
-    assert min(s) > 0
-    assert max(s) < 1
-
-
 def test_nonstandard_logistic_mean():
     s = pa.data.logistic(threshold=1)
     assert min(s) > 0
