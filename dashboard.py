@@ -61,7 +61,7 @@ app.layout = dbc.Container(
         Output("time-thresholds", "figure"),
         Output("curves", "figure"),
         Output("curve-data", "children"),
-        Output("bayes", "figure"),
+        # Output("bayes", "figure"),
     ],
     [
         Input("subjects", "value"),
@@ -82,12 +82,8 @@ def generate_data(n_subjects, n_sessions, n_trials, thresh, scale):
     }
     sim_model_params = {"threshold": thresh, "scale": scale}
     curves_data = pa.data.generate(**sim_data, **sim_model_params)
-    fits = pa.data.fit_curve(curves_data)
-    mu = pa.data.mu(fits)
-    estimates = pa.data.estimates_from_fit(fits, pd.Index(list(range(-4, 5))))
-    simulated = curves_data.copy()
-    bayes_fig = pa.plot.bayes(simulated, estimates)
-    data = pa.data.thresholds(mu)
+    data = curves_data.groupby(["Subject", "Day"]).apply(pa.data.mu).reset_index()
+
     table = dbc.Table.from_dataframe(data)
     curve_table = dbc.Table.from_dataframe(curves_data)
     return (
@@ -95,7 +91,7 @@ def generate_data(n_subjects, n_sessions, n_trials, thresh, scale):
         pa.plot.thresholds(data),
         pa.plot.curves(curves_data),
         curve_table.children,
-        bayes_fig,
+        # bayes_fig,
     )
 
 

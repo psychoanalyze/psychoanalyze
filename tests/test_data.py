@@ -87,7 +87,7 @@ def test_nonstandard_logistic_slope():
 
 def test_fit_curve():
     df = pa.data.generate(["A"], 1, "Hit Rate", 100, list(range(-4, 5))).reset_index()
-    pa.data.fit_curve(df)
+    fit = pa.data.fit_curve(df)
 
 
 def test_estimates_from_fit():
@@ -99,7 +99,22 @@ def test_estimates_from_fit():
     assert len(estimates) == 9
 
 
-def test_mu():
-    fit = pd.DataFrame({"50%": [5]}, index=["mu"])
-    mu = pa.data.mu(fit)
-    assert mu == 5
+def test_mu_groups():
+    data = pd.DataFrame({"x": [], "n": [], "Hits": [], "Subject": [], "Day": []})
+    output = data.groupby(["Subject", "Day"]).apply(pa.data.mu)
+    assert len(output) == 0
+
+
+def test_mu_two_groups():
+    data = pd.DataFrame(
+        {
+            "x": [1, 2],
+            "n": [10, 10],
+            "Hits": [1, 9],
+            "Subject": ["A", "A"],
+            "Day": [1, 2],
+        }
+    )
+    output = data.groupby(["Subject", "Day"]).apply(pa.data.mu)
+    assert len(output) == 2
+    assert "mu" in output.columns

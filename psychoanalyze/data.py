@@ -61,5 +61,6 @@ def estimates_from_fit(fit: pd.DataFrame, index: pd.Index):
     return estimates
 
 
-def mu(fit: pd.DataFrame):
-    return fit.loc["mu", "50%"]
+def mu(points: pd.DataFrame):
+    fit = fit_curve(points)
+    return pd.DataFrame({"mu": [fit.loc["mu", "50%"]]})
