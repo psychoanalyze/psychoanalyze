@@ -50,8 +50,7 @@ def fit_curve(points: pd.DataFrame):
         "hits": points["Hits"].to_numpy(),
     }
     model = CmdStanModel(stan_file="models/binomial_regression.stan")
-    # model.sample = MagicMock(return_value=pd.DataFrame({"50%": 0.1}, index=["mu"]))
     df = model.sample(chains=4, data=stan_data).summary()
-    # threshold = points["Hit Rate"].mean()
-    posterior_estimates = df.loc["alpha[1]":"alpha[9]", "50%"]
+    posterior_estimates = df.loc["p[1]":"p[9]", "50%"]
+    posterior_estimates.index = points.set_index("x").index
     return posterior_estimates

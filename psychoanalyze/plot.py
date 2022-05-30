@@ -27,3 +27,15 @@ def logistic(data):
     return px.line(
         data.reset_index(), x="x", y="Hit Rate", color="Type", template="plotly_white"
     )
+
+
+def bayes(simulated, estimated):
+    estimated = estimated.to_frame().rename(columns={"50%": "Hit Rate"})
+    df = pd.concat(
+        [simulated.reset_index(), estimated.reset_index()],
+        keys=["Simulated", "Estimated"],
+        names=["Type"],
+    )
+    return px.scatter(
+        df.reset_index(), x="x", y="Hit Rate", color="Type", template="plotly_white"
+    )
