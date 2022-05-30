@@ -16,12 +16,6 @@ def data(subjects):
     return pa.data.generate(subjects, 10, "Threshold", n_trials_per_stim_level=10, X=X)
 
 
-def test_generate_threshold_data_dashboard(data):
-    estimates = pa.data.thresholds(data)
-    assert len(estimates) == 1
-    assert "mu" in estimates.columns
-
-
 def test_generate_curve(subjects):
     data = pa.data.generate(
         subjects=subjects, n_sessions=8, y="Hit Rate", n_trials_per_stim_level=10, X=X

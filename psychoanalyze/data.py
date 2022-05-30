@@ -30,9 +30,9 @@ def generate(subjects, n_sessions, y, n_trials_per_stim_level, X, threshold=0, s
     )
 
 
-def thresholds(mu):
-    #     mu = data.groupby(["Subject", "Day"]).apply(fit_curve)
-    return pd.DataFrame({"Day": [0], "Subject": ["A"], "mu": [mu]})
+# def thresholds(mu):
+#     #     mu = data.groupby(["Subject", "Day"]).apply(fit_curve)
+#     return pd.DataFrame({"Day": [0], "Subject": ["A"], "mu": [mu]})
 
 
 def logistic(threshold=0, scale=1):
