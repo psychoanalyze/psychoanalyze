@@ -51,6 +51,8 @@ threshold_column = dbc.Col(
 curves_column = dbc.Col(
     [
         dcc.Graph(id="curves"),
+        dbc.Label("Fitted threshold value: "),
+        dbc.Label(id="fit-value"),
         dcc.Graph(id="sigmoid"),
         dbc.Table(id="curve-data"),
     ]
@@ -78,6 +80,7 @@ app.layout = dbc.Container(
         Output("time-thresholds", "figure"),
         Output("curves", "figure"),
         Output("curve-data", "children"),
+        Output("fit-value", "children"),
     ],
     [
         Input("subjects", "value"),
@@ -101,11 +104,13 @@ def generate_data(n_subjects, n_sessions, n_trials, thresh, scale):
     data = pa.data.thresholds(curves_data).rename(columns={"Hit Rate": "Threshold"})
     table = dbc.Table.from_dataframe(data)
     curve_table = dbc.Table.from_dataframe(curves_data)
+    fit_value = pa.data.fit_curve(curves_data)
     return (
         table.children,
         pa.plot.thresholds(data),
         pa.plot.curves(curves_data),
         curve_table.children,
+        fit_value,
     )
 
 

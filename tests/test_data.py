@@ -87,3 +87,11 @@ def test_nonstandard_logistic_slope():
     s_control = pa.data.logistic()
     s = pa.data.logistic(scale=2)
     assert max(s) < max(s_control)
+
+
+# @patch("cmdstanpy.CmdStanModel.sample.summary")
+def test_fit_curve():
+    df = pa.data.generate(["A"], 1, "Hit Rate", 100, list(range(-4, 5))).reset_index()
+    estimates = pa.data.fit_curve(df)
+    # assert model.assert_called()
+    assert len(estimates) == 9
