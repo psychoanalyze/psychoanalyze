@@ -2,11 +2,16 @@ import plotly.express as px
 import pandas as pd
 
 
-def thresholds(data):
+def thresholds(df):
+    df["err+"] = df["95%"] - df["50%"]
+    df["err-"] = df["50%"] - df["5%"]
+    df = df.drop(columns=["95%", "5%"])
     return px.scatter(
-        data,
+        df,
         x="Day",
-        y="mu",
+        y="50%",
+        error_y="err+",
+        error_y_minus="err-",
         color="Subject",
         template="plotly_white",
     )

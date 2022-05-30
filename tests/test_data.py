@@ -117,4 +117,4 @@ def test_mu_two_groups():
     )
     output = data.groupby(["Subject", "Day"]).apply(pa.data.mu)
     assert len(output) == 2
-    assert "mu" in output.columns
+    assert {"5%", "50%", "95%"} <= set(output.columns)

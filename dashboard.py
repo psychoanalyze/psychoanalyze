@@ -16,9 +16,9 @@ def input_pair(label, id, default_value):
     )
 
 
-subjects_input = input_pair("Number of subjects:", "subjects", 1)
+subjects_input = input_pair("Number of subjects:", "subjects", 2)
 
-n_sessions_input = input_pair("Number of sessions:", "sessions", 1)
+n_sessions_input = input_pair("Number of sessions:", "sessions", 3)
 n_trials_input = input_pair("Number of trials per session:", "trials", 100)
 true_thresh_input = input_pair("True threshold value:", "true-thresh", 0)
 true_scale_input = input_pair("True scale parameter value:", "true-scale", 1)
