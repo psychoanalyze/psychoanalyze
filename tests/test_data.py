@@ -34,31 +34,19 @@ def test_generate_n_subjects(n_subjects):
     assert "Threshold" in set(data.columns)
 
 
-def test_generate_10_trials(subjects):
+@pytest.mark.parametrize("n_trials", [10, 11])
+def test_generate_n_trials(n_trials, subjects):
     n_sessions = 10
     data = pa.data.generate(
         subjects=subjects,
         n_sessions=n_sessions,
         y="Threshold",
-        n_trials_per_stim_level=10,
+        n_trials_per_stim_level=n_trials,
         X=X,
     )
     assert "Threshold" in set(data.columns)
     assert len(data) == n_sessions * len(subjects) * 8
-
-
-def test_generate_11_trials(subjects):
-    n_sessions = 10
-    data = pa.data.generate(
-        subjects=subjects,
-        n_sessions=n_sessions,
-        y="Threshold",
-        n_trials_per_stim_level=11,
-        X=X,
-    )
-    assert "Threshold" in set(data.columns)
-    assert len(data) == n_sessions * len(subjects) * 8
-    assert all(data["n"] == 11)
+    assert all(data["n"] == n_trials)
 
 
 def test_standard_logistic():

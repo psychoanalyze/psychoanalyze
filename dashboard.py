@@ -2,7 +2,6 @@ from dash import Dash, dcc, Output, Input
 import dash_bootstrap_components as dbc
 import psychoanalyze as pa
 import pandas as pd
-import plotly.express as px
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 
@@ -16,12 +15,13 @@ def input_pair(label, id, default_value):
     )
 
 
-subjects_input = input_pair("Number of subjects:", "subjects", 2)
+subjects_input = input_pair("Number of subjects:", "subjects", 1)
 
-n_sessions_input = input_pair("Number of sessions:", "sessions", 3)
+n_sessions_input = input_pair("Number of sessions:", "sessions", 1)
 n_trials_input = input_pair("Number of trials per session:", "trials", 100)
-true_thresh_input = input_pair("True threshold value:", "true-thresh", 0)
-true_scale_input = input_pair("True scale parameter value:", "true-scale", 1)
+true_thresh_input = input_pair("Simulated threshold value:", "true-thresh", 0)
+true_scale_input = input_pair("Simulated scale parameter value:", "true-scale", 1)
+true_gamma_input = input_pair("Simulated gamma value:", "true-gamma", 0.1)
 
 threshold_column = dbc.Col(
     [
@@ -48,6 +48,7 @@ app.layout = dbc.Container(
                 n_trials_input,
                 true_thresh_input,
                 true_scale_input,
+                true_gamma_input,
             ]
         ),
         dbc.Row([threshold_column, curves_column]),
