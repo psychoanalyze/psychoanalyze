@@ -10,14 +10,12 @@ def trials():
 
 
 def test_thresholds():
-    data = pd.DataFrame(
-        {"Threshold": [1, 2], "Day": [1, 2]}, index=pd.Index(["A", "B"], name="Subject")
-    )
+    data = pd.DataFrame({"Subject": ["A", "B"], "mu": [1, 2], "Day": [1, 2]})
     fig = pa.plot.thresholds(data)
     subjects = {trace["legendgroup"] for trace in fig.data}
     assert subjects == {"A", "B"}
     assert fig.layout.xaxis.title.text == "Day"
-    assert fig.layout.yaxis.title.text == "Threshold"
+    assert fig.layout.yaxis.title.text == "mu"
 
 
 def test_curves():

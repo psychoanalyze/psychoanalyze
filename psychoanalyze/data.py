@@ -1,3 +1,4 @@
+from random import random
 import pandas as pd
 import numpy as np
 from scipy.stats import logistic as scipy_logistic
@@ -29,8 +30,9 @@ def generate(subjects, n_sessions, y, n_trials_per_stim_level, X, threshold=0, s
     )
 
 
-def thresholds(data):
-    return data.groupby(["Subject", "Day"]).mean().reset_index()
+def thresholds(mu):
+    #     mu = data.groupby(["Subject", "Day"]).apply(fit_curve)
+    return pd.DataFrame({"Day": [0], "Subject": ["A"], "mu": [mu]})
 
 
 def logistic(threshold=0, scale=1):
@@ -50,7 +52,14 @@ def fit_curve(points: pd.DataFrame):
         "hits": points["Hits"].to_numpy(),
     }
     model = CmdStanModel(stan_file="models/binomial_regression.stan")
-    df = model.sample(chains=4, data=stan_data).summary()
-    posterior_estimates = df.loc["p[1]":"p[9]", "50%"]
-    posterior_estimates.index = points.set_index("x").index
-    return posterior_estimates
+    return model.sample(chains=4, data=stan_data).summary()
+
+
+def estimates_from_fit(fit: pd.DataFrame, index: pd.Index):
+    estimates = fit.loc["p[1]":"p[9]", "50%"]
+    estimates.index = index
+    return estimates
+
+
+def mu(fit: pd.DataFrame):
+    return fit.loc["mu", "50%"]

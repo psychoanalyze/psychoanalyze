@@ -82,13 +82,14 @@ def generate_data(n_subjects, n_sessions, n_trials, thresh, scale):
     }
     sim_model_params = {"threshold": thresh, "scale": scale}
     curves_data = pa.data.generate(**sim_data, **sim_model_params)
-    data = pa.data.thresholds(curves_data).rename(columns={"Hit Rate": "Threshold"})
+    fits = pa.data.fit_curve(curves_data)
+    mu = pa.data.mu(fits)
+    estimates = pa.data.estimates_from_fit(fits, pd.Index(list(range(-4, 5))))
+    simulated = curves_data.copy()
+    bayes_fig = pa.plot.bayes(simulated, estimates)
+    data = pa.data.thresholds(mu)
     table = dbc.Table.from_dataframe(data)
     curve_table = dbc.Table.from_dataframe(curves_data)
-    fits = pa.data.fit_curve(curves_data)
-    print(f"fits:{fits}")
-    simulated = curves_data.copy()
-    bayes_fig = pa.plot.bayes(simulated, fits)
     return (
         table.children,
         pa.plot.thresholds(data),

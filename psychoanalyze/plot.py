@@ -4,9 +4,9 @@ import pandas as pd
 
 def thresholds(data):
     return px.scatter(
-        data.reset_index(),
+        data,
         x="Day",
-        y="Threshold",
+        y="mu",
         color="Subject",
         template="plotly_white",
     )

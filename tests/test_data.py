@@ -1,5 +1,6 @@
 import psychoanalyze as pa
 import pytest
+import pandas as pd
 
 
 @pytest.fixture
@@ -10,18 +11,15 @@ def subjects():
 X = list(range(8))
 
 
-def test_generate_threshold_data(subjects):
-    data = pa.data.generate(subjects, 10, "Threshold", n_trials_per_stim_level=10, X=X)
-    data = pa.data.thresholds(data)
-    assert len(data) == 20
-    assert "Threshold" in data.columns
+@pytest.fixture
+def data(subjects):
+    return pa.data.generate(subjects, 10, "Threshold", n_trials_per_stim_level=10, X=X)
 
 
-def test_generate_threshold_data_dashboard(subjects):
-    data = pa.data.generate(subjects, 10, "Threshold", n_trials_per_stim_level=10, X=X)
-    data = pa.data.thresholds(data)
-    assert len(data) == 20
-    assert "Threshold" in data.columns
+def test_generate_threshold_data_dashboard(data):
+    estimates = pa.data.thresholds(data)
+    assert len(estimates) == 1
+    assert "mu" in estimates.columns
 
 
 def test_generate_curve(subjects):
@@ -33,14 +31,12 @@ def test_generate_curve(subjects):
     assert "Hit Rate" in set(data.columns)
 
 
-@pytest.mark.parametrize("n", [2, 3])
-def test_generate_n_subjects(n):
-    subjects = pa.data.subjects(n_subjects=n)
-    data = pa.data.generate(
-        y="Threshold", n_sessions=10, subjects=subjects, n_trials_per_stim_level=10, X=X
-    )
+@pytest.mark.parametrize("n_subjects", [2, 3])
+def test_generate_n_subjects(n_subjects):
+    subjects = pa.data.subjects(n_subjects)
+    data = pa.data.generate(subjects, 10, "Threshold", n_trials_per_stim_level=10, X=X)
     assert {"Subject", "Day"} <= set(data.index.names)
-    assert data.index.get_level_values("Subject").nunique() == n
+    assert data.index.get_level_values("Subject").nunique() == n_subjects
     assert "Threshold" in set(data.columns)
 
 
@@ -89,9 +85,21 @@ def test_nonstandard_logistic_slope():
     assert max(s) < max(s_control)
 
 
-# @patch("cmdstanpy.CmdStanModel.sample.summary")
 def test_fit_curve():
     df = pa.data.generate(["A"], 1, "Hit Rate", 100, list(range(-4, 5))).reset_index()
-    estimates = pa.data.fit_curve(df)
-    # assert model.assert_called()
+    pa.data.fit_curve(df)
+
+
+def test_estimates_from_fit():
+    df = pd.DataFrame(
+        {"50%": list(range(9))}, index=[f"p[{i}]" for i in list(range(1, 10))]
+    )
+    index = pd.Index(list(range(9)), name="x")
+    estimates = pa.data.estimates_from_fit(df, index)
     assert len(estimates) == 9
+
+
+def test_mu():
+    fit = pd.DataFrame({"50%": [5]}, index=["mu"])
+    mu = pa.data.mu(fit)
+    assert mu == 5
