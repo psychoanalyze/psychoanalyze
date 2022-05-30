@@ -10,20 +10,6 @@ def test_version():
     assert __version__ == "0.1.0"
 
 
-def test_curve():
-    df = pd.DataFrame(
-        {"Result": [0, 1], "Subject": ["A", "A"], "x": [1, 1]}, index=[1, 2]
-    )
-    dt.validate(pa.curve(df), pd.Series([0.5], index=pd.Index([1], name="x")))
-
-
-def test_curve_multiple_subjects():
-    df = pd.DataFrame(
-        {"Result": [0, 1], "Subject": ["A", "B"], "x": [1, 1]}, index=[1, 2]
-    )
-    dt.validate(pa.curve(df), pd.Series([0.5], index=pd.Index([1], name="x")))
-
-
 def test_weber():
     curves = pd.DataFrame(
         {"Difference Threshold": [0, 1], "Base Stimulus Intensity": [0, 1]},

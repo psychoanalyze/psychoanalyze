@@ -28,6 +28,23 @@ def curves(points):
     )
 
 
+def linear_curves(points: pd.DataFrame):
+    df = points
+    df["err+"] = df["95%"] - df["50%"]
+    df["err-"] = df["50%"] - df["5%"]
+    df = df.drop(columns=["95%", "5%"]).reset_index()
+    return px.scatter(
+        df,
+        x="x",
+        y="50%",
+        error_y="err+",
+        error_y_minus="err-",
+        color="Subject",
+        symbol="Day",
+        template="plotly_white",
+    )
+
+
 def logistic(data):
     df = data.reset_index()
     return px.line(

@@ -1,9 +1,7 @@
-from random import random
 import pandas as pd
 import numpy as np
 from scipy.stats import logistic as scipy_logistic
 from cmdstanpy import CmdStanModel
-from unittest.mock import MagicMock
 
 
 def subjects(n_subjects):
@@ -30,11 +28,11 @@ def generate(subjects, n_sessions, y, n_trials_per_stim_level, X, threshold=0, s
     )
 
 
-def logistic(threshold=0, scale=1, gamma=0):
+def logistic(threshold=0, scale=1, gamma=0, lambda_=0):
     x = np.linspace(scipy_logistic.ppf(0.01), scipy_logistic.ppf(0.99), 100)
     index = pd.Index(x, name="x")
     return pd.Series(
-        gamma + (1 - gamma) * scipy_logistic.cdf(x, threshold, scale),
+        gamma + (1 - gamma - lambda_) * scipy_logistic.cdf(x, threshold, scale),
         index=index,
         name="Hit Rate",
     )
@@ -62,3 +60,10 @@ def mu(points: pd.DataFrame):
     fit = fit_curve(points)
     df = fit.loc["mu", "5%":"95%"]
     return df.T
+
+
+def alphas(points: pd.DataFrame, x: pd.Index):
+    fit = fit_curve(points)
+    df = fit.loc["alpha[1]":"alpha[9]", "5%":"95%"]
+    df.index = x
+    return df.reset_index()
