@@ -58,12 +58,18 @@ app.layout = dbc.Container(
 )
 def generate_data(n_trials, x_min, x_max, y):
     curves_data = pa.curve.generate(n_trials)
-    x = pd.Index(list(range(x_min, x_max + 1)), name="x")
-    curves_data["Hit Rate"] = curves_data["Hits"] / curves_data["n"]
-    if y == "alpha":
-        curves_data[y] = logit(curves_data["Hit Rate"])
-    elif y == "p":
-        curves_data[y] = curves_data["Hit Rate"]
+
+    def xrange_index(x_min=x_min, x_max=x_max):
+        return pd.Index(list(range(x_min, x_max + 1)), name="x")
+
+    x = xrange_index(x_min, x_max)
+
+    def hit_rate(df):
+        return df["Hits"] / df["n"]
+
+    curves_data["Hit Rate"] = hit_rate()
+    transform = {"alpha": logit(curves_data["Hit Rate"]), "p": curves_data["Hit Rate"]}
+    curves_data[y] = transform[y]
     posterior = pa.data.params(curves_data, x, y)
     curves_data_w_posterior = pa.curve.add_posterior(curves_data, posterior)
     fig = pa.plot.curves(curves_data_w_posterior, y)
