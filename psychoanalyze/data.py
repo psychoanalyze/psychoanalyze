@@ -40,28 +40,6 @@ def psych(hits, n_trials_per_stim_level, index, y):
     return df
 
 
-def generate(
-    subjects: List[str],
-    n_sessions: int,
-    y: str,
-    n_trials_per_stim_level: int,
-    X: List[int],
-    threshold=0,
-    scale=1,
-):
-    days = pa.session.generate(n_sessions)
-    index = construct_index(subjects, days, X)
-    hits = generate_outcomes(
-        n_trials_per_stim_level=n_trials_per_stim_level,
-        index=index,
-        threshold=threshold,
-        scale=scale,
-    )
-    psi = psych(hits, n_trials_per_stim_level, index, y)
-
-    return psi
-
-
 def logistic(threshold=0, scale=1, gamma=0, lambda_=0):
     x = np.linspace(scipy_logistic.ppf(0.01), scipy_logistic.ppf(0.99), 100)
     index = pd.Index(x, name="x")
