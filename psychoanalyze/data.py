@@ -52,7 +52,6 @@ def generate(
     threshold=0,
     scale=1,
 ):
-    # generate a list of days 1 through n_sessions
     days = pa.session.generate(n_sessions)
     index = construct_index(subjects, days, X)
     # generate psychophysical outcomes

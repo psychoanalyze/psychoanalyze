@@ -24,3 +24,7 @@ def generate(n_trials_per_level=100):
     n = [n_trials_per_level] * len(index)
     p = logistic.cdf(index)
     return pd.DataFrame({"n": n, "Hits": np.random.binomial(n, p)}, index=index)
+
+
+def hit_rate(df: pd.DataFrame) -> pd.Series:
+    return df["Hits"] / df["n"]
