@@ -58,7 +58,6 @@ def generate(
 ):
     days = pa.session.generate(n_sessions)
     index = construct_index(subjects, days, X)
-    # generate psychophysical outcomes
     hits = generate_outcomes(
         n_trials_per_stim_level=n_trials_per_stim_level,
         index=index,
