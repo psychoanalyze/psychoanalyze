@@ -28,7 +28,6 @@ def test_nonstandard_logistic_slope():
 
 
 def test_fit_curve(mocker):
-    # df = pa.data.generate(["A"], 1, "Hit Rate", 100, list(range(-4, 5))).reset_index()
     mocker.patch.object(CmdStanModel, "sample")
     df = pd.DataFrame({"x": [], "n": [], "Hits": []})
     pa.data.fit_curve(df)
