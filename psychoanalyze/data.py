@@ -11,6 +11,25 @@ def subjects(n_subjects):
     return list("ABCDEFG"[:n_subjects])
 
 
+def construct_index(subjects: List[str], day, X):
+    # structure levels based on presence of subject column
+    if subjects:
+        levels = [subjects, day, X]
+        names = ["Subject", "Day", "x"]
+    else:
+        levels = [day, X]
+        names = ["Day", "X"]
+    return pd.MultiIndex.from_product(levels, names=names)
+
+
+def generate_outcomes(n_trials_per_stim_level, index, threshold, scale):
+    return np.random.binomial(
+        n_trials_per_stim_level,
+        scipy_logistic.cdf(index.get_level_values("x"), threshold, scale),
+        len(index),
+    )
+
+
 def generate(
     subjects: List[str],
     n_sessions: int,
@@ -21,21 +40,14 @@ def generate(
     scale=1,
 ):
     # generate a list of days 1 through n_sessions
-    day = pa.session.generate(n_sessions)
-    # structure levels based on presence of subject column
-    if subjects:
-        levels = [subjects, day, X]
-        names = ["Subject", "Day", "x"]
-    else:
-        levels = [day, X]
-        names = ["Day", "X"]
-    # generate index from levels
-    index = pd.MultiIndex.from_product(levels, names=names)
+    days = pa.session.generate(n_sessions)
+    index = construct_index(subjects, days, X)
     # generate psychophysical outcomes
-    hits = np.random.binomial(
-        n_trials_per_stim_level,
-        scipy_logistic.cdf(index.get_level_values("x"), threshold, scale),
-        len(index),
+    hits = generate_outcomes(
+        n_trials_per_stim_level=n_trials_per_stim_level,
+        index=index,
+        threshold=threshold,
+        scale=scale,
     )
     # Build DF and calculated columns
     df = pd.DataFrame(
