@@ -66,3 +66,7 @@ def test_mu_two_groups():
     output = data.groupby(["Subject", "Day"]).apply(pa.data.mu)
     assert len(output) == 2
     assert {"5%", "50%", "95%"} <= set(output.columns)
+
+
+def test_construct_index():
+    pa.data.construct_index(subjects=None, days=[1, 2, 3], X=[1, 2, 3])
