@@ -12,13 +12,11 @@ def subjects(n_subjects):
 
 
 def construct_index(subjects: List[str], days: List[int], x: List[float]):
-    # structure levels based on presence of subject column
+    levels = [days, x]
+    names = ["Day", "x"]
     if subjects:
-        levels = [subjects, days, x]
-        names = ["Subject", "Day", "x"]
-    else:
-        levels = [days, x]
-        names = ["Day", "X"]
+        levels = [subjects] + levels
+        names = ["Subject"] + names
     return pd.MultiIndex.from_product(levels, names=names)
 
 

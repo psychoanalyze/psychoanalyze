@@ -72,5 +72,5 @@ def test_construct_index():
     days = [1, 2, 3]
     x = [1, 2, 3]
     index = pa.data.construct_index(subjects=None, days=days, x=x)
-    assert index.names == ["Day", "X"]
+    assert index.names == ["Day", "x"]
     assert len(index) == len(x) * len(days)
