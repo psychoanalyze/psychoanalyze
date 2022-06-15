@@ -69,4 +69,8 @@ def test_mu_two_groups():
 
 
 def test_construct_index():
-    pa.data.construct_index(subjects=None, days=[1, 2, 3], X=[1, 2, 3])
+    days = [1, 2, 3]
+    x = [1, 2, 3]
+    index = pa.data.construct_index(subjects=None, days=days, x=x)
+    assert index.names == ["Day", "X"]
+    assert len(index) == len(x) * len(days)
