@@ -1,3 +1,4 @@
+from typing import List
 import pandas as pd
 import numpy as np
 from scipy.stats import logistic as scipy_logistic
@@ -10,7 +11,15 @@ def subjects(n_subjects):
     return list("ABCDEFG"[:n_subjects])
 
 
-def generate(subjects, n_sessions, y, n_trials_per_stim_level, X, threshold=0, scale=1):
+def generate(
+    subjects: List[str],
+    n_sessions: int,
+    y: str,
+    n_trials_per_stim_level: int,
+    X: List[int],
+    threshold=0,
+    scale=1,
+):
     # generate a list of days 1 through n_sessions
     day = pa.session.generate(n_sessions)
     # structure levels based on presence of subject column

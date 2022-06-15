@@ -8,15 +8,17 @@ def subjects():
     return ["A", "B"]
 
 
-X = list(range(8))
+@pytest.fixture
+def X():
+    return list(range(8))
 
 
 @pytest.fixture
-def data(subjects):
+def data(subjects, X):
     return pa.data.generate(subjects, 10, "Threshold", n_trials_per_stim_level=10, X=X)
 
 
-def test_generate_curve(subjects):
+def test_generate_curve(subjects, X):
     data = pa.data.generate(
         subjects=subjects, n_sessions=8, y="Hit Rate", n_trials_per_stim_level=10, X=X
     )
@@ -26,27 +28,12 @@ def test_generate_curve(subjects):
 
 
 @pytest.mark.parametrize("n_subjects", [2, 3])
-def test_generate_n_subjects(n_subjects):
+def test_generate_n_subjects(n_subjects, X):
     subjects = pa.data.subjects(n_subjects)
     data = pa.data.generate(subjects, 10, "Threshold", n_trials_per_stim_level=10, X=X)
     assert {"Subject", "Day"} <= set(data.index.names)
     assert data.index.get_level_values("Subject").nunique() == n_subjects
     assert "Threshold" in set(data.columns)
-
-
-@pytest.mark.parametrize("n_trials", [10, 11])
-def test_generate_n_trials(n_trials, subjects):
-    n_sessions = 10
-    data = pa.data.generate(
-        subjects=subjects,
-        n_sessions=n_sessions,
-        y="Threshold",
-        n_trials_per_stim_level=n_trials,
-        X=X,
-    )
-    assert "Threshold" in set(data.columns)
-    assert len(data) == n_sessions * len(subjects) * 8
-    assert all(data["n"] == n_trials)
 
 
 def test_nonstandard_logistic_mean():

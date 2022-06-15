@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from scipy.stats import logistic
-from psychoanalyze.data import fit_curve
+from psychoanalyze import data
 
 
 def add_posterior(data, posterior):
@@ -13,7 +13,7 @@ def add_posterior(data, posterior):
 
 
 def params(points: pd.DataFrame, x: pd.Index, var: str):
-    fit = fit_curve(points)
+    fit = data.fit_curve(points)
     df = fit.loc[f"{var}[1]":f"{var}[{len(x)}]", "5%":"95%"]
     df.index = x
     return df
