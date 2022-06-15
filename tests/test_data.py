@@ -28,12 +28,11 @@ def test_generate_curve(subjects, X):
     assert "Hit Rate" in set(data.columns)
 
 
-@pytest.mark.parametrize("n_subjects", [2, 3])
-def test_generate_n_subjects(n_subjects, X):
-    subjects = pa.data.subjects(n_subjects)
+@pytest.mark.parametrize("subjects", [["A", "B"], ["A", "B", "C"]])
+def test_generate_n_subjects(subjects, X):
     data = pa.data.generate(subjects, 10, "Threshold", n_trials_per_stim_level=10, X=X)
     assert {"Subject", "Day"} <= set(data.index.names)
-    assert data.index.get_level_values("Subject").nunique() == n_subjects
+    assert data.index.get_level_values("Subject").nunique() == len(subjects)
     assert "Threshold" in set(data.columns)
 
 
