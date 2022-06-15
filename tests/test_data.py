@@ -15,14 +15,6 @@ def X():
     return list(range(8))
 
 
-@pytest.mark.parametrize("subjects", [["A", "B"], ["A", "B", "C"]])
-def test_generate_n_subjects(subjects, X):
-    data = pa.data.generate(subjects, 10, "Threshold", n_trials_per_stim_level=10, X=X)
-    assert {"Subject", "Day"} <= set(data.index.names)
-    assert data.index.get_level_values("Subject").nunique() == len(subjects)
-    assert "Threshold" in set(data.columns)
-
-
 def test_nonstandard_logistic_mean():
     s = pa.data.logistic(threshold=1)
     assert min(s) > 0
