@@ -43,7 +43,7 @@ def psych(hits, n_trials_per_stim_level, index, y):
         },
         index=index,
     )
-    df["Hit Rate"] = df["Hits"] / df["n"]
+    df["Hit Rate"] = pa.curve.hit_rate
     return df
 
 
