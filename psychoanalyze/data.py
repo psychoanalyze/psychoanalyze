@@ -30,6 +30,19 @@ def generate_outcomes(n_trials_per_stim_level, index, threshold, scale):
     )
 
 
+def psych(hits, n_trials_per_stim_level, index, y):
+    df = pd.DataFrame(
+        {
+            "Hits": hits,
+            y: hits / n_trials_per_stim_level,
+            "n": [n_trials_per_stim_level] * len(index),
+        },
+        index=index,
+    )
+    df["Hit Rate"] = df["Hits"] / df["n"]
+    return df
+
+
 def generate(
     subjects: List[str],
     n_sessions: int,
@@ -49,18 +62,9 @@ def generate(
         threshold=threshold,
         scale=scale,
     )
-    # Build DF and calculated columns
-    df = pd.DataFrame(
-        {
-            "Hits": hits,
-            y: hits / n_trials_per_stim_level,
-            "n": [n_trials_per_stim_level] * len(index),
-        },
-        index=index,
-    )
+    psi = psych(hits, n_trials_per_stim_level, index, y)
 
-    df["Hit Rate"] = df["Hits"] / df["n"]
-    return df
+    return psi
 
 
 def logistic(threshold=0, scale=1, gamma=0, lambda_=0):
