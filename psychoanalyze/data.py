@@ -118,5 +118,5 @@ def generate_animation_curves():
             )
         )
     )
-    df["Hit Rate"] = df["Hits"] / df["n"]
+    df["Hit Rate"] = pa.curve.hit_rate
     return df
