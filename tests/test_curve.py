@@ -17,3 +17,12 @@ def test_add_posterior():
 def test_hit_rate():
     df = pd.DataFrame({"Hits": [5], "n": [10]})
     dt.validate(pa.curve.hit_rate(df), pd.Series([0.5]))
+
+
+def test_xrange_index():
+    x_min = 0
+    x_max = 100
+    index = pa.curve.xrange_index(x_min, x_max)
+    assert max(index) == x_max
+    assert min(index) == x_min
+    assert index.name == "x"

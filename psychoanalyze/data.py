@@ -7,10 +7,6 @@ import psychoanalyze as pa
 from itertools import accumulate
 
 
-def xrange_index(x_min, x_max):
-    return pd.Index(list(range(x_min, x_max + 1)), name="x")
-
-
 def subjects(n_subjects):
     return list("ABCDEFG"[:n_subjects])
 

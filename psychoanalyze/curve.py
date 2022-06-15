@@ -28,3 +28,7 @@ def generate(n_trials_per_level=100):
 
 def hit_rate(df: pd.DataFrame) -> pd.Series:
     return df["Hits"] / df["n"]
+
+
+def xrange_index(x_min, x_max):
+    return pd.Index(list(range(x_min, x_max + 1)), name="x")
