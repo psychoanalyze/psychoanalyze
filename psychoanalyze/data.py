@@ -73,7 +73,7 @@ def logistic(threshold=0, scale=1, gamma=0, lambda_=0):
     )
 
 
-def fit_curve(points: pd.DataFrame):
+def fit_curve(points: pd.DataFrame) -> pd.DataFrame:
     points = points.reset_index()
     stan_data = {
         "X": len(points),
@@ -91,8 +91,7 @@ def mu(points: pd.DataFrame):
     return df.T
 
 
-def params(points: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame:
-    fit = fit_curve(points)
+def params(fit: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame:
     df = fit.loc[f"{y}[1]":f"{y}[{len(x)}]", "5%":"95%"]
     df[y] = df["50%"]
     df.index = x

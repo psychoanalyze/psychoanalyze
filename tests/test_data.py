@@ -1,6 +1,7 @@
 import psychoanalyze as pa
 import pytest
 import pandas as pd
+import datatest as dt
 
 
 @pytest.fixture
@@ -68,7 +69,16 @@ def test_mu_two_groups():
     assert {"5%", "50%", "95%"} <= set(output.columns)
 
 
-def test_construct_index():
+def test_params(mocker):
+    x = pd.Index([])
+    fit = mocker.patch("psychoanalyze.data.fit_curve", return_value=pd.DataFrame())
+    df = pa.data.params(fit=fit, x=x, y="p")
+    dt.validate(df.index, x)
+    assert set(df.columns) <= {"50%", "95%", "5%", "p"}
+
+
+def test_construct_index(mocker):
+    mocker.patch("psychoanalyze.data.params", return_value=pd.DataFrame({"x": []}))
     days = [1, 2, 3]
     x = [1, 2, 3]
     index = pa.data.construct_index(subjects=None, days=days, x=x)

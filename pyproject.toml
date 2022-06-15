@@ -23,6 +23,7 @@ dash = "^2.4.1"
 dash-bootstrap-components = "^1.1.0"
 pytest-sugar = "^0.9.4"
 cmdstanpy = "^1.0.1"
+pytest-mock = "^3.7.0"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.2.0"

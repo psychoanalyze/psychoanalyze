@@ -26,3 +26,10 @@ def test_xrange_index():
     assert max(index) == x_max
     assert min(index) == x_min
     assert index.name == "x"
+
+
+# def test_prep_psych_curve():
+#     curves_data = pd.DataFrame({"Hits": [], "n": []})
+#     x = pd.Index([1, 2, 3], name="x")
+#     y = "p"
+#     pa.curve.prep_psych_curve(curves_data=curves_data, x=x, y=y)

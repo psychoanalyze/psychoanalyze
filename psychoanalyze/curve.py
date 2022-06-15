@@ -35,9 +35,8 @@ def xrange_index(x_min, x_max):
     return pd.Index(list(range(x_min, x_max + 1)), name="x")
 
 
-def prep_psych_curve(curves_data, x_min, x_max, x, y):
-    pa.curve.xrange_index(x_min, x_max)
-    curves_data["Hit Rate"] = pa.curve.hit_rate()
+def prep_psych_curve(curves_data: pd.DataFrame, x: pd.Index, y: str):
+    curves_data["Hit Rate"] = pa.curve.hit_rate(curves_data)
     transform = {"alpha": logit(curves_data["Hit Rate"]), "p": curves_data["Hit Rate"]}
     curves_data[y] = transform[y]
     posterior = pa.data.params(curves_data, x, y)
