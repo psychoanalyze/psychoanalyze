@@ -14,11 +14,6 @@ def X():
     return list(range(8))
 
 
-@pytest.fixture
-def data(subjects, X):
-    return pa.data.generate(subjects, 10, "Threshold", n_trials_per_stim_level=10, X=X)
-
-
 def test_generate_curve(subjects, X):
     data = pa.data.generate(
         subjects=subjects, n_sessions=8, y="Hit Rate", n_trials_per_stim_level=10, X=X
