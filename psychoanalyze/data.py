@@ -2,7 +2,6 @@ from typing import List
 import pandas as pd
 import numpy as np
 from scipy.stats import logistic as scipy_logistic
-from cmdstanpy import CmdStanModel
 import psychoanalyze as pa
 from itertools import accumulate
 
@@ -73,20 +72,8 @@ def logistic(threshold=0, scale=1, gamma=0, lambda_=0):
     )
 
 
-def fit_curve(points: pd.DataFrame) -> pd.DataFrame:
-    points = points.reset_index()
-    stan_data = {
-        "X": len(points),
-        "x": points["x"].to_numpy(),
-        "N": points["n"].to_numpy(),
-        "hits": points["Hits"].to_numpy(),
-    }
-    model = CmdStanModel(stan_file="models/binomial_regression.stan")
-    return model.sample(chains=4, data=stan_data).summary()
-
-
 def mu(points: pd.DataFrame):
-    fit = fit_curve(points)
+    fit = pa.curve.fit(points)
     df = fit.loc["mu", "5%":"95%"]
     return df.T
 

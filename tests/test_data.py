@@ -30,7 +30,7 @@ def test_nonstandard_logistic_slope():
 def test_fit_curve(mocker):
     mocker.patch.object(CmdStanModel, "sample")
     df = pd.DataFrame({"x": [], "n": [], "Hits": []})
-    pa.data.fit_curve(df)
+    pa.curve.fit(df)
 
 
 def test_mu_two_groups():
@@ -50,7 +50,7 @@ def test_mu_two_groups():
 
 def test_params(mocker):
     x = pd.Index([])
-    fit = mocker.patch("psychoanalyze.data.fit_curve", return_value=pd.DataFrame())
+    fit = mocker.patch("psychoanalyze.curve.fit", return_value=pd.DataFrame())
     df = pa.data.params(fit=fit, x=x, y="p")
     dt.validate(df.index, x)
     assert set(df.columns) <= {"50%", "95%", "5%", "p"}
