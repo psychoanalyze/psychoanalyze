@@ -3,7 +3,6 @@ import dash_bootstrap_components as dbc
 import psychoanalyze as pa
 import pandas as pd
 from psychoanalyze.layout import input_group
-from scipy.special import logit
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 
@@ -58,12 +57,10 @@ app.layout = dbc.Container(
 )
 def generate_data(n_trials, x_min, x_max, y):
     curves_data = pa.curve.generate(n_trials)
-    x = pa.data.xrange_index(x_min, x_max)
-    curves_data["Hit Rate"] = pa.curve.hit_rate()
-    transform = {"alpha": logit(curves_data["Hit Rate"]), "p": curves_data["Hit Rate"]}
-    curves_data[y] = transform[y]
-    posterior = pa.data.params(curves_data, x, y)
-    curves_data_w_posterior = pa.curve.add_posterior(curves_data, posterior)
+    x = pa.curve.xrange_index(x_max, x_min)
+    curves_data_w_posterior = pa.curve.prep_psych_curve(
+        curves_data=curves_data, x_min=x_min, x_max=x_max, x=x, y=y
+    )
     fig = pa.plot.curves(curves_data_w_posterior, y)
     curve_table = dbc.Table.from_dataframe(curves_data_w_posterior.reset_index())
     return (
