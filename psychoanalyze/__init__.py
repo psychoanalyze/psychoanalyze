@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from scipy.special import expit
-from psychoanalyze import plot, data, trial, curve
+from psychoanalyze import plot, data, trial, curve, session
 
 pd.options.plotting.backend = "plotly"
 

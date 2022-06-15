@@ -26,25 +26,6 @@ def test_thresholds():
     assert fig.layout.yaxis.title.text == "50%"
 
 
-def test_curves():
-    n_subjects = 2
-    subjects = list("ABCDEFG"[:n_subjects])
-    subj_index = pd.MultiIndex.from_product([subjects, list(range(10))])
-    index = pd.MultiIndex.from_product(
-        [subjects, list(range(8)), list(range(10))], names=["Subject", "x", "Day"]
-    )
-    points = pd.DataFrame(
-        {
-            "Hit Rate": [random.random() for _ in index],
-        },
-        index=index,
-    )
-    fig = pa.plot.curves(points)
-    assert fig.layout.xaxis.title.text == "x"
-    assert fig.layout.yaxis.title.text == "Hit Rate"
-    assert len(fig.data) == len(subj_index)
-
-
 def test_standard_logistic():
     s = pa.data.logistic()
     df = s.to_frame()

@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 from scipy.stats import logistic as scipy_logistic
 from cmdstanpy import CmdStanModel
+import psychoanalyze as pa
+from itertools import accumulate
 
 
 def subjects(n_subjects):
@@ -9,16 +11,25 @@ def subjects(n_subjects):
 
 
 def generate(subjects, n_sessions, y, n_trials_per_stim_level, X, threshold=0, scale=1):
-    day = list(range(n_sessions))
-    index = pd.MultiIndex.from_product(
-        [subjects, day, X], names=["Subject", "Day", "x"]
-    )
+    # generate a list of days 1 through n_sessions
+    day = pa.session.generate(n_sessions)
+    # structure levels based on presence of subject column
+    if subjects:
+        levels = [subjects, day, X]
+        names = ["Subject", "Day", "x"]
+    else:
+        levels = [day, X]
+        names = ["Day", "X"]
+    # generate index from levels
+    index = pd.MultiIndex.from_product(levels, names=names)
+    # generate psychophysical outcomes
     hits = np.random.binomial(
         n_trials_per_stim_level,
         scipy_logistic.cdf(index.get_level_values("x"), threshold, scale),
         len(index),
     )
-    return pd.DataFrame(
+    # Build DF and calculated columns
+    df = pd.DataFrame(
         {
             "Hits": hits,
             y: hits / n_trials_per_stim_level,
@@ -26,6 +37,10 @@ def generate(subjects, n_sessions, y, n_trials_per_stim_level, X, threshold=0, s
         },
         index=index,
     )
+
+    df["Hit Rate"] = df["Hits"] / df["n"]
+    params(df, index, "p")
+    return df
 
 
 def logistic(threshold=0, scale=1, gamma=0, lambda_=0):
@@ -50,20 +65,32 @@ def fit_curve(points: pd.DataFrame):
     return model.sample(chains=4, data=stan_data).summary()
 
 
-def estimates_from_fit(fit: pd.DataFrame, index: pd.Index):
-    estimates = fit.loc["p[1]":"p[9]", "50%"]
-    estimates.index = index
-    return estimates
-
-
 def mu(points: pd.DataFrame):
     fit = fit_curve(points)
     df = fit.loc["mu", "5%":"95%"]
     return df.T
 
 
-def alphas(points: pd.DataFrame, x: pd.Index):
+def params(points: pd.DataFrame, x: pd.Index, y: str):
     fit = fit_curve(points)
-    df = fit.loc["alpha[1]":"alpha[9]", "5%":"95%"]
+    df = fit.loc[f"{y}[1]":f"{y}[{len(x)}]", "5%":"95%"]
+    df[y] = df["50%"]
     df.index = x
-    return df.reset_index()
+    return df
+
+
+def generate_animation_curves():
+    n_blocks = 10
+    n_trials_per_level_per_block = 10
+    df = pd.concat(
+        list(
+            accumulate(
+                [
+                    pa.curve.generate(n_trials_per_level_per_block)
+                    for _ in range(n_blocks)
+                ]
+            )
+        )
+    )
+    df["Hit Rate"] = df["Hits"] / df["n"]
+    return df

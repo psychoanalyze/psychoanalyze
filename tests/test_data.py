@@ -63,16 +63,7 @@ def test_nonstandard_logistic_slope():
 
 def test_fit_curve():
     df = pa.data.generate(["A"], 1, "Hit Rate", 100, list(range(-4, 5))).reset_index()
-    fit = pa.data.fit_curve(df)
-
-
-def test_estimates_from_fit():
-    df = pd.DataFrame(
-        {"50%": list(range(9))}, index=[f"p[{i}]" for i in list(range(1, 10))]
-    )
-    index = pd.Index(list(range(9)), name="x")
-    estimates = pa.data.estimates_from_fit(df, index)
-    assert len(estimates) == 9
+    pa.data.fit_curve(df)
 
 
 def test_mu_two_groups():

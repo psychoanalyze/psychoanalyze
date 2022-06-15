@@ -20,8 +20,8 @@ parameters {
   real mu;
   real sigma;
   real<lower=0> sigma_err;
-//   real<lower=0, upper=1> gamma;
-//   real<lower=0, upper=1> lambda;
+  real<lower=0, upper=1> gamma;
+  real<lower=0, upper=1> lambda;
 }
 transformed parameters {
   array[X] real p = inv_logit(alpha);
@@ -33,5 +33,8 @@ model {
   // sigma ~ normal(0,2);
 }
 // generated quantities {
-//   threshold = a
+//   array[X] real hit_rate;
+//   for (i in 1:X) {
+//     hit_rate[i] = hits[i] / N[i];
+//   }
 // }
