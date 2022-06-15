@@ -15,15 +15,6 @@ def X():
     return list(range(8))
 
 
-def test_generate_curve(subjects, X):
-    data = pa.data.generate(
-        subjects=subjects, n_sessions=8, y="Hit Rate", n_trials_per_stim_level=10, X=X
-    )
-    assert data.index.get_level_values("Subject").nunique() == 2
-    assert set(data.index.names) == {"Subject", "Day", "x"}
-    assert "Hit Rate" in set(data.columns)
-
-
 @pytest.mark.parametrize("subjects", [["A", "B"], ["A", "B", "C"]])
 def test_generate_n_subjects(subjects, X):
     data = pa.data.generate(subjects, 10, "Threshold", n_trials_per_stim_level=10, X=X)
