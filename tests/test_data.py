@@ -2,6 +2,7 @@ import psychoanalyze as pa
 import pytest
 import pandas as pd
 import datatest as dt
+from cmdstanpy import CmdStanModel
 
 
 @pytest.fixture
@@ -43,8 +44,10 @@ def test_nonstandard_logistic_slope():
     assert max(s) < max(s_control)
 
 
-def test_fit_curve():
-    df = pa.data.generate(["A"], 1, "Hit Rate", 100, list(range(-4, 5))).reset_index()
+def test_fit_curve(mocker):
+    # df = pa.data.generate(["A"], 1, "Hit Rate", 100, list(range(-4, 5))).reset_index()
+    mocker.patch.object(CmdStanModel, "sample")
+    df = pd.DataFrame({"x": [], "n": [], "Hits": []})
     pa.data.fit_curve(df)
 
 
