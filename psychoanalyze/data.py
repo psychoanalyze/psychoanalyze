@@ -60,7 +60,6 @@ def generate(
     )
 
     df["Hit Rate"] = df["Hits"] / df["n"]
-    params(df, index, "p")
     return df
 
 
@@ -92,7 +91,7 @@ def mu(points: pd.DataFrame):
     return df.T
 
 
-def params(points: pd.DataFrame, x: pd.Index, y: str):
+def params(points: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame:
     fit = fit_curve(points)
     df = fit.loc[f"{y}[1]":f"{y}[{len(x)}]", "5%":"95%"]
     df[y] = df["50%"]
