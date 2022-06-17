@@ -96,3 +96,23 @@ def posterior_animation(cumulative_draws: pd.DataFrame):
         symbol=df.get("Day"),
         template="plotly_white",
     )
+
+
+def difference_thresholds():
+    return px.scatter(
+        pd.DataFrame(
+            {
+                "Reference Charge (nC)": [0.0],
+                "Difference Threshold Charge (nC)": [0.1],
+                "Monkey": ["U"],
+                "Dimension": ["PW"],
+                "n": [10],
+            }
+        ),
+        x="Reference Charge (nC)",
+        y="Difference Threshold Charge (nC)",
+        color="Monkey",
+        symbol="Dimension",
+        size="n",
+        template="plotly_white",
+    )

@@ -3,6 +3,7 @@ import dash_bootstrap_components as dbc
 import psychoanalyze as pa
 import pandas as pd
 from psychoanalyze.layout import input_group
+import plotly.express as px
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 
@@ -39,6 +40,7 @@ app.layout = dbc.Container(
         dbc.Row(session_inputs + param_inputs),
         dbc.Row(x_min_input + x_max_input),
         dbc.Row([curves_column]),
+        dcc.Graph(figure=pa.plot.difference_thresholds()),
     ]
 )
 
