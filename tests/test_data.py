@@ -48,16 +48,18 @@ def test_mu_two_groups():
     assert {"5%", "50%", "95%"} <= set(output.columns)
 
 
-def test_params(mocker):
+def test_params():
     x = pd.Index([])
-    fit = mocker.patch("psychoanalyze.curve.fit", return_value=pd.DataFrame())
-    df = pa.data.params(fit=fit, x=x, y="p")
+    fit = pd.DataFrame({"5%": [], "50%": [], "95%": []})
+    df = pa.data.reshape_fit_results(fit=fit, x=x, y="p")
     dt.validate(df.index, x)
-    assert set(df.columns) <= {"50%", "95%", "5%", "p"}
+    assert set(df.columns) <= {"err+", "err-", "p"}
 
 
 def test_construct_index(mocker):
-    mocker.patch("psychoanalyze.data.params", return_value=pd.DataFrame({"x": []}))
+    mocker.patch(
+        "psychoanalyze.data.reshape_fit_results", return_value=pd.DataFrame({"x": []})
+    )
     days = [1, 2, 3]
     x = [1, 2, 3]
     index = pa.data.construct_index(subjects=None, days=days, x=x)

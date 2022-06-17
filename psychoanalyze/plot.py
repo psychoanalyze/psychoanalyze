@@ -1,17 +1,10 @@
-from statistics import median
 import plotly.express as px
 import pandas as pd
 import psychoanalyze as pa
 
 
-def transform_errors(df):
-    df["err+"] = df["95%"] - df["50%"]
-    df["err-"] = df["50%"] - df["5%"]
-    return df.drop(columns=["95%", "5%"])
-
-
 def thresholds(df):
-    df = transform_errors(df)
+    df = pa.data.transform_errors(df)
     return px.scatter(
         df,
         x="Day",
@@ -23,21 +16,19 @@ def thresholds(df):
     )
 
 
-def curves(points: pd.DataFrame, y: str):
-    df = points
-    print(df)
+def curves(curve_data):
+    df = curve_data["curves_df"]
+    y = curve_data["y"]
     if "5%" in df.columns:
-        df = transform_errors(df)
-    print(df)
-    df = points.reset_index()
-    print(df)
+        df = pa.data.transform_errors(df)
+    df = df.reset_index()
     return px.scatter(
         df,
         x="x",
         y=y,
         error_y="err+",
         error_y_minus="err-",
-        color=df.get("Subject") or df["Type"],
+        color=df.get("Subject"),  # or df["Type"],
         symbol=df.get("Day"),
         template="plotly_white",
     )
@@ -92,7 +83,7 @@ def hit_rate_animation(cumulative_draws: pd.DataFrame):
 
 def posterior_animation(cumulative_draws: pd.DataFrame):
     df = cumulative_draws
-    df = transform_errors(df, "50%").reset_index()
+    df = pa.data.transform_errors(df, "50%").reset_index()
     return px.scatter(
         df,
         x="x",

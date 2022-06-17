@@ -40,28 +40,6 @@ def psych(hits, n_trials_per_stim_level, index, y):
     return df
 
 
-def generate(
-    subjects: List[str],
-    n_sessions: int,
-    y: str,
-    n_trials_per_stim_level: int,
-    X: List[int],
-    threshold=0,
-    scale=1,
-):
-    days = pa.session.generate(n_sessions)
-    index = construct_index(subjects, days, X)
-    hits = generate_outcomes(
-        n_trials_per_stim_level=n_trials_per_stim_level,
-        index=index,
-        threshold=threshold,
-        scale=scale,
-    )
-    psi = psych(hits, n_trials_per_stim_level, index, y)
-
-    return psi
-
-
 def logistic(threshold=0, scale=1, gamma=0, lambda_=0):
     x = np.linspace(scipy_logistic.ppf(0.01), scipy_logistic.ppf(0.99), 100)
     index = pd.Index(x, name="x")
@@ -78,9 +56,19 @@ def mu(points: pd.DataFrame):
     return df.T
 
 
-def params(fit: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame:
-    df = fit.loc[f"{y}[1]":f"{y}[{len(x)}]", "5%":"95%"]
-    df[y] = df["50%"]
+def transform_errors(df):
+    df["err+"] = df["95%"] - df["50%"]
+    df["err-"] = df["50%"] - df["5%"]
+    return df.drop(columns=["95%", "5%"])
+
+
+def reshape_fit_results(fit: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame:
+    df = fit.loc[
+        f"{y}[1]":f"{y}[{len(x)}]",  # row eg 'p[1]:p[8]'
+        ["5%", "50%", "95%"],  # col
+    ]
+    df = transform_errors(df)
+    df = df.rename(columns={"50%": y})
     df.index = x
     return df
 

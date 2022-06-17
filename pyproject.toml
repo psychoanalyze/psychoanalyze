@@ -22,8 +22,8 @@ jupyterlab = "^3.4.2"
 dash = "^2.4.1"
 dash-bootstrap-components = "^1.1.0"
 pytest-sugar = "^0.9.4"
-cmdstanpy = "^1.0.1"
 pytest-mock = "^3.7.0"
+cmdstanpy = "^1.0.1"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.2.0"
@@ -36,4 +36,5 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 filterwarnings = [
     "ignore::DeprecationWarning",
+    "ignore::FutureWarning"
 ]

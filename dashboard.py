@@ -55,14 +55,24 @@ app.layout = dbc.Container(
         Input("y", "value"),
     ],
 )
-def generate_data(n_trials, x_min, x_max, y):
-    curves_data = pa.curve.generate(n_trials)
-    x = pa.curve.xrange_index(x_max, x_min)
+def generate_data(n_trials_per_level, x_min, x_max, y):
+    # generate curves with n trials per level
+    curves_data = pa.curve.generate(n_trials_per_level)
+
+    # define the range of the function
+    x = pa.curve.xrange_index(x_min, x_max)
+
+    # fit curves with Stan
     curves_data_w_posterior = pa.curve.prep_psych_curve(
         curves_data=curves_data, x=x, y=y
     )
-    fig = pa.plot.curves(curves_data_w_posterior, y)
-    curve_table = dbc.Table.from_dataframe(curves_data_w_posterior.reset_index())
+
+    # plot fig
+    curves_plot_data = {"y": y, "curves_df": curves_data_w_posterior}
+    fig = pa.plot.curves(curves_plot_data)
+
+    # render table
+    curve_table = dbc.Table.from_dataframe(pd.DataFrame())
     return (
         fig,
         curve_table.children,

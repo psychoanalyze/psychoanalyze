@@ -63,3 +63,13 @@ def test_standard_logistic():
     fig = pa.plot.logistic(df)
     assert fig.layout.xaxis.title.text == "x"
     assert fig.layout.yaxis.title.text == "Hit Rate"
+
+
+def test_curves():
+    curves_data = {
+        "y": "p",
+        "curves_df": pd.DataFrame(
+            {"p": [], "err+": [], "err-": []}, index=pd.Index([], name="x")
+        ),
+    }
+    assert pa.plot.curves(curves_data)
