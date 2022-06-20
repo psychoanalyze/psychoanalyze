@@ -78,12 +78,13 @@ def generate_data(n_trials_per_level, x_min, x_max, y):
     curves_data.index = x
     fit = pa.curve.fit(curves_data)
     df = pa.data.reshape_fit_results(fit, x, y)
-    mu = pa.curve.get_fit_param(fit, "mu")
-    sigma = pa.curve.get_fit_param(fit, "sigma")
-    sigma_err = pa.curve.get_fit_param(fit, "sigma_err")
-    gamma = pa.curve.get_fit_param(fit, "gamma")
-    lambda_ = pa.curve.get_fit_param(fit, "lambda")
-
+    # mu = pa.curve.get_fit_param(fit, "mu")
+    # sigma = pa.curve.get_fit_param(fit, "sigma")
+    # sigma_err = pa.curve.get_fit_param(fit, "sigma_err")
+    # gamma = pa.curve.get_fit_param(fit, "gamma")
+    # lambda_ = pa.curve.get_fit_param(fit, "lambda")
+    param_names = ["mu", "sigma", "sigma_err", "gamma", "lambda"]
+    param_fits = {name: [pa.curve.get_fit_param(fit, name)] for name in param_names}
     # plot fig
     curves_plot_data = {"y": y, "curves_df": df}
     fig = pa.plot.curves(curves_plot_data)
@@ -94,17 +95,7 @@ def generate_data(n_trials_per_level, x_min, x_max, y):
     weber_fraction = params[1]
 
     # render fit params table
-    params_table = dbc.Table.from_dataframe(
-        pd.DataFrame(
-            {
-                "mu": [mu],
-                "sigma": [sigma],
-                "sigma_err": sigma_err,
-                "gamma": gamma,
-                "lambda": lambda_,
-            }
-        )
-    )
+    params_table = dbc.Table.from_dataframe(pd.DataFrame(param_fits))
 
     # render points table
     curve_table = dbc.Table.from_dataframe(curves_plot_data["curves_df"])
