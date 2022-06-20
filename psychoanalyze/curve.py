@@ -55,6 +55,10 @@ def prep_psych_curve(curves_data: pd.DataFrame, x: pd.Index, y: str):
     return df
 
 
+def get_fit_param(fit: pd.DataFrame, name: str):
+    return fit.loc[name, "50%"]
+
+
 def fit(points: pd.DataFrame) -> pd.DataFrame:
     points = points.reset_index()
     stan_data = {

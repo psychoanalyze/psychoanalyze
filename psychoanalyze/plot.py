@@ -102,11 +102,11 @@ def difference_thresholds():
     return px.scatter(
         pd.DataFrame(
             {
-                "Reference Charge (nC)": [0.0],
-                "Difference Threshold Charge (nC)": [0.1],
-                "Monkey": ["U"],
-                "Dimension": ["PW"],
-                "n": [10],
+                "Reference Charge (nC)": [10.0, 20.0, 30.0],
+                "Difference Threshold Charge (nC)": [0.1, 0.2, 0.3],
+                "Monkey": ["U", "U", "U"],
+                "Dimension": ["PW", "PW", "PW"],
+                "n": [10, 7, 9],
             }
         ),
         x="Reference Charge (nC)",
@@ -114,5 +114,6 @@ def difference_thresholds():
         color="Monkey",
         symbol="Dimension",
         size="n",
+        trendline="ols",
         template="plotly_white",
     )
