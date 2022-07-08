@@ -78,11 +78,6 @@ def generate_data(n_trials_per_level, x_min, x_max, y):
     curves_data.index = x
     fit = pa.curve.fit(curves_data)
     df = pa.data.reshape_fit_results(fit, x, y)
-    # mu = pa.curve.get_fit_param(fit, "mu")
-    # sigma = pa.curve.get_fit_param(fit, "sigma")
-    # sigma_err = pa.curve.get_fit_param(fit, "sigma_err")
-    # gamma = pa.curve.get_fit_param(fit, "gamma")
-    # lambda_ = pa.curve.get_fit_param(fit, "lambda")
     param_names = ["mu", "sigma", "sigma_err", "gamma", "lambda"]
     param_fits = {name: [pa.curve.get_fit_param(fit, name)] for name in param_names}
     # plot fig
