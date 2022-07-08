@@ -1,5 +1,6 @@
 import psychoanalyze as pa
 import pandas as pd
+import datatest as dt
 
 
 def test_weber_plot():
@@ -20,3 +21,16 @@ def test_weber_plot():
     assert fig.layout.xaxis.title.text == y
     assert fig.layout.yaxis.title.text == x
     assert all(trace["error_y"] for trace in fig.data)
+
+
+def test_weber_aggregate():
+    curve_data = pd.DataFrame(
+        {
+            "Reference Charge (nC)": [0, 0],
+            "Difference Threshold (nC)": [0, 2],
+        }
+    )
+    dt.validate(
+        pa.weber.aggregate(curve_data),
+        pd.DataFrame({"Reference Charge (nC)": [0], "Difference Threshold (nC)": [1]}),
+    )

@@ -40,14 +40,6 @@ def transform(hit_rate, y: str):
     return logit(hit_rate) if y == "alpha" else hit_rate
 
 
-# def prep_psych_curve(curves_data: pd.DataFrame, x: pd.Index, y: str):
-#     hit_rate = pa.curve.hit_rate(curves_data)
-
-#     curves_data[y] = transform(hit_rate, y)
-#     curves_data = pa.curve.add_posterior(curves_data, posterior)
-#     return pa.data.params(curves_data, x, y)
-
-
 def prep_psych_curve(curves_data: pd.DataFrame, x: pd.Index, y: str):
     curves_data.index = x
     df = pa.curve.fit(curves_data)
