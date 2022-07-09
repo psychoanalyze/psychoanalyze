@@ -45,7 +45,7 @@ jobs:
       run: poetry run mypy .
 
     - name: Security w/bandit
-      run: poetry run bandit -r . -c pyproject.toml
+      run: poetry run bandit -r psychoanalyze
       
     - name: Security w/safety
       run: poetry export -f requirements.txt | poetry run safety check

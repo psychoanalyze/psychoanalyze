@@ -47,7 +47,3 @@ filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore::FutureWarning"
 ]
-
-[tool.bandit]
-include = ["."]
-exclude = [".git", ".venv", ".pytest_cache", ".mypy_cache", ".ipynb_checkpoints", ".hypothesis", "__pycache__", "dist", "site"]
