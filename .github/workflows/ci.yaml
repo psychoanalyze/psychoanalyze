@@ -23,7 +23,7 @@ jobs:
 
     - name: Install, configure Poetry
       run: |
-        pip install poetry safety
+        curl -sSL https://install.python-poetry.org | python3 -
         poetry config virtualenvs.in-project true
 
     - name: Install Python 3.10
