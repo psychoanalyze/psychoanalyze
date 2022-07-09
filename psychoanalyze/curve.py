@@ -54,3 +54,8 @@ def fit(points: pd.DataFrame) -> pd.DataFrame:
     }
     model = stan.CmdStanModel(stan_file="models/binomial_regression.stan")
     return model.sample(chains=4, data=stan_data).summary()
+
+
+def from_trials(trials: pd.DataFrame) -> pd.Series:
+    """Arrange *method of constant stimuli* performance curves using trial data"""
+    return trials.groupby("x").mean().rename(columns={"Result": "Hit Rate"})
