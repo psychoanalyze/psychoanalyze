@@ -48,7 +48,7 @@ jobs:
       run: poetry run bandit -r psychoanalyze
       
     - name: Security w/safety
-      run: poetry export -f requirements.txt | poetry run safety check
+      run: poetry export -f requirements.txt | poetry run safety check --stdin -i 42194
 
     - name: Tests
       run: poetry run pytest
