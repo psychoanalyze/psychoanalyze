@@ -15,3 +15,9 @@ def plot(data):
 
 def aggregate(data):
     return data.groupby("Reference Charge (nC)").mean().reset_index()
+
+
+def from_curves(curves):
+    curves["Reference Charge (nC)"] = curves["Reference PW"] * curves["Reference Amp"]
+    curves["Difference Threshold (nC)"] = curves["Threshold"]
+    return curves

@@ -22,13 +22,21 @@ def test_weber_plot():
 
 
 def test_weber_aggregate():
-    curve_data = pd.DataFrame(
-        {
-            "Reference Charge (nC)": [0, 0],
-            "Difference Threshold (nC)": [0, 2],
-        }
-    )
+    points = [
+        {"Reference Charge (nC)": 0, "Difference Threshold (nC)": 0},
+        {"Reference Charge (nC)": 0, "Difference Threshold (nC)": 2},
+    ]
+    curve_data = pd.DataFrame.from_records(points)
     dt.validate(
         pa.weber.aggregate(curve_data),
         pd.DataFrame({"Reference Charge (nC)": [0], "Difference Threshold (nC)": [1]}),
     )
+
+
+def test_from_curves():
+    curves = pd.DataFrame({"Reference PW": [], "Reference Amp": [], "Threshold": []})
+    weber = pa.weber.from_curves(curves)
+    with dt.accepted(dt.Extra):
+        dt.validate(
+            weber.columns, {"Reference Charge (nC)", "Difference Threshold (nC)"}
+        )
