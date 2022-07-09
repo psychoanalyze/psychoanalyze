@@ -29,11 +29,13 @@ def test_xrange_index():
     assert index.name == "x"
 
 
-def test_prep_psych_curve():
+def test_prep_psych_curve(mocker):
     curves_data = pd.DataFrame({"Hits": [1] * 3, "n": [1] * 3})
     x = pd.Index([1, 2, 3], name="x")
     y = "p"
-    return pa.curve.prep_psych_curve(curves_data=curves_data, x=x, y=y)
+
+    mocker.patch("psychoanalyze.curve.fit")
+    assert pa.curve.prep_psych_curve(curves_data=curves_data, x=x, y=y)
 
 
 def test_transform():

@@ -3,7 +3,7 @@ import numpy as np
 from scipy.stats import logistic
 from scipy.special import logit
 import psychoanalyze as pa
-from cmdstanpy import CmdStanModel
+import cmdstanpy as stan
 
 
 def add_posterior(data, posterior):
@@ -59,5 +59,5 @@ def fit(points: pd.DataFrame) -> pd.DataFrame:
         "N": points["n"].to_numpy(),
         "hits": points["Hits"].to_numpy(),
     }
-    model = CmdStanModel(stan_file="models/binomial_regression.stan")
+    model = stan.CmdStanModel(stan_file="models/binomial_regression.stan")
     return model.sample(chains=4, data=stan_data).summary()

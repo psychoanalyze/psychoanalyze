@@ -1,7 +1,8 @@
 import psychoanalyze as pa
 
 
-def test_integrate_data():
+def test_integrate_data(mocker):
+    mocker.patch("psychoanalyze.curve.fit")
     n_trials_per_level = 10
     x_min = -3
     x_max = 3
