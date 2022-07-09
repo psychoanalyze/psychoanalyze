@@ -1,8 +1,8 @@
-from dash import Dash, dcc, Output, Input, html
-import dash_bootstrap_components as dbc
+from dash import Dash, dcc, Output, Input, html  # type: ignore
+import dash_bootstrap_components as dbc  # type: ignore
 import psychoanalyze as pa
 import pandas as pd
-import plotly.express as px
+import plotly.express as px  # type: ignore
 from psychoanalyze.layout import input_group
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])

@@ -1,9 +1,9 @@
 from psychoanalyze import __version__
 import psychoanalyze as pa
 import pandas as pd
-import datatest as dt
+import datatest as dt  # type: ignore
 import numpy as np
-from scipy.special import expit
+from scipy.special import expit  # type: ignore
 
 
 def test_version():

@@ -10,6 +10,4 @@ def test_integrate_data(mocker):
     curves_data = pa.curve.generate(n_trials_per_level)
 
     x = pa.curve.xrange_index(x_min, x_max)
-    curves_data_w_posterior = pa.curve.prep_psych_curve(
-        curves_data=curves_data, x=x, y=y
-    )
+    assert pa.curve.prep_psych_curve(curves_data=curves_data, x=x, y=y)

@@ -1,6 +1,6 @@
 import psychoanalyze as pa
 import pandas as pd
-import datatest as dt
+import datatest as dt  # type: ignore
 
 
 def test_generate():

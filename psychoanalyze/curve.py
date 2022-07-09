@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-from scipy.stats import logistic
-from scipy.special import logit
+from scipy.stats import logistic  # type: ignore
+from scipy.special import logit  # type: ignore
 import psychoanalyze as pa
 import cmdstanpy as stan
 
@@ -12,13 +12,6 @@ def add_posterior(data, posterior):
         keys=["Observed", "Posterior"],
         names=["Type"],
     ).reset_index()
-
-
-def params(points: pd.DataFrame, x: pd.Index, var: str):
-    fit = pa.data.fit_curve(points)
-    df = fit.loc[f"{var}[1]":f"{var}[{len(x)}]", "5%":"95%"]
-    df.index = x
-    return df
 
 
 def generate(n_trials_per_level=100):

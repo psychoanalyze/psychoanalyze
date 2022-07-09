@@ -1,7 +1,7 @@
 import psychoanalyze as pa
 import pytest
 import pandas as pd
-import datatest as dt
+import datatest as dt  # type: ignore
 
 
 @pytest.fixture

@@ -1,5 +1,4 @@
-import plotly.express as px
-import pandas as pd
+import plotly.express as px  # type: ignore
 
 
 def plot(data):

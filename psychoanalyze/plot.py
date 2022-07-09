@@ -1,4 +1,4 @@
-import plotly.express as px
+import plotly.express as px  # type: ignore
 import pandas as pd
 import psychoanalyze as pa
 
@@ -83,7 +83,7 @@ def hit_rate_animation(cumulative_draws: pd.DataFrame):
 
 def posterior_animation(cumulative_draws: pd.DataFrame):
     df = cumulative_draws
-    df = pa.data.transform_errors(df, "50%").reset_index()
+    df = pa.data.transform_errors(df).reset_index()
     return px.scatter(
         df,
         x="x",

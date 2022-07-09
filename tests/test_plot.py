@@ -1,7 +1,6 @@
 import pandas as pd
 import psychoanalyze as pa
 import pytest
-import random
 
 
 @pytest.fixture
@@ -55,14 +54,6 @@ def test_bayes():
     assert fig.layout.xaxis.title.text == "x"
     assert fig.layout.yaxis.title.text == "Hit Rate"
     assert len(fig.data) == 2
-
-
-def test_standard_logistic():
-    s = pa.data.logistic()
-    df = s.to_frame()
-    fig = pa.plot.logistic(df)
-    assert fig.layout.xaxis.title.text == "x"
-    assert fig.layout.yaxis.title.text == "Hit Rate"
 
 
 def test_curves():

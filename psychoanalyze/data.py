@@ -1,7 +1,7 @@
 from typing import List
 import pandas as pd
 import numpy as np
-from scipy.stats import logistic as scipy_logistic
+from scipy.stats import logistic as scipy_logistic  # type: ignore
 import psychoanalyze as pa
 from itertools import accumulate
 
@@ -14,7 +14,7 @@ def construct_index(subjects: List[str], days: List[int], x: List[float]):
     levels = [days, x]
     names = ["Day", "x"]
     if subjects:
-        levels = [subjects] + levels
+        levels = [subjects] + levels  # type: ignore
         names = ["Subject"] + names
     return pd.MultiIndex.from_product(levels, names=names)
 
@@ -52,7 +52,7 @@ def logistic(threshold=0, scale=1, gamma=0, lambda_=0):
 
 def mu(points: pd.DataFrame):
     fit = pa.curve.fit(points)
-    df = fit.loc["mu", "5%":"95%"]
+    df = fit.loc["mu", ["5%", "50%", "95%"]]  # type: ignore
     return df.T
 
 
@@ -63,8 +63,9 @@ def transform_errors(df):
 
 
 def reshape_fit_results(fit: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame:
+    rows = [f"{y}[{i}]" for i in range(1, len(x) + 1)]
     df = fit.loc[
-        f"{y}[1]":f"{y}[{len(x)}]",  # row eg 'p[1]:p[8]'
+        rows,  # row eg 'p[1]:p[8]'
         ["5%", "50%", "95%"],  # col
     ]
     df = transform_errors(df)

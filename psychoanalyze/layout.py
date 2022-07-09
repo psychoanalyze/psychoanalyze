@@ -1,4 +1,4 @@
-import dash_bootstrap_components as dbc
+import dash_bootstrap_components as dbc  # type: ignore
 
 
 defaults = {

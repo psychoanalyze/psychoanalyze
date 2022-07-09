@@ -1,11 +1,13 @@
 import pandas as pd
 import numpy as np
-from scipy.special import expit
+from scipy.special import expit  # type: ignore
 from psychoanalyze import plot, data, trial, curve, session, weber
 
 pd.options.plotting.backend = "plotly"
 
 __version__ = "0.1.0"
+
+__all__ = ["plot", "data", "trial", "curve", "session", "weber"]
 
 
 # def curve(trials: pd.DataFrame) -> pd.Series:
@@ -23,7 +25,7 @@ def psi() -> pd.Series:
     """Basic sigmoid psychometric function psi (Ψ) = expit/logistic"""
     expected_x = np.linspace(-3, 3)
     expected_y = expit(expected_x)
-    return pd.Series(expected_y, index=expected_x)
+    return pd.Series(expected_y, index=expected_x)  # type: ignore
 
 
 def fit(points):
