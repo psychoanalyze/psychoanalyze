@@ -27,6 +27,7 @@ cmdstanpy = "^1.0.1"
 statsmodels = "^0.13.2"
 ipywidgets = "^7.7.0"
 mypy = "^0.961"
+hypothesis = "^6.50.0"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.2.0"
