@@ -31,6 +31,7 @@ hypothesis = "^6.50.0"
 flake8 = "^4.0.1"
 bandit = "^1.7.4"
 pandas-stubs = "^1.4.3"
+importlib-resources = "^5.8.0"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.2.0"

@@ -21,31 +21,31 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Set up the project
+    - name: Install, configure Poetry
       run: |
         pip install poetry safety
         poetry config virtualenvs.in-project true
 
-    - name: Set up Python 3.10
+    - name: Install Python 3.10
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
         cache: 'poetry'
 
-    - name: Install dependencies
+    - name: Install package dependencies
       run: poetry install
 
-    - name: Check if the documentation builds correctly
+    - name: Build documentation
       run: poetry run mkdocs build
 
-    - name: Check the code quality
+    - name: Flake8 lint
       run: poetry run flake8
 
-    - name: Check if the code is correctly typed
+    - name: MyPy type check
       run: poetry run mypy
 
-    - name: Check for vulnerabilities in dependencies
+    - name: Security w/bandit
       run: poetry run bandit .
 
-    - name: Run the test suite
+    - name: Tests
       run: poetry run pytest
