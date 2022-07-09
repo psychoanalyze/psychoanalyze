@@ -45,7 +45,10 @@ jobs:
       run: poetry run mypy .
 
     - name: Security w/bandit
-      run: poetry run bandit -r .
+      run: poetry run bandit -r . -c pyproject.toml
+      
+    - name: Security w/safety
+      run: poetry export -f requirements.txt | poetry run safety check
 
     - name: Tests
       run: poetry run pytest
