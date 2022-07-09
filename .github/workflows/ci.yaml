@@ -45,7 +45,7 @@ jobs:
       run: poetry run mypy .
 
     - name: Security w/bandit
-      run: poetry run bandit .
+      run: poetry run bandit -r .
 
     - name: Tests
       run: poetry run pytest
