@@ -6,11 +6,9 @@ import datatest as dt
 def test_weber_plot():
     y = "Reference Charge (nC)"
     x = "Difference Threshold (nC)"
+    subjects = ["U", "Y"]
     line = {x: [0, 1], y: [0, 1]}
-    data = {
-        "U": {"Amp": line, "Width": line},
-        "Y": {"Amp": line, "Width": line},
-    }
+    data = {subject: {"Amp": line, "Width": line} for subject in subjects}
     data = pd.concat({k: pd.DataFrame(v).T for k, v in data.items()})
     data.index.names = ["Monkey", "Dimension"]
     data["err_y"] = 1
