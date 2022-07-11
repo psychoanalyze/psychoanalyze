@@ -2,53 +2,72 @@ from dash import Dash, dcc, Output, Input, html  # type: ignore
 import dash_bootstrap_components as dbc  # type: ignore
 import psychoanalyze as pa
 import pandas as pd
-import plotly.express as px  # type: ignore
-from psychoanalyze.layout import input_group
+import plotly.express as px
+from psychoanalyze.layout import controls, curves_column, diff_thresh_column
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 
-
-session_inputs = input_group("session")
-param_inputs = input_group("param")
-x_min_input = input_group("x_min")
-x_max_input = input_group("x_max")
-
-threshold_column = dbc.Col(
-    [
-        dcc.Graph(id="time-thresholds"),
-        dbc.Table(id="thresh-data"),
-    ]
+detection_data = pa.detection.load(pd.read_hdf("data/curves.h5"))[
+    ["Monkey", "Threshold", "width", "lambda", "gamma"]
+]
+main_params = detection_data[["Monkey", "Threshold", "width"]].melt(
+    id_vars=["Monkey"], var_name="param"
 )
-
-curves_column = dbc.Col(
-    [
-        dcc.RadioItems(
-            [
-                {"label": "sigmoid", "value": "p"},
-                {"label": "linear", "value": "alpha"},
-            ],
-            "p",
-            id="y",
-        ),
-        dcc.Graph(id="curves"),
-        dbc.Table(id="fit-params"),
-        dbc.Table(id="curve-data"),
-    ]
+nuisance_params = detection_data[["Monkey", "gamma", "lambda"]].melt(
+    id_vars=["Monkey"], var_name="param"
 )
-
-diff_thresh_column = dbc.Col(
-    [
-        dcc.Graph(id="difference-thresholds"),
-        html.P(id="weber-fraction"),
-    ]
-)
+weber_data = pd.read_csv("data/weber_curves.csv")
 
 app.layout = dbc.Container(
-    [
-        dbc.Row(session_inputs + param_inputs),
-        dbc.Row(x_min_input + x_max_input),
-        dbc.Row([curves_column, diff_thresh_column]),
-    ]
+    dbc.Tabs(
+        [
+            dbc.Tab(
+                dbc.Tabs(
+                    [
+                        dbc.Tab(
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        dcc.Graph(
+                                            figure=px.ecdf(
+                                                main_params,
+                                                color="Monkey",
+                                                line_dash="param",
+                                                template="plotly_white",
+                                            )
+                                        ),
+                                    ),
+                                    dbc.Col(
+                                        dcc.Graph(
+                                            figure=px.ecdf(
+                                                nuisance_params,
+                                                line_dash="param",
+                                                color="Monkey",
+                                                template="plotly_white",
+                                            )
+                                        )
+                                    ),
+                                ]
+                            ),
+                            label="Detection",
+                        ),
+                        dbc.Tab(
+                            dcc.Graph(figure=pa.weber.plot(weber_data)),
+                            label="Discrimination",
+                        ),
+                    ]
+                ),
+                label="Experiment",
+            ),
+            dbc.Tab(
+                [
+                    controls,
+                    dbc.Row([curves_column, diff_thresh_column]),
+                ],
+                label="Simulation",
+            ),
+        ]
+    )
 )
 
 

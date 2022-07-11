@@ -1,13 +1,13 @@
 import pandas as pd
 import numpy as np
 from scipy.special import expit  # type: ignore
-from psychoanalyze import plot, data, trial, curve, session, weber
+from psychoanalyze import plot, data, trial, curve, session, weber, detection
 
 pd.options.plotting.backend = "plotly"
 
 __version__ = "0.1.0"
 
-__all__ = ["plot", "data", "trial", "curve", "session", "weber"]
+__all__ = ["plot", "data", "trial", "curve", "session", "weber", "detection"]
 
 
 # def curve(trials: pd.DataFrame) -> pd.Series:

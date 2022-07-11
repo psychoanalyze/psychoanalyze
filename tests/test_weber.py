@@ -31,12 +31,3 @@ def test_weber_aggregate():
         pa.weber.aggregate(curve_data),
         pd.DataFrame({"Reference Charge (nC)": [0], "Difference Threshold (nC)": [1]}),
     )
-
-
-def test_from_curves():
-    curves = pd.DataFrame({"Reference PW": [], "Reference Amp": [], "Threshold": []})
-    weber = pa.weber.from_curves(curves)
-    with dt.accepted(dt.Extra):
-        dt.validate(
-            weber.columns, {"Reference Charge (nC)", "Difference Threshold (nC)"}
-        )
