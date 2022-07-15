@@ -44,7 +44,7 @@ jobs:
       run: poetry run flake8
 
     - name: MyPy type check
-      run: poetry run mypy .
+      run: poetry run mypy psychoanalyze
 
     - name: Security w/bandit
       run: poetry run bandit -r psychoanalyze

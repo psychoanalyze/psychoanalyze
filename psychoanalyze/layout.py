@@ -1,5 +1,5 @@
 import dash_bootstrap_components as dbc  # type: ignore
-from dash import html, dcc
+from dash import html, dcc  # type: ignore
 
 defaults = {
     "session": {"sessions": 1, "trials": 100, "subjects": 1},
