@@ -935,11 +935,11 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "markdown"
-version = "3.3.7"
+version = "3.4"
 description = "Python implementation of Markdown."
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [package.extras]
 testing = ["coverage", "pyyaml"]
@@ -2199,8 +2199,8 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 
 [metadata]
 lock-version = "1.1"
-python-versions = ">=3.10,<3.11"
-content-hash = "948da3bc7931532872fd00495fa596e2532652ac630868728c1881bf247ef6f8"
+python-versions = "3.10.4"
+content-hash = "42c2762dc641f5f0dc51dbc70d12b67d3c837ffde084af16671cd7e1689423f9"
 
 [metadata.files]
 anyio = [
@@ -2633,8 +2633,8 @@ kiwisolver = [
     {file = "kiwisolver-1.4.3.tar.gz", hash = "sha256:ab8a15c2750ae8d53e31f77a94f846d0a00772240f1c12817411fa2344351f86"},
 ]
 markdown = [
-    {file = "Markdown-3.3.7-py3-none-any.whl", hash = "sha256:f5da449a6e1c989a4cea2631aa8ee67caa5a2ef855d551c88f9e309f4634c621"},
-    {file = "Markdown-3.3.7.tar.gz", hash = "sha256:cbb516f16218e643d8e0a95b309f77eb118cb138d39a4f27851e6a63581db874"},
+    {file = "Markdown-3.4-py3-none-any.whl", hash = "sha256:e90f851d4b0f788ee2e9c352205d8a592fd0c713ca6b934f87b81bc14d24dab7"},
+    {file = "Markdown-3.4.tar.gz", hash = "sha256:03078d25ed76dd9d2a803e5708ddb1c4ec3a5ed7654bc882e032364f09c184d5"},
 ]
 markdown-it-py = [
     {file = "markdown-it-py-2.1.0.tar.gz", hash = "sha256:cf7e59fed14b5ae17c0006eff14a2d9a00ed5f3a846148153899a0224e2c07da"},
