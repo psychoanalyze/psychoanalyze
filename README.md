@@ -11,17 +11,13 @@ Psychophysics analysis in Python.
 
 
 ## Installation
-
+pip:
 ```console
 $ pip install psychoanalyze
 ```
-
-## Usage 
-
-```python
->>> import psychoanalyze as pa
->>> trials_df = pa.fake()
->>> curve_df = pa.curve(trials_df)
+poetry:
+```console
+$ poetry add psychoanalyze
 ```
 
 ## Documentation

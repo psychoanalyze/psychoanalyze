@@ -34,6 +34,10 @@ pandas-stubs = "^1.4.3"
 importlib-resources = "^5.8.0"
 safety = "^2.0.0"
 tables = "^3.7.0"
+mkdocs-material = "^8.3.9"
+tabulate = "^0.8.10"
+mknotebooks = "^0.7.1"
+jupyterlite = "^0.1.0-beta.11"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.2.0"

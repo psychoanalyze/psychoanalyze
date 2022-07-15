@@ -1,13 +1,23 @@
 site_name: PsychoAnalyze
 site_url: https://github.com/schlich/psychoanalyze
 theme:
-    name: readthedocs
+    name: material
 plugins:
  - search
  - mkdocstrings:
     watch:
     - psychoanalyze
- - mkdocs-jupyter:
-    include_source: True
+ - mknotebooks
+#  - mkdocs-jupyter
 repo_url: https://github.com/schlich/psychoanalyze
 edit_uri: edit/main/docs/
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - tables
+extra_javascript:
+ - https://cdn.plot.ly/plotly-2.12.1.min.js
+ - docs/require.js

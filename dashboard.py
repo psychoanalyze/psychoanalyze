@@ -7,6 +7,7 @@ import plotly.express as px  # type: ignore
 from psychoanalyze.layout import controls, curves_column, diff_thresh_column
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
+server = app.server
 
 if os.path.isfile("data/blocks.csv"):
     blocks = pd.read_csv("data/blocks.csv")

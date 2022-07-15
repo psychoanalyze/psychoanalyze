@@ -134,3 +134,5 @@ dmypy.json
 .vscode/
 
 data/*
+
+docs/tables/*
