@@ -136,3 +136,5 @@ dmypy.json
 data/*
 
 docs/tables/*
+
+.jupyterlite.doit.db
