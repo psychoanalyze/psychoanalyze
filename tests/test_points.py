@@ -47,4 +47,4 @@ def test_both_dimensions():
 def test_fit(mocker):
     mocker.patch("cmdstanpy.CmdStanModel")
     df = pd.DataFrame({"Amp1": [], "n": [], "Hits": []})
-    fit = pa.points.fit(df)
+    pa.points.fit(df)
