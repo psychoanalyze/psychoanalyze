@@ -9,20 +9,34 @@ from psychoanalyze.layout import controls, curves_column, diff_thresh_column
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 server = app.server
 
+session_index_levels = ["Monkey", "Date"]
+ref_stimulus_levels = [
+    "Amp2",
+    "Width2",
+    "Freq2",
+    "Dur2",
+    "Active Channels",
+    "Return Channels",
+]
+trial_stimulus_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
+block_index_levels = session_index_levels + ref_stimulus_levels
+point_index_levels = block_index_levels + trial_stimulus_levels
+
 if os.path.isfile("data/blocks.csv"):
-    blocks = pd.read_csv("data/blocks.csv")
+    blocks = pd.read_csv("data/blocks.csv").set_index(block_index_levels)
 else:
     if os.path.isfile("data/trials.csv"):
         trials = pd.read_csv("data/trials.csv")
-        points = pa.points.from_trials(trials)
-        blocks = pa.blocks.from_points(points)
+        points = pa.points.from_trials(trials).set_index(point_index_levels)
+        blocks = pa.blocks.from_points(points).set_index(block_index_levels)
     else:
-        blocks = pd.DataFrame({"Dimension": []})
-
+        blocks = pd.DataFrame()
+print(blocks.index.names)
+print(blocks.columns)
 detection_data = pa.detection.load(blocks)[
     ["Monkey", "Threshold", "width", "lambda", "gamma"]
 ]
-main_params = detection_data[["Monkey", "Dimension", "Threshold", "width"]].melt(
+main_params = detection_data[["Monkey", "Threshold", "width"]].melt(
     id_vars=["Monkey"], var_name="param"
 )
 main_params_amp = main_params[main_params["Dimension"] == "Amp"].drop(
