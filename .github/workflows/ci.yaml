@@ -30,12 +30,18 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
-        cache: 'poetry'
 
     - name: Install package dependencies
       run: |
         poetry env use 3.10
-        poetry install
+        poetry install --no-interaction
+
+    - name: Activate Poetry Cache
+    
+    - name: Install Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        cache: poetry
 
     - name: Build documentation
       run: poetry run mkdocs build
