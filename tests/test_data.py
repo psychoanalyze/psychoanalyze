@@ -28,13 +28,13 @@ def test_nonstandard_logistic_slope():
 
 def test_fit_curve(mocker):
     mocker.patch("cmdstanpy.CmdStanModel")
-    df = pd.DataFrame({"x": [], "n": [], "Hits": []})
-    pa.curve.fit(df)
+    df = pd.DataFrame({"Amp1": [], "n": [], "Hits": []})
+    pa.points.fit(df)
 
 
 def test_mu_two_groups(mocker):
     mocker.patch(
-        "psychoanalyze.curve.fit",
+        "psychoanalyze.points.fit",
         return_value=pd.DataFrame(
             {"5%": [1], "50%": [2], "95%": [3]}, index=pd.Index(["mu"])
         ),

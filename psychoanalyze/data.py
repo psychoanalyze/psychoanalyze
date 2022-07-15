@@ -36,7 +36,7 @@ def psych(hits, n_trials_per_stim_level, index, y):
         },
         index=index,
     )
-    df["Hit Rate"] = pa.curve.hit_rate
+    df["Hit Rate"] = pa.blocks.hit_rate
     return df
 
 
@@ -51,7 +51,7 @@ def logistic(threshold=0, scale=1, gamma=0, lambda_=0):
 
 
 def mu(points: pd.DataFrame):
-    fit = pa.curve.fit(points)
+    fit = pa.points.fit(points)
     df = fit.loc["mu", ["5%", "50%", "95%"]]  # type: ignore
     return df.T
 
@@ -81,11 +81,11 @@ def generate_animation_curves():
         list(
             accumulate(
                 [
-                    pa.curve.generate(n_trials_per_level_per_block)
+                    pa.blocks.generate(n_trials_per_level_per_block)
                     for _ in range(n_blocks)
                 ]
             )
         )
     )
-    df["Hit Rate"] = pa.curve.hit_rate
+    df["Hit Rate"] = pa.blocks.hit_rate
     return df

@@ -1,4 +1,5 @@
-from dash import Dash, dcc, Output, Input, html  # type: ignore
+import os
+from dash import Dash, dcc, Output, Input  # type: ignore
 import dash_bootstrap_components as dbc  # type: ignore
 import psychoanalyze as pa
 import pandas as pd
@@ -7,11 +8,24 @@ from psychoanalyze.layout import controls, curves_column, diff_thresh_column
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 
-detection_data = pa.detection.load(pd.read_hdf("data/curves.h5"))[
+if os.path.isfile("data/blocks.csv"):
+    blocks = pd.read_csv("data/blocks.csv")
+else:
+    trials = pd.read_csv("data/trials.csv")
+    points = pa.points.from_trials(trials)
+    blocks = pa.blocks.from_points(points)
+
+detection_data = pa.detection.load(blocks)[
     ["Monkey", "Threshold", "width", "lambda", "gamma"]
 ]
-main_params = detection_data[["Monkey", "Threshold", "width"]].melt(
+main_params = detection_data[["Monkey", "Dimension", "Threshold", "width"]].melt(
     id_vars=["Monkey"], var_name="param"
+)
+main_params_amp = main_params[main_params["Dimension"] == "Amp"].drop(
+    columns=["Dimension"]
+)
+main_params_width = main_params[main_params["Dimension"] == "Width"].drop(
+    columns=["Dimension"]
 )
 nuisance_params = detection_data[["Monkey", "gamma", "lambda"]].melt(
     id_vars=["Monkey"], var_name="param"
@@ -88,17 +102,17 @@ app.layout = dbc.Container(
 )
 def generate_data(n_trials_per_level, x_min, x_max, y):
     # generate curves with n trials per level
-    curves_data = pa.curve.generate(n_trials_per_level)
+    curves_data = pa.blocks.generate(n_trials_per_level)
 
     # define the range of the function
-    x = pa.curve.xrange_index(x_min, x_max)
+    x = pa.blocks.xrange_index(x_min, x_max)
 
     # fit curves with Stan
     curves_data.index = x
-    fit = pa.curve.fit(curves_data)
+    fit = pa.points.fit(curves_data)
     df = pa.data.reshape_fit_results(fit, x, y)
     param_names = ["mu", "sigma", "sigma_err", "gamma", "lambda"]
-    param_fits = {name: [pa.curve.get_fit_param(fit, name)] for name in param_names}
+    param_fits = {name: [pa.blocks.get_fit_param(fit, name)] for name in param_names}
     # plot fig
     curves_plot_data = {"y": y, "curves_df": df}
     fig = pa.plot.curves(curves_plot_data)

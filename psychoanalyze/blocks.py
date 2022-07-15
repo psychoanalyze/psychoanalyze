@@ -3,7 +3,8 @@ import numpy as np
 from scipy.stats import logistic  # type: ignore
 from scipy.special import logit  # type: ignore
 import psychoanalyze as pa
-import cmdstanpy as stan
+
+reference_stimulus_dimensions = ["Amp2", "Width2", "Freq2", "Dur2"]
 
 
 def add_posterior(data, posterior):
@@ -35,7 +36,7 @@ def transform(hit_rate, y: str):
 
 def prep_psych_curve(curves_data: pd.DataFrame, x: pd.Index, y: str):
     curves_data.index = x
-    df = pa.curve.fit(curves_data)
+    df = pa.points.fit(curves_data)
     df = pa.data.reshape_fit_results(df, x, y)
     return df
 
@@ -44,18 +45,20 @@ def get_fit_param(fit: pd.DataFrame, name: str):
     return fit.loc[name, "50%"]
 
 
-def fit(points: pd.DataFrame) -> pd.DataFrame:
-    points = points.reset_index()
-    stan_data = {
-        "X": len(points),
-        "x": points["x"].to_numpy(),
-        "N": points["n"].to_numpy(),
-        "hits": points["Hits"].to_numpy(),
-    }
-    model = stan.CmdStanModel(stan_file="models/binomial_regression.stan")
-    return model.sample(chains=4, data=stan_data).summary()
-
-
 def from_trials(trials: pd.DataFrame) -> pd.Series:
     """Arrange *method of constant stimuli* performance curves using trial data"""
-    return trials.groupby("x").mean().rename(columns={"Result": "Hit Rate"})
+    return trials["Result"].to_frame().mean()
+
+
+def dimension(points):
+    return points.groupby(
+        ["Monkey", "Date"]
+        + reference_stimulus_dimensions
+        + ["Active Channels", "Return Channels"]
+    ).apply(pa.points.dimension)
+
+
+def from_points(df, block_index_names):
+    dimensions = df.groupby(block_index_names).apply(pa.blocks.dimension)
+    fits = df.groupby(block_index_names).apply(pa.points.fit, dimension="Amp1")
+    return dimensions.join(fits).reset_index()
