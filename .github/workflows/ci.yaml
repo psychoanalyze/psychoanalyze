@@ -37,8 +37,6 @@ jobs:
         poetry install --no-interaction
 
     - name: Activate Poetry Cache
-    
-    - name: Install Python 3.10
       uses: actions/setup-python@v4
       with:
         cache: poetry
