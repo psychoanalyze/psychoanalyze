@@ -33,7 +33,9 @@ jobs:
         cache: 'poetry'
 
     - name: Install package dependencies
-      run: poetry install
+      run: |
+        poetry env use 3.10
+        poetry install
 
     - name: Build documentation
       run: poetry run mkdocs build

@@ -4,7 +4,6 @@ import cmdstanpy as stan
 
 def from_trials(trials):
     trials = trials[trials["Result"].isin([0, 1])]
-
     return (
         trials.groupby(trials.index)["Result"]
         .agg(["count", "sum"])
