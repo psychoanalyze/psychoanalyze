@@ -13,11 +13,12 @@ def from_trials(trials):
 
 def dimension(points):
     df = points
-    if df["Amp1"].nunique() > 1 and df["Width1"].nunique() == 1:
+    amp1, width1 = (df.index.get_level_values(param) for param in ["Amp1", "Width1"])
+    if amp1.nunique() > 1 and width1.nunique() == 1:
         return "Amp"
-    elif df["Width1"].nunique() > 1 and df["Amp1"].nunique() == 1:
+    elif width1.nunique() > 1 and amp1.nunique() == 1:
         return "Width"
-    elif df["Width1"].nunique() > 1 and df["Amp1"].nunique() > 1:
+    elif width1.nunique() > 1 and amp1.nunique() > 1:
         return "Both"
 
 

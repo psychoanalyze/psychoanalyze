@@ -50,15 +50,15 @@ def from_trials(trials: pd.DataFrame) -> pd.Series:
     return trials["Result"].to_frame().mean()
 
 
-def dimension(points):
+def dimension(points, dims=None):
+    if dims is None:
+        return pa.points.dimension(points)
     return points.groupby(
-        ["Monkey", "Date"]
-        + reference_stimulus_dimensions
-        + ["Active Channels", "Return Channels"]
+        [dim for dim in list(points.index.names) if dim not in dims]
     ).apply(pa.points.dimension)
 
 
 def from_points(df, block_index_names):
     dimensions = df.groupby(block_index_names).apply(pa.blocks.dimension)
     fits = df.groupby(block_index_names).apply(pa.points.fit, dimension="Amp1")
-    return dimensions.join(fits).reset_index()
+    return dimensions.join(fits)

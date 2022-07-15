@@ -30,17 +30,23 @@ def test_from_trials():
 
 
 def test_amp_dimension():
-    df = pd.DataFrame({"Amp1": [1, 2], "Width1": [1, 1]})
+    df = pd.DataFrame(
+        index=pd.MultiIndex.from_frame(pd.DataFrame({"Amp1": [1, 2], "Width1": [1, 1]}))
+    )
     assert pa.points.dimension(df) == "Amp"
 
 
 def test_width_dimension():
-    df = pd.DataFrame({"Amp1": [1, 1], "Width1": [1, 2]})
+    df = pd.DataFrame(
+        index=pd.MultiIndex.from_frame(pd.DataFrame({"Amp1": [1, 1], "Width1": [1, 2]}))
+    )
     assert pa.points.dimension(df) == "Width"
 
 
 def test_both_dimensions():
-    df = pd.DataFrame({"Amp1": [1, 2], "Width1": [1, 2]})
+    df = pd.DataFrame(
+        index=pd.MultiIndex.from_frame(pd.DataFrame({"Amp1": [1, 2], "Width1": [1, 2]}))
+    )
     assert pa.points.dimension(df) == "Both"
 
 

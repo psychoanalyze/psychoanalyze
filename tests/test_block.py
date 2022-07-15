@@ -53,7 +53,10 @@ def test_from_points(mocker):
         "psychoanalyze.points.dimension", return_value=pd.DataFrame({"Dimension": []})
     )
     mocker.patch("psychoanalyze.points.fit", return_value=pd.Series(name="session"))
-    df = pd.DataFrame({"session": [1] * 8, "x": list(range(8)), "Hits": list(range(8))})
+    df = pd.DataFrame(
+        {"x": list(range(8)), "Hits": list(range(8))},
+        index=pd.Index([1] * 8, name="session"),
+    )
     df["n"] = 1000
-    blocks = pa.blocks.from_points(df, "session")
+    blocks = pa.blocks.from_points(df, ("session"))
     assert "Dimension" in list(blocks.columns)

@@ -12,9 +12,12 @@ server = app.server
 if os.path.isfile("data/blocks.csv"):
     blocks = pd.read_csv("data/blocks.csv")
 else:
-    trials = pd.read_csv("data/trials.csv")
-    points = pa.points.from_trials(trials)
-    blocks = pa.blocks.from_points(points)
+    if os.path.isfile("data/trials.csv"):
+        trials = pd.read_csv("data/trials.csv")
+        points = pa.points.from_trials(trials)
+        blocks = pa.blocks.from_points(points)
+    else:
+        blocks = pd.DataFrame({"Dimension": []})
 
 detection_data = pa.detection.load(blocks)[
     ["Monkey", "Threshold", "width", "lambda", "gamma"]
