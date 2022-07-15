@@ -4,21 +4,25 @@ import pandas as pd
 
 def test_from_trials():
     df = pd.DataFrame(
-        {
-            "Monkey": ["U", "U"],
-            "Date": [1, 1],
-            "Amp2": [1, 1],
-            "Width2": [1, 1],
-            "Freq2": [1, 1],
-            "Dur2": [1, 1],
-            "Active Channels": [1, 1],
-            "Return Channels": [1, 1],
-            "Amp1": [1, 2],
-            "Width1": [1, 1],
-            "Freq1": [1, 1],
-            "Dur1": [1, 1],
-            "Result": [0, 1],
-        }
+        {"Result": [0, 1]},
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame(
+                {
+                    "Monkey": ["U", "U"],
+                    "Date": [1, 1],
+                    "Amp2": [1, 1],
+                    "Width2": [1, 1],
+                    "Freq2": [1, 1],
+                    "Dur2": [1, 1],
+                    "Active Channels": [1, 1],
+                    "Return Channels": [1, 1],
+                    "Amp1": [1, 2],
+                    "Width1": [1, 1],
+                    "Freq1": [1, 1],
+                    "Dur1": [1, 1],
+                }
+            )
+        ),
     )
     df = pa.points.from_trials(df.reset_index())
     assert len(df) == 2

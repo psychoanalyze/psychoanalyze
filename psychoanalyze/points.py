@@ -6,22 +6,7 @@ def from_trials(trials):
     trials = trials[trials["Result"].isin([0, 1])]
 
     return (
-        trials.groupby(
-            [
-                "Monkey",
-                "Date",
-                "Amp2",
-                "Width2",
-                "Freq2",
-                "Dur2",
-                "Active Channels",
-                "Return Channels",
-                "Amp1",
-                "Width1",
-                "Freq1",
-                "Dur1",
-            ]
-        )["Result"]
+        trials.groupby(trials.index)["Result"]
         .agg(["count", "sum"])
         .rename(columns={"count": "n", "sum": "Hits"})
     )
