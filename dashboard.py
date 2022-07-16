@@ -18,7 +18,7 @@ def data_path(entity):
     return f"data/{entity}.csv"
 
 
-weber_data = pd.read_csv("data/weber_curves.csv")
+# weber_data = pd.read_csv("data/weber_curves.csv")
 x = list(range(-3, 4))
 p = expit(x)
 
@@ -66,7 +66,7 @@ experiment_tab = dbc.Tab(
         [
             dbc.Tab(label="Detection"),
             dbc.Tab(
-                dcc.Graph(figure=pa.weber.plot(weber_data)), label="Discrimination"
+                # dcc.Graph(figure=pa.weber.plot(weber_data)), label="Discrimination"
             ),
         ]
     ),
