@@ -5,8 +5,8 @@ from psychoanalyze import (
     blocks,
     plot,
     data,
-    trial,
-    session,
+    sessions,
+    trials,
     weber,
     detection,
     amp,
@@ -22,11 +22,12 @@ __all__ = [
     "data",
     "trial",
     "blocks",
-    "session",
+    "sessions",
     "weber",
     "detection",
     "amp",
     "points",
+    "trials",
 ]
 
 

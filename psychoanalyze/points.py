@@ -12,8 +12,10 @@ def from_trials(trials):
 
 
 def dimension(points):
-    df = points
-    amp1, width1 = (df.index.get_level_values(param) for param in ["Amp1", "Width1"])
+    points
+    amp1, width1 = (
+        points.index.get_level_values(param) for param in ["Amp1", "Width1"]
+    )
     if amp1.nunique() > 1 and width1.nunique() == 1:
         return "Amp"
     elif width1.nunique() > 1 and amp1.nunique() == 1:

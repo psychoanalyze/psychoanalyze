@@ -4,7 +4,7 @@ from scipy.stats import logistic  # type: ignore
 from scipy.special import logit  # type: ignore
 import psychoanalyze as pa
 
-reference_stimulus_dimensions = ["Amp2", "Width2", "Freq2", "Dur2"]
+dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
 
 
 def add_posterior(data, posterior):

@@ -60,26 +60,3 @@ def test_from_points(mocker):
     df["n"] = 1000
     blocks = pa.blocks.from_points(df, ("session"))
     assert "Dimension" in list(blocks.columns)
-
-
-def test_load(tmp_path):
-    df = pd.DataFrame(
-        {
-            "Monkey": [],
-            "Date": [],
-            "Amp2": [],
-            "Width2": [],
-            "Freq2": [],
-            "Dur2": [],
-            "Active Channels": [],
-            "Return Channels": [],
-            "Amp1": [],
-            "Width1": [],
-            "Freq1": [],
-            "Dur1": [],
-            "Result": [],
-        }
-    )
-    df.to_csv(tmp_path / "points.csv")
-
-    a

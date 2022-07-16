@@ -15,4 +15,5 @@ def test_load():
             )
         ),
     )
-    assert all(pa.detection.load(df)["Reference Charge (nC)"] == 0)
+    df = pa.detection.load(df)
+    assert all(df[df["Reference Charge (nC)"] == 0])

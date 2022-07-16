@@ -23,7 +23,7 @@ block_index_levels = session_index_levels + ref_stimulus_levels
 point_index_levels = block_index_levels + trial_stimulus_levels
 
 if os.path.isfile("data/blocks.csv"):
-    blocks = pd.read_csv("data/blocks.csv").set_index(block_index_levels)
+    blocks = 
 else:
     if os.path.isfile("data/trials.csv"):
         trials = pd.read_csv("data/trials.csv")

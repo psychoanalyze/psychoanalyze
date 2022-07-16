@@ -14,7 +14,7 @@ def X():
 
 
 def test_generate():
-    data = pa.trial.generate(100)
+    data = pa.trials.generate(100)
     assert len(data) == 100
 
 
@@ -35,7 +35,7 @@ def test_load(tmp_path):
             "Dur1": [],
             "Result": [],
         }
-    ).to_csv(tmp_path / "trials.csv")
+    ).to_csv(tmp_path / "trials.csv", index_label=False)
 
     trials = pa.trials.load(tmp_path / "trials.csv")
     assert list(trials.index.names) == [
