@@ -1,7 +1,7 @@
 import pandas as pd
 import cmdstanpy as stan
-import plotly.express as px
-from scipy.stats import binom
+import plotly.express as px  # type: ignore
+from scipy.stats import binom  # type: ignore
 
 dims = ["Amp1", "Width1", "Freq1", "Dur1"]
 

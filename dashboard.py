@@ -2,9 +2,8 @@ from dash import Dash, dcc, dash_table, Input, Output, State  # type: ignore
 import dash_bootstrap_components as dbc  # type: ignore
 import psychoanalyze as pa
 import pandas as pd
-from psychoanalyze.layout import points_column, diff_thresh_column
+from psychoanalyze.layout import points_column
 from scipy.special import expit
-import json
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 server = app.server
