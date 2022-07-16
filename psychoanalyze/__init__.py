@@ -11,6 +11,7 @@ from psychoanalyze import (
     detection,
     amp,
     points,
+    blocks,
 )
 
 pd.options.plotting.backend = "plotly"
@@ -28,6 +29,7 @@ __all__ = [
     "amp",
     "points",
     "trials",
+    "blocks",
 ]
 
 

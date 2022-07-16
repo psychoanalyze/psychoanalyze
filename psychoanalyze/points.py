@@ -1,11 +1,15 @@
 import pandas as pd
 import cmdstanpy as stan
+import plotly.express as px
+from scipy.stats import binom
+
+dims = ["Amp1", "Width1", "Freq1", "Dur1"]
 
 
 def from_trials(trials):
     trials = trials[trials["Result"].isin([0, 1])]
     return (
-        trials.groupby(trials.index)["Result"]
+        trials.groupby(trials.index.names)["Result"]
         .agg(["count", "sum"])
         .rename(columns={"count": "n", "sum": "Hits"})
     )
@@ -34,3 +38,15 @@ def fit(points: pd.DataFrame, dimension="Amp1") -> pd.DataFrame:
     }
     model = stan.CmdStanModel(stan_file="models/binomial_regression.stan")
     return model.sample(chains=4, data=stan_data).summary()
+
+
+def plot(df):
+    return px.scatter(df, y="Hit Rate", template="plotly_white")
+
+
+def generate(x, n, p):
+    return pd.Series(
+        [binom.rvs(n[i], p[i]) for i in range(len(x))],
+        index=pd.Index(x, name="Amplitude (µA)"),
+        name="Hit Rate",
+    )

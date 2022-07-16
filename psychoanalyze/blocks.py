@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from scipy.stats import logistic  # type: ignore
 from scipy.special import logit  # type: ignore
+import plotly.express as px
 import psychoanalyze as pa
 
 dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
@@ -58,7 +59,14 @@ def dimension(points, dims=None):
     ).apply(pa.points.dimension)
 
 
-def from_points(df, block_index_names):
+def fit(df):
+    block_index_names = pa.sessions.dims + pa.blocks.dims
     dimensions = df.groupby(block_index_names).apply(pa.blocks.dimension)
     fits = df.groupby(block_index_names).apply(pa.points.fit, dimension="Amp1")
     return dimensions.join(fits)
+
+
+def empty():
+    return pd.Series(
+        [], name="Hit Rate", index=pd.Index([], name="Amplitude (µA)"), dtype=float
+    )

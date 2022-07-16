@@ -1,5 +1,6 @@
 import psychoanalyze as pa
 import pandas as pd
+from scipy.special import expit
 
 
 def test_from_trials():
@@ -24,7 +25,7 @@ def test_from_trials():
             )
         ),
     )
-    df = pa.points.from_trials(df.reset_index())
+    df = pa.points.from_trials(df)
     assert len(df) == 2
     assert list(df["n"].values) == [1, 1]
 
@@ -54,3 +55,21 @@ def test_fit(mocker):
     mocker.patch("cmdstanpy.CmdStanModel")
     df = pd.DataFrame({"Amp1": [], "n": [], "Hits": []})
     pa.points.fit(df)
+
+
+def test_plot():
+    s = pd.Series(
+        [], name="Hit Rate", index=pd.Index([], name="Amplitude (µA)"), dtype=float
+    )
+    fig = pa.points.plot(s)
+    assert fig.layout.yaxis.title.text == "Hit Rate"
+    assert fig.layout.xaxis.title.text == "Amplitude (µA)"
+
+
+def test_generate():
+    x = list(range(-3, 4))
+    n = [10] * 8
+    p = expit(x)
+    points = pa.points.generate(x, n, p)
+    assert all(points.index.values == x)
+    assert points.name == "Hit Rate"

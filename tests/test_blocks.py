@@ -50,13 +50,16 @@ def test_from_trials():
 
 def test_from_points(mocker):
     mocker.patch(
-        "psychoanalyze.points.dimension", return_value=pd.DataFrame({"Dimension": []})
+        "psychoanalyze.points.fit",
+        return_value=pd.Series(
+            index=pd.MultiIndex.from_frame(pd.DataFrame({"Monkey": [], "Amp1": []}))
+        ),
     )
-    mocker.patch("psychoanalyze.points.fit", return_value=pd.Series(name="session"))
     df = pd.DataFrame(
         {"x": list(range(8)), "Hits": list(range(8))},
-        index=pd.Index([1] * 8, name="session"),
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame({"Amp1": [1] * 8, "Width1": [1] * 8})
+        ),
     )
     df["n"] = 1000
-    blocks = pa.blocks.from_points(df, ("session"))
-    assert "Dimension" in list(blocks.columns)
+    pa.blocks.fit(df)

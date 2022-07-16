@@ -1,157 +1,117 @@
-import os
-from dash import Dash, dcc, Output, Input  # type: ignore
+from dash import Dash, dcc, dash_table, Input, Output, State  # type: ignore
 import dash_bootstrap_components as dbc  # type: ignore
 import psychoanalyze as pa
 import pandas as pd
-import plotly.express as px  # type: ignore
-from psychoanalyze.layout import controls, curves_column, diff_thresh_column
+from psychoanalyze.layout import points_column, diff_thresh_column
+from scipy.special import expit
+import json
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 server = app.server
 
-session_index_levels = ["Monkey", "Date"]
-ref_stimulus_levels = [
-    "Amp2",
-    "Width2",
-    "Freq2",
-    "Dur2",
-    "Active Channels",
-    "Return Channels",
-]
-trial_stimulus_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
-block_index_levels = session_index_levels + ref_stimulus_levels
-point_index_levels = block_index_levels + trial_stimulus_levels
+block_index_levels = pa.sessions.dims + pa.blocks.dims
+point_index_levels = block_index_levels + pa.points.dims
 
-if os.path.isfile("data/blocks.csv"):
-    blocks = 
-else:
-    if os.path.isfile("data/trials.csv"):
-        trials = pd.read_csv("data/trials.csv")
-        points = pa.points.from_trials(trials).set_index(point_index_levels)
-        blocks = pa.blocks.from_points(points).set_index(block_index_levels)
-    else:
-        blocks = pd.DataFrame()
-print(blocks.index.names)
-print(blocks.columns)
-detection_data = pa.detection.load(blocks)[
-    ["Monkey", "Threshold", "width", "lambda", "gamma"]
-]
-main_params = detection_data[["Monkey", "Threshold", "width"]].melt(
-    id_vars=["Monkey"], var_name="param"
-)
-main_params_amp = main_params[main_params["Dimension"] == "Amp"].drop(
-    columns=["Dimension"]
-)
-main_params_width = main_params[main_params["Dimension"] == "Width"].drop(
-    columns=["Dimension"]
-)
-nuisance_params = detection_data[["Monkey", "gamma", "lambda"]].melt(
-    id_vars=["Monkey"], var_name="param"
-)
+data_dir = "data"
+
+
+def data_path(entity):
+    return f"data/{entity}.csv"
+
+
 weber_data = pd.read_csv("data/weber_curves.csv")
+x = list(range(-3, 4))
+p = expit(x)
 
-app.layout = dbc.Container(
+trials = pa.trials.generate(1)
+points = pa.points.from_trials(trials)
+points["Hit Rate"] = points["Hits"] / points["n"]
+# points = pa.points.generate(x=x, n=[10] * 7, p=p)
+points_list = points.reset_index().to_dict("records")
+
+simulation_tab = dbc.Tab(
+    [
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        dbc.Label("n trials"),
+                        dbc.Input(type="number", value=1, id="n-trials"),
+                    ],
+                    width=1,
+                    align="center",
+                ),
+                dbc.Col(
+                    [
+                        points_column(points),
+                    ],
+                    width=6,
+                    align="center",
+                ),
+                dbc.Col(
+                    [
+                        dash_table.DataTable(points_list, id="psych-table"),
+                    ],
+                    width=1,
+                    align="center",
+                ),
+            ],
+            justify="center",
+        )
+    ],
+    label="Simulation",
+)
+
+experiment_tab = dbc.Tab(
     dbc.Tabs(
         [
+            dbc.Tab(label="Detection"),
             dbc.Tab(
-                dbc.Tabs(
-                    [
-                        dbc.Tab(
-                            dbc.Row(
-                                [
-                                    dbc.Col(
-                                        dcc.Graph(
-                                            figure=px.ecdf(
-                                                main_params,
-                                                color="Monkey",
-                                                line_dash="param",
-                                                template="plotly_white",
-                                            )
-                                        ),
-                                    ),
-                                    dbc.Col(
-                                        dcc.Graph(
-                                            figure=px.ecdf(
-                                                nuisance_params,
-                                                line_dash="param",
-                                                color="Monkey",
-                                                template="plotly_white",
-                                            )
-                                        )
-                                    ),
-                                ]
-                            ),
-                            label="Detection",
-                        ),
-                        dbc.Tab(
-                            dcc.Graph(figure=pa.weber.plot(weber_data)),
-                            label="Discrimination",
-                        ),
-                    ]
-                ),
-                label="Experiment",
-            ),
-            dbc.Tab(
-                [
-                    controls,
-                    dbc.Row([curves_column, diff_thresh_column]),
-                ],
-                label="Simulation",
+                dcc.Graph(figure=pa.weber.plot(weber_data)), label="Discrimination"
             ),
         ]
-    )
+    ),
+    label="Experiment",
+)
+
+app.layout = dbc.Container(
+    [
+        dbc.Tabs(
+            [
+                simulation_tab,
+                experiment_tab,
+            ]
+        ),
+        dcc.Store(data=trials.to_json(orient="split"), id="trials"),
+    ]
 )
 
 
 @app.callback(
-    [
-        Output("curves", "figure"),
-        Output("curve-data", "children"),
-        Output("weber-fraction", "children"),
-        Output("difference-thresholds", "figure"),
-        Output("fit-params", "children"),
-    ],
-    [
-        Input("trials", "value"),
-        Input("x_min", "value"),
-        Input("x_max", "value"),
-        Input("y", "value"),
-    ],
+    Output("trials", "data"), Input("n-trials", "value"), State("trials", "data")
 )
-def generate_data(n_trials_per_level, x_min, x_max, y):
-    # generate curves with n trials per level
-    curves_data = pa.blocks.generate(n_trials_per_level)
+def add_or_remove_trials(n_trials, trials):
+    trials = pd.read_json(trials, orient="split")
+    trials.index.name = "x"
+    if n_trials > len(trials):
+        trials = pd.concat([trials, pa.trials.generate(1)])
+        print(trials)
+    elif n_trials < len(trials):
+        trials = trials[:-1]
+    return trials.to_json(orient="split")
 
-    # define the range of the function
-    x = pa.blocks.xrange_index(x_min, x_max)
 
-    # fit curves with Stan
-    curves_data.index = x
-    fit = pa.points.fit(curves_data)
-    df = pa.data.reshape_fit_results(fit, x, y)
-    param_names = ["mu", "sigma", "sigma_err", "gamma", "lambda"]
-    param_fits = {name: [pa.blocks.get_fit_param(fit, name)] for name in param_names}
-    # plot fig
-    curves_plot_data = {"y": y, "curves_df": df}
-    fig = pa.plot.curves(curves_plot_data)
-    diff_thresh_fig = pa.plot.difference_thresholds()
-    # fetch regression data
-    results = px.get_trendline_results(diff_thresh_fig)
-    params = results.loc[0, "px_fit_results"].params
-    weber_fraction = params[1]
-
-    # render fit params table
-    params_table = dbc.Table.from_dataframe(pd.DataFrame(param_fits))
-
-    # render points table
-    curve_table = dbc.Table.from_dataframe(curves_plot_data["curves_df"])
-    return (
-        fig,
-        curve_table.children,
-        f"Weber Fraction: {weber_fraction}",
-        diff_thresh_fig,
-        params_table.children,
-    )
+@app.callback(
+    [Output("psych-plot", "figure"), Output("psych-table", "data")],
+    Input("trials", "data"),
+)
+def plot_from_data(trials):
+    trials_df = pd.read_json(trials, orient="split")
+    trials_df.index.name = "x"
+    points = pa.points.from_trials(trials_df)
+    points["Hit Rate"] = points["Hits"] / points["n"]
+    points_list = points.reset_index().to_dict("records")
+    return pa.points.plot(points), points_list
 
 
 if __name__ == "__main__":

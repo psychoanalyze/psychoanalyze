@@ -1,5 +1,6 @@
 import dash_bootstrap_components as dbc  # type: ignore
 from dash import html, dcc  # type: ignore
+import psychoanalyze as pa
 
 defaults = {
     "session": {"sessions": 1, "trials": 100, "subjects": 1},
@@ -12,7 +13,7 @@ defaults = {
 def label(type, param):
     labels = {
         "param": f"{param}",
-        "session": f"Number of {param}: ",
+        "session": f"{param}",
         "x_min": "Min: ",
         "x_max": "Max: ",
     }
@@ -45,55 +46,40 @@ threshold_column = dbc.Col(
     ]
 )
 
-curves_column = dbc.Col(
-    [
-        dcc.RadioItems(
-            [
-                {"label": "sigmoid", "value": "p"},
-                {"label": "linear", "value": "alpha"},
-            ],
-            "p",
-            id="y",
-        ),
-        dcc.Graph(id="curves"),
-        dbc.Table(id="fit-params"),
-        dbc.Table(id="curve-data"),
-    ]
-)
+
+def points_column(data):
+    return dbc.Col(
+        [
+            dcc.Graph(figure=pa.points.plot(data), id="psych-plot"),
+        ],
+    )
+
 
 diff_thresh_column = dbc.Col(
     [
         dcc.Graph(id="difference-thresholds"),
         html.P(id="weber-fraction"),
-    ]
+    ],
 )
-controls = dbc.Row(
+controls = dbc.Col(
     [
-        dbc.Col(
-            dbc.Card(
-                dbc.CardBody(
-                    [html.H4("Entity Counts", className="card-title")] + session_inputs
-                )
-            ),
-            width=3,
+        dbc.Card(
+            dbc.CardBody(
+                [html.H4("Entity Counts", className="card-title")] + session_inputs
+            )
         ),
-        dbc.Col(
-            dbc.Card(
-                dbc.CardBody(
-                    [html.H4("Simulated Params", className="card-title")] + param_inputs
-                ),
+        dbc.Card(
+            dbc.CardBody(
+                [html.H4("Simulated Params", className="card-title")] + param_inputs
             ),
-            width=3,
         ),
-        dbc.Col(
-            dbc.Card(
-                dbc.CardBody(
-                    [html.H4("Visible Range", className="card-title")]
-                    + x_min_input
-                    + x_max_input
-                ),
+        dbc.Card(
+            dbc.CardBody(
+                [html.H4("Visible Range", className="card-title")]
+                + x_min_input
+                + x_max_input
             ),
-            width=3,
         ),
-    ]
+    ],
+    width=2,
 )

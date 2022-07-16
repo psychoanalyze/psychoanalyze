@@ -6,10 +6,13 @@ from pathlib import Path
 dims = ["Amp1", "Width1", "Freq1", "Dur1"]
 
 
-def generate(n, stim_levels=list(range(-4, 5))):
+def generate(n, stim_levels=list(range(-3, 4))):
     return pd.DataFrame(
         {"Result": np.random.binomial(1, 0.5, n)},
-        index=pd.Index(np.random.choice(stim_levels, size=n), name="x"),
+        index=pd.Index(
+            np.random.choice(stim_levels, size=n),
+            name="x",
+        ),
     )
 
 
