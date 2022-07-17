@@ -6,6 +6,8 @@ import psychoanalyze as pa
 
 dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
 
+index_levels = pa.sessions.dims + dims
+
 
 def add_posterior(data, posterior):
     return pd.concat(

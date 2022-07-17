@@ -73,3 +73,8 @@ def test_generate():
     points = pa.points.generate(x, n, p)
     assert all(points.index.values == x)
     assert points.name == "Hit Rate"
+
+
+def test_load(tmp_path):
+    points = pa.points.load()
+    assert "n" in points.columns

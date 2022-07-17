@@ -2,8 +2,11 @@ import pandas as pd
 import cmdstanpy as stan
 import plotly.express as px  # type: ignore
 from scipy.stats import binom  # type: ignore
+import psychoanalyze as pa
 
 dims = ["Amp1", "Width1", "Freq1", "Dur1"]
+
+index_levels = pa.blocks.index_levels + dims
 
 
 def from_trials(trials):
@@ -41,7 +44,8 @@ def fit(points: pd.DataFrame, dimension="Amp1") -> pd.DataFrame:
 
 
 def plot(df):
-    return px.scatter(df, y="Hit Rate", template="plotly_white")
+    df["Hit Rate"] = df["Hits"] / df["n"]
+    return px.scatter(df.reset_index(), y="Hit Rate", template="plotly_white")
 
 
 def generate(x, n, p):
@@ -50,3 +54,8 @@ def generate(x, n, p):
         index=pd.Index(x, name="Amplitude (µA)"),
         name="Hit Rate",
     )
+
+
+def load():
+    trials = pa.trials.load("data/trials.csv")
+    return from_trials(trials)

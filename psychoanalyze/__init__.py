@@ -2,15 +2,15 @@ import pandas as pd
 import numpy as np
 from scipy.special import expit  # type: ignore
 from psychoanalyze import (
+    sessions,
     blocks,
+    points,
     plot,
     data,
-    sessions,
     trials,
     weber,
     detection,
     amp,
-    points,
 )
 
 pd.options.plotting.backend = "plotly"
