@@ -38,7 +38,14 @@ app.layout = dbc.Container(
 )
 
 
-# @app.callback(Output(""))
+@app.callback(Output("points", "figure"), Input("fit", "n_clicks"), State("trials"))
+def fit_curves(n_clicks, trials):
+    points = pa.points.from_store(trials)
+    if n_clicks:
+        fits = points.fit(points)
+    fit_plot = pa.points.plot_fits(fits)
+    return pa.points.combine_plots(pa.points.plot(experiment_points), fit_plot)
+
 
 # @app.callback(
 #     Output("trials", "data"), Input("n-trials", "value"), State("trials", "data")

@@ -15,16 +15,16 @@ schema = pr.DataFrameSchema(
         "n": pr.Column(int, checks=pr.Check.isin([0, 1, 2, 3]), coerce=True),
         "Hits": pr.Column(int, checks=pr.Check.isin([0, 1, 2, 3]), coerce=True),
     },
-    #     index=pr.MultiIndex(
-    #         [
-    #             pr.Index(str, name="Monkey", checks=pr.Check.isin(["U", "Y", "Z"])),
-    #             pr.Index("datetime64", name="Date", coerce=True),
-    #         ]
-    #         + [pr.Index(float, name=dim) for dim in pa.blocks.stim_dims]
-    #         + [pr.Index(int, name=dim) for dim in pa.blocks.channel_dims]
-    #         + [pr.Index(float, name=dim) for dim in dims]
-    #     ),
-    #     coerce=True,
+    index=pr.MultiIndex(
+        [
+            pr.Index(str, name="Monkey", checks=pr.Check.isin(["U", "Y", "Z"])),
+            pr.Index("datetime64", name="Date", coerce=True),
+        ]
+        + [pr.Index(float, name=dim) for dim in pa.blocks.stim_dims]
+        + [pr.Index(int, name=dim) for dim in pa.blocks.channel_dims]
+        + [pr.Index(float, name=dim) for dim in dims]
+    ),
+    coerce=True,
 )
 
 
