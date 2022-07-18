@@ -1,5 +1,5 @@
 import dash_bootstrap_components as dbc  # type: ignore
-from dash import html, dcc  # type: ignore
+from dash import html, dcc, dash_table  # type: ignore
 import psychoanalyze as pa
 
 defaults = {
@@ -83,3 +83,75 @@ controls = dbc.Col(
     ],
     width=2,
 )
+
+
+def simulation_tab(points):
+    return dbc.Tab(
+        [
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dbc.Label("n trials"),
+                            dbc.Input(type="number", value=1, id="n-trials"),
+                        ],
+                        width=1,
+                        align="center",
+                    ),
+                    dbc.Col(
+                        [
+                            points_column(points),
+                        ],
+                        width=6,
+                        align="center",
+                    ),
+                    dbc.Col(
+                        [
+                            dash_table.DataTable(
+                                points.reset_index().to_dict("records"),
+                                id="psych-table",
+                            ),
+                        ],
+                        width=1,
+                        align="center",
+                    ),
+                ],
+                justify="center",
+            )
+        ],
+        label="Simulation",
+    )
+
+
+def experiment_tab(experiment_points):
+    return dbc.Tab(
+        dbc.Tabs(
+            [
+                dbc.Tab(
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                dcc.Graph(
+                                    figure=pa.points.plot(experiment_points),
+                                    id="points",
+                                )
+                            ),
+                            dbc.Col(
+                                [
+                                    dbc.Button("Fit curves", id="fit"),
+                                    pa.points.datatable(experiment_points),
+                                ],
+                                width=2,
+                                align="center",
+                            ),
+                        ]
+                    ),
+                    label="Detection",
+                ),
+                dbc.Tab(
+                    label="Discrimination",
+                ),
+            ]
+        ),
+        label="Experiment",
+    )

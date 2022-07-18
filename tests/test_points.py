@@ -1,6 +1,7 @@
 import psychoanalyze as pa
 import pandas as pd
 from scipy.special import expit
+import json
 
 
 def test_from_trials():
@@ -58,8 +59,26 @@ def test_fit(mocker):
 
 
 def test_plot():
-    s = pd.Series(
-        [], name="Hit Rate", index=pd.Index([], name="Amplitude (µA)"), dtype=float
+    s = pd.DataFrame(
+        {"Hits": [], "n": [], "Hit Rate": []},
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame(
+                {
+                    "Monkey": [],
+                    "Date": [],
+                    "Amp2": [],
+                    "Width2": [],
+                    "Freq2": [],
+                    "Active Channels": [],
+                    "Return Channels": [],
+                    "Amp1": [],
+                    "Width1": [],
+                    "Freq1": [],
+                    "Dur1": [],
+                }
+            )
+        ),
+        dtype=float,
     )
     fig = pa.points.plot(s)
     assert fig.layout.yaxis.title.text == "Hit Rate"
@@ -78,3 +97,81 @@ def test_generate():
 def test_load(tmp_path):
     points = pa.points.load()
     assert "n" in points.columns
+
+
+def test_datatable():
+    data = pd.DataFrame(
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame({"Amp1": [0.1212345], "Hit Rate": [0.1234543], "n": [1]})
+        )
+    )
+    datatable = pa.points.datatable(data)
+    amp_column = [column for column in datatable.columns if column["name"] == "Amp1"]
+    assert amp_column[0]["format"].to_plotly_json()["specifier"] == ".2f"
+
+
+def test_from_store(mocker):
+    mocker.patch(
+        "psychoanalyze.trials.from_store",
+        return_value=pd.DataFrame(
+            {"Result": [1]},
+            index=pd.MultiIndex.from_frame(
+                pd.DataFrame(
+                    {
+                        "Monkey": ["U"],
+                        "Date": ["1-1-2001"],
+                        "Amp2": [0],
+                        "Width2": [0],
+                        "Freq2": [0],
+                        "Dur2": [0],
+                        "Active Channels": [0],
+                        "Return Channels": [0],
+                        "Amp1": [0],
+                        "Width1": [0],
+                        "Freq1": [0],
+                        "Dur1": [0],
+                    }
+                )
+            ),
+        ),
+    )
+    store_data = pd.DataFrame(
+        {"Result": [1]},
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame(
+                {
+                    "Monkey": ["U"],
+                    "Date": ["1-1-2001"],
+                    "Amp2": [0],
+                    "Width2": [0],
+                    "Freq2": [0],
+                    "Dur2": [0],
+                    "Active Channels": [0],
+                    "Return Channels": [0],
+                    "Amp1": [0],
+                    "Width1": [0],
+                    "Freq1": [0],
+                    "Dur1": [0],
+                }
+            )
+        ),
+    )
+
+    store_data = store_data.to_dict(orient="split")
+    store_data["index_names"] = (
+        "Monkey",
+        "Date",
+        "Amp2",
+        "Width2",
+        "Freq2",
+        "Dur2",
+        "Active Channels",
+        "Return Channels",
+        "Amp1",
+        "Width1",
+        "Freq1",
+        "Dur1",
+    )
+    df = pa.points.from_store(json.dumps(store_data))
+    print(df.columns)
+    pa.points.schema.validate(df)

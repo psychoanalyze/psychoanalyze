@@ -1,3 +1,4 @@
+import pathlib
 import pandas as pd
 import numpy as np
 from scipy.special import expit  # type: ignore
@@ -30,7 +31,6 @@ __all__ = [
     "trials",
     "blocks",
 ]
-
 
 # def curve(trials: pd.DataFrame) -> pd.Series:
 #     """Arrange *method of constant stimuli* performance curves using trial data"""

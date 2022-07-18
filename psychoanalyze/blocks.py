@@ -4,8 +4,10 @@ from scipy.stats import logistic  # type: ignore
 from scipy.special import logit  # type: ignore
 import psychoanalyze as pa
 
-dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
+stim_dims = ["Amp2", "Width2", "Freq2", "Dur2"]
+channel_dims = ["Active Channels", "Return Channels"]
 
+dims = stim_dims + channel_dims
 index_levels = pa.sessions.dims + dims
 
 
