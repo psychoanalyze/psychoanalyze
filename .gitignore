@@ -138,3 +138,5 @@ data/*
 docs/tables/*
 
 .jupyterlite.doit.db
+
+notebooks/*
