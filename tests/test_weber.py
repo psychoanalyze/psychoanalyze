@@ -3,7 +3,7 @@ import pandas as pd
 import datatest as dt  # type: ignore
 
 
-def test_weber_plot():
+def test_plot():
     y = "Reference Charge (nC)"
     x = "Difference Threshold (nC)"
     subjects = ["U", "Y"]
@@ -21,12 +21,17 @@ def test_weber_plot():
     assert all(trace["error_y"] for trace in fig.data)
 
 
-def test_weber_aggregate():
+def test_aggregate():
     points = [
         {"Reference Charge (nC)": 0, "Difference Threshold (nC)": 0},
         {"Reference Charge (nC)": 0, "Difference Threshold (nC)": 2},
     ]
-    curve_data = pd.DataFrame.from_records(points)
+    curve_data = pd.DataFrame.from_records(
+        points,
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame({"Monkey": ["U", "U"], "Dimension": ["Amp", "Amp"]})
+        ),
+    )
     dt.validate(
         pa.weber.aggregate(curve_data),
         pd.DataFrame({"Reference Charge (nC)": [0], "Difference Threshold (nC)": [1]}),

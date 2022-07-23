@@ -2,6 +2,7 @@ import psychoanalyze as pa
 import pandas as pd
 from scipy.special import expit
 import json
+import plotly.express as px
 
 
 def test_from_trials():
@@ -54,29 +55,20 @@ def test_both_dimensions():
 
 def test_fit(mocker):
     mocker.patch("cmdstanpy.CmdStanModel")
-    df = pd.DataFrame({"Amp1": [], "n": [], "Hits": []})
-    pa.points.fit(df)
+    mocker.patch("cmdstanpy.CmdStanModel.sample")
+    # mocker.patch("cmdstanpy.CmdStanModel.summary", return_value=pd.DataFrame({"Mean": [1]}, index=[""]))
+    df = pa.points.schema.example(8)
+
+    fit_df = pa.blocks.fit(df)
+
+    pa.blocks.schema.validate(fit_df)
 
 
 def test_plot():
     s = pd.DataFrame(
         {"Hits": [], "n": [], "Hit Rate": []},
         index=pd.MultiIndex.from_frame(
-            pd.DataFrame(
-                {
-                    "Monkey": [],
-                    "Date": [],
-                    "Amp2": [],
-                    "Width2": [],
-                    "Freq2": [],
-                    "Active Channels": [],
-                    "Return Channels": [],
-                    "Amp1": [],
-                    "Width1": [],
-                    "Freq1": [],
-                    "Dur1": [],
-                }
-            )
+            pd.DataFrame({level: [] for level in pa.points.index_levels})
         ),
         dtype=float,
     )
@@ -111,67 +103,25 @@ def test_datatable():
 
 
 def test_from_store(mocker):
-    mocker.patch(
-        "psychoanalyze.trials.from_store",
-        return_value=pd.DataFrame(
-            {"Result": [1]},
-            index=pd.MultiIndex.from_frame(
-                pd.DataFrame(
-                    {
-                        "Monkey": ["U"],
-                        "Date": ["1-1-2001"],
-                        "Amp2": [0],
-                        "Width2": [0],
-                        "Freq2": [0],
-                        "Dur2": [0],
-                        "Active Channels": [0],
-                        "Return Channels": [0],
-                        "Amp1": [0],
-                        "Width1": [0],
-                        "Freq1": [0],
-                        "Dur1": [0],
-                    }
-                )
-            ),
-        ),
-    )
     store_data = pd.DataFrame(
         {"Result": [1]},
         index=pd.MultiIndex.from_frame(
             pd.DataFrame(
-                {
-                    "Monkey": ["U"],
-                    "Date": ["1-1-2001"],
-                    "Amp2": [0],
-                    "Width2": [0],
-                    "Freq2": [0],
-                    "Dur2": [0],
-                    "Active Channels": [0],
-                    "Return Channels": [0],
-                    "Amp1": [0],
-                    "Width1": [0],
-                    "Freq1": [0],
-                    "Dur1": [0],
-                }
+                {"Monkey": ["U"], "Date": ["1-1-2001"]}
+                | {level: [0] for level in pa.blocks.dims + pa.points.dims}
             )
         ),
     )
+    mocker.patch("psychoanalyze.trials.from_store", return_value=store_data)
 
     store_data = store_data.to_dict(orient="split")
-    store_data["index_names"] = (
-        "Monkey",
-        "Date",
-        "Amp2",
-        "Width2",
-        "Freq2",
-        "Dur2",
-        "Active Channels",
-        "Return Channels",
-        "Amp1",
-        "Width1",
-        "Freq1",
-        "Dur1",
-    )
+    store_data["index_names"] = pa.points.index_levels
     df = pa.points.from_store(json.dumps(store_data))
-    print(df.columns)
     pa.points.schema.validate(df)
+
+
+def test_combine_plots():
+    plot1 = px.scatter(pd.DataFrame({"A": [1]}))
+    plot2 = px.line(pd.DataFrame({"B": [1]}))
+    fig = pa.points.combine_plots(plot1, plot2)
+    assert len(fig.data) == 2

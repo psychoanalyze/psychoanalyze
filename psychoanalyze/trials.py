@@ -65,23 +65,14 @@ def load(filepath: Path = data_path):
 def from_store(store_data):
     df_dict = json.loads(store_data)
     index_names = df_dict.pop("index_names")
-    print(f"store_data: {df_dict}")
-    print(index_names)
     index = pd.MultiIndex.from_tuples(df_dict["index"])
     df = pd.DataFrame({"Result": df_dict["data"][0]}, index=index)
-    df.index.names = [
-        "Monkey",
-        "Date",
-        "Amp2",
-        "Width2",
-        "Freq2",
-        "Dur2",
-        "Active Channels",
-        "Return Channels",
-        "Amp1",
-        "Width1",
-        "Freq1",
-        "Dur1",
-    ]
-    print(df)
+    df.index.names = index_names
     return schema.validate(df)
+
+
+def to_store(df):
+    df.index = df.index.set_levels(df.index.levels[1].astype(str), level=1)
+    data_dict = df.to_dict(orient="split")
+    data_dict["index_names"] = pa.points.index_levels
+    return json.dumps(data_dict)

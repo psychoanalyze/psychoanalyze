@@ -121,3 +121,9 @@ def datatable(data):
 def from_store(store_data):
     trials = pa.trials.from_store(store_data)
     return from_trials(trials)
+
+
+def combine_plots(fig1, fig2):
+    for trace in fig2.data:
+        fig1.add_trace(trace)
+    return fig1

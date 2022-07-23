@@ -1,14 +1,28 @@
 import pandas as pd
 import numpy as np
 from scipy.stats import logistic  # type: ignore
-from scipy.special import logit  # type: ignore
+from scipy.special import logit, expit  # type: ignore
 import psychoanalyze as pa
+import plotly.express as px
+import pandera as pr
 
 stim_dims = ["Amp2", "Width2", "Freq2", "Dur2"]
 channel_dims = ["Active Channels", "Return Channels"]
 
 dims = stim_dims + channel_dims
 index_levels = pa.sessions.dims + dims
+
+schema = pr.DataFrameSchema(
+    columns={"Threshold": pr.Column(dtype=float), "width": pr.Column(dtype=float)},
+    index=pr.MultiIndex(
+        [
+            pr.Index(str, name="Monkey", checks=pr.Check.isin(["U", "Y", "Z"])),
+            pr.Index("datetime64", name="Date", coerce=True),
+        ]
+        + [pr.Index(float, name=dim) for dim in stim_dims]
+        + [pr.Index(int, name=dim) for dim in channel_dims]
+    ),
+)
 
 
 def add_posterior(data, posterior):
@@ -63,13 +77,17 @@ def dimension(points, dims=None):
 
 
 def fit(df):
-    block_index_names = pa.sessions.dims + pa.blocks.dims
-    dimensions = df.groupby(block_index_names).apply(pa.blocks.dimension)
-    fits = df.groupby(block_index_names).apply(pa.points.fit, dimension="Amp1")
-    return dimensions.join(fits)
+    return df.groupby(pa.blocks.index_levels).apply(pa.points.fit, dimension="Amp1")
 
 
 def empty():
     return pd.Series(
         [], name="Hit Rate", index=pd.Index([], name="Amplitude (µA)"), dtype=float
     )
+
+
+def plot_fits(df):
+    print(df["Mean"])
+    x = np.linspace(-3, 3, 100)
+    y = expit(x)
+    return px.line(df.reset_index(), x=x, y=y)

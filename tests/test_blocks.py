@@ -63,3 +63,9 @@ def test_from_points(mocker):
     )
     df["n"] = 1000
     pa.blocks.fit(df)
+
+
+def test_plot_fits():
+    fits = pd.DataFrame({"Threshold": [0], "width": [1]})
+    fig = pa.blocks.plot_fits(fits)
+    assert len(fig.data)

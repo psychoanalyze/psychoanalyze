@@ -1,6 +1,7 @@
 import dash_bootstrap_components as dbc  # type: ignore
 from dash import html, dcc, dash_table  # type: ignore
 import psychoanalyze as pa
+import plotly.express as px
 
 defaults = {
     "session": {"sessions": 1, "trials": 100, "subjects": 1},
@@ -123,34 +124,63 @@ def simulation_tab(points):
     )
 
 
+def detection_tab(experiment_points):
+    return dbc.Tab(
+        dbc.Row(
+            [
+                dbc.Col(
+                    dcc.Graph(
+                        figure=pa.points.plot(experiment_points),
+                        id="points",
+                    )
+                ),
+                dbc.Col(
+                    [
+                        dbc.Button("Fit curves", id="fit"),
+                        pa.points.datatable(experiment_points),
+                    ],
+                    width=2,
+                    align="center",
+                ),
+            ]
+        ),
+        label="Detection",
+    )
+
+
+discrimination_tab = dbc.Tab(
+    [
+        dcc.RadioItems(options=["ols", None], value="ols", id="trendline"),
+        dcc.RadioItems(
+            options=["Log Scale", "Linear Scale"], value="Log Scale", id="log-scale"
+        ),
+        dcc.RadioItems(options=["Group by x values", "show all blocks"], id="group-x"),
+        dcc.RadioItems(options=["Histogram", "off"], value="Histogram", id="marginal"),
+        dcc.RadioItems(options=["stable", "all"], value="all", id="stable"),
+        dcc.RadioItems(
+            options=["error bars", "off"],
+            value="error bars",
+            id="error",
+        ),
+        html.P("Plot width:"),
+        dcc.Input(value=6, id="weber-width-input"),
+        dbc.Row(
+            [
+                dbc.Col(dcc.Graph(id="weber"), width=6, id="weber-width"),
+                dbc.Col(dcc.Graph(id="weber-time")),
+            ]
+        ),
+    ],
+    label="Discrimination",
+)
+
+
 def experiment_tab(experiment_points):
     return dbc.Tab(
         dbc.Tabs(
             [
-                dbc.Tab(
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                dcc.Graph(
-                                    figure=pa.points.plot(experiment_points),
-                                    id="points",
-                                )
-                            ),
-                            dbc.Col(
-                                [
-                                    dbc.Button("Fit curves", id="fit"),
-                                    pa.points.datatable(experiment_points),
-                                ],
-                                width=2,
-                                align="center",
-                            ),
-                        ]
-                    ),
-                    label="Detection",
-                ),
-                dbc.Tab(
-                    label="Discrimination",
-                ),
+                discrimination_tab,
+                detection_tab(experiment_points),
             ]
         ),
         label="Experiment",
