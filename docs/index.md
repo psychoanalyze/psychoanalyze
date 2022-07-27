@@ -14,6 +14,10 @@ Psychophysics analysis in Python.
 $ pip install psychoanalyze
 ```
 
+## Dashboard
+
+See what `psychoanalyze` can do by [visiting our dashboard](https://psychoanalyze.herokuapp.com/).
+
 ## Usage 
 
 ``` py
