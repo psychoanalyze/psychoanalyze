@@ -69,8 +69,8 @@ def generate(x, n, p):
     )
 
 
-def load():
-    trials = pa.trials.load("data/trials.csv")
+def load(path):
+    trials = pa.trials.load(path)
     return from_trials(trials)
 
 
