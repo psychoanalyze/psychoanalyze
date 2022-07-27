@@ -22,12 +22,6 @@ df = pa.weber.load("data/weber_curves.csv")
 df = df[df["Reference Charge (nC)"] != 260]
 df = df[df["Date"] != "3/26/2018"]
 df = df[df["Date"] != "4/30/2018"]
-df["err+"] = (df["location_CI_5"] * df["Fixed_Param_Value"] / 1000) - df[
-    "Threshold_Charge_nC"
-]
-df["err-"] = (
-    df["Threshold_Charge_nC"] - (df["location_CI_95"]) * df["Fixed_Param_Value"] / 1000
-)
 weber_blocks = df
 weber_blocks["Difference Threshold (nC)"] = weber_blocks[
     "Difference Threshold (nC)"

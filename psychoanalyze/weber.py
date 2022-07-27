@@ -47,4 +47,12 @@ def aggregate(data):
 
 
 def load(path):
-    return pd.read_csv(path, parse_dates=["Date"])
+    df = pd.read_csv(path, parse_dates=["Date"])
+    df["err+"] = (df["location_CI_5"] * df["Fixed_Param_Value"] / 1000) - df[
+        "Threshold_Charge_nC"
+    ]
+    df["err-"] = (
+        df["Threshold_Charge_nC"]
+        - (df["location_CI_95"]) * df["Fixed_Param_Value"] / 1000
+    )
+    return df

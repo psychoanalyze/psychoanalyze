@@ -39,6 +39,12 @@ def test_aggregate():
 def test_load(tmp_path):
     pd.DataFrame(
         {level_name: [] for level_name in pa.schemas.block_index_levels}
-        | {"Reference Charge (nC)": []},
+        | {
+            "Reference Charge (nC)": [],
+            "location_CI_5": [],
+            "location_CI_95": [],
+            "Fixed_Param_Value": [],
+            "Threshold_Charge_nC": [],
+        },
     ).to_csv(tmp_path / "weber_curves.csv", index_label=False)
     assert len(pa.weber.load(tmp_path / "weber_curves.csv")) == 0
