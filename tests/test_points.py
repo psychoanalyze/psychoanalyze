@@ -53,17 +53,6 @@ def test_both_dimensions():
     assert pa.points.dimension(df) == "Both"
 
 
-def test_fit(mocker):
-    mocker.patch("cmdstanpy.CmdStanModel")
-    mocker.patch("cmdstanpy.CmdStanModel.sample")
-    # mocker.patch("cmdstanpy.CmdStanModel.summary", return_value=pd.DataFrame({"Mean": [1]}, index=[""]))
-    df = pa.points.schema.example(8)
-
-    fit_df = pa.blocks.fit(df)
-
-    pa.blocks.schema.validate(fit_df)
-
-
 def test_plot():
     s = pd.DataFrame(
         {"Hits": [], "n": [], "Hit Rate": []},
@@ -125,3 +114,13 @@ def test_combine_plots():
     plot2 = px.line(pd.DataFrame({"B": [1]}))
     fig = pa.points.combine_plots(plot1, plot2)
     assert len(fig.data) == 2
+
+
+def test_fit_prep():
+    points_df = pa.points.schema.example(0)
+    ready_for_fit = pa.points.prep_fit(points_df, "Amp1")
+    points_df = points_df.reset_index()
+    assert ready_for_fit["X"] == len(points_df)
+    assert list(ready_for_fit["x"]) == list(points_df["Amp1"].to_numpy())
+    assert list(ready_for_fit["N"]) == list(points_df["n"].to_numpy())
+    assert list(ready_for_fit["hits"]) == list(points_df["Hits"].to_numpy())

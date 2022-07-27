@@ -11,12 +11,7 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 server = app.server
 
 experiment_points = pa.points.load()
-experiment_points = experiment_points[
-    experiment_points.index.get_level_values("Monkey") == "Z"
-]
-experiment_points = experiment_points[
-    experiment_points.index.get_level_values("Date") == "2017-01-10"
-]
+experiment_points = experiment_points.xs(("Z", "2017-01-10"))
 
 x = list(range(-3, 4))
 p = expit(x)
@@ -35,6 +30,11 @@ df["err-"] = (
     df["Threshold_Charge_nC"] - (df["location_CI_95"]) * df["Fixed_Param_Value"] / 1000
 )
 weber_blocks = df
+weber_blocks["Difference Threshold (nC)"] = weber_blocks[
+    "Difference Threshold (nC)"
+].abs()
+weber_blocks["err+"] = weber_blocks["err+"].abs()
+weber_blocks["err-"] = weber_blocks["err-"].abs()
 
 app.layout = dbc.Container(
     [
@@ -48,14 +48,17 @@ app.layout = dbc.Container(
             figure=px.scatter(
                 pa.weber.aggregate(weber_blocks).reset_index(),
                 x="Reference Charge (nC)",
-                y="mean",
+                y="Difference Threshold (nC)",
                 color="Monkey",
+                color_discrete_map=pa.plot.colormap,
                 symbol="Dimension",
+                symbol_map={"Amp": "diamond", "Width": "diamond-open"},
                 size="count",
                 error_y="std",
-                template="plotly_white",
+                template=pa.plot.template,
                 trendline="ols",
-            )
+            ).update_layout(xaxis_range=(0, 250))
+            # .write_image("figures/fig6A.svg", width=600)
         ),
         dcc.Store(data=pa.trials.to_store(trials), id="trials"),
     ]

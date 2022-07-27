@@ -1,6 +1,6 @@
 import psychoanalyze as pa
 import pandas as pd
-import datatest as dt  # type: ignore
+from datetime import datetime
 
 
 def test_plot():
@@ -12,27 +12,25 @@ def test_plot():
     data = pd.concat({k: pd.DataFrame(v).T for k, v in data.items()})
     data.index.names = ["Monkey", "Dimension"]
     data["err_y"] = 1
+    data["Date"] = datetime.now()
 
     fig = pa.weber.plot(data)
 
-    assert len(fig.data) == 4
+    assert len(fig.data) == 8
     assert fig.layout.xaxis.title.text == y
     assert fig.layout.yaxis.title.text == x
     assert all(trace["error_y"] for trace in fig.data)
 
 
 def test_aggregate():
-    points = [
-        {"Reference Charge (nC)": 0, "Difference Threshold (nC)": 0},
-        {"Reference Charge (nC)": 0, "Difference Threshold (nC)": 2},
-    ]
     curve_data = pd.DataFrame.from_records(
-        points,
+        [
+            {"Reference Charge (nC)": 0, "Difference Threshold (nC)": 0},
+            {"Reference Charge (nC)": 0, "Difference Threshold (nC)": 2},
+        ],
         index=pd.MultiIndex.from_frame(
             pd.DataFrame({"Monkey": ["U", "U"], "Dimension": ["Amp", "Amp"]})
         ),
     )
-    dt.validate(
-        pa.weber.aggregate(curve_data),
-        pd.DataFrame({"Reference Charge (nC)": [0], "Difference Threshold (nC)": [1]}),
-    )
+    df = pa.weber.aggregate(curve_data)
+    assert df.at[df.index[0], "Difference Threshold (nC)"] == 1.0

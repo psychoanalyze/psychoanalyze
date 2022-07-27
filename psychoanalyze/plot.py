@@ -1,6 +1,29 @@
 import plotly.express as px  # type: ignore
 import pandas as pd
 import psychoanalyze as pa
+from plotly import graph_objects as go
+
+axis_settings = {
+    "ticks": "outside",
+    # "rangemode": "tozero",
+    "showgrid": False,
+    "showline": True,
+    "zeroline": False,
+    "title": {"font": {"size": 12, "family": "Arial"}},
+}
+
+template = go.layout.Template(
+    layout=go.Layout(
+        template="plotly_white",
+        xaxis=axis_settings,
+        yaxis=axis_settings,
+        colorway=["#e41a1c", "#377eb8", "#4daf4a"],
+        title={"font": {"size": 16, "family": "Arial"}},
+        legend={"yanchor": "top", "y": 1, "xanchor": "left", "x": 0.98},
+    ),
+)
+
+colormap = {"U": "#e41a1c", "Y": "#377eb8", "Z": "#4daf4a"}
 
 
 def thresholds(df):
@@ -12,7 +35,8 @@ def thresholds(df):
         error_y="err+",
         error_y_minus="err-",
         color="Subject",
-        template="plotly_white",
+        color_discrete_map=colormap,
+        template=template,
     )
 
 
@@ -29,8 +53,9 @@ def curves(curve_data):
         error_y="err+",
         error_y_minus="err-",
         color=df.get("Subject"),  # or df["Type"],
+        color_discrete_map=colormap,
         symbol=df.get("Day"),
-        template="plotly_white",
+        template=template,
     )
 
 
@@ -77,7 +102,7 @@ def hit_rate_animation(cumulative_draws: pd.DataFrame):
         symbol=df.get("Day"),
         animation_group="x",
         animation_frame="n",
-        template="plotly_white",
+        template=template,
     )
 
 
@@ -94,7 +119,7 @@ def posterior_animation(cumulative_draws: pd.DataFrame):
         animation_frame="n",
         color=df.get("Subject"),
         symbol=df.get("Day"),
-        template="plotly_white",
+        template=template,
     )
 
 
@@ -112,8 +137,9 @@ def difference_thresholds():
         x="Reference Charge (nC)",
         y="Difference Threshold Charge (nC)",
         color="Monkey",
+        color_discrete_map=colormap,
         symbol="Dimension",
         size="n",
         trendline="ols",
-        template="plotly_white",
+        template=template,
     )

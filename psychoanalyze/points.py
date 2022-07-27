@@ -50,16 +50,24 @@ def dimension(points):
         return "Both"
 
 
-def fit(points: pd.DataFrame, dimension="Amp1") -> pd.DataFrame:
+def prep_fit(points: pd.DataFrame, dimension="Amp1"):
     points = points.reset_index()
-    stan_data = {
+    print(points.columns)
+    return {
         "X": len(points),
         "x": points[f"{dimension}"].to_numpy(),
         "N": points["n"].to_numpy(),
         "hits": points["Hits"].to_numpy(),
     }
-    model = stan.CmdStanModel(stan_file="models/binomial_regression.stan")
-    return model.sample(chains=4, data=stan_data).summary()
+
+
+def model():
+    return stan.CmdStanModel(stan_file="models/binomial_regression.stan")
+
+
+def fit(ready_for_fit: pd.DataFrame) -> pd.DataFrame:
+    _model = model()
+    return _model.sample(chains=4, data=ready_for_fit)
 
 
 def plot(df):
@@ -69,7 +77,7 @@ def plot(df):
         df.reset_index(),
         x="Amplitude (µA)",
         y="Hit Rate",
-        color="Monkey",
+        color=df.get("Monkey"),
         template="plotly_white",
     )
 

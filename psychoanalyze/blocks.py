@@ -87,7 +87,6 @@ def empty():
 
 
 def plot_fits(df):
-    print(df["Mean"])
     x = np.linspace(-3, 3, 100)
     y = expit(x)
     return px.line(df.reset_index(), x=x, y=y)
