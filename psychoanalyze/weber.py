@@ -18,6 +18,7 @@ def plot(
         data = pa.weber.aggregate(data)
     _log_scale = True if log_scale == "Log Scale" else None
     _marginal = "histogram" if marginal == "Histogram" else None
+    _trendline = "ols" if trendline else None
     return px.scatter(
         data.reset_index(),
         x="Reference Charge (nC)",
@@ -27,7 +28,7 @@ def plot(
         color="Monkey",
         color_discrete_map=pa.plot.colormap,
         symbol="Dimension",
-        trendline=trendline,
+        trendline=_trendline,
         template="plotly_white",
         log_x=_log_scale,
         trendline_options={"log_x": _log_scale},

@@ -1,6 +1,7 @@
 import dash_bootstrap_components as dbc  # type: ignore
 from dash import html, dcc, dash_table  # type: ignore
 import psychoanalyze as pa
+import dash_daq as daq  # type: ignore
 
 defaults = {
     "session": {"sessions": 1, "trials": 100, "subjects": 1},
@@ -149,24 +150,64 @@ def detection_tab(experiment_points):
 
 discrimination_tab = dbc.Tab(
     [
-        dcc.RadioItems(options=["ols", None], value="ols", id="trendline"),
-        dcc.RadioItems(
-            options=["Log Scale", "Linear Scale"], value="Log Scale", id="log-scale"
+        dbc.Row(
+            [
+                dbc.Col(
+                    daq.BooleanSwitch(
+                        on=True,
+                        label="Trendline",
+                        labelPosition="top",
+                        id="trendline",
+                    ),
+                ),
+                dbc.Col(
+                    dbc.RadioItems(
+                        options=[
+                            {"label": "Log Scale", "value": "Log Scale"},
+                            {"label": "Linear Scale", "value": "Linear Scale"},
+                        ],
+                        value="Log Scale",
+                        id="log-scale",
+                    ),
+                ),
+                dbc.Col(
+                    dbc.RadioItems(
+                        options=[
+                            {
+                                "label": "Group by x values",
+                                "value": "Group by x values",
+                            },
+                            {"label": "Show all blocks", "value": None},
+                        ],
+                        value=None,
+                        id="group-x",
+                    )
+                ),
+                dbc.Col(
+                    dbc.RadioItems(
+                        options=[
+                            {"label": "Histogram", "value": "Histogram"},
+                            {"label": "Off", "value": "Off"},
+                        ],
+                        value="Histogram",
+                        id="marginal",
+                    )
+                ),
+                dbc.Col(
+                    dbc.RadioItems(
+                        options=[
+                            {"label": "error bars", "value": "error bars"},
+                            {"label": "off", "value": "off"},
+                        ],
+                        value="error bars",
+                        id="error",
+                    )
+                ),
+            ],
         ),
-        dcc.RadioItems(options=["Group by x values", "show all blocks"], id="group-x"),
-        dcc.RadioItems(options=["Histogram", "off"], value="Histogram", id="marginal"),
-        dcc.RadioItems(options=["stable", "all"], value="all", id="stable"),
-        dcc.RadioItems(
-            options=["error bars", "off"],
-            value="error bars",
-            id="error",
-        ),
-        html.P("Plot width:"),
-        dcc.Input(value=6, id="weber-width-input"),
         dbc.Row(
             [
                 dbc.Col(dcc.Graph(id="weber"), width=6, id="weber-width"),
-                dbc.Col(dcc.Graph(id="weber-time")),
             ]
         ),
     ],

@@ -327,6 +327,17 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "dash-daq"
+version = "0.5.0"
+description = "DAQ components for Dash"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+dash = ">=1.6.1"
+
+[[package]]
 name = "dash-html-components"
 version = "2.0.0"
 description = "Vanilla HTML components for Dash"
@@ -2314,7 +2325,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.13"
-content-hash = "5ac9d5232d2607e7b2389de67d1d2ab5dfec5d731b2ea767df045fc1532f9f1c"
+content-hash = "706bfaad4e37d7d3639bb5a138dfec90825f0a2272134c61838a7490a12ea79a"
 
 [metadata.files]
 anyio = [
@@ -2569,6 +2580,9 @@ dash = [
 dash-bootstrap-components = []
 dash-core-components = [
     {file = "dash_core_components-2.0.0.tar.gz", hash = "sha256:c6733874af975e552f95a1398a16c2ee7df14ce43fa60bb3718a3c6e0b63ffee"},
+]
+dash-daq = [
+    {file = "dash_daq-0.5.0.tar.gz", hash = "sha256:a1d85b6799f7b885652fbc44aebdb58c41254616a8d350b943beeb42ade4256a"},
 ]
 dash-html-components = [
     {file = "dash_html_components-2.0.0.tar.gz", hash = "sha256:8703a601080f02619a6390998e0b3da4a5daabe97a1fd7a9cebc09d015f26e50"},

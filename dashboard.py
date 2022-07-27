@@ -3,7 +3,6 @@ import dash_bootstrap_components as dbc  # type: ignore
 import psychoanalyze as pa
 from psychoanalyze.layout import simulation_tab, experiment_tab
 from scipy.special import expit
-import plotly.express as px
 
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
@@ -32,7 +31,6 @@ app.layout = dbc.Container(
                 simulation_tab(points),
             ]
         ),
-        dcc.Graph(figure=pa.weber.plot(weber_blocks)),
         dcc.Store(data=pa.trials.to_store(trials), id="trials"),
     ]
 )
@@ -41,19 +39,18 @@ app.layout = dbc.Container(
 @app.callback(
     Output("weber", "figure"),
     [
-        Input("trendline", "value"),
+        Input("trendline", "on"),
         Input("group-x", "value"),
         Input("log-scale", "value"),
         Input("marginal", "value"),
         Input("error", "value"),
-        Input("stable", "value"),
     ],
 )
 def format_weber_plot(
-    trendline, group_x, log_scale, marginal, error_y, stable_sessions
+    trendline, group_x, log_scale, marginal, error_y
 ):
     fig = pa.weber.plot(
-        weber_blocks, trendline, group_x, log_scale, marginal, error_y, stable_sessions
+        weber_blocks, trendline, group_x, log_scale, marginal, error_y,
     )
     return fig
 
@@ -69,19 +66,6 @@ def fit_curves(n_clicks, trials):
         return pa.points.combine_plots(pa.points.plot(experiment_points), fit_plot)
     else:
         return pa.points.plot(experiment_points)
-
-
-@app.callback(Output("weber-width", "width"), Input("weber-width-input", "value"))
-def adjust_figure_width(width):
-    return width
-
-
-@app.callback(Output("weber-time", "figure"), Input("weber-width-input", "value"))
-def plot_weber_v_time_plot(dummy):
-    return px.scatter(
-        weber_blocks, x="Date", y="Threshold", color="Monkey", template="plotly_white"
-    )
-
 
 # @app.callback(
 #     Output("trials", "data"), Input("n-trials", "value"), State("trials", "data")
