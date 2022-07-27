@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from scipy.special import expit  # type: ignore
 from psychoanalyze import (
+    schemas,
     sessions,
     blocks,
     points,
@@ -18,6 +19,7 @@ pd.options.plotting.backend = "plotly"
 __version__ = "0.1.0"
 
 __all__ = [
+    "schemas",
     "plot",
     "data",
     "trial",

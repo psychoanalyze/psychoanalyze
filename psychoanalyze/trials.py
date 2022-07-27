@@ -3,31 +3,15 @@ import numpy as np
 import psychoanalyze as pa
 from pathlib import Path
 import random
-import pandera as pr
 from datetime import datetime
 import json
 
-dims = ["Amp1", "Width1", "Freq1", "Dur1"]
 
 data_path = Path("data/trials.csv")
 
-schema = pr.DataFrameSchema(
-    {"Result": pr.Column(int, checks=pr.Check.isin([0, 1, 2, 3]), coerce=True)},
-    index=pr.MultiIndex(
-        [
-            pr.Index(str, name="Monkey", checks=pr.Check.isin(["U", "Y", "Z"])),
-            pr.Index("datetime64", name="Date", coerce=True),
-        ]
-        + [pr.Index(float, name=dim) for dim in pa.blocks.stim_dims]
-        + [pr.Index(int, name=dim) for dim in pa.blocks.channel_dims]
-        + [pr.Index(float, name=dim) for dim in dims]
-    ),
-    coerce=True,
-)
 
-
-def generate(n, stim_levels=[float(i) for i in range(-3, 4)]):
-    return schema.validate(
+def generate(n, stim_levels=None):
+    return pa.schemas.trials.validate(
         pd.DataFrame(
             {"Result": np.random.binomial(1, 0.5, n)},
             index=pd.MultiIndex.from_frame(
@@ -53,10 +37,10 @@ def generate(n, stim_levels=[float(i) for i in range(-3, 4)]):
 
 
 def load(filepath: Path = data_path):
-    return schema.validate(
+    return pa.schemas.trials.validate(
         pd.read_csv(
             filepath,
-            index_col=pa.sessions.dims + pa.blocks.dims + pa.trials.dims,
+            index_col=pa.schemas.points_index_levels,
             parse_dates=["Date"],
         )
     )
@@ -68,11 +52,11 @@ def from_store(store_data):
     index = pd.MultiIndex.from_tuples(df_dict["index"])
     df = pd.DataFrame({"Result": df_dict["data"][0]}, index=index)
     df.index.names = index_names
-    return schema.validate(df)
+    return pa.schemas.trials.validate(df)
 
 
 def to_store(df):
     df.index = df.index.set_levels(df.index.levels[1].astype(str), level=1)
     data_dict = df.to_dict(orient="split")
-    data_dict["index_names"] = pa.points.index_levels
+    data_dict["index_names"] = pa.schemas.points_index_levels
     return json.dumps(data_dict)

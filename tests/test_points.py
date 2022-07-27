@@ -57,7 +57,7 @@ def test_plot():
     s = pd.DataFrame(
         {"Hits": [], "n": [], "Hit Rate": []},
         index=pd.MultiIndex.from_frame(
-            pd.DataFrame({level: [] for level in pa.points.index_levels})
+            pd.DataFrame({level: [] for level in pa.schemas.points_index_levels})
         ),
         dtype=float,
     )
@@ -97,16 +97,19 @@ def test_from_store(mocker):
         index=pd.MultiIndex.from_frame(
             pd.DataFrame(
                 {"Monkey": ["U"], "Date": ["1-1-2001"]}
-                | {level: [0] for level in pa.blocks.dims + pa.points.dims}
+                | {
+                    level: [0]
+                    for level in pa.schemas.block_dims + pa.schemas.point_dims
+                }
             )
         ),
     )
     mocker.patch("psychoanalyze.trials.from_store", return_value=store_data)
 
     store_data = store_data.to_dict(orient="split")
-    store_data["index_names"] = pa.points.index_levels
+    store_data["index_names"] = pa.schemas.points_index_levels
     df = pa.points.from_store(json.dumps(store_data))
-    pa.points.schema.validate(df)
+    pa.schemas.points.validate(df)
 
 
 def test_combine_plots():
@@ -117,7 +120,7 @@ def test_combine_plots():
 
 
 def test_fit_prep():
-    points_df = pa.points.schema.example(0)
+    points_df = pa.schemas.points.example(0)
     ready_for_fit = pa.points.prep_fit(points_df, "Amp1")
     points_df = points_df.reset_index()
     assert ready_for_fit["X"] == len(points_df)

@@ -13,10 +13,10 @@ server = app.server
 experiment_points = pa.points.load()
 experiment_points = experiment_points.xs(("Z", "2017-01-10"))
 
-x = list(range(-3, 4))
-p = expit(x)
+stim_levels = list(range(-3, 4))
+p = expit(stim_levels)
 
-trials = pa.trials.generate(100)
+trials = pa.trials.generate(100, stim_levels)
 points = pa.points.from_trials(trials)
 
 df = pd.read_csv("data/weber_curves.csv", parse_dates=["Date"])

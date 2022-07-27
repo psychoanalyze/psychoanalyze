@@ -3,38 +3,18 @@ import cmdstanpy as stan
 import plotly.express as px  # type: ignore
 from scipy.stats import binom  # type: ignore
 import psychoanalyze as pa
-from dash import dash_table
-import pandera as pr
-
-dims = ["Amp1", "Width1", "Freq1", "Dur1"]
-
-index_levels = pa.blocks.index_levels + dims
-
-schema = pr.DataFrameSchema(
-    {
-        "n": pr.Column(int, checks=pr.Check.isin([0, 1, 2, 3]), coerce=True),
-        "Hits": pr.Column(int, checks=pr.Check.isin([0, 1, 2, 3]), coerce=True),
-    },
-    index=pr.MultiIndex(
-        [
-            pr.Index(str, name="Monkey", checks=pr.Check.isin(["U", "Y", "Z"])),
-            pr.Index("datetime64", name="Date", coerce=True),
-        ]
-        + [pr.Index(float, name=dim) for dim in pa.blocks.stim_dims]
-        + [pr.Index(int, name=dim) for dim in pa.blocks.channel_dims]
-        + [pr.Index(float, name=dim) for dim in dims]
-    ),
-    coerce=True,
-)
+from dash import dash_table  # type: ignore
 
 
 def from_trials(trials):
     trials = trials[trials["Result"].isin([0, 1])]
-    return (
+    df = (
         trials.groupby(trials.index.names)["Result"]
         .agg(["count", "sum"])
         .rename(columns={"count": "n", "sum": "Hits"})
     )
+    df["x"] = df.index.get_level_values("Amp1")
+    return df
 
 
 def dimension(points):
@@ -52,7 +32,6 @@ def dimension(points):
 
 def prep_fit(points: pd.DataFrame, dimension="Amp1"):
     points = points.reset_index()
-    print(points.columns)
     return {
         "X": len(points),
         "x": points[f"{dimension}"].to_numpy(),
