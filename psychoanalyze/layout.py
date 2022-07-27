@@ -1,7 +1,6 @@
 import dash_bootstrap_components as dbc  # type: ignore
 from dash import html, dcc, dash_table  # type: ignore
 import psychoanalyze as pa
-import plotly.express as px
 
 defaults = {
     "session": {"sessions": 1, "trials": 100, "subjects": 1},
