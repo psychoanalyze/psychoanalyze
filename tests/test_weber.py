@@ -34,3 +34,11 @@ def test_aggregate():
     )
     df = pa.weber.aggregate(curve_data)
     assert df.at[df.index[0], "Difference Threshold (nC)"] == 1.0
+
+
+def test_load(tmp_path):
+    pd.DataFrame(
+        {level_name: [] for level_name in pa.schemas.block_index_levels}
+        | {"Reference Charge (nC)": []},
+    ).to_csv(tmp_path / "weber_curves.csv", index_label=False)
+    assert len(pa.weber.load(tmp_path / "weber_curves.csv")) == 0

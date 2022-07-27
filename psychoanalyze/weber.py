@@ -1,5 +1,6 @@
 import plotly.express as px  # type: ignore
 import psychoanalyze as pa
+import pandas as pd
 
 
 def plot(
@@ -43,3 +44,7 @@ def aggregate(data):
         .agg(["mean", "count", "std"])
         .rename(columns={"mean": "Difference Threshold (nC)"})
     )
+
+
+def load(path):
+    return pd.read_csv(path, parse_dates=["Date"])

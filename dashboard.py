@@ -1,7 +1,6 @@
 from dash import Dash, dcc, Input, Output, State  # type: ignore
 import dash_bootstrap_components as dbc  # type: ignore
 import psychoanalyze as pa
-import pandas as pd
 from psychoanalyze.layout import simulation_tab, experiment_tab
 from scipy.special import expit
 import plotly.express as px
@@ -19,7 +18,7 @@ p = expit(stim_levels)
 trials = pa.trials.generate(100, stim_levels)
 points = pa.points.from_trials(trials)
 
-df = pd.read_csv("data/weber_curves.csv", parse_dates=["Date"])
+df = pa.weber.load("data/weber_curves.csv")
 df = df[df["Reference Charge (nC)"] != 260]
 df = df[df["Date"] != "3/26/2018"]
 df = df[df["Date"] != "4/30/2018"]
