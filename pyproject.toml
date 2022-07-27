@@ -41,6 +41,7 @@ jupyterlite = "^0.1.0-beta.11"
 gunicorn = "^20.1.0"
 pandera = "^0.11.0"
 kaleido = "0.2.1"
+pre-commit = "^2.20.0"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.2.0"
