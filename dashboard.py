@@ -5,10 +5,11 @@ from psychoanalyze.layout import simulation_tab, experiment_tab
 from scipy.special import expit
 import plotly.express as px
 
+
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 server = app.server
 
-experiment_points = pa.points.load()
+experiment_points = pa.points.load("data/trials.csv")
 experiment_points = experiment_points.xs(("Z", "2017-01-10"))
 
 stim_levels = list(range(-3, 4))
