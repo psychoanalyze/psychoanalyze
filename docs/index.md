@@ -32,7 +32,3 @@ trials.T
 --8<-- "docs/figures/fig1.html"
 
 --8<-- "docs/jupyterlite.html"
-
-## API
-
-Learn about functions and classes provided by PsychoAnalyze in our [API docs](reference)
