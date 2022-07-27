@@ -34,3 +34,7 @@ def test_aggregate():
     )
     df = pa.weber.aggregate(curve_data)
     assert df.at[df.index[0], "Difference Threshold (nC)"] == 1.0
+
+
+def test_tmp():
+    pass
