@@ -76,16 +76,9 @@ def test_generate():
 
 
 def test_load(tmp_path):
-    pd.DataFrame(
-        {level_name: [] for level_name in pa.schemas.block_index_levels}
-        | {
-            "Reference Charge (nC)": [],
-            "location_CI_5": [],
-            "location_CI_95": [],
-            "Fixed_Param_Value": [],
-            "Threshold_Charge_nC": [],
-        },
-    ).to_csv(tmp_path / "points.csv", index_label=False)
+    pd.DataFrame(pa.schemas.trials.example(0).reset_index()).to_csv(
+        tmp_path / "points.csv", index_label=False
+    )
     points = pa.points.load(tmp_path / "points.csv")
     assert "n" in points.columns
 
