@@ -140,3 +140,4 @@ docs/tables/*
 .jupyterlite.doit.db
 
 notebooks/*
+figures/*
