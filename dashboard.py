@@ -4,7 +4,6 @@ import psychoanalyze as pa
 from psychoanalyze.layout import simulation_tab, experiment_tab
 from scipy.special import expit
 import plotly.express as px
-from statsmodels.stats import anova
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 server = app.server
@@ -23,11 +22,6 @@ df = df[df["Reference Charge (nC)"] != 260]
 df = df[df["Date"] != "3/26/2018"]
 df = df[df["Date"] != "4/30/2018"]
 weber_blocks = df
-weber_blocks["Difference Threshold (nC)"] = weber_blocks[
-    "Difference Threshold (nC)"
-].abs()
-weber_blocks["err+"] = weber_blocks["err+"].abs()
-weber_blocks["err-"] = weber_blocks["err-"].abs()
 
 app.layout = dbc.Container(
     [
@@ -37,22 +31,7 @@ app.layout = dbc.Container(
                 simulation_tab(points),
             ]
         ),
-        dcc.Graph(
-            figure=px.scatter(
-                pa.weber.aggregate(weber_blocks).reset_index(),
-                x="Reference Charge (nC)",
-                y="Difference Threshold (nC)",
-                color="Monkey",
-                color_discrete_map=pa.plot.colormap,
-                symbol="Dimension",
-                symbol_map={"Amp": "diamond", "Width": "diamond-open"},
-                size="count",
-                error_y="std",
-                template=pa.plot.template,
-                trendline="ols",
-            ).update_layout(xaxis_range=(0, 250))
-            # .write_image("figures/fig6A.svg", width=600)
-        ),
+        dcc.Graph(figure=pa.weber.plot(weber_blocks)),
         dcc.Store(data=pa.trials.to_store(trials), id="trials"),
     ]
 )
@@ -75,14 +54,6 @@ def format_weber_plot(
     fig = pa.weber.plot(
         weber_blocks, trendline, group_x, log_scale, marginal, error_y, stable_sessions
     )
-    results = px.get_trendline_results(fig)
-    anova.anova_lm(*list(results["px_fit_results"].values)).to_csv("data/anova_all.csv")
-    results_U = results[results["Monkey"] == "U"]
-    anova.anova_lm(*list(results_U["px_fit_results"].values)).to_csv("data/anova_U.csv")
-
-    results_Y = results[results["Monkey"] == "Y"]
-    anova.anova_lm(*list(results_Y["px_fit_results"].values)).to_csv("data/anova_Y.csv")
-
     return fig
 
 
