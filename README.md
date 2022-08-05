@@ -8,7 +8,7 @@ Psychophysics analysis in Python.
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/schlich/psychoanalyze/blob/main/docs/notebook.ipynb)
 [![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
 
-
+> Author's note: Documentation on this repository is a work in progress.  However, you may still find most of the analysis modules used for the JNE paper in the source code. Contact me at t.schlic@wustl.edu if you need guidance.
 
 ## Installation
 pip:
