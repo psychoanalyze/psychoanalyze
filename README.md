@@ -7,6 +7,7 @@ Psychophysics analysis in Python.
 [![Documentation Status](https://readthedocs.org/projects/psychoanalyze/badge/?version=latest)](https://psychoanalyze.readthedocs.io/en/latest/?badge=latest)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/schlich/psychoanalyze/blob/main/docs/notebook.ipynb)
 [![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
+[![Open in Remote - Containers](https://img.shields.io/static/v1?label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/psychoanalyze/psychoanalyze)
 
 > Author's note: Documentation on this repository is a work in progress.  However, you may still find most of the analysis modules used for the JNE paper in the source code. Contact me at t.schlic@wustl.edu if you need guidance.
 
