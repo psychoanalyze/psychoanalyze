@@ -130,6 +130,55 @@ def detection_tab(experiment_points, blocks):
         dbc.Tabs(
             [
                 dbc.Tab(
+                    [
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    dcc.Graph(
+                                        figure=px.scatter(
+                                            pa.strength_duration(dim="amp"),
+                                            x="Fixed Pulse Width (μs)",
+                                            y="Threshold Amplitude (μA)",
+                                        )
+                                    )
+                                ),
+                                dbc.Col(
+                                    dcc.Graph(
+                                        figure=px.scatter(
+                                            pa.strength_duration(dim="pw"),
+                                            y="Threshold Pulse Width (μs)",
+                                            x="Fixed Amplitude (μA)",
+                                        )
+                                    )
+                                ),
+                            ]
+                        ),
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    dcc.Graph(
+                                        figure=px.scatter(
+                                            pa.strength_duration(dim="amp"),
+                                            x="Fixed Pulse Width (μs)",
+                                            y="Threshold Amplitude (μA)",
+                                        )
+                                    )
+                                ),
+                                dbc.Col(
+                                    dcc.Graph(
+                                        figure=px.scatter(
+                                            pa.strength_duration(dim="pw"),
+                                            x="Fixed Amplitude (μA)",
+                                            y="Threshold Pulse Width (μs)",
+                                        )
+                                    )
+                                ),
+                            ]
+                        ),
+                    ],
+                    label="Strength Duration",
+                ),
+                dbc.Tab(
                     dbc.Row(
                         [
                             dbc.Col(

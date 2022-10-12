@@ -55,22 +55,12 @@ def fit(points):
     return {"location": 1, "width": None, "gamma": None, "lambda": None}
 
 
-def strength_duration(fixed):
-    if fixed == "pw":
-        return pd.DataFrame(
-            {
-                "Monkey": [],
-                "Day": [],
-                "Threshold Amplitude (μA)": [],
-                "Fixed Pulse Width (μs)": [],
-            }
-        )
-    if fixed == "amp":
-        return pd.DataFrame(
-            {
-                "Monkey": [],
-                "Day": [],
-                "Fixed Amplitude (μA)": [],
-                "Threshold Pulse Width (μs)": [],
-            }
-        )
+def strength_duration(dim=None):
+    df = pd.DataFrame({"Monkey": [], "Day": []})
+    if dim == "amp":
+        df["Threshold Amplitude (μA)"] = []
+        df["Fixed Pulse Width (μs)"] = []
+    elif dim == "pw":
+        df["Fixed Amplitude (μA)"] = []
+        df["Threshold Pulse Width (μs)"] = []
+    return df
