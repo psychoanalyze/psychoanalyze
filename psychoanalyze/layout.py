@@ -125,41 +125,27 @@ def simulation_tab(points):
     )
 
 
+inverse_plots = dbc.Row(
+    [
+        dbc.Col(dcc.Graph(figure=pa.plot.strength_duration(dim=dim)))
+        for dim in ["Amp", "Width"]
+    ]
+)
+
+linear_plots = dbc.Row(
+    [
+        dbc.Col(dcc.Graph(figure=pa.plot.strength_duration(dim=dim)))
+        for dim in ["Amp", "Width"]
+    ]
+)
+
+
 def detection_tab(experiment_points, blocks):
     return dbc.Tab(
         dbc.Tabs(
             [
                 dbc.Tab(
-                    [
-                        dbc.Row(
-                            [
-                                dbc.Col(
-                                    dcc.Graph(
-                                        figure=pa.plot.strength_duration(dim="Amp")
-                                    )
-                                ),
-                                dbc.Col(
-                                    dcc.Graph(
-                                        figure=pa.plot.strength_duration(dim="Width")
-                                    )
-                                ),
-                            ]
-                        ),
-                        dbc.Row(
-                            [
-                                dbc.Col(
-                                    dcc.Graph(
-                                        figure=pa.plot.strength_duration(dim="Amp")
-                                    )
-                                ),
-                                dbc.Col(
-                                    dcc.Graph(
-                                        figure=pa.plot.strength_duration(dim="Width")
-                                    )
-                                ),
-                            ]
-                        ),
-                    ],
+                    [inverse_plots, linear_plots],
                     label="Strength Duration",
                 ),
                 dbc.Tab(

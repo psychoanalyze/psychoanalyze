@@ -12,6 +12,7 @@ from psychoanalyze import (
     weber,
     detection,
     amp,
+    strength_duration,
 )
 
 pd.options.plotting.backend = "plotly"
@@ -31,6 +32,7 @@ __all__ = [
     "points",
     "trials",
     "blocks",
+    "strength_duration",
 ]
 
 # def curve(trials: pd.DataFrame) -> pd.Series:
@@ -53,14 +55,3 @@ def psi() -> pd.Series:
 
 def fit(points):
     return {"location": 1, "width": None, "gamma": None, "lambda": None}
-
-
-def strength_duration(df=None, dim=None):
-    df = pd.DataFrame({"Monkey": [], "Day": []})
-    if dim == "amp":
-        df["Threshold Amplitude (μA)"] = []
-        df["Fixed Pulse Width (μs)"] = []
-    elif dim == "pw":
-        df["Fixed Amplitude (μA)"] = []
-        df["Threshold Pulse Width (μs)"] = []
-    return df
