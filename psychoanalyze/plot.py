@@ -145,7 +145,7 @@ def difference_thresholds():
     )
 
 
-def strength_duration(dim, view=None, x_data=[], y_data=[]):
+def strength_duration(dim, view=None, x_data=[], y_data=[], df=None):
     labels = {
         "Amp": {
             "x": "Fixed Pulse Width (μs)",
@@ -165,9 +165,27 @@ def strength_duration(dim, view=None, x_data=[], y_data=[]):
 
     x = labels[dim]["x"]
     y = labels[dim]["y"][view]
+    if df is not None:
+        print(df)
+        sd_df = df[df["Dimension"] == dim]
+        print(sd_df)
+    else:
+        sd_df = pd.DataFrame({x: x_data, y: y_data})
     return px.scatter(
-        pd.DataFrame({x: x_data, y: y_data}),
+        sd_df,
         x=x,
         y=y,
         template=template,
     )
+
+
+def counts(sessions, facet_col=None):
+    if facet_col == "All":
+        facet_col = None
+    return px.histogram(
+        sessions,
+        x="Monkey",
+        color="Monkey",
+        facet_col=facet_col,
+        template=template,
+    ).update_layout(yaxis_title_text="# of Sessions")

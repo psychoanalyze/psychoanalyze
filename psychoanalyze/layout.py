@@ -3,6 +3,7 @@ from dash import html, dcc, dash_table  # type: ignore
 import psychoanalyze as pa
 import dash_daq as daq  # type: ignore
 import plotly.express as px
+import pandas as pd
 
 defaults = {
     "session": {"sessions": 1, "trials": 100, "subjects": 1},
@@ -141,11 +142,29 @@ plots = [
     for view in ["inverse", "linear"]
 ]
 
+sessions = pd.read_csv("data/trials.csv")[["Monkey", "Date"]].drop_duplicates()
+
 
 def detection_tab(experiment_points, blocks):
     return dbc.Tab(
         dbc.Tabs(
             [
+                dbc.Tab(
+                    [
+                        dcc.RadioItems(["All", "Dimension"], "All", id="facet_col"),
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    dcc.Graph(
+                                        figure=pa.plot.counts(sessions), id="counts"
+                                    )
+                                ),
+                                dbc.Col(),
+                            ],
+                        ),
+                    ],
+                    label="Counts",
+                ),
                 dbc.Tab(
                     plots,
                     label="Strength-Duration Plots",

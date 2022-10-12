@@ -75,6 +75,12 @@ def fit_curves(n_clicks, trials):
         return pa.points.plot(experiment_points)
 
 
+# @app.callback(Output("counts", "figure"), Input("facet_col", "value"))
+# def make_facets(facet_col):
+#     sessions = pd.read_csv("data/trials.csv")[["Monkey", "Date"]]
+#     return pa.plot.counts(sessions, facet_col=facet_col)
+
+
 # @app.callback(
 #     Output("trials", "data"), Input("n-trials", "value"), State("trials", "data")
 # )

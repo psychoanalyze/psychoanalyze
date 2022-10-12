@@ -60,3 +60,12 @@ def to_store(df):
     data_dict = df.to_dict(orient="split")
     data_dict["index_names"] = pa.schemas.points_index_levels
     return json.dumps(data_dict)
+
+
+def normalize(trials):
+    return {
+        "Session": trials[["Monkey", "Day"]].drop_duplicates(),
+        "Reference Stimulus": trials[["Amp2", "Width2", "Freq2", "Dur2"]],
+        "Channel Config": trials[["Active Channels", "Return Channels"]],
+        "Test Stimulus": trials[["Amp1", "Width1", "Freq1", "Dur1"]],
+    }

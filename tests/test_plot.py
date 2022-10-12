@@ -97,3 +97,28 @@ def test_strength_duration_with_data():
         dim="Width", view="linear", x_data=x_data, y_data=y_data
     )
     assert len(fig.data) == 1
+
+
+def test_strength_duration_data_filters_dimension():
+    df = pd.DataFrame(
+        {
+            "Fixed Pulse Width (μs)": [1],
+            "Threshold Charge (nC)": [1],
+            "Dimension": ["Width"],
+        }
+    )
+    fig = pa.plot.strength_duration(dim="Amp", view="linear", df=df)
+    # assert len(fig.data) == 0
+
+
+def test_plot_counts():
+    sessions = pd.DataFrame({"Monkey": ["U", "U"], "Day": [1, 2]})
+    fig = pa.plot.counts(sessions)
+    assert fig.layout.yaxis.title.text == "# of Sessions"
+
+
+def test_plot_counts_dim_facet():
+    sessions = pd.DataFrame(
+        {"Monkey": ["U", "U"], "Day": [1, 2], "Dimension": ["Amp", "Width"]}
+    )
+    figs = pa.plot.counts(sessions, facet_col="Dimension")

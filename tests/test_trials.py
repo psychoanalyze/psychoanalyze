@@ -53,3 +53,27 @@ def test_from_store():
 def test_to_store():
     data_json = pa.trials.to_store(pa.schemas.trials.example(1))
     assert "index_names" in json.loads(data_json).keys()
+
+
+def test_normalize():
+    fields = {
+        "Session": ["Monkey", "Day"],
+        "Reference Stimulus": ["Amp2", "Width2", "Freq2", "Dur2"],
+        "Channel Configuration": ["Active Channels", "Return Channels"],
+        "Test Stimulus": ["Amp1", "Width1", "Freq1", "Dur1"],
+    }
+    data = {
+        field: []
+        for field in fields["Session"]
+        + fields["Reference Stimulus"]
+        + fields["Channel Configuration"]
+        + fields["Test Stimulus"]
+    }
+    trials = pd.DataFrame(data)
+    normalized_data = pa.trials.normalize(trials)
+    assert normalized_data.keys() == {
+        "Session",
+        "Reference Stimulus",
+        "Channel Config",
+        "Test Stimulus",
+    }
