@@ -88,3 +88,12 @@ def test_strength_duration_linear_width():
     fig = pa.plot.strength_duration(dim="Width", view="linear")
     assert fig.layout.xaxis.title.text == "Fixed Amplitude (μA)"
     assert fig.layout.yaxis.title.text == "Threshold Charge (nC)"
+
+
+def test_strength_duration_with_data():
+    x_data = [1]
+    y_data = [1]
+    fig = pa.plot.strength_duration(
+        dim="Width", view="linear", x_data=x_data, y_data=y_data
+    )
+    assert len(fig.data) == 1

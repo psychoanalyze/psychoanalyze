@@ -128,7 +128,13 @@ def simulation_tab(points):
 plots = [
     dbc.Row(
         [
-            dbc.Col(dcc.Graph(figure=pa.plot.strength_duration(dim=dim, view=view)))
+            dbc.Col(
+                dcc.Graph(
+                    figure=pa.plot.strength_duration(
+                        dim=dim, view=view, x_data=[1], y_data=[1]
+                    )
+                )
+            )
             for dim in ["Amp", "Width"]
         ]
     )
