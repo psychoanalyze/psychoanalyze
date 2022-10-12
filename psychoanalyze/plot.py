@@ -143,3 +143,18 @@ def difference_thresholds():
         trendline="ols",
         template=template,
     )
+
+
+def strength_duration(dim):
+    if dim == "Amp":
+        return px.scatter(
+            pd.DataFrame({"Fixed Pulse Width (μs)": []}),
+            x="Fixed Pulse Width (μs)",
+            template=template,
+        )
+    if dim == "Width":
+        return px.scatter(
+            pd.DataFrame({"Fixed Amplitude (μA)": []}),
+            x="Fixed Amplitude (μA)",
+            template=template,
+        )

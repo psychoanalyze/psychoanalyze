@@ -64,3 +64,13 @@ def test_curves():
         ),
     }
     assert pa.plot.curves(curves_data)
+
+
+def test_strength_duration():
+    fig = pa.plot.strength_duration(dim="Amp")
+    assert fig.layout.xaxis.title.text == "Fixed Pulse Width (μs)"
+
+
+def test_strength_duration_pw():
+    fig = pa.plot.strength_duration(dim="Width")
+    assert fig.layout.xaxis.title.text == "Fixed Amplitude (μA)"

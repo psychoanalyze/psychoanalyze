@@ -55,7 +55,7 @@ def fit(points):
     return {"location": 1, "width": None, "gamma": None, "lambda": None}
 
 
-def strength_duration(dim=None):
+def strength_duration(df=None, dim=None):
     df = pd.DataFrame({"Monkey": [], "Day": []})
     if dim == "amp":
         df["Threshold Amplitude (μA)"] = []

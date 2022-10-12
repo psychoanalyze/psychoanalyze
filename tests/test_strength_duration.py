@@ -1,3 +1,4 @@
+import pandas as pd
 import pytest
 
 import psychoanalyze as pa
@@ -8,8 +9,14 @@ def s_d_columns():
     return {"Monkey", "Day"}
 
 
-def test_strengh_duration(s_d_columns):
-    s_d = pa.strength_duration()
+def test_strength_duration(s_d_columns):
+    df_index = pd.MultiIndex.from_frame(
+        pd.DataFrame(
+            {"Monkey": [], "Day": [], "Dimension": [], "Reference Magnitude": []}
+        )
+    )
+    df = pd.DataFrame({"Threshold": []}, index=df_index)
+    s_d = pa.strength_duration(df=df)
     assert set(s_d.columns) == s_d_columns
 
 
