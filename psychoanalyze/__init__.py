@@ -53,3 +53,24 @@ def psi() -> pd.Series:
 
 def fit(points):
     return {"location": 1, "width": None, "gamma": None, "lambda": None}
+
+
+def strength_duration(fixed):
+    if fixed == "pw":
+        return pd.DataFrame(
+            {
+                "Monkey": [],
+                "Day": [],
+                "Threshold Amplitude (μA)": [],
+                "Fixed Pulse Width (μs)": [],
+            }
+        )
+    if fixed == "amp":
+        return pd.DataFrame(
+            {
+                "Monkey": [],
+                "Day": [],
+                "Fixed Amplitude (μA)": [],
+                "Threshold Pulse Width (μs)": [],
+            }
+        )

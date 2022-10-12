@@ -34,3 +34,23 @@ def test_curve_fit_fields():
     points = pd.Series([0, 2], name="Hit Rate", index=pd.Index([0, 2], name="x"))
     fit = pa.fit(points)
     assert fit.keys() == {"location", "width", "gamma", "lambda"}
+
+
+def test_strength_duration_amp():
+    s_d = pa.strength_duration(fixed="pw")
+    assert set(s_d.columns) <= {
+        "Monkey",
+        "Day",
+        "Threshold Amplitude (μA)",
+        "Fixed Pulse Width (μs)",
+    }
+
+
+def test_strength_duration_pw():
+    s_d = pa.strength_duration(fixed="amp")
+    assert set(s_d.columns) <= {
+        "Monkey",
+        "Day",
+        "Fixed Amplitude (μA)",
+        "Threshold Pulse Width (μs)",
+    }
