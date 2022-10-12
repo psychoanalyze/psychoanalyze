@@ -20,8 +20,6 @@
 			"settings": {
 				"python.venvPath": "/workspaces/psychoanalyze/.venv",
 				"python.defaultInterpreterPath": "/workspaces/psychoanalyze/.venv/bin/python",
-				"python.linting.enabled": true,
-				"python.linting.pylintEnabled": true,
 				"python.formatting.blackPath": "/usr/local/py-utils/bin/black",
 				"python.linting.banditPath": "/usr/local/py-utils/bin/bandit",
 				"python.linting.flake8Path": "/usr/local/py-utils/bin/flake8",

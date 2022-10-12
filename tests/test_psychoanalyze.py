@@ -1,13 +1,13 @@
-from psychoanalyze import __version__
-import psychoanalyze as pa
 import pandas as pd
 import datatest as dt  # type: ignore
 import numpy as np
 from scipy.special import expit  # type: ignore
 
+import psychoanalyze as pa
+
 
 def test_version():
-    assert __version__ == "0.1.0"
+    assert pa.__version__ == "0.1.0"
 
 
 def test_weber():
