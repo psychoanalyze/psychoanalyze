@@ -135,20 +135,12 @@ def detection_tab(experiment_points, blocks):
                             [
                                 dbc.Col(
                                     dcc.Graph(
-                                        figure=px.scatter(
-                                            pa.strength_duration(dim="amp"),
-                                            x="Fixed Pulse Width (μs)",
-                                            y="Threshold Amplitude (μA)",
-                                        )
+                                        figure=pa.plot.strength_duration(dim="Amp")
                                     )
                                 ),
                                 dbc.Col(
                                     dcc.Graph(
-                                        figure=px.scatter(
-                                            pa.strength_duration(dim="pw"),
-                                            y="Threshold Pulse Width (μs)",
-                                            x="Fixed Amplitude (μA)",
-                                        )
+                                        figure=pa.plot.strength_duration(dim="Width")
                                     )
                                 ),
                             ]
@@ -157,20 +149,12 @@ def detection_tab(experiment_points, blocks):
                             [
                                 dbc.Col(
                                     dcc.Graph(
-                                        figure=px.scatter(
-                                            pa.strength_duration(dim="amp"),
-                                            x="Fixed Pulse Width (μs)",
-                                            y="Threshold Amplitude (μA)",
-                                        )
+                                        figure=pa.plot.strength_duration(dim="Amp")
                                     )
                                 ),
                                 dbc.Col(
                                     dcc.Graph(
-                                        figure=px.scatter(
-                                            pa.strength_duration(dim="pw"),
-                                            x="Fixed Amplitude (μA)",
-                                            y="Threshold Pulse Width (μs)",
-                                        )
+                                        figure=pa.plot.strength_duration(dim="Width")
                                     )
                                 ),
                             ]

@@ -69,8 +69,10 @@ def test_curves():
 def test_strength_duration():
     fig = pa.plot.strength_duration(dim="Amp")
     assert fig.layout.xaxis.title.text == "Fixed Pulse Width (μs)"
+    assert fig.layout.yaxis.title.text == "Threshold Amplitude (μA)"
 
 
 def test_strength_duration_pw():
     fig = pa.plot.strength_duration(dim="Width")
     assert fig.layout.xaxis.title.text == "Fixed Amplitude (μA)"
+    assert fig.layout.yaxis.title.text == "Threshold Pulse Width (μs)"

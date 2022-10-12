@@ -146,15 +146,25 @@ def difference_thresholds():
 
 
 def strength_duration(dim):
+    labels = {
+        "Amp": {"x": "Fixed Pulse Width (μs)", "y": "Threshold Amplitude (μA)"},
+        "Width": {"x": "Fixed Amplitude (μA)", "y": "Threshold Pulse Width (μs)"},
+    }
     if dim == "Amp":
+        x = labels[dim]["x"]
+        y = labels[dim]["y"]
         return px.scatter(
-            pd.DataFrame({"Fixed Pulse Width (μs)": []}),
-            x="Fixed Pulse Width (μs)",
+            pd.DataFrame({x: [], y: []}),
+            x=x,
+            y=y,
             template=template,
         )
     if dim == "Width":
+        x = labels[dim]["x"]
+        y = labels[dim]["y"]
         return px.scatter(
-            pd.DataFrame({"Fixed Amplitude (μA)": []}),
-            x="Fixed Amplitude (μA)",
+            pd.DataFrame({x: [], y: []}),
+            x=x,
+            y=y,
             template=template,
         )
