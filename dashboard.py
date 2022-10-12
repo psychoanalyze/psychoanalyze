@@ -3,6 +3,7 @@ import dash_bootstrap_components as dbc  # type: ignore
 import psychoanalyze as pa
 from psychoanalyze.layout import simulation_tab, experiment_tab
 from scipy.special import expit
+import pandas as pd
 
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
@@ -22,12 +23,15 @@ df = df[df["Reference Charge (nC)"] != 260]
 df = df[df["Date"] != "3/26/2018"]
 df = df[df["Date"] != "4/30/2018"]
 weber_blocks = df
+blocks = pd.DataFrame(
+    {"Threshold": [], "width": [], "gamma": [], "lambda": [], "Monkey": []}
+)
 
 app.layout = dbc.Container(
     [
         dbc.Tabs(
             [
-                experiment_tab(experiment_points),
+                experiment_tab(experiment_points, blocks),
                 simulation_tab(points),
             ]
         ),
@@ -46,11 +50,14 @@ app.layout = dbc.Container(
         Input("error", "value"),
     ],
 )
-def format_weber_plot(
-    trendline, group_x, log_scale, marginal, error_y
-):
+def format_weber_plot(trendline, group_x, log_scale, marginal, error_y):
     fig = pa.weber.plot(
-        weber_blocks, trendline, group_x, log_scale, marginal, error_y,
+        weber_blocks,
+        trendline,
+        group_x,
+        log_scale,
+        marginal,
+        error_y,
     )
     return fig
 
@@ -66,6 +73,7 @@ def fit_curves(n_clicks, trials):
         return pa.points.combine_plots(pa.points.plot(experiment_points), fit_plot)
     else:
         return pa.points.plot(experiment_points)
+
 
 # @app.callback(
 #     Output("trials", "data"), Input("n-trials", "value"), State("trials", "data")

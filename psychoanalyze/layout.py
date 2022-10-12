@@ -2,6 +2,7 @@ import dash_bootstrap_components as dbc  # type: ignore
 from dash import html, dcc, dash_table  # type: ignore
 import psychoanalyze as pa
 import dash_daq as daq  # type: ignore
+import plotly.express as px
 
 defaults = {
     "session": {"sessions": 1, "trials": 100, "subjects": 1},
@@ -124,23 +125,56 @@ def simulation_tab(points):
     )
 
 
-def detection_tab(experiment_points):
+def detection_tab(experiment_points, blocks):
     return dbc.Tab(
-        dbc.Row(
+        dbc.Tabs(
             [
-                dbc.Col(
-                    dcc.Graph(
-                        figure=pa.points.plot(experiment_points),
-                        id="points",
-                    )
+                dbc.Tab(
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                dcc.Graph(
+                                    figure=px.ecdf(
+                                        blocks, x=["lambda", "gamma"], color="Monkey"
+                                    ).update_layout(xaxis_title="Guess/Lapse Rate"),
+                                    id="ecdf_g_l",
+                                )
+                            ),
+                            dbc.Col(
+                                dcc.Graph(
+                                    figure=px.ecdf(blocks, x="width"),
+                                    id="ecdf_amp",
+                                )
+                            ),
+                            dbc.Col(
+                                dcc.Graph(
+                                    figure=px.ecdf(blocks, x="Threshold"), id="ecdf_pw"
+                                )
+                            ),
+                        ]
+                    ),
+                    label="eCDF",
                 ),
-                dbc.Col(
-                    [
-                        dbc.Button("Fit curves", id="fit"),
-                        pa.points.datatable(experiment_points),
-                    ],
-                    width=2,
-                    align="center",
+                dbc.Tab(
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                dcc.Graph(
+                                    figure=pa.points.plot(experiment_points),
+                                    id="points",
+                                )
+                            ),
+                            dbc.Col(
+                                [
+                                    dbc.Button("Fit curves", id="fit"),
+                                    pa.points.datatable(experiment_points),
+                                ],
+                                width=2,
+                                align="center",
+                            ),
+                        ]
+                    ),
+                    label="Single Block",
                 ),
             ]
         ),
@@ -215,12 +249,12 @@ discrimination_tab = dbc.Tab(
 )
 
 
-def experiment_tab(experiment_points):
+def experiment_tab(experiment_points, blocks):
     return dbc.Tab(
         dbc.Tabs(
             [
+                detection_tab(experiment_points, blocks),
                 discrimination_tab,
-                detection_tab(experiment_points),
             ]
         ),
         label="Experiment",
