@@ -150,19 +150,16 @@ def detection_tab(experiment_points, blocks):
         dbc.Tabs(
             [
                 dbc.Tab(
-                    [
-                        dcc.RadioItems(["All", "Dimension"], "All", id="facet_col"),
-                        dbc.Row(
-                            [
-                                dbc.Col(
-                                    dcc.Graph(
-                                        figure=pa.plot.counts(sessions), id="counts"
-                                    )
-                                ),
-                                dbc.Col(),
-                            ],
-                        ),
-                    ],
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                dcc.Graph(figure=pa.plot.counts(sessions), id="counts")
+                            ),
+                            dbc.Col(
+                                dcc.Graph(figure=pa.plot.counts(sessions, dim="Width"))
+                            ),
+                        ],
+                    ),
                     label="Counts",
                 ),
                 dbc.Tab(

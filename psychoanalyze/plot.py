@@ -179,13 +179,13 @@ def strength_duration(dim, view=None, x_data=[], y_data=[], df=None):
     )
 
 
-def counts(sessions, facet_col=None):
-    if facet_col == "All":
-        facet_col = None
+def counts(sessions, dim=None):
+    if dim is not None:
+        sessions["Dimension"] = "Amp"
+        sessions = sessions[sessions["Dimension"] == dim]
     return px.histogram(
         sessions,
         x="Monkey",
         color="Monkey",
-        facet_col=facet_col,
         template=template,
     ).update_layout(yaxis_title_text="# of Sessions")

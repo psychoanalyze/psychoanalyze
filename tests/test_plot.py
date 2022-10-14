@@ -112,8 +112,10 @@ def test_strength_duration_data_filters_dimension():
 
 
 def test_plot_counts():
-    sessions = pd.DataFrame({"Monkey": ["U", "U"], "Day": [1, 2]})
-    fig = pa.plot.counts(sessions)
+    sessions = pd.DataFrame(
+        {"Monkey": ["U", "U"], "Day": [1, 2], "Dimension": ["Amp", "Amp"]}
+    )
+    fig = pa.plot.counts(sessions, dim="Width")
     assert fig.layout.yaxis.title.text == "# of Sessions"
 
 
@@ -121,4 +123,4 @@ def test_plot_counts_dim_facet():
     sessions = pd.DataFrame(
         {"Monkey": ["U", "U"], "Day": [1, 2], "Dimension": ["Amp", "Width"]}
     )
-    figs = pa.plot.counts(sessions, facet_col="Dimension")
+    figs = pa.plot.counts(sessions, dim="Amp")

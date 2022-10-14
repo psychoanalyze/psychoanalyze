@@ -10,6 +10,8 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 server = app.server
 
 experiment_points = pa.points.load("data/trials.csv")
+
+# experiment_points = pa.points.load("data/trials.csv", n=0)
 experiment_points = experiment_points.xs(("Z", "2017-01-10"))
 
 stim_levels = list(range(-3, 4))

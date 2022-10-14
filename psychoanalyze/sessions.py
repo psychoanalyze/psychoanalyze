@@ -7,4 +7,6 @@ def generate(n: int) -> List[int]:
 
 
 def from_trials_csv(path):
-    return pd.read_csv(path)[["Monkey", "Date"]].drop_duplicates()
+    df = pd.read_csv(path)[["Monkey", "Date"]].drop_duplicates()
+    df.to_csv("data/normalized/sessions.csv", index=False)
+    return df

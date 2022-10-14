@@ -15,4 +15,5 @@ def test_from_trials_csv(tmp_path):
     df = pd.DataFrame(data)
     df.to_csv(csv_path)
 
-    df = pa.sessions.from_trials_csv(csv_path)
+    sessions = pa.sessions.from_trials_csv(csv_path)
+    assert set(sessions.columns) == {"Monkey", "Date"}
