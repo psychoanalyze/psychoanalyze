@@ -67,25 +67,25 @@ def test_curves():
 
 
 def test_strength_duration():
-    fig = pa.plot.strength_duration(dim="Amp", view="inverse")
+    fig = pa.plot.strength_duration(dim="Amp", plot_type="inverse")
     assert fig.layout.xaxis.title.text == "Fixed Pulse Width (μs)"
     assert fig.layout.yaxis.title.text == "Threshold Amplitude (μA)"
 
 
 def test_strength_duration_pw():
-    fig = pa.plot.strength_duration(dim="Width", view="inverse")
+    fig = pa.plot.strength_duration(dim="Width", plot_type="inverse")
     assert fig.layout.xaxis.title.text == "Fixed Amplitude (μA)"
     assert fig.layout.yaxis.title.text == "Threshold Pulse Width (μs)"
 
 
 def test_strength_duration_linear_amp():
-    fig = pa.plot.strength_duration(dim="Amp", view="linear")
+    fig = pa.plot.strength_duration(dim="Amp", plot_type="linear")
     assert fig.layout.xaxis.title.text == "Fixed Pulse Width (μs)"
     assert fig.layout.yaxis.title.text == "Threshold Charge (nC)"
 
 
 def test_strength_duration_linear_width():
-    fig = pa.plot.strength_duration(dim="Width", view="linear")
+    fig = pa.plot.strength_duration(dim="Width", plot_type="linear")
     assert fig.layout.xaxis.title.text == "Fixed Amplitude (μA)"
     assert fig.layout.yaxis.title.text == "Threshold Charge (nC)"
 
@@ -94,7 +94,7 @@ def test_strength_duration_with_data():
     x_data = [1]
     y_data = [1]
     fig = pa.plot.strength_duration(
-        dim="Width", view="linear", x_data=x_data, y_data=y_data
+        dim="Width", plot_type="linear", x_data=x_data, y_data=y_data
     )
     assert len(fig.data) == 1
 
@@ -107,7 +107,7 @@ def test_strength_duration_data_filters_dimension():
             "Dimension": ["Width"],
         }
     )
-    fig = pa.plot.strength_duration(dim="Amp", view="linear", df=df)
+    fig = pa.plot.strength_duration(dim="Amp", plot_type="linear", df=df)
     # assert len(fig.data) == 0
 
 

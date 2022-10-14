@@ -1,5 +1,7 @@
 import pandas as pd
 
+import psychoanalyze as pa
+
 
 def xlabel():
     pass
@@ -16,3 +18,7 @@ def data(df, dim=None):
         df["Threshold Pulse Width (μs)"] = df["Fixed Magnitude"]
         df = df.drop(columns=["Threshold", "Fixed Magnitude"])
     return df
+
+
+def plot(plot_type, dim=None):
+    return pa.plot.strength_duration(dim=dim, plot_type=plot_type)

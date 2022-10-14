@@ -69,3 +69,7 @@ def test_plot_fits():
     fits = pd.DataFrame({"Threshold": [0], "width": [1]})
     fig = pa.blocks.plot_fits(fits)
     assert len(fig.data)
+
+
+# def test_blocks_from_trials_full_schema():
+#     trials = pd.

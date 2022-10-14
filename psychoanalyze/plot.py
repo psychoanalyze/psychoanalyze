@@ -145,30 +145,32 @@ def difference_thresholds():
     )
 
 
-def strength_duration(dim, view=None, x_data=[], y_data=[], df=None):
-    labels = {
-        "Amp": {
-            "x": "Fixed Pulse Width (μs)",
-            "y": {
-                "inverse": "Threshold Amplitude (μA)",
-                "linear": "Threshold Charge (nC)",
-            },
+labels = {
+    "Amp": {
+        "x": "Fixed Pulse Width (μs)",
+        "y": {
+            "inverse": "Threshold Amplitude (μA)",
+            "linear": "Threshold Charge (nC)",
         },
-        "Width": {
-            "x": "Fixed Amplitude (μA)",
-            "y": {
-                "inverse": "Threshold Pulse Width (μs)",
-                "linear": "Threshold Charge (nC)",
-            },
+    },
+    "Width": {
+        "x": "Fixed Amplitude (μA)",
+        "y": {
+            "inverse": "Threshold Pulse Width (μs)",
+            "linear": "Threshold Charge (nC)",
         },
-    }
+    },
+}
+
+
+def strength_duration(
+    data=None, dim=None, plot_type=None, x_data=[], y_data=[], df=None
+):
 
     x = labels[dim]["x"]
-    y = labels[dim]["y"][view]
+    y = labels[dim]["y"][plot_type]
     if df is not None:
-        print(df)
         sd_df = df[df["Dimension"] == dim]
-        print(sd_df)
     else:
         sd_df = pd.DataFrame({x: x_data, y: y_data})
     return px.scatter(

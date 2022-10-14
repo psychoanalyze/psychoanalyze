@@ -17,3 +17,7 @@ def test_from_trials_csv(tmp_path):
 
     sessions = pa.sessions.from_trials_csv(csv_path)
     assert set(sessions.columns) == {"Monkey", "Date"}
+
+
+# def test_get(monkey, day):
+#     pass

@@ -37,3 +37,9 @@ def test_strength_duration_pw(s_d_columns):
         "Fixed Amplitude (μA)",
         "Threshold Pulse Width (μs)",
     }
+
+
+def test_strength_duration_plot():
+    fig = pa.strength_duration.plot(plot_type="inverse", dim="Amp")
+    assert fig.layout.xaxis.title.text == "Fixed Pulse Width (μs)"
+    assert fig.layout.yaxis.title.text == "Threshold Amplitude (μA)"

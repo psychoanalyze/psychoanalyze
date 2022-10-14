@@ -131,6 +131,7 @@ def test_fit_prep():
     assert list(ready_for_fit["N"]) == list(points_df["n"].to_numpy())
     assert list(ready_for_fit["hits"]) == list(points_df["Hits"].to_numpy())
 
-def test_load_n_0():
-    points = pa.points.load("data/trials.csv", n=0)
-    assert len(points) == 0
+
+# def test_load_n_0():
+#     points = pa.points.load("data/trials.csv", n=0)
+#     assert len(points) == 0
