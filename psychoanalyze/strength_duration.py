@@ -9,15 +9,15 @@ def xlabel():
 
 def from_blocks(blocks, dim=None):
     if dim == "Amp":
-        blocks["Threshold Amplitude (μA)"] = blocks.get("Threshold")
-        blocks["Fixed Pulse Width (μs)"] = blocks["Fixed Magnitude"]
-        blocks = blocks.drop(columns=["Fixed Magnitude"])
-
+        ylabel = "Threshold Amplitude (μA)"
+        xlabel = "Fixed Pulse Width (μs)"
     elif dim == "Width":
-        blocks["Fixed Amplitude (μA)"] = blocks.get("Threshold")
-        blocks["Threshold Pulse Width (μs)"] = blocks["Fixed Magnitude"]
-        blocks = blocks.drop(columns=["Fixed Magnitude"])
-    return blocks
+        ylabel = "Fixed Amplitude (μA)"
+        xlabel = "Threshold Pulse Width (μs)"
+
+    blocks[ylabel] = blocks.get("Threshold")
+    blocks[xlabel] = blocks["Fixed Magnitude"]
+    return blocks.drop(columns=["Threshold", "Fixed Magnitude"])
 
 
 def plot(plot_type, dim=None):
