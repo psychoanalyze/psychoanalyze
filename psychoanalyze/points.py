@@ -17,6 +17,11 @@ def from_trials(trials):
     return df
 
 
+def load(path):
+    trials = pa.trials.load(path)
+    return from_trials(trials)
+
+
 def dimension(points):
     points
     amp1, width1 = (
@@ -67,11 +72,6 @@ def generate(x, n, p):
         index=pd.Index(x, name="Amplitude (µA)"),
         name="Hit Rate",
     )
-
-
-def load(path):
-    trials = pa.trials.load(path)
-    return from_trials(trials)
 
 
 def datatable(data):

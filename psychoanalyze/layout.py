@@ -126,13 +126,17 @@ def simulation_tab(points):
     )
 
 
-plots = [
+sd_plots = [
     dbc.Row(
         [
             dbc.Col(
                 dcc.Graph(
                     figure=pa.plot.strength_duration(
-                        dim=dim, view=view, x_data=[1], y_data=[1]
+                        data=pa.strength_duration.from_blocks(
+                            pa.blocks.load(), dim=dim
+                        ),
+                        dim=dim,
+                        plot_type="inverse",
                     )
                 )
             )
@@ -162,18 +166,13 @@ def detection_tab(experiment_points, blocks):
                     ),
                     label="Counts",
                 ),
-                dbc.Tab(
-                    plots,
-                    label="Strength-Duration Plots",
-                ),
+                dbc.Tab(sd_plots, label="Strength-Duration Plots", tab_id="sd"),
                 dbc.Tab(
                     dbc.Row(
                         [
                             dbc.Col(
                                 dcc.Graph(
-                                    figure=px.ecdf(
-                                        blocks, x=["lambda", "gamma"], color="Monkey"
-                                    ).update_layout(xaxis_title="Guess/Lapse Rate"),
+                                    figure=pa.plot.ecdf(blocks),
                                     id="ecdf_g_l",
                                 )
                             ),
@@ -213,7 +212,8 @@ def detection_tab(experiment_points, blocks):
                     ),
                     label="Single Block",
                 ),
-            ]
+            ],
+            active_tab="sd",
         ),
         label="Detection",
     )

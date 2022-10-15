@@ -7,17 +7,17 @@ def xlabel():
     pass
 
 
-def data(df, dim=None):
-    if dim == "amp":
-        df["Threshold Amplitude (μA)"] = df["Threshold"]
-        df["Fixed Pulse Width (μs)"] = df["Fixed Magnitude"]
-        df = df.drop(columns=["Threshold", "Fixed Magnitude"])
+def from_blocks(blocks, dim=None):
+    if dim == "Amp":
+        blocks["Threshold Amplitude (μA)"] = blocks["Threshold"]
+        blocks["Fixed Pulse Width (μs)"] = blocks["Fixed Magnitude"]
+        blocks = blocks.drop(columns=["Threshold", "Fixed Magnitude"])
 
-    elif dim == "pw":
-        df["Fixed Amplitude (μA)"] = df["Threshold"]
-        df["Threshold Pulse Width (μs)"] = df["Fixed Magnitude"]
-        df = df.drop(columns=["Threshold", "Fixed Magnitude"])
-    return df
+    elif dim == "Width":
+        blocks["Fixed Amplitude (μA)"] = blocks["Threshold"]
+        blocks["Threshold Pulse Width (μs)"] = blocks["Fixed Magnitude"]
+        blocks = blocks.drop(columns=["Threshold", "Fixed Magnitude"])
+    return blocks
 
 
 def plot(plot_type, dim=None):

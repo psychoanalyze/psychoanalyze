@@ -29,7 +29,7 @@ blocks = pd.DataFrame(
     {"Threshold": [], "width": [], "gamma": [], "lambda": [], "Monkey": []}
 )
 
-app.layout = dbc.Container(
+layout = dbc.Container(
     [
         dbc.Tabs(
             [
@@ -40,6 +40,8 @@ app.layout = dbc.Container(
         dcc.Store(data=pa.trials.to_store(trials), id="trials"),
     ]
 )
+
+app.layout = layout
 
 
 @app.callback(

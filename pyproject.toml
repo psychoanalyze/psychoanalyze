@@ -42,6 +42,7 @@ pandera = "^0.11.0"
 kaleido = "0.2.1"
 pre-commit = "^2.20.0"
 dash-daq = "^0.5.0"
+pandas-profiling = {extras = ["notebook"], version = "^3.3.0"}
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.2.0"

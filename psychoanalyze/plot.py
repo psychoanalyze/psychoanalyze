@@ -163,14 +163,19 @@ labels = {
 }
 
 
+def get_labels_given_dim(labels, dim, plot_type):
+    return {"x": labels[dim]["x"], "y": labels[dim]["y"][plot_type]}
+
+
 def strength_duration(
-    data=None, dim=None, plot_type=None, x_data=[], y_data=[], df=None
+    data=None, dim=None, plot_type=None, x_data=[], y_data=[], points=None
 ):
 
-    x = labels[dim]["x"]
-    y = labels[dim]["y"][plot_type]
-    if df is not None:
-        sd_df = df[df["Dimension"] == dim]
+    labels_given_dim = get_labels_given_dim(labels=labels, dim=dim, plot_type=plot_type)
+    x = labels_given_dim["x"]
+    y = labels_given_dim["y"]
+    if data is not None:
+        sd_df = pa.data.filter(data, dim=dim)
     else:
         sd_df = pd.DataFrame({x: x_data, y: y_data})
     return px.scatter(
@@ -191,3 +196,9 @@ def counts(sessions, dim=None):
         color="Monkey",
         template=template,
     ).update_layout(yaxis_title_text="# of Sessions")
+
+
+def ecdf(blocks):
+    return px.ecdf(blocks, x=["lambda", "gamma"], color="Monkey").update_layout(
+        xaxis_title="Guess/Lapse Rate"
+    )

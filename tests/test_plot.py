@@ -107,7 +107,7 @@ def test_strength_duration_data_filters_dimension():
             "Dimension": ["Width"],
         }
     )
-    fig = pa.plot.strength_duration(dim="Amp", plot_type="linear", df=df)
+    fig = pa.plot.strength_duration(dim="Amp", plot_type="linear", data=df)
     # assert len(fig.data) == 0
 
 

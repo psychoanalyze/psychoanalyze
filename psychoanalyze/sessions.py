@@ -2,6 +2,9 @@ from typing import List
 import pandas as pd
 
 
+dims = ["Monkey", "Date"]
+
+
 def generate(n: int) -> List[int]:
     return list(range(n))
 

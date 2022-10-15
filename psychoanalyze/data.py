@@ -89,3 +89,7 @@ def generate_animation_curves():
     )
     df["Hit Rate"] = pa.blocks.hit_rate
     return df
+
+
+def filter(df, dim):
+    return df[df["Dimension"] == dim]

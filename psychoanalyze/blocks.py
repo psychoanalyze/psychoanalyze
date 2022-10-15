@@ -6,6 +6,9 @@ import psychoanalyze as pa
 import plotly.express as px  # type: ignore
 
 
+dims = ["Amp2", "Width2", "Freq1", "Dur1", "Active Channels", "Return Channels"]
+
+
 def add_posterior(data, posterior):
     return pd.concat(
         [data, posterior],
@@ -44,9 +47,13 @@ def get_fit_param(fit: pd.DataFrame, name: str):
     return fit.loc[name, "50%"]
 
 
+def from_points(points: pd.DataFrame):
+    return pd.DataFrame({"Threshold": [], "Fixed Magnitude": [], "Dimension": []})
+
+
 def from_trials(trials: pd.DataFrame) -> pd.Series:
-    """Arrange *method of constant stimuli* performance curves using trial data"""
-    return trials["Result"].to_frame().mean()
+    points = pa.points.from_trials(trials)
+    return from_points(points)
 
 
 def dimension(points, dims=None):
@@ -58,8 +65,10 @@ def dimension(points, dims=None):
 
 
 def fit(df):
-    return df.groupby(pa.schemas.block_index_levels).apply(
-        pa.points.fit, dimension="Amp1"
+    return (
+        df.groupby(pa.schemas.block_index_levels)
+        .apply(pa.points.fit, dimension="Amp1")
+        .agg(lambda: 1)
     )
 
 
@@ -73,3 +82,7 @@ def plot_fits(df):
     x = np.linspace(-3, 3, 100)
     y = expit(x)
     return px.line(df.reset_index(), x=x, y=y)
+
+
+def load():
+    return from_trials(pa.trials.load())
