@@ -25,9 +25,7 @@ df = df[df["Reference Charge (nC)"] != 260]
 df = df[df["Date"] != "3/26/2018"]
 df = df[df["Date"] != "4/30/2018"]
 weber_blocks = df
-blocks = pd.DataFrame(
-    {"Threshold": [], "width": [], "gamma": [], "lambda": [], "Monkey": []}
-)
+blocks = pa.blocks.load()
 
 layout = dbc.Container(
     [

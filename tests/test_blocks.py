@@ -1,6 +1,7 @@
 import psychoanalyze as pa
 import pandas as pd
 import datatest as dt  # type: ignore
+import os
 
 
 def test_generate():
@@ -114,9 +115,54 @@ def test_plot_fits():
     assert len(fig.data)
 
 
-def test_load():
-    blocks = pa.blocks.load()
+def test_load_pre_fitted(tmp_path):
+    fullpath = tmp_path / "blocks.csv"
+    pd.DataFrame(
+        {
+            "Monkey": [],
+            "Date": [],
+            "Amp2": [],
+            "Width2": [],
+            "Freq2": [],
+            "Dur2": [],
+            "Active Channels": [],
+            "Return Channels": [],
+            "Threshold": [],
+            "Dimension": [],
+            "Fixed Magnitude": [],
+        }
+    ).to_csv(fullpath, index=False)
+    blocks = pa.blocks.load(fullpath)
+    assert set(blocks.columns) == {"Threshold", "Dimension", "Fixed Magnitude"}
 
 
-# def test_blocks_from_trials_full_schema():
-#     trials = pd.
+def test_load_no_fit(tmp_path):
+    blocks = pa.blocks.load(tmp_path / "blocks.csv")
+    assert set(blocks.columns) == {"Threshold", "Dimension", "Fixed Magnitude"}
+    assert os.path.exists(tmp_path / "blocks.csv")
+
+
+# def test_from_points():
+#     points = pd.DataFrame(
+#         {"n": [], "Hits": [], "x": []},
+#         index=pd.MultiIndex.from_frame(
+#             pd.DataFrame(
+#                 {
+#                     "Monkey": [],
+#                     "Date": [],
+#                     "Amp2": [],
+#                     "Width2": [],
+#                     "Freq2": [],
+#                     "Dur2": [],
+#                     "Active Channels": [],
+#                     "Return Channels": [],
+#                     "Amp1": [],
+#                     "Width1": [],
+#                     "Freq1": [],
+#                     "Dur1": [],
+#                 }
+#             )
+#         ),
+#     )
+#     fits = pa.blocks.fit(points)
+#     assert "Threshold" in fits.columns

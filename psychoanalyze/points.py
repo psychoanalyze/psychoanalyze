@@ -4,6 +4,7 @@ import plotly.express as px  # type: ignore
 from scipy.stats import binom  # type: ignore
 import psychoanalyze as pa
 from dash import dash_table  # type: ignore
+import psignifit as ps
 
 
 def from_trials(trials):
@@ -49,9 +50,19 @@ def model():
     return stan.CmdStanModel(stan_file="models/binomial_regression.stan")
 
 
-def fit(ready_for_fit: pd.DataFrame) -> pd.DataFrame:
-    _model = model()
-    return _model.sample(chains=4, data=ready_for_fit)
+# def fit(ready_for_fit: pd.DataFrame) -> pd.DataFrame:
+#     _model = model()
+#     return _model.sample(chains=4, data=ready_for_fit)
+
+
+def fit(points):
+    if len(points):
+        options = {"expType": "YesNo"}
+        data = points.to_numpy()
+        result = ps.psignifit(data, options)
+        return pd.DataFrame({"Threshold": result["Fit"]})
+    else:
+        return pd.DataFrame({"Threshold": []})
 
 
 def plot(df):

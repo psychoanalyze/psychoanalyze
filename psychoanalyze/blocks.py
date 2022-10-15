@@ -4,6 +4,7 @@ from scipy.stats import logistic  # type: ignore
 from scipy.special import logit, expit  # type: ignore
 import psychoanalyze as pa
 import plotly.express as px  # type: ignore
+import os
 
 
 dims = ["Amp2", "Width2", "Freq1", "Dur1", "Active Channels", "Return Channels"]
@@ -48,8 +49,9 @@ def get_fit_param(fit: pd.DataFrame, name: str):
 
 
 def from_points(points: pd.DataFrame):
+    # thresholds = fit(points)
     return pd.DataFrame(
-        {"Fixed Magnitude": [], "Dimension": []},
+        {"Fixed Magnitude": [], "Dimension": [], "Threshold": []},
         index=pd.MultiIndex.from_frame(
             pd.DataFrame(
                 {
@@ -80,12 +82,8 @@ def dimension(points, dims=None):
     ).apply(pa.points.dimension)
 
 
-def fit(df):
-    return (
-        df.groupby(pa.schemas.block_index_levels)
-        .apply(pa.points.fit, dimension="Amp1")
-        .agg(lambda: 1)
-    )
+def fit(points):
+    return points.groupby(pa.schemas.block_index_levels).apply(pa.points.fit)
 
 
 def empty():
@@ -100,5 +98,21 @@ def plot_fits(df):
     return px.line(df.reset_index(), x=x, y=y)
 
 
-def load():
-    return from_trials(pa.trials.load())
+def load(path):
+    if os.path.exists(path):
+        return pd.read_csv(path).set_index(
+            [
+                "Monkey",
+                "Date",
+                "Amp2",
+                "Width2",
+                "Freq2",
+                "Dur2",
+                "Active Channels",
+                "Return Channels",
+            ]
+        )
+    else:
+        blocks = from_trials(pa.trials.load())
+        blocks.to_csv(path)
+        return blocks
