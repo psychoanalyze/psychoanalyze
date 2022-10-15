@@ -9,14 +9,14 @@ def xlabel():
 
 def from_blocks(blocks, dim=None):
     if dim == "Amp":
-        blocks["Threshold Amplitude (μA)"] = blocks["Threshold"]
+        blocks["Threshold Amplitude (μA)"] = blocks.get("Threshold")
         blocks["Fixed Pulse Width (μs)"] = blocks["Fixed Magnitude"]
-        blocks = blocks.drop(columns=["Threshold", "Fixed Magnitude"])
+        blocks = blocks.drop(columns=["Fixed Magnitude"])
 
     elif dim == "Width":
-        blocks["Fixed Amplitude (μA)"] = blocks["Threshold"]
+        blocks["Fixed Amplitude (μA)"] = blocks.get("Threshold")
         blocks["Threshold Pulse Width (μs)"] = blocks["Fixed Magnitude"]
-        blocks = blocks.drop(columns=["Threshold", "Fixed Magnitude"])
+        blocks = blocks.drop(columns=["Fixed Magnitude"])
     return blocks
 
 

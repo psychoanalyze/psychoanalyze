@@ -64,11 +64,34 @@ def test_from_trials():
     trials = pd.DataFrame({"Result": []}, index=index)
     blocks = pa.blocks.from_trials(trials)
     assert len(blocks) == 0
-    assert "Threshold" in blocks.columns
+    assert "Dimension" in blocks.columns
 
 
-def test_from_points(mocker):
-    pass
+def test_from_points():
+    points = pd.DataFrame(
+        {"n": [], "Hits": []},
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame(
+                {
+                    "Monkey": [],
+                    "Date": [],
+                    "Amp2": [],
+                    "Width2": [],
+                    "Freq2": [],
+                    "Dur2": [],
+                    "Active Channels": [],
+                    "Return Channels": [],
+                    "Amp1": [],
+                    "Width1": [],
+                    "Freq1": [],
+                    "Dur1": [],
+                }
+            )
+        ),
+    )
+    blocks = pa.blocks.from_points(points)
+    assert {"Dimension", "Fixed Magnitude"} <= set(blocks.columns)
+    assert "Monkey" in blocks.index.names
     # mocker.patch(
     #     "psychoanalyze.points.fit",
     #     return_value=pd.Series(

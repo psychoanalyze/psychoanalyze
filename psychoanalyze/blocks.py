@@ -48,7 +48,23 @@ def get_fit_param(fit: pd.DataFrame, name: str):
 
 
 def from_points(points: pd.DataFrame):
-    return pd.DataFrame({"Threshold": [], "Fixed Magnitude": [], "Dimension": []})
+    return pd.DataFrame(
+        {"Fixed Magnitude": [], "Dimension": []},
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame(
+                {
+                    "Monkey": [],
+                    "Date": [],
+                    "Amp2": [],
+                    "Width2": [],
+                    "Freq2": [],
+                    "Dur2": [],
+                    "Active Channels": [],
+                    "Return Channels": [],
+                }
+            )
+        ),
+    )
 
 
 def from_trials(trials: pd.DataFrame) -> pd.Series:
