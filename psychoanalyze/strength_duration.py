@@ -15,7 +15,7 @@ def from_blocks(blocks, dim=None):
         ylabel = "Fixed Amplitude (μA)"
         xlabel = "Threshold Pulse Width (μs)"
 
-    blocks[ylabel] = blocks.get("Threshold")
+    blocks[ylabel] = blocks["Threshold"]
     blocks[xlabel] = blocks["Fixed Magnitude"]
     return blocks.drop(columns=["Threshold", "Fixed Magnitude"])
 
