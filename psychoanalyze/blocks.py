@@ -49,24 +49,7 @@ def get_fit_param(fit: pd.DataFrame, name: str):
 
 
 def from_points(points: pd.DataFrame):
-    # thresholds = fit(points)
-    return pd.DataFrame(
-        {"Fixed Magnitude": [], "Dimension": [], "Threshold": []},
-        index=pd.MultiIndex.from_frame(
-            pd.DataFrame(
-                {
-                    "Monkey": [],
-                    "Date": [],
-                    "Amp2": [],
-                    "Width2": [],
-                    "Freq2": [],
-                    "Dur2": [],
-                    "Active Channels": [],
-                    "Return Channels": [],
-                }
-            )
-        ),
-    )
+    return points.groupby(pa.schemas.block_index_levels).apply(pa.points.to_block)
 
 
 def from_trials(trials: pd.DataFrame) -> pd.Series:
@@ -74,7 +57,7 @@ def from_trials(trials: pd.DataFrame) -> pd.Series:
     return from_points(points)
 
 
-def dimension(points, dims=None):
+def dimensions(points, dims=None):
     if dims is None:
         return pa.points.dimension(points)
     return points.groupby(
@@ -82,8 +65,27 @@ def dimension(points, dims=None):
     ).apply(pa.points.dimension)
 
 
-def fit(points):
-    return points.groupby(pa.schemas.block_index_levels).apply(pa.points.fit)
+def fits(points):
+    if len(points):
+        return points.groupby(pa.schemas.block_index_levels).apply(pa.points.fit)
+    else:
+        return pd.DataFrame(
+            {"Threshold": [], "Fixed Magnitude": [], "Dimension": []},
+            index=pd.MultiIndex.from_frame(
+                pd.DataFrame(
+                    {
+                        "Monkey": [],
+                        "Date": [],
+                        "Amp2": [],
+                        "Width2": [],
+                        "Freq2": [],
+                        "Dur2": [],
+                        "Active Channels": [],
+                        "Return Channels": [],
+                    }
+                )
+            ),
+        )
 
 
 def empty():
@@ -98,7 +100,9 @@ def plot_fits(df):
     return px.line(df.reset_index(), x=x, y=y)
 
 
-def load(path):
+def load(path=None):
+    if path is None:
+        path = "data/blocks.csv"
     if os.path.exists(path):
         return pd.read_csv(path).set_index(
             [
@@ -116,3 +120,7 @@ def load(path):
         blocks = from_trials(pa.trials.load())
         blocks.to_csv(path)
         return blocks
+
+
+def fixed_magnitudes(points):
+    return points.groupby(pa.schemas.block_index_levels).agg(pa.points.fixed_magnitude)

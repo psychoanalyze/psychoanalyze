@@ -2,6 +2,32 @@ import psychoanalyze as pa
 import pandas as pd
 import datatest as dt  # type: ignore
 import os
+import pytest
+
+
+@pytest.fixture
+def points_empty():
+    return pd.DataFrame(
+        {"n": [], "Hits": []},
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame(
+                {
+                    "Monkey": [],
+                    "Date": [],
+                    "Amp2": [],
+                    "Width2": [],
+                    "Freq2": [],
+                    "Dur2": [],
+                    "Active Channels": [],
+                    "Return Channels": [],
+                    "Amp1": [],
+                    "Width1": [],
+                    "Freq1": [],
+                    "Dur1": [],
+                }
+            )
+        ),
+    )
 
 
 def test_generate():
@@ -43,70 +69,49 @@ def test_transform():
     pa.blocks.transform(pd.Series(), y="p")
 
 
-def test_from_trials():
-    index = pd.MultiIndex.from_frame(
-        pd.DataFrame(
-            {
-                "Monkey": [],
-                "Date": [],
-                "Amp2": [],
-                "Width2": [],
-                "Freq2": [],
-                "Dur2": [],
-                "Active Channels": [],
-                "Return Channels": [],
-                "Amp1": [],
-                "Width1": [],
-                "Freq1": [],
-                "Dur1": [],
-            }
-        )
-    )
-    trials = pd.DataFrame({"Result": []}, index=index)
-    blocks = pa.blocks.from_trials(trials)
-    assert len(blocks) == 0
-    assert "Dimension" in blocks.columns
+# def test_from_trials():
+#     index = pd.MultiIndex.from_frame(
+#         pd.DataFrame(
+#             {
+#                 "Monkey": [],
+#                 "Date": [],
+#                 "Amp2": [],
+#                 "Width2": [],
+#                 "Freq2": [],
+#                 "Dur2": [],
+#                 "Active Channels": [],
+#                 "Return Channels": [],
+#                 "Amp1": [],
+#                 "Width1": [],
+#                 "Freq1": [],
+#                 "Dur1": [],
+#             }
+#         )
+#     )
+#     trials = pd.DataFrame({"Result": []}, index=index)
+#     blocks = pa.blocks.from_trials(trials)
+#     assert len(blocks) == 0
+#     assert "Dimension" in blocks.columns
 
 
-def test_from_points():
-    points = pd.DataFrame(
-        {"n": [], "Hits": []},
-        index=pd.MultiIndex.from_frame(
-            pd.DataFrame(
-                {
-                    "Monkey": [],
-                    "Date": [],
-                    "Amp2": [],
-                    "Width2": [],
-                    "Freq2": [],
-                    "Dur2": [],
-                    "Active Channels": [],
-                    "Return Channels": [],
-                    "Amp1": [],
-                    "Width1": [],
-                    "Freq1": [],
-                    "Dur1": [],
-                }
-            )
-        ),
-    )
-    blocks = pa.blocks.from_points(points)
-    assert {"Dimension", "Fixed Magnitude"} <= set(blocks.columns)
-    assert "Monkey" in blocks.index.names
-    # mocker.patch(
-    #     "psychoanalyze.points.fit",
-    #     return_value=pd.Series(
-    #         index=pd.MultiIndex.from_frame(pd.DataFrame({"Monkey": [], "Amp1": []}))
-    #     ),
-    # )
-    # df = pd.DataFrame(
-    #     {"x": list(range(8)), "Hits": list(range(8))},
-    #     index=pd.MultiIndex.from_frame(
-    #         pd.DataFrame({"Amp1": [1] * 8, "Width1": [1] * 8})
-    #     ),
-    # )
-    # df["n"] = 1000
-    # pa.blocks.fit(df)
+# def test_from_points(points_empty):
+#     blocks = pa.blocks.from_points(points_empty)
+#     assert {"Dimension", "Fixed Magnitude"} <= set(blocks.columns)
+#     assert "Monkey" in blocks.index.names
+# mocker.patch(
+#     "psychoanalyze.points.fit",
+#     return_value=pd.Series(
+#         index=pd.MultiIndex.from_frame(pd.DataFrame({"Monkey": [], "Amp1": []}))
+#     ),
+# )
+# df = pd.DataFrame(
+#     {"x": list(range(8)), "Hits": list(range(8))},
+#     index=pd.MultiIndex.from_frame(
+#         pd.DataFrame({"Amp1": [1] * 8, "Width1": [1] * 8})
+#     ),
+# )
+# df["n"] = 1000
+# pa.blocks.fit(df)
 
 
 def test_plot_fits():
@@ -137,32 +142,17 @@ def test_load_pre_fitted(tmp_path):
 
 
 def test_load_no_fit(tmp_path):
+    pd.DataFrame({"n": [], "Hits": [], "x": []}).to_csv(tmp_path / "trials.csv")
     blocks = pa.blocks.load(tmp_path / "blocks.csv")
     assert set(blocks.columns) == {"Threshold", "Dimension", "Fixed Magnitude"}
     assert os.path.exists(tmp_path / "blocks.csv")
 
 
-# def test_from_points():
-#     points = pd.DataFrame(
-#         {"n": [], "Hits": [], "x": []},
-#         index=pd.MultiIndex.from_frame(
-#             pd.DataFrame(
-#                 {
-#                     "Monkey": [],
-#                     "Date": [],
-#                     "Amp2": [],
-#                     "Width2": [],
-#                     "Freq2": [],
-#                     "Dur2": [],
-#                     "Active Channels": [],
-#                     "Return Channels": [],
-#                     "Amp1": [],
-#                     "Width1": [],
-#                     "Freq1": [],
-#                     "Dur1": [],
-#                 }
-#             )
-#         ),
-#     )
-#     fits = pa.blocks.fit(points)
-#     assert "Threshold" in fits.columns
+# def test_fits(points_empty):
+#     fits = pa.blocks.fits(points_empty)
+#     assert fits.name == "Threshold"
+
+
+# def test_fixed_magnitudes(points_empty):
+#     fixed_magnitudes = pa.blocks.fixed_magnitudes(points_empty)
+#     assert fixed_magnitudes.name == "Fixed Magnitudes"

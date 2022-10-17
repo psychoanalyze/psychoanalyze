@@ -108,19 +108,20 @@ def simulation_tab(points):
                         width=6,
                         align="center",
                     ),
-                    dbc.Col(
-                        [
-                            dash_table.DataTable(
-                                points.reset_index().to_dict("records"),
-                                id="psych-table",
-                            ),
-                        ],
-                        width=1,
-                        align="center",
-                    ),
+                    # dbc.Col(
+                    #     [
+                    #         dash_table.DataTable(
+                    #             points.reset_index().to_dict("records"),
+                    #             id="psych-table",
+                    #         ),
+                    #     ],
+                    #     width=1,
+                    #     align="center",
+                    # ),
                 ],
                 justify="center",
-            )
+            ),
+            dbc.Row(pa.plot.strength_duration()),
         ],
         label="Simulation",
     )
@@ -176,12 +177,12 @@ def detection_tab(experiment_points, blocks):
                                     id="ecdf_g_l",
                                 )
                             ),
-                            dbc.Col(
-                                dcc.Graph(
-                                    figure=px.ecdf(blocks, x="width"),
-                                    id="ecdf_amp",
-                                )
-                            ),
+                            # dbc.Col(
+                            #     dcc.Graph(
+                            #         figure=px.ecdf(blocks, x="width"),
+                            #         id="ecdf_amp",
+                            #     )
+                            # ),
                             dbc.Col(
                                 dcc.Graph(
                                     figure=px.ecdf(blocks, x="Threshold"), id="ecdf_pw"

@@ -10,6 +10,18 @@ import json
 data_path = Path("data/trials.csv")
 
 
+def generate_hits(n, p):
+    return np.random.binomial(n, p)
+
+
+def generate_block(dim="x"):
+    hits = pd.Series(
+        [generate_hits(100, p) for p in [0.1, 0.2, 0.5, 0.8, 0.9]], name="Hits"
+    )
+    x = [0, 1, 2, 3, 4]
+    return pd.DataFrame({"Hits": hits, "n": [100] * 5}, index=pd.Index(x, name=dim))
+
+
 def generate(n, stim_levels=None):
     return pa.schemas.trials.validate(
         pd.DataFrame(
@@ -25,7 +37,7 @@ def generate(n, stim_levels=None):
                         "Dur2": [0.0] * n,
                         "Active Channels": [1] * n,
                         "Return Channels": [1] * n,
-                        "Amp1": random.choices(stim_levels, k=n),
+                        "Amp1": random.choices(list(range(8)), k=n),
                         "Width1": [0.0] * n,
                         "Freq1": [0.0] * n,
                         "Dur1": [0.0] * n,

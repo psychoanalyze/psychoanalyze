@@ -133,6 +133,84 @@ def test_fit_prep():
 
 
 def test_fit():
-    points = pd.DataFrame({"Stimulus Level": [], "nCorrect": [], "nTotal": []})
+    points = pd.DataFrame({"x": [], "n": [], "Hits": []})
     fit = pa.points.fit(points)
-    assert "Threshold" in fit.columns
+    assert fit.keys() == {"Threshold", "width", "gamma", "lambda", "beta"}
+
+
+def test_no_dimension():
+    points = pd.DataFrame(
+        {"n": [], "Hits": []},
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame(
+                {
+                    "Monkey": [],
+                    "Date": [],
+                    "Amp2": [],
+                    "Width2": [],
+                    "Freq2": [],
+                    "Dur2": [],
+                    "Active Channels": [],
+                    "Return Channels": [],
+                    "Amp1": [],
+                    "Width1": [],
+                    "Freq1": [],
+                    "Dur1": [],
+                }
+            )
+        ),
+    )
+    dimension = pa.points.dimension(points)
+    assert dimension is None
+
+
+def test_fixed_magnitudes():
+    points = pd.DataFrame(
+        {"n": [1, 1], "Hits": [0, 1]},
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame(
+                {
+                    "Monkey": ["U"] * 2,
+                    "Date": ["2020-01-01"] * 2,
+                    "Amp2": [0] * 2,
+                    "Width2": [0] * 2,
+                    "Freq2": [0] * 2,
+                    "Dur2": [0] * 2,
+                    "Active Channels": [0] * 2,
+                    "Return Channels": [0] * 2,
+                    "Amp1": [0, 1],
+                    "Width1": [0] * 2,
+                    "Freq1": [0] * 2,
+                    "Dur1": [0] * 2,
+                }
+            )
+        ),
+    )
+    fixed_magnitude = pa.points.fixed_magnitude(points)
+    assert fixed_magnitude == 0
+
+
+def test_to_block():
+    points = pd.DataFrame(
+        {"n": [], "Hits": [], "x": []},
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame(
+                {
+                    "Monkey": [],
+                    "Date": [],
+                    "Amp2": [],
+                    "Width2": [],
+                    "Freq2": [],
+                    "Dur2": [],
+                    "Active Channels": [],
+                    "Return Channels": [],
+                    "Amp1": [],
+                    "Width1": [],
+                    "Freq1": [],
+                    "Dur1": [],
+                }
+            )
+        ),
+    )
+    block = pa.points.to_block(points)
+    assert set(block.index) == {"Threshold", "Fixed Magnitude", "Dimension"}

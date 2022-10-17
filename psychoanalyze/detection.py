@@ -6,5 +6,5 @@ def load(points):
         "Amp2"
     ) * points.index.get_level_values("Width2")
     detection_points = points[points["Reference Charge (nC)"] == 0]
-    detection_points["Dimension"] = pa.blocks.dimension(detection_points)
+    detection_points["Dimension"] = pa.blocks.dimensions(detection_points)
     return detection_points

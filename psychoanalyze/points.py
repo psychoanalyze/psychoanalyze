@@ -18,13 +18,12 @@ def from_trials(trials):
     return df
 
 
-def load(path):
-    trials = pa.trials.load(path)
+def load(trials_path="data/trials.csv"):
+    trials = pa.trials.load(trials_path)
     return from_trials(trials)
 
 
 def dimension(points):
-    points
     amp1, width1 = (
         points.index.get_level_values(param) for param in ["Amp1", "Width1"]
     )
@@ -60,9 +59,13 @@ def fit(points):
         options = {"expType": "YesNo"}
         data = points.to_numpy()
         result = ps.psignifit(data, options)
-        return pd.DataFrame({"Threshold": result["Fit"]})
-    else:
-        return pd.DataFrame({"Threshold": []})
+        return {
+            "Threshold": result["Fit"][0],
+            "width": result["Fit"][1],
+            "gamma": result["Fit"][2],
+            "lambda": result["Fit"][3],
+            "beta": result["Fit"][4],
+        }
 
 
 def plot(df):
@@ -125,3 +128,21 @@ def combine_plots(fig1, fig2):
     for trace in fig2.data:
         fig1.add_trace(trace)
     return fig1
+
+
+def fixed_magnitude(points):
+    dim = dimension(points)
+    if dim == "Amp":
+        return 0
+    if dim == "Width":
+        return 0
+
+
+def to_block(points):
+    return pd.Series(
+        {
+            "Threshold": fit(points),
+            "Dimension": dimension(points),
+            "Fixed Magnitude": fixed_magnitude(points),
+        }
+    )

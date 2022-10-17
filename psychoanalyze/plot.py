@@ -199,6 +199,6 @@ def counts(sessions, dim=None):
 
 
 def ecdf(blocks):
-    return px.ecdf(
-        blocks.reset_index(), x=["lambda", "gamma"], color="Monkey"
-    ).update_layout(xaxis_title="Guess/Lapse Rate")
+    return px.ecdf(blocks.reset_index(), x="Threshold", color="Monkey").update_layout(
+        xaxis_title="Threshold"
+    )

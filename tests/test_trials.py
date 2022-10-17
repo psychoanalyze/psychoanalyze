@@ -16,8 +16,9 @@ def X():
 
 def test_generate():
     stim_levels = tuple(range(-3, 4))
-    data = pa.trials.generate(100, stim_levels)
-    assert len(data) == 100
+    trials = pa.trials.generate(100, stim_levels)
+    assert len(trials) == 100
+    assert set(trials.columns) == {"Result"}
 
 
 def test_load(tmp_path):
@@ -77,3 +78,9 @@ def test_normalize():
         "Channel Config",
         "Test Stimulus",
     }
+
+
+def test_generate_block():
+    block = pa.trials.generate_block()
+    assert set(block.columns) == {"Hits", "n"}
+    assert block.index.name == "x"
