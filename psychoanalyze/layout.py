@@ -121,7 +121,7 @@ def simulation_tab(points):
                 ],
                 justify="center",
             ),
-            dbc.Row(pa.plot.strength_duration()),
+            # dbc.Row(pa.plot.strength_duration()),
         ],
         label="Simulation",
     )
@@ -132,13 +132,14 @@ sd_plots = [
         [
             dbc.Col(
                 dcc.Graph(
-                    figure=pa.plot.strength_duration(
-                        data=pa.strength_duration.from_blocks(
-                            pa.blocks.load(), dim=dim
-                        ),
-                        dim=dim,
-                        plot_type="inverse",
-                    )
+                    # figure=pa.plot.strength_duration(
+                    #     data=pa.strength_duration.from_blocks(
+                    #         pa.blocks.load(), dim=dim
+                    #     ),
+                    #     dim=dim,
+                    #     plot_type="inverse",
+                    # )
+                    figure=px.scatter()
                 )
             )
             for dim in ["Amp", "Width"]
@@ -173,7 +174,7 @@ def detection_tab(experiment_points, blocks):
                         [
                             dbc.Col(
                                 dcc.Graph(
-                                    figure=pa.plot.ecdf(blocks),
+                                    # figure=pa.plot.ecdf(blocks),
                                     id="ecdf_g_l",
                                 )
                             ),
@@ -185,7 +186,8 @@ def detection_tab(experiment_points, blocks):
                             # ),
                             dbc.Col(
                                 dcc.Graph(
-                                    figure=px.ecdf(blocks, x="Threshold"), id="ecdf_pw"
+                                    # figure=px.ecdf(blocks, x="Threshold"),
+                                    id="ecdf_pw"
                                 )
                             ),
                         ]

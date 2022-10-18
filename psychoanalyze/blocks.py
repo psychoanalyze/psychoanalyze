@@ -48,8 +48,13 @@ def get_fit_param(fit: pd.DataFrame, name: str):
     return fit.loc[name, "50%"]
 
 
-def from_points(points: pd.DataFrame):
-    return points.groupby(pa.schemas.block_index_levels).apply(pa.points.to_block)
+def from_points(points: pd.DataFrame, dim=None):
+    levels = pa.schemas.block_index_levels
+    if dim == "Amp":
+        levels = levels + ["Width1"]
+        df = points.groupby(levels).apply(pa.points.to_block)
+        return df[df["n Levels"] > 1].drop(columns="Dimension")
+    return points.groupby(levels).apply(pa.points.to_block)
 
 
 def from_trials(trials: pd.DataFrame) -> pd.Series:

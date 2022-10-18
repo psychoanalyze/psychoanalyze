@@ -114,6 +114,20 @@ def test_transform():
 # pa.blocks.fit(df)
 
 
+def test_from_points(points_empty):
+    blocks = pa.blocks.from_points(points_empty)
+    assert blocks.index.names == [
+        "Monkey",
+        "Date",
+        "Amp2",
+        "Width2",
+        "Freq2",
+        "Dur2",
+        "Active Channels",
+        "Return Channels",
+    ]
+
+
 def test_plot_fits():
     fits = pd.DataFrame({"Threshold": [0], "width": [1]})
     fig = pa.blocks.plot_fits(fits)
@@ -141,11 +155,62 @@ def test_load_pre_fitted(tmp_path):
     assert set(blocks.columns) == {"Threshold", "Dimension", "Fixed Magnitude"}
 
 
-def test_load_no_fit(tmp_path):
-    pd.DataFrame({"n": [], "Hits": [], "x": []}).to_csv(tmp_path / "trials.csv")
-    blocks = pa.blocks.load(tmp_path / "blocks.csv")
-    assert set(blocks.columns) == {"Threshold", "Dimension", "Fixed Magnitude"}
-    assert os.path.exists(tmp_path / "blocks.csv")
+def test_from_points_amp_dim():
+
+    amp_points_index = pd.MultiIndex.from_frame(
+        pd.DataFrame(
+            {
+                "Monkey": ["U"] * 2,
+                "Date": ["2020-01-01"] * 2,
+                "Amp2": [0] * 2,
+                "Width2": [0] * 2,
+                "Freq2": [0] * 2,
+                "Dur2": [0] * 2,
+                "Active Channels": [0] * 2,
+                "Return Channels": [0] * 2,
+                "Amp1": [0, 1],
+                "Width1": [0] * 2,
+                "Freq1": [0] * 2,
+                "Dur1": [0] * 2,
+            }
+        )
+    )
+    amp_points = pd.DataFrame(
+        {"n": [1, 1], "Hits": [0, 1], "x": [0, 1]}, index=amp_points_index
+    )
+    width_points_index = pd.MultiIndex.from_frame(
+        pd.DataFrame(
+            {
+                "Monkey": ["U"] * 2,
+                "Date": ["2020-01-01"] * 2,
+                "Amp2": [0] * 2,
+                "Width2": [0] * 2,
+                "Freq2": [0] * 2,
+                "Dur2": [0] * 2,
+                "Active Channels": [0] * 2,
+                "Return Channels": [0] * 2,
+                "Amp1": [0] * 2,
+                "Width1": [0, 1],
+                "Freq1": [0] * 2,
+                "Dur1": [0] * 2,
+            }
+        )
+    )
+    width_points = pd.DataFrame(
+        {"n": [1, 1], "Hits": [0, 1], "x": [0, 1]}, index=width_points_index
+    )
+    points = pd.concat([amp_points, width_points])
+    blocks = pa.blocks.from_points(points, dim="Amp")
+    assert len(blocks) == 1
+    assert "Width1" in blocks.index.names
+
+
+# def test_load_no_fit(tmp_path, mocker):
+#     mocker.patch(pa.points.load)
+#     pd.DataFrame({"n": [], "Hits": [], "x": []}).to_csv(tmp_path / "trials.csv")
+#     blocks = pa.blocks.load(tmp_path / "blocks.csv")
+#     assert set(blocks.columns) <= {"Threshold", "Dimension", "Fixed Magnitude"}
+#     assert os.path.exists(tmp_path / "blocks.csv")
 
 
 # def test_fits(points_empty):

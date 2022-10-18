@@ -55,17 +55,20 @@ def model():
 
 
 def fit(points):
-    if len(points):
-        options = {"expType": "YesNo"}
-        data = points.to_numpy()
-        result = ps.psignifit(data, options)
-        return {
-            "Threshold": result["Fit"][0],
-            "width": result["Fit"][1],
-            "gamma": result["Fit"][2],
-            "lambda": result["Fit"][3],
-            "beta": result["Fit"][4],
-        }
+    pass
+
+
+#     if len(points):
+#         options = {"expType": "YesNo"}
+#         data = points.to_numpy()
+#         result = ps.psignifit(data, options)
+#         return {
+#             "Threshold": result["Fit"][0],
+#             "width": result["Fit"][1],
+#             "gamma": result["Fit"][2],
+#             "lambda": result["Fit"][3],
+#             "beta": result["Fit"][4],
+#         }
 
 
 def plot(df):
@@ -138,11 +141,16 @@ def fixed_magnitude(points):
         return 0
 
 
+def n(points):
+    return len(points)
+
+
 def to_block(points):
     return pd.Series(
         {
-            "Threshold": fit(points),
+            # "Threshold": fit(points),
             "Dimension": dimension(points),
             "Fixed Magnitude": fixed_magnitude(points),
+            "n Levels": n(points),
         }
     )
