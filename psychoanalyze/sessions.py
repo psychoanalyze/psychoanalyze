@@ -16,4 +16,13 @@ def from_trials_csv(path):
 
 
 def day_marks(subjects, sessions, monkey):
-    return {1: "2020-01-02"}
+    surgery_date = pd.to_datetime(
+        subjects.loc[subjects["Monkey"] == monkey, "Surgery Date"]
+    )[0]
+    sessions = sessions[sessions["Monkey"] == "U"]
+    sessions["Days"] = (pd.to_datetime(sessions["Date"]) - surgery_date).dt.days
+
+    print(sessions)
+    return {
+        sessions.loc[i, "Days"]: sessions.loc[i, "Date"] for i in range(len(sessions))
+    }
