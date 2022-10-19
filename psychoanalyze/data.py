@@ -104,4 +104,6 @@ def load():
 def normalize(blocks):
     sessions = blocks[["Monkey", "Date"]].drop_duplicates()
     subjects = sessions[["Monkey"]].drop_duplicates()
+    subjects = pa.subjects.load()
+    sessions["Days"] = pa.sessions.days(sessions, subjects)
     return {"Sessions": sessions, "Subjects": subjects}

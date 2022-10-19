@@ -129,3 +129,12 @@ def load(path=None):
 
 def fixed_magnitudes(points):
     return points.groupby(pa.schemas.block_index_levels).agg(pa.points.fixed_magnitude)
+
+
+def days(blocks, intervention_dates):
+    blocks = blocks.join(intervention_dates, on="Monkey")
+    days = (
+        blocks.index.get_level_values("Date").to_series() - blocks["Surgery Date"]
+    ).dt.days
+    days.name = "Days"
+    return days

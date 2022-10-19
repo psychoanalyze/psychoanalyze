@@ -1,8 +1,8 @@
 import psychoanalyze as pa
 import pandas as pd
 import datatest as dt  # type: ignore
-import os
 import pytest
+import datetime
 
 
 @pytest.fixture
@@ -67,51 +67,6 @@ def test_prep_psych_curve(mocker):
 
 def test_transform():
     pa.blocks.transform(pd.Series(), y="p")
-
-
-# def test_from_trials():
-#     index = pd.MultiIndex.from_frame(
-#         pd.DataFrame(
-#             {
-#                 "Monkey": [],
-#                 "Date": [],
-#                 "Amp2": [],
-#                 "Width2": [],
-#                 "Freq2": [],
-#                 "Dur2": [],
-#                 "Active Channels": [],
-#                 "Return Channels": [],
-#                 "Amp1": [],
-#                 "Width1": [],
-#                 "Freq1": [],
-#                 "Dur1": [],
-#             }
-#         )
-#     )
-#     trials = pd.DataFrame({"Result": []}, index=index)
-#     blocks = pa.blocks.from_trials(trials)
-#     assert len(blocks) == 0
-#     assert "Dimension" in blocks.columns
-
-
-# def test_from_points(points_empty):
-#     blocks = pa.blocks.from_points(points_empty)
-#     assert {"Dimension", "Fixed Magnitude"} <= set(blocks.columns)
-#     assert "Monkey" in blocks.index.names
-# mocker.patch(
-#     "psychoanalyze.points.fit",
-#     return_value=pd.Series(
-#         index=pd.MultiIndex.from_frame(pd.DataFrame({"Monkey": [], "Amp1": []}))
-#     ),
-# )
-# df = pd.DataFrame(
-#     {"x": list(range(8)), "Hits": list(range(8))},
-#     index=pd.MultiIndex.from_frame(
-#         pd.DataFrame({"Amp1": [1] * 8, "Width1": [1] * 8})
-#     ),
-# )
-# df["n"] = 1000
-# pa.blocks.fit(df)
 
 
 def test_from_points(points_empty):
@@ -203,6 +158,30 @@ def test_from_points_amp_dim():
     blocks = pa.blocks.from_points(points, dim="Amp")
     assert len(blocks) == 1
     assert "Width1" in blocks.index.names
+
+
+def test_blocks_day():
+    index = pd.MultiIndex.from_frame(
+        pd.DataFrame(
+            {
+                "Monkey": ["U"],
+                "Date": [datetime.date(2001, 1, 1)],
+                "Amp2": [0],
+                "Width2": [0],
+                "Freq2": [0],
+                "Dur2": [0],
+                "Active Channels": [0],
+                "Return Channels": [0],
+            }
+        )
+    )
+    blocks = pd.DataFrame(index=index)
+    intervention_dates = pd.DataFrame(
+        {"Surgery Date": [datetime.date(2000, 12, 31)]},
+        index=pd.Index(["U"], name="Monkey"),
+    )
+    days = pa.blocks.days(blocks, intervention_dates)
+    pd.testing.assert_series_equal(days, pd.Series([1], name="Days", index=index))
 
 
 # def test_load_no_fit(tmp_path, mocker):

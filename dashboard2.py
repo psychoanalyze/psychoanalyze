@@ -1,6 +1,5 @@
-from dash import Dash, dcc, Output, Input
+from dash import Dash, dcc, html, Output, Input, dash_table
 import dash_bootstrap_components as dbc
-import pandas as pd
 import psychoanalyze as pa
 
 
@@ -13,25 +12,43 @@ app.layout = dbc.Container(
             marks={
                 1: "A",
             },
-            id="day",
+            id="day-select",
         ),
+        html.P(id="day-display"),
+        dash_table.DataTable(id="ref-stimulus-table"),
         dcc.Graph(id="psycho"),
     ]
 )
 
 
-@app.callback(Output("day", "marks"), Input("monkey", "value"))
+@app.callback(Output("day-select", "marks"), Input("monkey", "value"))
 def day_marks(monkey):
-    subjects = pa.subjects.load()
-    sessions = pa.sessions.load()
-    sessions["Days"] = pa.sessions.days(sessions, subjects)
+    sessions = pa.data.load()["Sessions"]
     sessions = sessions[sessions["Monkey"] == monkey]
     day_marks = {
-        float(sessions.loc[i, "Days"]): str(sessions.loc[i, "Date"].date())
-        for i in sessions.index
+        float(sessions.loc[i, "Days"]): sessions.loc[i, "Date"]
+        for i in sessions.index.values
     }
     if len(day_marks):
         return day_marks
+
+
+@app.callback(Output("day-display", "children"), Input("day-select", "value"))
+def display_day(day):
+    return f"Day {day}"
+
+
+@app.callback(
+    Output("ref-stimulus-table", "data"),
+    Input("monkey", "value"),
+    Input("day-select", "value"),
+)
+def display_ref_stimulus_table(monkey, day):
+    blocks = pa.blocks.load()
+    blocks = blocks.xs(monkey)
+    blocks["Day"] = pa.blocks.day(blocks, subjects)
+    blocks = blocks[blocks["Day"] == day]
+    return blocks.to_dict("records")
 
 
 if __name__ == "__main__":
