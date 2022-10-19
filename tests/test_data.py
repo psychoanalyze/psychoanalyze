@@ -72,6 +72,24 @@ def test_construct_index(mocker):
     assert len(index) == len(x) * len(days)
 
 
-def test_data_load():
+def test_data_load(mocker):
+    spy = mocker.spy(pa.data, "normalize")
     data = pa.data.load()
-    assert data.keys() == {"Subjects", "Sessions"}
+    assert spy.call_count == 1
+
+
+def test_normalize():
+    blocks = pd.DataFrame(
+        {
+            "Monkey": [],
+            "Date": [],
+            "Amp2": [],
+            "Width2": [],
+            "Freq2": [],
+            "Dur2": [],
+            "Active Channels": [],
+            "Return Channels": [],
+        }
+    )
+    blocks = pa.data.normalize(blocks)
+    assert blocks.keys() == {"Subjects", "Sessions"}
