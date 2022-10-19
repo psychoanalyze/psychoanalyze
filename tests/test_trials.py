@@ -27,7 +27,7 @@ def test_load(tmp_path):
         | {"Result": []},
     ).to_csv(tmp_path / "trials.csv", index_label=False)
 
-    trials = pa.trials.load(tmp_path / "trials.csv")
+    trials = pa.trials.load(tmp_path)
     assert list(trials.index.names) == pa.schemas.points_index_levels
     assert list(trials.columns) == ["Result"]
 

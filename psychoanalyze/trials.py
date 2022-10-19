@@ -48,10 +48,10 @@ def generate(n, stim_levels=None):
     )
 
 
-def load(filepath: Path = data_path):
+def load(data_path: Path = Path("data")):
     return pa.schemas.trials.validate(
         pd.read_csv(
-            filepath,
+            data_path / "trials.csv",
             index_col=pa.schemas.points_index_levels,
             parse_dates=["Date"],
         )

@@ -5,6 +5,7 @@ from scipy.special import logit, expit  # type: ignore
 import psychoanalyze as pa
 import plotly.express as px  # type: ignore
 import os
+import pathlib
 
 
 dims = ["Amp2", "Width2", "Freq1", "Dur1", "Active Channels", "Return Channels"]
@@ -105,11 +106,10 @@ def plot_fits(df):
     return px.line(df.reset_index(), x=x, y=y)
 
 
-def load(path=None, monkey=None, day=None):
-    if path is None:
-        path = "data/blocks.csv"
-    if os.path.exists(path):
-        blocks = pd.read_csv(path, parse_dates=["Date"]).set_index(
+def load(data_path=pathlib.Path("data"), monkey=None, day=None):
+    blocks_path = data_path / "blocks.csv"
+    if os.path.exists(blocks_path):
+        blocks = pd.read_csv(blocks_path, parse_dates=["Date"]).set_index(
             [
                 "Monkey",
                 "Date",
@@ -121,7 +121,7 @@ def load(path=None, monkey=None, day=None):
                 "Return Channels",
             ]
         )
-        blocks["Day"] = days(blocks, pa.subjects.load())
+        blocks["Day"] = days(blocks, pa.subjects.load(data_path))
         if monkey:
             if day:
                 blocks = blocks[blocks["Day"] == day]
@@ -131,8 +131,8 @@ def load(path=None, monkey=None, day=None):
         blocks = blocks[blocks["n Levels"] > 1]
         return blocks
     else:
-        blocks = from_trials(pa.trials.load())
-        blocks.to_csv(path)
+        blocks = from_trials(pa.trials.load(data_path))
+        blocks.to_csv(blocks_path)
         return blocks
 
 

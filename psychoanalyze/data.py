@@ -95,9 +95,9 @@ def filter(df, dim):
     return df[df["Dimension"] == dim]
 
 
-def load():
+def load(tmp_path):
     return {
-        "Sessions": pa.sessions.load(),
-        "Subjects": pa.subjects.load(),
-        "Blocks": pa.blocks.load(),
+        "Sessions": pa.sessions.load(tmp_path),
+        "Subjects": pa.subjects.load(tmp_path),
+        "Blocks": pa.blocks.load(tmp_path),
     }

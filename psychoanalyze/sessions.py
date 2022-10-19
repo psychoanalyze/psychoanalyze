@@ -1,5 +1,6 @@
 from typing import List
 import pandas as pd
+import pathlib
 
 import psychoanalyze as pa
 
@@ -33,16 +34,16 @@ def cache():
     )
 
 
-def load(path="data/trials.csv", monkey=None):
-    trials = pd.read_csv(path, parse_dates=["Date"])
+def load(data_path=pathlib.Path("data"), monkey=None):
+    trials = pa.trials.load(data_path)
+    if monkey:
+        trials = trials[trials.index.get_level_values("Monkey") == monkey]
     sessions = (
         trials.groupby(["Monkey", "Date"])[["Result"]]
         .count()
         .rename(columns={"Result": "n Trials"})
     )
-    sessions["Day"] = days(sessions, pa.subjects.load())
-    if monkey:
-        sessions = sessions[sessions.index.get_level_values("Monkey") == monkey]
+    sessions["Day"] = days(sessions, pa.subjects.load(data_path))
     return sessions
 
 
@@ -54,5 +55,4 @@ def days(sessions: pd.DataFrame, subjects):
 
 
 def n_trials(sessions, trials):
-    trials = trials.join(sessions)
     return trials.groupby(["Monkey", "Day"])[["Result"]].count()
