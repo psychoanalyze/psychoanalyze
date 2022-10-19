@@ -20,7 +20,9 @@ def from_trials(trials):
 
 def load(data_path=pathlib.Path("data")):
     trials = pa.trials.load(data_path)
-    return from_trials(trials)
+    points = from_trials(trials)
+    points["Hit Rate"] = points["Hits"] / points["n"]
+    return points
 
 
 def dimension(points):
