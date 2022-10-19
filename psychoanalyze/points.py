@@ -5,6 +5,7 @@ from scipy.stats import binom  # type: ignore
 import psychoanalyze as pa
 from dash import dash_table  # type: ignore
 import pathlib
+from plotly import graph_objects as go
 
 
 def from_trials(trials):
@@ -57,7 +58,14 @@ def model():
 
 
 def fit(points):
-    pass
+    return {
+        "threshold": 400,
+        "scale": 50,
+        "lambda_": 0.05,
+        "gamma": 0.1,
+        # "err+": [50],
+        # "err-": [50],
+    }
 
 
 #     if len(points):
@@ -130,9 +138,7 @@ def from_store(store_data):
 
 
 def combine_plots(fig1, fig2):
-    for trace in fig2.data:
-        fig1.add_trace(trace)
-    return fig1
+    return go.Figure(data=fig1.data + fig2.data)
 
 
 def fixed_magnitude(points):

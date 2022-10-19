@@ -50,8 +50,7 @@ def logistic(threshold=0, scale=1, gamma=0, lambda_=0):
     )
 
 
-def mu(points: pd.DataFrame):
-    fit = pa.points.fit(points)
+def mu(fit):
     df = fit.loc["mu", ["5%", "50%", "95%"]]  # type: ignore
     return df.T
 

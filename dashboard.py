@@ -3,13 +3,14 @@ import dash_bootstrap_components as dbc  # type: ignore
 import psychoanalyze as pa
 from psychoanalyze.layout import simulation_tab, experiment_tab
 from scipy.special import expit
-import pandas as pd
+import pathlib
+import plotly.express as px
 
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 server = app.server
 
-experiment_points = pa.points.load("data/trials.csv").iloc[0:100]
+experiment_points = pa.points.load(pathlib.Path("data")).iloc[0:100]
 
 stim_levels = list(range(-3, 4))
 p = expit(stim_levels)
@@ -67,9 +68,12 @@ def format_weber_plot(trendline, group_x, log_scale, marginal, error_y):
 def fit_curves(n_clicks, trials):
     points = pa.points.from_store(trials)
     if n_clicks:
-        fits = pa.blocks.fit(points)
-        fit_plot = pa.blocks.plot_fits(fits)
-        return pa.points.combine_plots(pa.points.plot(experiment_points), fit_plot)
+        fits = pa.points.fit(points)
+        trace = pa.data.logistic(fits["Threshold"].iloc[0])
+        print(trace)
+        fit_plot = px.line(trace)
+        return fit_plot
+        # return pa.points.combine_plots(pa.points.plot(experiment_points), fit_plot)
     else:
         return pa.points.plot(experiment_points)
 

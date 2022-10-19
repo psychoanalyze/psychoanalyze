@@ -26,33 +26,6 @@ def test_nonstandard_logistic_slope():
     assert max(s) < max(s_control)
 
 
-def test_fit_curve(mocker):
-    mocker.patch("cmdstanpy.CmdStanModel")
-    df = pd.DataFrame({"Amp1": [], "n": [], "Hits": []})
-    pa.points.fit(df)
-
-
-def test_mu_two_groups(mocker):
-    mocker.patch(
-        "psychoanalyze.points.fit",
-        return_value=pd.DataFrame(
-            {"5%": [1], "50%": [2], "95%": [3]}, index=pd.Index(["mu"])
-        ),
-    )
-    data = pd.DataFrame(
-        {
-            "x": [1, 2],
-            "n": [10, 10],
-            "Hits": [1, 9],
-            "Subject": ["A", "A"],
-            "Day": [1, 2],
-        }
-    )
-    output = data.groupby(["Subject", "Day"]).apply(pa.data.mu)
-    assert len(output) == 2
-    assert {"5%", "50%", "95%"} <= set(output.columns)
-
-
 def test_params():
     x = pd.Index([])
     fit = pd.DataFrame({"5%": [], "50%": [], "95%": []})
