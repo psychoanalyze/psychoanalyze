@@ -109,7 +109,7 @@ def load(path=None):
     if path is None:
         path = "data/blocks.csv"
     if os.path.exists(path):
-        return pd.read_csv(path).set_index(
+        return pd.read_csv(path, parse_dates=["Date"]).set_index(
             [
                 "Monkey",
                 "Date",
@@ -133,8 +133,21 @@ def fixed_magnitudes(points):
 
 def days(blocks, intervention_dates):
     blocks = blocks.join(intervention_dates, on="Monkey")
-    days = (
-        blocks.index.get_level_values("Date").to_series() - blocks["Surgery Date"]
-    ).dt.days
+    days = (blocks.index.get_level_values("Date") - blocks["Surgery Date"]).dt.days
     days.name = "Days"
     return days
+
+
+def n_trials(trials):
+    return trials.groupby(
+        [
+            "Monkey",
+            "Date",
+            "Amp2",
+            "Width2",
+            "Freq2",
+            "Dur2",
+            "Active Channels",
+            "Return Channels",
+        ]
+    )["Result"].count()

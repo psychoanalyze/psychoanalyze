@@ -3,6 +3,8 @@ import pandas as pd
 import datatest as dt  # type: ignore
 import pytest
 import datetime
+import numpy as np
+import pandas.api.types as ptypes
 
 
 @pytest.fixture
@@ -93,21 +95,23 @@ def test_load_pre_fitted(tmp_path):
     fullpath = tmp_path / "blocks.csv"
     pd.DataFrame(
         {
-            "Monkey": [],
-            "Date": [],
-            "Amp2": [],
-            "Width2": [],
-            "Freq2": [],
-            "Dur2": [],
-            "Active Channels": [],
-            "Return Channels": [],
-            "Threshold": [],
-            "Dimension": [],
-            "Fixed Magnitude": [],
+            "Monkey": ["U"],
+            "Date": ["2022-01-01"],
+            "Amp2": [0],
+            "Width2": [0],
+            "Freq2": [0],
+            "Dur2": [0],
+            "Active Channels": [0],
+            "Return Channels": [0],
+            "Threshold": [1],
+            "Dimension": ["Amp"],
+            "Fixed Magnitude": [0],
         }
     ).to_csv(fullpath, index=False)
     blocks = pa.blocks.load(fullpath)
     assert set(blocks.columns) == {"Threshold", "Dimension", "Fixed Magnitude"}
+    dates = blocks.index.get_level_values("Date")
+    assert ptypes.is_datetime64_any_dtype(dates)
 
 
 def test_from_points_amp_dim():
@@ -184,19 +188,26 @@ def test_blocks_day():
     pd.testing.assert_series_equal(days, pd.Series([1], name="Days", index=index))
 
 
-# def test_load_no_fit(tmp_path, mocker):
-#     mocker.patch(pa.points.load)
-#     pd.DataFrame({"n": [], "Hits": [], "x": []}).to_csv(tmp_path / "trials.csv")
-#     blocks = pa.blocks.load(tmp_path / "blocks.csv")
-#     assert set(blocks.columns) <= {"Threshold", "Dimension", "Fixed Magnitude"}
-#     assert os.path.exists(tmp_path / "blocks.csv")
-
-
-# def test_fits(points_empty):
-#     fits = pa.blocks.fits(points_empty)
-#     assert fits.name == "Threshold"
-
-
-# def test_fixed_magnitudes(points_empty):
-#     fixed_magnitudes = pa.blocks.fixed_magnitudes(points_empty)
-#     assert fixed_magnitudes.name == "Fixed Magnitudes"
+def test_n_trials():
+    trials = pd.DataFrame(
+        {"Result": [1] * 3},
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame(
+                {
+                    "Monkey": ["U"] * 3,
+                    "Date": [datetime.date(2000, 1, 1)] * 3,
+                    "Amp2": [0] * 3,
+                    "Width2": [0] * 3,
+                    "Freq2": [0] * 3,
+                    "Dur2": [0] * 3,
+                    "Active Channels": [0] * 3,
+                    "Return Channels": [0] * 3,
+                    "Amp1": [2] * 3,
+                    "Width1": [0] * 3,
+                    "Freq1": [0] * 3,
+                    "Dur1": [0] * 3,
+                }
+            )
+        ),
+    )
+    assert pa.blocks.n_trials(trials).iloc[0] == 3

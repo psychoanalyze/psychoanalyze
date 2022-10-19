@@ -96,14 +96,8 @@ def filter(df, dim):
 
 
 def load():
-    blocks = pa.blocks.load()
-    return pa.data.normalize(blocks.reset_index())
-    # return {"Sessions": pd.DataFrame(), "Subjects": pd.DataFrame()}
-
-
-def normalize(blocks):
-    sessions = blocks[["Monkey", "Date"]].drop_duplicates()
-    subjects = sessions[["Monkey"]].drop_duplicates()
-    subjects = pa.subjects.load()
-    sessions["Days"] = pa.sessions.days(sessions, subjects)
-    return {"Sessions": sessions, "Subjects": subjects}
+    return {
+        "Sessions": pa.sessions.load(),
+        "Subjects": pa.subjects.load(),
+        "Blocks": pa.blocks.load(),
+    }

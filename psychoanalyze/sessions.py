@@ -1,6 +1,8 @@
 from typing import List
 import pandas as pd
 
+import psychoanalyze as pa
+
 
 dims = ["Monkey", "Date"]
 
@@ -32,9 +34,22 @@ def cache():
 
 
 def load():
-    return pd.read_csv("data/normalized/sessions.csv", parse_dates=["Date"])
+    sessions = (
+        pd.read_csv("data/trials.csv", parse_dates=["Date"])[["Monkey", "Date"]]
+        .drop_duplicates()
+        .set_index(["Monkey", "Date"])
+    )
+    sessions["Day"] = days(sessions, pa.subjects.load())
+    return sessions
 
 
 def days(sessions, subjects):
     df = sessions.join(subjects, on="Monkey")
-    return (pd.to_datetime(df["Date"]) - df["Surgery Date"]).dt.days
+    return (
+        pd.to_datetime(df.index.get_level_values("Date")) - df["Surgery Date"]
+    ).dt.days
+
+
+def n_trials(sessions, trials):
+    trials = trials.join(sessions)
+    return trials.groupby(["Monkey", "Day"])[["Result"]].count()
