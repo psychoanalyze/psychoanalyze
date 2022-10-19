@@ -119,7 +119,7 @@ def display_selected_traces(monkey, day, row_numbers):
             points["Hit Rate"] = points["Hits"] / points["n"]
         else:
             points = pd.DataFrame({"x": [], "Hit Rate": []})
-    return px.scatter(points, x="x", y="Hit Rate", template=pa.plot.template)
+    return px.scatter(points, x="x", y="Hit Rate", size="n", template=pa.plot.template)
 
 
 if __name__ == "__main__":
