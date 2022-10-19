@@ -21,8 +21,22 @@ def day_marks(subjects, sessions, monkey):
     )[0]
     sessions = sessions[sessions["Monkey"] == "U"]
     sessions["Days"] = (pd.to_datetime(sessions["Date"]) - surgery_date).dt.days
+    return {sessions.loc[i, "Days"]: sessions.loc[i, "Date"] for i in sessions.index}
 
-    print(sessions)
-    return {
-        sessions.loc[i, "Days"]: sessions.loc[i, "Date"] for i in range(len(sessions))
-    }
+
+def cache():
+    pd.read_csv("data/trials.csv")[["Monkey", "Date"]].drop_duplicates().to_csv(
+        "data/normalized/sessions.csv", index=False
+    )
+
+
+def load():
+    return pd.read_csv("data/normalized/sessions.csv", parse_dates=["Date"])
+
+
+import psychoanalyze as pa
+
+
+def days(sessions, subjects):
+    df = sessions.join(subjects, on="Monkey")
+    return (df["Date"] - df["Surgery Date"]).dt.days

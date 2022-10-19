@@ -19,8 +19,15 @@ def test_from_trials_csv(tmp_path):
     assert set(sessions.columns) == {"Monkey", "Date"}
 
 
-def test_day_marks_from_monkey_two_sessions():
-    subjects = pd.DataFrame({"Monkey": ["U"], "Surgery Date": ["2020-01-01"]})
+import pytest
+
+
+@pytest.fixture
+def subjects():
+    return pd.DataFrame({"Monkey": ["U"], "Surgery Date": ["2020-01-01"]})
+
+
+def test_day_marks_from_monkey_two_sessions(subjects):
     sessions = pd.DataFrame(
         {"Monkey": ["U", "U"], "Date": ["2020-01-02", "2020-01-03"]}
     )
@@ -30,8 +37,7 @@ def test_day_marks_from_monkey_two_sessions():
     }
 
 
-def test_day_marks_from_monkey_one_session():
-    subjects = pd.DataFrame({"Monkey": ["U"], "Surgery Date": ["2020-01-01"]})
+def test_day_marks_from_monkey_one_session(subjects):
     sessions = pd.DataFrame({"Monkey": ["U"], "Date": ["2020-01-02"]})
 
     assert pa.sessions.day_marks(subjects, sessions, "U") == {1: "2020-01-02"}
