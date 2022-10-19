@@ -34,10 +34,11 @@ def cache():
 
 
 def load(path="data/trials.csv", monkey=None):
+    trials = pd.read_csv(path, parse_dates=["Date"])
     sessions = (
-        pd.read_csv(path, parse_dates=["Date"])[["Monkey", "Date"]]
-        .drop_duplicates()
-        .set_index(["Monkey", "Date"])
+        trials.groupby(["Monkey", "Date"])[["Result"]]
+        .count()
+        .rename(columns={"Result": "n Trials"})
     )
     sessions["Day"] = days(sessions, pa.subjects.load())
     if monkey:
@@ -45,7 +46,7 @@ def load(path="data/trials.csv", monkey=None):
     return sessions
 
 
-def days(sessions, subjects):
+def days(sessions: pd.DataFrame, subjects):
     df = sessions.join(subjects, on="Monkey")
     return (
         pd.to_datetime(df.index.get_level_values("Date")) - df["Surgery Date"]

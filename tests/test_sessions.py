@@ -86,7 +86,12 @@ def test_load():
 def test_load_monkey(tmp_path):
     path = tmp_path / "trials.csv"
     pd.DataFrame(
-        {"Monkey": ["U", "Y"], "Date": ["2020-01-01", "2020-01-01"], "Day": [1, 1]}
+        {
+            "Monkey": ["U", "Y"],
+            "Date": ["2020-01-01", "2020-01-01"],
+            "Day": [1, 1],
+            "Result": [1, 1],
+        }
     ).to_csv(path)
     sessions = pa.sessions.load(path=path, monkey="U")
     assert all(sessions.index.get_level_values("Monkey") == "U")
