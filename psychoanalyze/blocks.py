@@ -122,7 +122,7 @@ def load(path=None, monkey=None):
             ]
         )
         if monkey:
-            blocks = blocks.xs(monkey)
+            blocks = blocks.xs(monkey, drop_level=False)
         return blocks
     else:
         blocks = from_trials(pa.trials.load())

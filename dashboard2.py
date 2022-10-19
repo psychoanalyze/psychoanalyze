@@ -41,11 +41,13 @@ app.layout = dbc.Container(
         dbc.Row(
             [
                 dbc.Col(
-                    dbc.Button("Fit Curve"),
+                    dbc.Button(
+                        "Fit Curve",
+                        id="fit button",
+                        n_clicks=0,
+                    ),
                     align="center",
                     width=2,
-                    n_clicks=0,
-                    id="fit button",
                 ),
                 dbc.Col(dcc.Graph(id="psycho"), width=8),
             ],
@@ -86,7 +88,6 @@ def display_day(day):
 )
 def display_ref_stimulus_table(monkey, day):
     blocks = pa.blocks.load()
-    blocks = blocks.xs(monkey, drop_level=False)
     blocks["Day"] = pa.blocks.days(blocks, pa.subjects.load())
     blocks = blocks[blocks["Day"] == day]
     blocks = blocks[blocks["n Levels"] > 1]
