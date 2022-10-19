@@ -81,3 +81,12 @@ def test_n_trials():
 def test_load():
     sessions = pa.sessions.load()
     assert ptypes.is_datetime64_any_dtype(sessions.index.get_level_values("Date"))
+
+
+def test_load_monkey(tmp_path):
+    path = tmp_path / "trials.csv"
+    pd.DataFrame(
+        {"Monkey": ["U", "Y"], "Date": ["2020-01-01", "2020-01-01"], "Day": [1, 1]}
+    ).to_csv(path)
+    sessions = pa.sessions.load(path=path, monkey="U")
+    assert all(sessions.index.get_level_values("Monkey") == "U")

@@ -33,13 +33,15 @@ def cache():
     )
 
 
-def load():
+def load(path="data/trials.csv", monkey=None):
     sessions = (
-        pd.read_csv("data/trials.csv", parse_dates=["Date"])[["Monkey", "Date"]]
+        pd.read_csv(path, parse_dates=["Date"])[["Monkey", "Date"]]
         .drop_duplicates()
         .set_index(["Monkey", "Date"])
     )
     sessions["Day"] = days(sessions, pa.subjects.load())
+    if monkey:
+        sessions = sessions[sessions.index.get_level_values("Monkey") == monkey]
     return sessions
 
 

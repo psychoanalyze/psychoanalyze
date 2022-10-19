@@ -63,8 +63,7 @@ app.layout = dbc.Container(
     Input("monkey", "value"),
 )
 def day_marks(monkey):
-    sessions = pa.sessions.load()
-    sessions = sessions.xs(monkey)
+    sessions = pa.sessions.load(monkey=monkey)
     trials = pa.trials.load()
     n_trials = pa.sessions.n_trials(sessions, trials)
     day_value = n_trials.idxmax()[0][1]
@@ -87,10 +86,7 @@ def display_day(day):
     Input("day-select", "value"),
 )
 def display_ref_stimulus_table(monkey, day):
-    blocks = pa.blocks.load()
-    blocks["Day"] = pa.blocks.days(blocks, pa.subjects.load())
-    blocks = blocks[blocks["Day"] == day]
-    blocks = blocks[blocks["n Levels"] > 1]
+    blocks = pa.blocks.load(monkey=monkey, day=day)
     return (
         blocks.reset_index()
         .drop(columns=["Monkey", "Date", "Dimension", "n Levels", "Day"])
@@ -109,11 +105,8 @@ def display_selected_traces(monkey, day, row_numbers):
         points = pd.DataFrame({"x": [], "Hit Rate": []})
     else:
         if len(row_numbers):
-            blocks = pa.blocks.load()
-            blocks = blocks.xs(monkey, drop_level=False)
-            blocks["Day"] = pa.blocks.days(blocks, pa.subjects.load())
-            blocks = blocks[blocks["n Levels"] > 1]
-            blocks = blocks[blocks["Day"] == day].iloc[row_numbers]
+            blocks = pa.blocks.load(monkey=monkey, day=day)
+            blocks = blocks.iloc[row_numbers]
             points = pa.points.load()
             points = blocks.join(points)
             points["Hit Rate"] = points["Hits"] / points["n"]

@@ -105,7 +105,7 @@ def plot_fits(df):
     return px.line(df.reset_index(), x=x, y=y)
 
 
-def load(path=None, monkey=None):
+def load(path=None, monkey=None, day=None):
     if path is None:
         path = "data/blocks.csv"
     if os.path.exists(path):
@@ -121,8 +121,14 @@ def load(path=None, monkey=None):
                 "Return Channels",
             ]
         )
+        blocks["Day"] = days(blocks, pa.subjects.load())
         if monkey:
-            blocks = blocks.xs(monkey, drop_level=False)
+            if day:
+                blocks = blocks[blocks["Day"] == day]
+            else:
+                blocks = blocks.xs(monkey, drop_level=False)
+
+        blocks = blocks[blocks["n Levels"] > 1]
         return blocks
     else:
         blocks = from_trials(pa.trials.load())

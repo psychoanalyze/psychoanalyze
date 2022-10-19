@@ -52,6 +52,8 @@ def blocks():
             "Threshold": [1],
             "Dimension": ["Amp"],
             "Fixed Magnitude": [0],
+            "n Levels": [8],
+            "Day": [1],
         }
     )
 
@@ -118,7 +120,7 @@ def test_plot_fits():
 def test_load_pre_fitted(path, blocks):
     blocks.to_csv(path, index=False)
     blocks = pa.blocks.load(path)
-    assert set(blocks.columns) == {"Threshold", "Dimension", "Fixed Magnitude"}
+    assert set(blocks.columns) >= {"Threshold", "Dimension", "Fixed Magnitude"}
     dates = blocks.index.get_level_values("Date")
     assert ptypes.is_datetime64_any_dtype(dates)
 
@@ -127,6 +129,13 @@ def test_blocks_load_monkey(path, blocks):
     blocks.to_csv(path)
     blocks = pa.blocks.load(path, monkey="U")
     assert all(blocks.index.get_level_values("Monkey") == "U")
+
+
+def test_blocks_load_monkey_day(path, blocks):
+    blocks.to_csv(path)
+    blocks = pa.blocks.load(path, monkey="U", day=1)
+    assert all(blocks.index.get_level_values("Monkey") == "U")
+    assert all(blocks["Day"] == 1)
 
 
 def test_from_points_amp_dim():
