@@ -105,11 +105,11 @@ def plot_fits(df):
     return px.line(df.reset_index(), x=x, y=y)
 
 
-def load(path=None):
+def load(path=None, monkey=None):
     if path is None:
         path = "data/blocks.csv"
     if os.path.exists(path):
-        return pd.read_csv(path, parse_dates=["Date"]).set_index(
+        blocks = pd.read_csv(path, parse_dates=["Date"]).set_index(
             [
                 "Monkey",
                 "Date",
@@ -121,6 +121,9 @@ def load(path=None):
                 "Return Channels",
             ]
         )
+        if monkey:
+            blocks = blocks.xs(monkey)
+        return blocks
     else:
         blocks = from_trials(pa.trials.load())
         blocks.to_csv(path)

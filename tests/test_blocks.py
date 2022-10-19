@@ -124,7 +124,9 @@ def test_load_pre_fitted(path, blocks):
 
 
 def test_blocks_load_monkey(path, blocks):
-    blocks.to_csv()
+    blocks.to_csv(path)
+    blocks = pa.blocks.load(path, monkey="U")
+    assert "Monkey" not in blocks.index.names
 
 
 def test_from_points_amp_dim():
