@@ -55,4 +55,4 @@ def days(sessions: pd.DataFrame, subjects):
 
 
 def n_trials(sessions, trials):
-    return trials.groupby(["Monkey", "Day"])[["Result"]].count()
+    return trials.groupby(["Monkey", "Date"])[["Result"]].count()

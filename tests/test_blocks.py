@@ -58,6 +58,31 @@ def blocks():
     )
 
 
+@pytest.fixture
+def three_trials():
+    return pd.DataFrame(
+        {"Result": [1] * 3},
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame(
+                {
+                    "Monkey": ["U"] * 3,
+                    "Date": [datetime.date(2000, 1, 1)] * 3,
+                    "Amp2": [0] * 3,
+                    "Width2": [0] * 3,
+                    "Freq2": [0] * 3,
+                    "Dur2": [0] * 3,
+                    "Active Channels": [0] * 3,
+                    "Return Channels": [0] * 3,
+                    "Amp1": [2] * 3,
+                    "Width1": [0] * 3,
+                    "Freq1": [0] * 3,
+                    "Dur1": [0] * 3,
+                }
+            )
+        ),
+    )
+
+
 def test_generate():
     df = pa.blocks.generate()
     assert len(df) == 7
@@ -117,32 +142,12 @@ def test_plot_fits():
     assert len(fig.data)
 
 
-def test_load_pre_fitted(tmp_path, blocks):
+def test_load_pre_fitted(tmp_path, blocks, three_trials):
     pd.DataFrame(
         {"Surgery Date": [datetime.date(2000, 12, 31)]},
         index=pd.Index(["U"], name="Monkey"),
     ).to_csv(tmp_path / "subjects.csv")
-    pd.DataFrame(
-        {"Result": [1] * 3},
-        index=pd.MultiIndex.from_frame(
-            pd.DataFrame(
-                {
-                    "Monkey": ["U"] * 3,
-                    "Date": [datetime.date(2000, 1, 1)] * 3,
-                    "Amp2": [0] * 3,
-                    "Width2": [0] * 3,
-                    "Freq2": [0] * 3,
-                    "Dur2": [0] * 3,
-                    "Active Channels": [0] * 3,
-                    "Return Channels": [0] * 3,
-                    "Amp1": [2] * 3,
-                    "Width1": [0] * 3,
-                    "Freq1": [0] * 3,
-                    "Dur1": [0] * 3,
-                }
-            )
-        ),
-    ).to_csv(tmp_path / "trials.csv")
+    three_trials.to_csv(tmp_path / "trials.csv")
     blocks.to_csv(tmp_path / "blocks.csv", index=False)
     blocks = pa.blocks.load(tmp_path)
     assert set(blocks.columns) >= {"Threshold", "Dimension", "Fixed Magnitude"}
@@ -246,26 +251,6 @@ def test_blocks_day(tmp_path):
     pd.testing.assert_series_equal(days, pd.Series([1], name="Days", index=index))
 
 
-def test_n_trials():
-    trials = pd.DataFrame(
-        {"Result": [1] * 3},
-        index=pd.MultiIndex.from_frame(
-            pd.DataFrame(
-                {
-                    "Monkey": ["U"] * 3,
-                    "Date": [datetime.date(2000, 1, 1)] * 3,
-                    "Amp2": [0] * 3,
-                    "Width2": [0] * 3,
-                    "Freq2": [0] * 3,
-                    "Dur2": [0] * 3,
-                    "Active Channels": [0] * 3,
-                    "Return Channels": [0] * 3,
-                    "Amp1": [2] * 3,
-                    "Width1": [0] * 3,
-                    "Freq1": [0] * 3,
-                    "Dur1": [0] * 3,
-                }
-            )
-        ),
-    )
+def test_n_trials(three_trials):
+    trials = three_trials
     assert pa.blocks.n_trials(trials).iloc[0] == 3

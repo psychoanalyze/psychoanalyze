@@ -4,7 +4,7 @@ import plotly.express as px  # type: ignore
 from scipy.stats import binom  # type: ignore
 import psychoanalyze as pa
 from dash import dash_table  # type: ignore
-import psignifit as ps
+import pathlib
 
 
 def from_trials(trials):
@@ -18,8 +18,8 @@ def from_trials(trials):
     return df
 
 
-def load(trials_path="data/trials.csv"):
-    trials = pa.trials.load(trials_path)
+def load(data_path=pathlib.Path("data")):
+    trials = pa.trials.load(data_path)
     return from_trials(trials)
 
 

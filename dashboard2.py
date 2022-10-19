@@ -64,9 +64,8 @@ app.layout = dbc.Container(
 )
 def day_marks(monkey):
     sessions = pa.sessions.load(monkey=monkey)
-    trials = pa.trials.load()
-    n_trials = pa.sessions.n_trials(sessions, trials)
-    day_value = n_trials.idxmax()[0][1]
+    session_max_n_index = sessions["n Trials"].idxmax()
+    day_value = sessions.loc[session_max_n_index, "Day"]
     day_marks = {
         float(sessions.loc[i, "Day"]): str(sessions.loc[i, "Day"])
         for i in sessions.index.values
