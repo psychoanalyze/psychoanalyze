@@ -93,3 +93,7 @@ def generate_animation_curves():
 
 def filter(df, dim):
     return df[df["Dimension"] == dim]
+
+
+def load():
+    return {"Sessions": pd.DataFrame(), "Subjects": pd.DataFrame()}

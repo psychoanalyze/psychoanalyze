@@ -70,3 +70,8 @@ def test_construct_index(mocker):
     index = pa.data.construct_index(subjects=None, days=days, x=x)
     assert index.names == ["Day", "x"]
     assert len(index) == len(x) * len(days)
+
+
+def test_data_load():
+    data = pa.data.load()
+    assert data.keys() == {"Subjects", "Sessions"}

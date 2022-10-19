@@ -9,9 +9,10 @@ def generate(n: int) -> List[int]:
     return list(range(n))
 
 
-def from_trials_csv(path):
+def from_trials_csv(path, cache=False):
     df = pd.read_csv(path)[["Monkey", "Date"]].drop_duplicates()
-    df.to_csv("data/normalized/sessions.csv", index=False)
+    if cache:
+        df.to_csv("data/normalized/sessions.csv", index=False)
     return df
 
 
@@ -34,9 +35,6 @@ def load():
     return pd.read_csv("data/normalized/sessions.csv", parse_dates=["Date"])
 
 
-import psychoanalyze as pa
-
-
 def days(sessions, subjects):
     df = sessions.join(subjects, on="Monkey")
-    return (df["Date"] - df["Surgery Date"]).dt.days
+    return (pd.to_datetime(df["Date"]) - df["Surgery Date"]).dt.days

@@ -26,10 +26,12 @@ def day_marks(monkey):
     sessions = pa.sessions.load()
     sessions["Days"] = pa.sessions.days(sessions, subjects)
     sessions = sessions[sessions["Monkey"] == monkey]
-    return {
+    day_marks = {
         float(sessions.loc[i, "Days"]): str(sessions.loc[i, "Date"].date())
         for i in sessions.index
     }
+    if len(day_marks):
+        return day_marks
 
 
 if __name__ == "__main__":
