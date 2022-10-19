@@ -8,13 +8,33 @@ import plotly.express as px
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 app.layout = dbc.Container(
     [
-        dcc.RadioItems(["U", "Y", "Z"], "Z", id="monkey"),
-        dcc.Slider(
-            step=None,
-            marks={"": ""},
-            id="day-select",
+        html.H1("PsychoAnalyze"),
+        dbc.Row(
+            [
+                dbc.Col(
+                    dbc.RadioItems(
+                        options=[
+                            {"label": monkey, "value": monkey}
+                            for monkey in ["U", "Y", "Z"]
+                        ],
+                        value="Z",
+                        inline=True,
+                        id="monkey",
+                    )
+                ),
+                dbc.Col(
+                    [
+                        html.P(id="day-display"),
+                        dcc.Slider(
+                            step=None,
+                            marks={"": ""},
+                            id="day-select",
+                        ),
+                    ],
+                    width=8,
+                ),
+            ]
         ),
-        html.P(id="day-display"),
         dash_table.DataTable(
             id="ref-stimulus-table", row_selectable="single", selected_rows=[0]
         ),
@@ -58,7 +78,11 @@ def display_ref_stimulus_table(monkey, day):
     blocks["Day"] = pa.blocks.days(blocks, pa.subjects.load())
     blocks = blocks[blocks["Day"] == day]
     blocks = blocks[blocks["n Levels"] > 1]
-    return blocks.reset_index().to_dict("records")
+    return (
+        blocks.reset_index()
+        .drop(columns=["Monkey", "Date", "Dimension", "n Levels", "Day"])
+        .to_dict("records")
+    )
 
 
 @app.callback(
@@ -82,7 +106,7 @@ def display_selected_traces(monkey, day, row_numbers):
             points["Hit Rate"] = points["Hits"] / points["n"]
         else:
             points = pd.DataFrame({"x": [], "Hit Rate": []})
-    return px.scatter(points, x="x", y="Hit Rate", template="plotly_white")
+    return px.scatter(points, x="x", y="Hit Rate", template=pa.plot.template)
 
 
 if __name__ == "__main__":
