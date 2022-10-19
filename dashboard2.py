@@ -15,7 +15,9 @@ app.layout = dbc.Container(
             id="day-select",
         ),
         html.P(id="day-display"),
-        dash_table.DataTable(id="ref-stimulus-table", row_selectable="multi"),
+        dash_table.DataTable(
+            id="ref-stimulus-table", row_selectable="single", selected_rows=[0]
+        ),
         dcc.Graph(id="psycho"),
     ]
 )
@@ -29,11 +31,8 @@ app.layout = dbc.Container(
 def day_marks(monkey):
     sessions = pa.sessions.load()
     sessions = sessions.xs(monkey)
-    print(sessions)
     trials = pa.trials.load()
-    print(trials)
     n_trials = pa.sessions.n_trials(sessions, trials)
-    print(n_trials)
     day_value = n_trials.idxmax()[0][1]
     day_marks = {
         float(sessions.loc[i, "Day"]): str(sessions.loc[i, "Day"])
@@ -58,23 +57,26 @@ def display_ref_stimulus_table(monkey, day):
     blocks = blocks.xs(monkey, drop_level=False)
     blocks["Day"] = pa.blocks.days(blocks, pa.subjects.load())
     blocks = blocks[blocks["Day"] == day]
+    blocks = blocks[blocks["n Levels"] > 1]
     return blocks.reset_index().to_dict("records")
 
 
 @app.callback(
     Output("psycho", "figure"),
-    Input("ref-stimulus-table", "derived_virtual_data"),
+    Input("monkey", "value"),
+    Input("day-select", "value"),
+    Input("ref-stimulus-table", "selected_rows"),
 )
-def display_selected_traces(blocks):
-    if blocks is None:
+def display_selected_traces(monkey, day, row_numbers):
+    if row_numbers is None:
         points = pd.DataFrame({"x": [], "Hit Rate": []})
     else:
-        if len(blocks):
-            blocks = pd.DataFrame(blocks)
-            blocks["Date"] = pd.to_datetime(blocks["Date"])
-            blocks = blocks.set_index(
-                ["Monkey", "Date", "Amp2", "Width2", "Freq2", "Dur2"]
-            )
+        if len(row_numbers):
+            blocks = pa.blocks.load()
+            blocks = blocks.xs(monkey, drop_level=False)
+            blocks["Day"] = pa.blocks.days(blocks, pa.subjects.load())
+            blocks = blocks[blocks["n Levels"] > 1]
+            blocks = blocks[blocks["Day"] == day].iloc[row_numbers]
             points = pa.points.load()
             points = blocks.join(points)
             points["Hit Rate"] = points["Hits"] / points["n"]
