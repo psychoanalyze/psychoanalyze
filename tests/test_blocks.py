@@ -32,6 +32,30 @@ def points_empty():
     )
 
 
+@pytest.fixture
+def path(tmp_path):
+    return tmp_path / "blocks.csv"
+
+
+@pytest.fixture
+def blocks():
+    return pd.DataFrame(
+        {
+            "Monkey": ["U"],
+            "Date": ["2022-01-01"],
+            "Amp2": [0],
+            "Width2": [0],
+            "Freq2": [0],
+            "Dur2": [0],
+            "Active Channels": [0],
+            "Return Channels": [0],
+            "Threshold": [1],
+            "Dimension": ["Amp"],
+            "Fixed Magnitude": [0],
+        }
+    )
+
+
 def test_generate():
     df = pa.blocks.generate()
     assert len(df) == 7
@@ -91,27 +115,16 @@ def test_plot_fits():
     assert len(fig.data)
 
 
-def test_load_pre_fitted(tmp_path):
-    fullpath = tmp_path / "blocks.csv"
-    pd.DataFrame(
-        {
-            "Monkey": ["U"],
-            "Date": ["2022-01-01"],
-            "Amp2": [0],
-            "Width2": [0],
-            "Freq2": [0],
-            "Dur2": [0],
-            "Active Channels": [0],
-            "Return Channels": [0],
-            "Threshold": [1],
-            "Dimension": ["Amp"],
-            "Fixed Magnitude": [0],
-        }
-    ).to_csv(fullpath, index=False)
-    blocks = pa.blocks.load(fullpath)
+def test_load_pre_fitted(path, blocks):
+    blocks.to_csv(path, index=False)
+    blocks = pa.blocks.load(path)
     assert set(blocks.columns) == {"Threshold", "Dimension", "Fixed Magnitude"}
     dates = blocks.index.get_level_values("Date")
     assert ptypes.is_datetime64_any_dtype(dates)
+
+
+def test_blocks_load_monkey(path, blocks):
+    blocks.to_csv()
 
 
 def test_from_points_amp_dim():

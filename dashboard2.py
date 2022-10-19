@@ -38,7 +38,19 @@ app.layout = dbc.Container(
         dash_table.DataTable(
             id="ref-stimulus-table", row_selectable="single", selected_rows=[0]
         ),
-        dcc.Graph(id="psycho"),
+        dbc.Row(
+            [
+                dbc.Col(
+                    dbc.Button("Fit Curve"),
+                    align="center",
+                    width=2,
+                    n_clicks=0,
+                    id="fit button",
+                ),
+                dbc.Col(dcc.Graph(id="psycho"), width=8),
+            ],
+            justify="center",
+        ),
     ]
 )
 
