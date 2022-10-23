@@ -55,7 +55,7 @@ def test_both_dimensions():
 
 def test_plot():
     s = pd.DataFrame(
-        {"Hits": [], "n": [], "Hit Rate": []},
+        {"x": [], "n": [], "Hit Rate": []},
         index=pd.MultiIndex.from_frame(
             pd.DataFrame({level: [] for level in pa.schemas.points_index_levels})
         ),
@@ -63,7 +63,7 @@ def test_plot():
     )
     fig = pa.points.plot(s)
     assert fig.layout.yaxis.title.text == "Hit Rate"
-    assert fig.layout.xaxis.title.text == "Amplitude (µA)"
+    assert fig.layout.xaxis.title.text == "x"
 
 
 def test_generate():

@@ -10,13 +10,13 @@ from plotly import graph_objects as go
 
 def from_trials(trials):
     trials = trials[trials["Result"].isin([0, 1])]
-    df = (
+    points = (
         trials.groupby(trials.index.names)["Result"]
         .agg(["count", "sum"])
         .rename(columns={"count": "n", "sum": "Hits"})
     )
-    df["x"] = df.index.get_level_values("Amp1")
-    return df
+    points["x"] = points.index.get_level_values("Amp1")
+    return points
 
 
 def load(data_path=pathlib.Path("data")):
@@ -83,14 +83,12 @@ def fit(points):
 #         }
 
 
-def plot(df):
-    df["Hit Rate"] = df["Hits"] / df["n"]
-    df["Amplitude (µA)"] = df.index.get_level_values("Amp1")
+def plot(points):
     return px.scatter(
-        df.reset_index(),
-        x="Amplitude (µA)",
+        points.reset_index(),
+        x="x",
         y="Hit Rate",
-        color=df.get("Monkey"),
+        color=points.get("Monkey"),
         template="plotly_white",
     )
 
