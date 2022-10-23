@@ -240,4 +240,4 @@ def test_to_block():
 def test_fit():
     points = pd.DataFrame({"n": [], "Hits": [], "x": []})
     fit = pa.points.fit(points)
-    assert {"Threshold", "err+", "err-"} <= set(fit.columns)
+    assert {"Threshold", "err+", "err-"} <= set(fit.index.values)

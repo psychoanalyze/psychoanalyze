@@ -58,14 +58,16 @@ def model():
 
 
 def fit(points):
-    return {
-        "threshold": 400,
-        "scale": 50,
-        "lambda_": 0.05,
-        "gamma": 0.1,
-        # "err+": [50],
-        # "err-": [50],
-    }
+    return pd.Series(
+        {
+            "Threshold": 400,
+            "scale": 50,
+            "lambda_": 0.05,
+            "gamma": 0.1,
+            "err+": 50,
+            "err-": 50,
+        }
+    )
 
 
 #     if len(points):

@@ -37,6 +37,7 @@
 	// "forwardPorts": [],
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"onCreateCommand": "curl -sSL https://install.python-poetry.org | python3 -",
+	"postStartCommand": "poetry run python dashboard.py",
 	"postCreateCommand": "poetry update",
 	// "postCreateCommand": "pip3 install --user -r requirements.txt",
 	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
