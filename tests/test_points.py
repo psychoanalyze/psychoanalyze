@@ -1,8 +1,10 @@
 import psychoanalyze as pa
 import pandas as pd
+import psignifit as ps
 from scipy.special import expit
 import json
 import plotly.express as px
+import os
 
 
 def test_from_trials():
@@ -237,7 +239,25 @@ def test_to_block():
     assert set(block.index) <= {"Threshold", "Fixed Magnitude", "Dimension", "n Levels"}
 
 
-def test_fit():
+def test_fit_no_data(mocker):
+    stub = mocker.stub("psignifit")
     points = pd.DataFrame({"n": [], "Hits": [], "x": []})
     fit = pa.points.fit(points)
     assert {"Threshold", "err+", "err-"} <= set(fit.index.values)
+
+
+def test_fit_data(monkeypatch, tmp_path):
+    monkeypatch.setattr(
+        ps, "psignifit", lambda data, options: {"Fit": [None, None, None, None]}
+    )
+    points = pd.DataFrame({"n": [0], "Hits": [0], "x": [0]})
+    fit = pa.points.fit(points, save_to=tmp_path / "fit.csv")
+    assert set(fit.index.values) == {
+        "Threshold",
+        "width",
+        "gamma",
+        "lambda",
+        "err+",
+        "err-",
+    }
+    assert os.path.exists(tmp_path / "fit.csv")

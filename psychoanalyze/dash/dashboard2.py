@@ -47,16 +47,19 @@ def display_ref_stimulus_table(monkey, day):
 
 @app.callback(
     Output("psychometric-fig", "figure"),
+    Output("fitted-curve-fig", "figure"),
     Output("Threshold-value", "children"),
     Output("width-value", "children"),
     Output("gamma-value", "children"),
     Output("lambda-value", "children"),
+    Output("Threshold-err+", "children"),
+    Output("Threshold-err-", "children"),
     Input("monkey-select", "value"),
     Input("day-select", "value"),
     Input("ref-stimulus-table", "selected_rows"),
     Input("fit-button", "n_clicks"),
 )
-def display_selected_traces(monkey, day, row_numbers, n_clicks):
+def plot_selected_block(monkey, day, row_numbers, n_clicks):
     if row_numbers is None:
         points = pd.DataFrame({"x": [], "Hit Rate": []})
     else:
@@ -67,12 +70,25 @@ def display_selected_traces(monkey, day, row_numbers, n_clicks):
             points = data["Points"]
             points = blocks.join(points)
             if n_clicks:
-                fit = (1, 2, 3, 4)
-                return (pa.points.plot(points, trendline="ols"), *fit)
+                fit = pa.points.fit(points, save_to="data/fit.csv").values
+                return (
+                    pa.points.plot(points),
+                    pa.plot.psychometric_function(lambda_=fit[3], gamma=fit[2]),
+                    *fit,
+                )
         else:
             points = pd.DataFrame({"x": [], "Hit Rate": []})
     base_plot = pa.points.plot(points)
-    return base_plot, None, None, None, None
+    return (
+        base_plot,
+        pa.plot.psychometric_function(),
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+    )
 
 
 if __name__ == "__main__":

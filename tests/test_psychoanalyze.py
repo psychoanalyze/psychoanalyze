@@ -20,9 +20,14 @@ def test_weber():
 
 
 def test_psi():
-    expected_x = np.linspace(-3, 3)
-    expected_y = expit(expected_x)
-    dt.validate(pa.psi(), pd.Series(expected_y, index=expected_x))
+    x = np.linspace(-3, 3)
+    y = expit(x)
+    dt.validate(pa.psi(), pd.Series(y, index=x))
+
+
+def test_psi_nuisance_params():
+    s = pa.psi(lambda_=0.1, gamma=0.1)
+    assert all(s.values < 0.9) & all(s.values > 0.1)
 
 
 def test_curve_fit():

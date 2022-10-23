@@ -56,7 +56,25 @@ layout = dbc.Container(
                         html.Table(
                             children=[
                                 html.Tr(
-                                    [html.Td(param), html.Td(None, id=f"{param}-value")]
+                                    [
+                                        html.Th(param)
+                                        for param in [
+                                            "param",
+                                            "MAP fit",
+                                            "err+",
+                                            "err-",
+                                        ]
+                                    ]
+                                )
+                            ]
+                            + [
+                                html.Tr(
+                                    [
+                                        html.Td(param),
+                                        html.Td(id=f"{param}-value"),
+                                        html.Td(id=f"{param}-err+"),
+                                        html.Td(id=f"{param}-err-"),
+                                    ]
                                 )
                                 for param in [
                                     "Threshold",
@@ -71,7 +89,8 @@ layout = dbc.Container(
                     align="center",
                     width=2,
                 ),
-                dbc.Col(dcc.Graph(id="psychometric-fig"), width=8),
+                dbc.Col(dcc.Graph(id="psychometric-fig")),
+                dbc.Col(dcc.Graph(id="fitted-curve-fig")),
             ],
             justify="center",
         ),

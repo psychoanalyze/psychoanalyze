@@ -2,6 +2,7 @@ import plotly.express as px  # type: ignore
 import pandas as pd
 import psychoanalyze as pa
 from plotly import graph_objects as go
+import numpy as np
 
 axis_settings = {
     "ticks": "outside",
@@ -202,3 +203,8 @@ def ecdf(blocks):
     return px.ecdf(blocks.reset_index(), x="Threshold", color="Monkey").update_layout(
         xaxis_title="Threshold"
     )
+
+
+def psychometric_function(lambda_=0, gamma=0):
+    s = pa.psi(lambda_, gamma)
+    return px.line(s, template=pa.plot.template)

@@ -6,6 +6,7 @@ import psychoanalyze as pa
 from dash import dash_table  # type: ignore
 import pathlib
 from plotly import graph_objects as go
+import psignifit as ps
 
 
 def from_trials(trials):
@@ -57,30 +58,37 @@ def model():
 #     return _model.sample(chains=4, data=ready_for_fit)
 
 
-def fit(points):
-    return pd.Series(
-        {
-            "Threshold": 400,
-            "scale": 50,
-            "lambda_": 0.05,
-            "gamma": 0.1,
-            "err+": 50,
-            "err-": 50,
-        }
-    )
+def fit(points, save_to=None):
+    points = points[["x", "Hits", "n"]]
+    if len(points):
 
-
-#     if len(points):
-#         options = {"expType": "YesNo"}
-#         data = points.to_numpy()
-#         result = ps.psignifit(data, options)
-#         return {
-#             "Threshold": result["Fit"][0],
-#             "width": result["Fit"][1],
-#             "gamma": result["Fit"][2],
-#             "lambda": result["Fit"][3],
-#             "beta": result["Fit"][4],
-#         }
+        options = {"expType": "YesNo"}
+        data = points.to_numpy()
+        fit = ps.psignifit(data, options)
+        s = pd.Series(
+            {
+                "Threshold": fit["Fit"][0],
+                "width": fit["Fit"][1],
+                "gamma": fit["Fit"][2],
+                "lambda": fit["Fit"][3],
+                "err+": None,
+                "err-": None,
+            }
+        )
+        if save_to:
+            s.to_csv(save_to)
+        return s
+    else:
+        return pd.Series(
+            {
+                "Threshold": None,
+                "width": None,
+                "lambda": None,
+                "gamma": None,
+                "err+": None,
+                "err-": None,
+            }
+        )
 
 
 def plot(points, trendline=None):
