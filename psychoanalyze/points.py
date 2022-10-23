@@ -88,6 +88,7 @@ def plot(points):
         points.reset_index(),
         x="x",
         y="Hit Rate",
+        size="n",
         color=points.get("Monkey"),
         template="plotly_white",
     )
