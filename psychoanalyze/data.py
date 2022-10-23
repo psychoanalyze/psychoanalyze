@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import List
 import pandas as pd
 import numpy as np
@@ -94,9 +95,10 @@ def filter(df, dim):
     return df[df["Dimension"] == dim]
 
 
-def load(tmp_path):
+def load(data_dir=Path("data"), monkey=None, day=None):
     return {
-        "Sessions": pa.sessions.load(tmp_path),
-        "Subjects": pa.subjects.load(tmp_path),
-        "Blocks": pa.blocks.load(tmp_path),
+        "Sessions": pa.sessions.load(data_dir),
+        "Subjects": pa.subjects.load(data_dir),
+        "Blocks": pa.blocks.load(data_dir, monkey=monkey, day=day),
+        "Points": pa.points.load(data_dir),
     }

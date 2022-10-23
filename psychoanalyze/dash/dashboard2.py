@@ -6,90 +6,7 @@ import plotly.express as px
 
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
-app.layout = dbc.Container(
-    [
-        html.H1("PsychoAnalyze"),
-        dbc.Row(
-            [
-                dbc.Col(
-                    [
-                        dbc.RadioItems(
-                            options=[
-                                {"label": monkey, "value": monkey}
-                                for monkey in ["U", "Y", "Z"]
-                            ],
-                            value="Z",
-                            inline=True,
-                            id="monkey-select",
-                        ),
-                        dbc.RadioItems(
-                            options=[
-                                {"label": dim, "value": dim} for dim in ["Amp", "PW"]
-                            ],
-                            value="Amp",
-                            inline=True,
-                            id="dim-select",
-                        ),
-                    ]
-                ),
-                dbc.Col(
-                    [
-                        html.P(id="day-display"),
-                        dcc.Slider(
-                            step=None,
-                            marks={"": ""},
-                            id="day-select",
-                        ),
-                    ],
-                    width=8,
-                ),
-            ]
-        ),
-        dash_table.DataTable(
-            id="ref-stimulus-table", row_selectable="single", selected_rows=[0]
-        ),
-        dbc.Row(
-            [
-                dbc.Col(
-                    [
-                        dbc.Button(
-                            "Fit Curve",
-                            id="fit-button",
-                            n_clicks=0,
-                        ),
-                        html.Table(
-                            children=[
-                                html.Tr(
-                                    [html.Td("Threshold"), html.Td(id="threshold")]
-                                ),
-                                html.Tr(
-                                    [
-                                        html.Td("width", id="width"),
-                                    ]
-                                ),
-                                html.Tr(
-                                    [
-                                        html.Td("gamma", id="gamma"),
-                                    ]
-                                ),
-                                html.Tr(
-                                    [
-                                        html.Td("lambda", id="lambda"),
-                                    ]
-                                ),
-                            ],
-                            id="fit-table",
-                        ),
-                    ],
-                    align="center",
-                    width=2,
-                ),
-                dbc.Col(dcc.Graph(id="psychometric-fig"), width=8),
-            ],
-            justify="center",
-        ),
-    ]
-)
+app.layout = pa.dash.layout
 
 
 @app.callback(
@@ -130,6 +47,10 @@ def display_ref_stimulus_table(monkey, day):
 
 @app.callback(
     Output("psychometric-fig", "figure"),
+    Output("Threshold-value", "children"),
+    Output("width-value", "children"),
+    Output("gamma-value", "children"),
+    Output("lambda-value", "children"),
     Input("monkey-select", "value"),
     Input("day-select", "value"),
     Input("ref-stimulus-table", "selected_rows"),
@@ -140,16 +61,18 @@ def display_selected_traces(monkey, day, row_numbers, n_clicks):
         points = pd.DataFrame({"x": [], "Hit Rate": []})
     else:
         if len(row_numbers):
-            blocks = pa.blocks.load(monkey=monkey, day=day)
+            data = pa.data.load(monkey=monkey, day=day)
+            blocks = data["Blocks"]
             blocks = blocks.iloc[row_numbers]
-            points = pa.points.load()
+            points = data["Points"]
             points = blocks.join(points)
             if n_clicks:
-                return pa.points.plot(points, trendline="ols")
+                fit = (1, 2, 3, 4)
+                return (pa.points.plot(points, trendline="ols"), *fit)
         else:
             points = pd.DataFrame({"x": [], "Hit Rate": []})
     base_plot = pa.points.plot(points)
-    return base_plot
+    return base_plot, None, None, None, None
 
 
 if __name__ == "__main__":
