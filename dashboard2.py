@@ -57,7 +57,29 @@ app.layout = dbc.Container(
                             id="fit-button",
                             n_clicks=0,
                         ),
-                        html.P(id="threshold"),
+                        html.Table(
+                            children=[
+                                html.Tr(
+                                    [html.Td("Threshold"), html.Td(id="threshold")]
+                                ),
+                                html.Tr(
+                                    [
+                                        html.Td("width", id="width"),
+                                    ]
+                                ),
+                                html.Tr(
+                                    [
+                                        html.Td("gamma", id="gamma"),
+                                    ]
+                                ),
+                                html.Tr(
+                                    [
+                                        html.Td("lambda", id="lambda"),
+                                    ]
+                                ),
+                            ],
+                            id="fit-table",
+                        ),
                     ],
                     align="center",
                     width=2,
