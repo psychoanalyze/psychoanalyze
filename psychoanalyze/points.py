@@ -83,14 +83,15 @@ def fit(points):
 #         }
 
 
-def plot(points):
+def plot(points, trendline=None):
     return px.scatter(
         points.reset_index(),
         x="x",
         y="Hit Rate",
         size="n",
         color=points.get("Monkey"),
-        template="plotly_white",
+        template=pa.plot.template,
+        trendline=trendline,
     )
 
 

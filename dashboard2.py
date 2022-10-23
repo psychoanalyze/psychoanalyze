@@ -123,19 +123,10 @@ def display_selected_traces(monkey, day, row_numbers, n_clicks):
             points = pa.points.load()
             points = blocks.join(points)
             if n_clicks:
-                return px.scatter(
-                    points,
-                    x="x",
-                    y="Hit Rate",
-                    size="n",
-                    template=pa.plot.template,
-                    trendline="ols",
-                )
+                return pa.points.plot(points, trendline="ols")
         else:
             points = pd.DataFrame({"x": [], "Hit Rate": []})
-    base_plot = px.scatter(
-        points, x="x", y="Hit Rate", size="n", template=pa.plot.template
-    )
+    base_plot = pa.points.plot(points)
     return base_plot
 
 
