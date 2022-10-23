@@ -12,15 +12,25 @@ app.layout = dbc.Container(
         dbc.Row(
             [
                 dbc.Col(
-                    dbc.RadioItems(
-                        options=[
-                            {"label": monkey, "value": monkey}
-                            for monkey in ["U", "Y", "Z"]
-                        ],
-                        value="Z",
-                        inline=True,
-                        id="monkey",
-                    )
+                    [
+                        dbc.RadioItems(
+                            options=[
+                                {"label": monkey, "value": monkey}
+                                for monkey in ["U", "Y", "Z"]
+                            ],
+                            value="Z",
+                            inline=True,
+                            id="monkey-select",
+                        ),
+                        dbc.RadioItems(
+                            options=[
+                                {"label": dim, "value": dim} for dim in ["Amp", "PW"]
+                            ],
+                            value="Amp",
+                            inline=True,
+                            id="dim-select",
+                        ),
+                    ]
                 ),
                 dbc.Col(
                     [
@@ -52,7 +62,7 @@ app.layout = dbc.Container(
                     align="center",
                     width=2,
                 ),
-                dbc.Col(dcc.Graph(id="psycho"), width=8),
+                dbc.Col(dcc.Graph(id="psychometric-fig"), width=8),
             ],
             justify="center",
         ),
@@ -63,7 +73,7 @@ app.layout = dbc.Container(
 @app.callback(
     Output("day-select", "marks"),
     Output("day-select", "value"),
-    Input("monkey", "value"),
+    Input("monkey-select", "value"),
 )
 def day_marks(monkey):
     sessions = pa.sessions.load(monkey=monkey)
@@ -84,7 +94,7 @@ def display_day(day):
 
 @app.callback(
     Output("ref-stimulus-table", "data"),
-    Input("monkey", "value"),
+    Input("monkey-select", "value"),
     Input("day-select", "value"),
 )
 def display_ref_stimulus_table(monkey, day):
@@ -97,8 +107,8 @@ def display_ref_stimulus_table(monkey, day):
 
 
 @app.callback(
-    Output("psycho", "figure"),
-    Input("monkey", "value"),
+    Output("psychometric-fig", "figure"),
+    Input("monkey-select", "value"),
     Input("day-select", "value"),
     Input("ref-stimulus-table", "selected_rows"),
     Input("fit-button", "n_clicks"),
@@ -112,32 +122,21 @@ def display_selected_traces(monkey, day, row_numbers, n_clicks):
             blocks = blocks.iloc[row_numbers]
             points = pa.points.load()
             points = blocks.join(points)
+            if n_clicks:
+                return px.scatter(
+                    points,
+                    x="x",
+                    y="Hit Rate",
+                    size="n",
+                    template=pa.plot.template,
+                    trendline="ols",
+                )
         else:
             points = pd.DataFrame({"x": [], "Hit Rate": []})
     base_plot = px.scatter(
         points, x="x", y="Hit Rate", size="n", template=pa.plot.template
     )
     return base_plot
-
-
-@app.callback(
-    Output("threshold", "children"),
-    State("monkey", "value"),
-    State("day-select", "value"),
-    State("ref-stimulus-table", "selected_rows"),
-    Input("fit-button", "n_clicks"),
-)
-def fit_single_block(monkey, day, block, n_clicks):
-    blocks = pa.blocks.load(monkey=monkey, day=day)
-    blocks = blocks.iloc[block]
-    points = pa.points.load()
-    points = blocks.join(points)
-    if n_clicks:
-        fit = pa.points.fit(points)
-        return fit["threshold"]
-        # trace = pa.data.logistic(**fit)
-        # fit_plot = px.line(trace)
-        # return pa.points.combine_plots(pa.points.plot(points), fit_plot)
 
 
 if __name__ == "__main__":
