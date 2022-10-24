@@ -63,4 +63,4 @@ def n_trials(sessions, trials):
 
 
 def load_cached(data_dir):
-    return pd.read_csv(data_dir / "sessions.csv")
+    return pd.read_csv(data_dir / "sessions.csv", index_col=["Monkey", "Date"])

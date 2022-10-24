@@ -97,7 +97,7 @@ def filter(df, dim):
 
 def load(data_dir=Path("data"), monkey=None, day=None):
     return {
-        "Sessions": pa.sessions.load(data_dir),
+        "Sessions": pa.sessions.load_cached(data_dir),
         "Subjects": pa.subjects.load(data_dir),
         "Blocks": pa.blocks.load(data_dir, monkey=monkey, day=day),
         "Points": pa.points.load(data_dir),

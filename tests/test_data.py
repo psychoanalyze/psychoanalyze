@@ -71,5 +71,8 @@ def test_data_load(tmp_path):
         {"Surgery Date": pd.to_datetime(["1999-12-31"])},
         index=pd.Index(["U"], name="Monkey"),
     ).to_csv(tmp_path / "subjects.csv")
+    pd.DataFrame({"Monkey": ["U"], "Date": ["2000-01-01"]}).to_csv(
+        tmp_path / "sessions.csv"
+    )
     data = pa.data.load(tmp_path)
     assert data.keys() == {"Subjects", "Sessions", "Blocks", "Points"}
