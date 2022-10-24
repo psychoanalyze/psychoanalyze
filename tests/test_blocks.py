@@ -254,3 +254,11 @@ def test_blocks_day(tmp_path):
 def test_n_trials(three_trials):
     trials = three_trials
     assert pa.blocks.n_trials(trials).iloc[0] == 3
+
+
+def test_read_fit(tmp_path):
+    pd.DataFrame({"Threshold": [0], "width": [1], "gamma": [0], "lambda": [0]}).to_csv(
+        tmp_path / "fit.csv", index=False
+    )
+    fit = pa.blocks.read_fit(tmp_path / "fit.csv")
+    assert set(fit.columns) == {"Threshold", "width", "gamma", "lambda", "err+", "err-"}

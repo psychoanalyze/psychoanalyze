@@ -1,8 +1,10 @@
-from dash import Dash, dcc, html, Output, Input, State, dash_table
+from dash import Dash, Output, Input
 import dash_bootstrap_components as dbc
 import psychoanalyze as pa
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
+import os
 
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
@@ -40,14 +42,25 @@ def display_ref_stimulus_table(monkey, day):
     blocks = pa.blocks.load(monkey=monkey, day=day)
     return (
         blocks.reset_index()
-        .drop(columns=["Monkey", "Date", "Dimension", "n Levels", "Day"])
+        .drop(
+            columns=[
+                "Monkey",
+                "Date",
+                "Dimension",
+                "n Levels",
+                "Day",
+                "Amp2",
+                "Width2",
+                "Freq2",
+                "Dur2",
+            ]
+        )
         .to_dict("records")
     )
 
 
 @app.callback(
     Output("psychometric-fig", "figure"),
-    Output("fitted-curve-fig", "figure"),
     Output("Threshold-value", "children"),
     Output("width-value", "children"),
     Output("gamma-value", "children"),
@@ -69,11 +82,38 @@ def plot_selected_block(monkey, day, row_numbers, n_clicks):
             blocks = blocks.iloc[row_numbers]
             points = data["Points"]
             points = blocks.join(points)
+            if os.path.exists("data/fit.csv"):
+                fit = pa.blocks.read_fit("data/fit.csv")
+                threshold = fit["Threshold"][0]
+                width = fit["width"][0]
+                gamma = fit["gamma"][0]
+                lambda_ = fit["lambda"][0]
+                x_range = (points["x"].min(), points["x"].max())
+                fig = go.Figure(
+                    data=pa.points.plot(points).data
+                    + pa.plot.psychometric(
+                        threshold=threshold,
+                        width=width,
+                        lambda_=lambda_,
+                        gamma=gamma,
+                        x_range=x_range,
+                    ).data,
+                    layout_template=pa.plot.template,
+                )
+                return (
+                    fig,
+                    f"{threshold: .2f}",
+                    f"{width: .2f}",
+                    f"{gamma: .2f}",
+                    f"{lambda_: .2f}",
+                    None,
+                    None,
+                )
             if n_clicks:
                 fit = pa.points.fit(points, save_to="data/fit.csv").values
                 return (
                     pa.points.plot(points),
-                    pa.plot.psychometric_function(lambda_=fit[3], gamma=fit[2]),
+                    pa.plot.psychometric(lambda_=fit[3], gamma=fit[2]),
                     *fit,
                 )
         else:
@@ -81,11 +121,8 @@ def plot_selected_block(monkey, day, row_numbers, n_clicks):
     base_plot = pa.points.plot(points)
     return (
         base_plot,
-        pa.plot.psychometric_function(),
-        None,
-        None,
-        None,
-        None,
+        px.line(),
+        *(None, None, None, None),
         None,
         None,
     )

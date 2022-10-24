@@ -76,7 +76,7 @@ def fit(points, save_to=None):
             }
         )
         if save_to:
-            s.to_csv(save_to)
+            s.to_frame().T.to_csv(save_to, index=False)
         return s
     else:
         return pd.Series(

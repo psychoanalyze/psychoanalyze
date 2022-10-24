@@ -41,9 +41,6 @@ layout = dbc.Container(
                 ),
             ]
         ),
-        dash_table.DataTable(
-            id="ref-stimulus-table", row_selectable="single", selected_rows=[0]
-        ),
         dbc.Row(
             [
                 dbc.Col(
@@ -87,10 +84,15 @@ layout = dbc.Container(
                         ),
                     ],
                     align="center",
-                    width=2,
+                ),
+                dbc.Col(
+                    dash_table.DataTable(
+                        id="ref-stimulus-table",
+                        row_selectable="single",
+                        selected_rows=[0],
+                    ),
                 ),
                 dbc.Col(dcc.Graph(id="psychometric-fig")),
-                dbc.Col(dcc.Graph(id="fitted-curve-fig")),
             ],
             justify="center",
         ),

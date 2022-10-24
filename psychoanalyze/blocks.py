@@ -160,3 +160,10 @@ def n_trials(trials):
             "Return Channels",
         ]
     )["Result"].count()
+
+
+def read_fit(path):
+    fits = pd.read_csv(path)
+    fits["err+"] = None
+    fits["err-"] = None
+    return fits

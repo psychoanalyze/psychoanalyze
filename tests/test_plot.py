@@ -127,5 +127,5 @@ def test_plot_counts_dim_facet():
 
 
 def test_psychometric_function():
-    psychometric_plot = pa.plot.psychometric_function()
+    psychometric_plot = pa.plot.psychometric()
     assert len(psychometric_plot.data) == 1

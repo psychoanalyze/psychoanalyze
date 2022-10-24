@@ -30,6 +30,12 @@ def test_psi_nuisance_params():
     assert all(s.values < 0.9) & all(s.values > 0.1)
 
 
+def test_psi_xrange():
+    s = pa.psi(x_range=(-5, 5))
+    assert s.index.values.min() == -5
+    assert s.index.values.max() == 5
+
+
 def test_curve_fit():
     points = pd.DataFrame({"Hit Rate": [0, 2], "x": [0, 2]})
     fit = pa.fit(points)
