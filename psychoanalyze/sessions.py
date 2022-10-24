@@ -1,3 +1,4 @@
+import os
 from typing import List
 import pandas as pd
 import pathlib
@@ -35,14 +36,17 @@ def cache():
 
 
 def load(data_path=pathlib.Path("data"), monkey=None):
-    trials = pa.trials.load(data_path)
-    if monkey:
-        trials = trials[trials.index.get_level_values("Monkey") == monkey]
-    sessions = (
-        trials.groupby(["Monkey", "Date"])[["Result"]]
-        .count()
-        .rename(columns={"Result": "n Trials"})
-    )
+    if os.path.exists(data_path / "sessions.csv"):
+        sessions = pd.read_csv(data_path / "sessions.csv")
+    else:
+        trials = pa.trials.load(data_path)
+        if monkey:
+            trials = trials[trials.index.get_level_values("Monkey") == monkey]
+        sessions = (
+            trials.groupby(["Monkey", "Date"])[["Result"]]
+            .count()
+            .rename(columns={"Result": "n Trials"})
+        )
     sessions["Day"] = days(sessions, pa.subjects.load(data_path))
     return sessions
 
@@ -56,3 +60,7 @@ def days(sessions: pd.DataFrame, subjects):
 
 def n_trials(sessions, trials):
     return trials.groupby(["Monkey", "Date"])[["Result"]].count()
+
+
+def load_cached(data_dir):
+    return pd.read_csv(data_dir / "sessions.csv")

@@ -1,3 +1,4 @@
+import pathlib
 import pandas as pd
 import pytest
 import datetime
@@ -88,28 +89,28 @@ def test_load_n_trials(tmp_path):
 
 
 def test_load(tmp_path):
-    pd.DataFrame(
-        {
-            "Monkey": [],
-            "Date": [],
-            "Amp2": [],
-            "Width2": [],
-            "Freq2": [],
-            "Dur2": [],
-            "Active Channels": [],
-            "Return Channels": [],
-            "Amp1": [],
-            "Width1": [],
-            "Freq1": [],
-            "Dur1": [],
-            "Result": [],
-        }
-    ).to_csv(tmp_path / "trials.csv")
+    session_index = ["Monkey", "Date"]
+    reference_stim = ["Amp2", "Width2", "Freq2", "Dur2"]
+    channel_config = ["Active Channels", "Return Channels"]
+    test_stim = ["Amp1", "Width1", "Freq1", "Dur1"]
+    index = session_index + reference_stim + channel_config + test_stim + ["Result"]
+    pd.DataFrame({field: [] for field in index}).to_csv(tmp_path / "trials.csv")
     pd.DataFrame(
         {"Surgery Date": ["2019-12-31"]}, index=pd.Index(["U"], name="Monkey")
     ).to_csv(tmp_path / "subjects.csv")
     sessions = pa.sessions.load(tmp_path)
     assert ptypes.is_datetime64_any_dtype(sessions.index.get_level_values("Date"))
+
+
+def test_load_cached(tmp_path):
+    pd.DataFrame({"Surgery Date": []}, index=pd.Index([], name="Monkey")).to_csv(
+        tmp_path / "subjects.csv"
+    )
+    pd.DataFrame({"Monkey": [], "Date": []}).set_index(["Monkey", "Date"]).to_csv(
+        tmp_path / "sessions.csv"
+    )
+    sessions = pa.sessions.load_cached(tmp_path)
+    sessions.to_dict() == pd.DataFrame({"Monkey": [], "Date": []}).to_dict()
 
 
 def test_load_monkey(tmp_path):

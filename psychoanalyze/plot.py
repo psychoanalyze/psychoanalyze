@@ -205,6 +205,6 @@ def ecdf(blocks):
     )
 
 
-def psychometric(threshold=0, width=0, lambda_=0, gamma=0, x_range=(-3, 3)):
-    s = pa.psi(threshold, width, lambda_, gamma, x_range)
+def psychometric(fit, x_range=(-3, 3)):
+    s = pa.psi(fit["Threshold"], fit["width"], fit["lambda"], fit["gamma"], x_range)
     return px.line(s, template=pa.plot.template)
