@@ -82,13 +82,13 @@ def plot_selected_block(monkey, day, row_numbers, n_clicks):
             blocks = blocks.iloc[row_numbers]
             points = data["Points"]
             points = blocks.join(points)
+            x_range = (points["x"].min(), points["x"].max())
             if os.path.exists("data/fit.csv"):
-                fit = pa.blocks.read_fit("data/fit.csv")
-                threshold = fit["Threshold"][0]
-                width = fit["width"][0]
-                gamma = fit["gamma"][0]
-                lambda_ = fit["lambda"][0]
-                x_range = (points["x"].min(), points["x"].max())
+                fit = pa.blocks.read_fit("data/fit.csv", blocks.index[0])
+                threshold = fit["Threshold"]
+                width = fit["width"]
+                gamma = fit["gamma"]
+                lambda_ = fit["lambda"]
                 fig = go.Figure(
                     data=pa.points.plot(points).data
                     + pa.plot.psychometric(
@@ -110,10 +110,21 @@ def plot_selected_block(monkey, day, row_numbers, n_clicks):
                     None,
                 )
             if n_clicks:
-                fit = pa.points.fit(points, save_to="data/fit.csv").values
+                fit = pa.points.fit(
+                    points, save_to="data/fit.csv", block=blocks.index[0]
+                ).values
                 return (
-                    pa.points.plot(points),
-                    pa.plot.psychometric(lambda_=fit[3], gamma=fit[2]),
+                    go.Figure(
+                        data=pa.points.plot(points).data
+                        + pa.plot.psychometric(
+                            threshold=fit[0],
+                            width=fit[1],
+                            lambda_=fit[3],
+                            gamma=fit[2],
+                            x_range=x_range,
+                        ).data,
+                        layout_template=pa.plot.template,
+                    ),
                     *fit,
                 )
         else:
@@ -121,7 +132,6 @@ def plot_selected_block(monkey, day, row_numbers, n_clicks):
     base_plot = pa.points.plot(points)
     return (
         base_plot,
-        px.line(),
         *(None, None, None, None),
         None,
         None,

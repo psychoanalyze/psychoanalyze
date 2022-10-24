@@ -174,10 +174,22 @@ def read_fit(path, block):
             "Dur2",
             "Active Channels",
             "Return Channels",
-            "Fixed Pulse Width",
         ],
         parse_dates=["Date"],
     )
     fits["err+"] = 0.0
     fits["err-"] = 0.0
-    return fits.loc[block]
+    if block in fits.index:
+        return fits.loc[block]
+    else:
+        return pd.Series(
+            {
+                "Threshold": 0.0,
+                "width": 1.0,
+                "gamma": 0.0,
+                "lambda": 0.0,
+                "err+": 0.0,
+                "err-": 0.0,
+            },
+            name=block,
+        )

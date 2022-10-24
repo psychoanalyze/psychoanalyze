@@ -261,14 +261,13 @@ def test_read_fit(tmp_path):
     pd.DataFrame(
         {
             "Monkey": ["U"],
-            "Date": ["2000-01-01"],
+            "Date": pd.to_datetime(["2000-01-01"]),
             "Amp2": [0],
             "Width2": [0],
             "Freq2": [0],
             "Dur2": [0],
             "Active Channels": [0],
             "Return Channels": [0],
-            "Fixed Pulse Width": [0],
             "Threshold": [0],
             "width": [1],
             "gamma": [0],
@@ -284,6 +283,6 @@ def test_read_fit(tmp_path):
             [0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
             dtype=float,
             index=["Threshold", "width", "gamma", "lambda", "err+", "err-"],
-            name=("U", pd.to_datetime("2000-01-01 00:00:00"), 0, 0, 0, 0, 0, 0, 0),
+            name=("U", "2000-01-01", 0, 0, 0, 0, 0, 0, 0),
         ),
     )

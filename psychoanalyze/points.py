@@ -58,26 +58,39 @@ def model():
 #     return _model.sample(chains=4, data=ready_for_fit)
 
 
-def fit(points, save_to=None):
+def fit(points, save_to=None, block=None):
     points = points[["x", "Hits", "n"]]
     if len(points):
 
         options = {"expType": "YesNo"}
         data = points.to_numpy()
         fit = ps.psignifit(data, options)
-        s = pd.Series(
+        fit = pd.DataFrame(
             {
-                "Threshold": fit["Fit"][0],
-                "width": fit["Fit"][1],
-                "gamma": fit["Fit"][2],
-                "lambda": fit["Fit"][3],
-                "err+": None,
-                "err-": None,
-            }
+                "Threshold": [fit["Fit"][0]],
+                "width": [fit["Fit"][1]],
+                "gamma": [fit["Fit"][2]],
+                "lambda": [fit["Fit"][3]],
+                "err+": [None],
+                "err-": [None],
+            },
+            index=pd.MultiIndex.from_tuples(
+                [block],
+                names=[
+                    "Monkey",
+                    "Date",
+                    "Amp2",
+                    "Width2",
+                    "Freq2",
+                    "Dur2",
+                    "Active Channels",
+                    "Return Channels",
+                ],
+            ),
         )
         if save_to:
-            s.to_frame().T.to_csv(save_to, index=False)
-        return s
+            fit.to_csv(save_to)
+        return fit
     else:
         return pd.Series(
             {

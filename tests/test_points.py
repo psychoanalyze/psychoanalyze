@@ -5,6 +5,7 @@ from scipy.special import expit
 import json
 import plotly.express as px
 import os
+import datetime
 
 
 def test_from_trials():
@@ -251,8 +252,12 @@ def test_fit_data(monkeypatch, tmp_path):
         ps, "psignifit", lambda data, options: {"Fit": [None, None, None, None]}
     )
     points = pd.DataFrame({"n": [0], "Hits": [0], "x": [0]})
-    fit = pa.points.fit(points, save_to=tmp_path / "fit.csv")
-    assert set(fit.index.values) == {
+    fit = pa.points.fit(
+        points,
+        save_to=tmp_path / "fit.csv",
+        block=("U", datetime.date(2000, 1, 1), 0, 0, 0, 0, 0, 0),
+    )
+    assert set(fit.columns) == {
         "Threshold",
         "width",
         "gamma",
@@ -260,4 +265,4 @@ def test_fit_data(monkeypatch, tmp_path):
         "err+",
         "err-",
     }
-    assert os.path.exists(tmp_path / "fit.csv")
+    assert "Date" in pd.read_csv(tmp_path / "fit.csv").columns
