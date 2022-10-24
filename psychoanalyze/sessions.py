@@ -62,5 +62,6 @@ def n_trials(sessions, trials):
     return trials.groupby(["Monkey", "Date"])[["Result"]].count()
 
 
-def load_cached(data_dir):
-    return pd.read_csv(data_dir / "sessions.csv", index_col=["Monkey", "Date"])
+def load_cached(data_dir, monkey=None):
+    sessions = pd.read_csv(data_dir / "sessions.csv", index_col=["Monkey", "Date"])
+    return sessions[sessions.index.get_level_values("Monkey") == monkey]

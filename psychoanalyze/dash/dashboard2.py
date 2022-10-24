@@ -1,3 +1,4 @@
+from pathlib import Path
 from dash import Dash, Output, Input
 import dash_bootstrap_components as dbc
 import psychoanalyze as pa
@@ -17,7 +18,7 @@ app.layout = pa.dash.layout
     Input("monkey-select", "value"),
 )
 def day_marks(monkey):
-    sessions = pa.sessions.load(monkey=monkey)
+    sessions = pa.sessions.load_cached(Path("data"), monkey=monkey)
     session_max_n_index = sessions["n Trials"].idxmax()
     day_value = sessions.loc[session_max_n_index, "Day"]
     day_marks = {
@@ -40,20 +41,23 @@ def display_day(day):
 )
 def display_ref_stimulus_table(monkey, day):
     blocks = pa.blocks.load(monkey=monkey, day=day)
+    session_cols = ["Monkey", "Date"]
+    ref_stim_cols = [
+        "Amp2",
+        "Width2",
+        "Freq2",
+        "Dur2",
+    ]
     return (
         blocks.reset_index()
         .drop(
-            columns=[
-                "Monkey",
-                "Date",
+            columns=session_cols
+            + [
                 "Dimension",
                 "n Levels",
                 "Day",
-                "Amp2",
-                "Width2",
-                "Freq2",
-                "Dur2",
             ]
+            + ref_stim_cols
         )
         .to_dict("records")
     )
@@ -94,16 +98,12 @@ def plot_selected_block(monkey, day, row_numbers, n_clicks):
                     ).data,
                     layout_template=pa.plot.template,
                 )
-                threshold = fit["Threshold"]
-                width = fit["width"]
-                gamma = fit["gamma"]
-                lambda_ = fit["lambda"]
                 return (
                     fig,
-                    f"{threshold: .2f}",
-                    f"{width: .2f}",
-                    f"{gamma: .2f}",
-                    f"{lambda_: .2f}",
+                    f'{fit["Threshold"]: .2f}',
+                    f'{fit["width"]: .2f}',
+                    f'{fit["gamma"]: .2f}',
+                    f'{fit["lambda"]: .2f}',
                     None,
                     None,
                 )
