@@ -81,10 +81,10 @@ def plot_selected_block(monkey, day, row_numbers, n_clicks):
         points = pd.DataFrame({"x": [], "Hit Rate": []})
     else:
         if len(row_numbers):
-            data = pa.data.load(monkey=monkey, day=day)
-            blocks = data["Blocks"]
+            session = {"Monkey": monkey, "Day": day}
+            blocks = pa.blocks.load(monkey=monkey, day=day)
             blocks = blocks.iloc[row_numbers]
-            points = data["Points"]
+            points = pa.points.load()
             points = blocks.join(points)
             x_range = (points["x"].min(), points["x"].max())
             if os.path.exists("data/fit.csv"):
