@@ -162,8 +162,22 @@ def n_trials(trials):
     )["Result"].count()
 
 
-def read_fit(path):
-    fits = pd.read_csv(path)
-    fits["err+"] = None
-    fits["err-"] = None
-    return fits
+def read_fit(path, block):
+    fits = pd.read_csv(
+        path,
+        index_col=[
+            "Monkey",
+            "Date",
+            "Amp2",
+            "Width2",
+            "Freq2",
+            "Dur2",
+            "Active Channels",
+            "Return Channels",
+            "Fixed Pulse Width",
+        ],
+        parse_dates=["Date"],
+    )
+    fits["err+"] = 0.0
+    fits["err-"] = 0.0
+    return fits.loc[block]

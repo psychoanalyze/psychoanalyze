@@ -257,8 +257,33 @@ def test_n_trials(three_trials):
 
 
 def test_read_fit(tmp_path):
-    pd.DataFrame({"Threshold": [0], "width": [1], "gamma": [0], "lambda": [0]}).to_csv(
-        tmp_path / "fit.csv", index=False
+    block = ("U", "2000-01-01", 0, 0, 0, 0, 0, 0, 0)
+    pd.DataFrame(
+        {
+            "Monkey": ["U"],
+            "Date": ["2000-01-01"],
+            "Amp2": [0],
+            "Width2": [0],
+            "Freq2": [0],
+            "Dur2": [0],
+            "Active Channels": [0],
+            "Return Channels": [0],
+            "Fixed Pulse Width": [0],
+            "Threshold": [0],
+            "width": [1],
+            "gamma": [0],
+            "lambda": [0],
+            "err+": [0],
+            "err-": [0],
+        }
+    ).to_csv(tmp_path / "fit.csv", index=False)
+    fit = pa.blocks.read_fit(path=tmp_path / "fit.csv", block=block)
+    pd.testing.assert_series_equal(
+        fit,
+        pd.Series(
+            [0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
+            dtype=float,
+            index=["Threshold", "width", "gamma", "lambda", "err+", "err-"],
+            name=("U", pd.to_datetime("2000-01-01 00:00:00"), 0, 0, 0, 0, 0, 0, 0),
+        ),
     )
-    fit = pa.blocks.read_fit(tmp_path / "fit.csv")
-    assert set(fit.columns) == {"Threshold", "width", "gamma", "lambda", "err+", "err-"}
