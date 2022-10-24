@@ -108,18 +108,12 @@ def plot_fits(df):
 
 def load(data_path=pathlib.Path("data"), monkey=None, day=None):
     blocks_path = data_path / "blocks.csv"
+    session_cols = ["Monkey", "Date"]
+    ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
+    channel_config = ["Active Channels", "Return Channels"]
     if os.path.exists(blocks_path):
         blocks = pd.read_csv(blocks_path, parse_dates=["Date"]).set_index(
-            [
-                "Monkey",
-                "Date",
-                "Amp2",
-                "Width2",
-                "Freq2",
-                "Dur2",
-                "Active Channels",
-                "Return Channels",
-            ]
+            session_cols + ref_stim_cols + channel_config
         )
         blocks["Day"] = days(blocks, pa.subjects.load(data_path))
         if monkey:
