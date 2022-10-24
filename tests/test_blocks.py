@@ -257,7 +257,7 @@ def test_n_trials(three_trials):
 
 
 def test_read_fit(tmp_path):
-    block = ("U", "2000-01-01", 0, 0, 0, 0, 0, 0, 0)
+    block = ("U", "2000-01-01", 0, 0, 0, 0, 0, 0)
     pd.DataFrame(
         {
             "Monkey": ["U"],
@@ -283,6 +283,6 @@ def test_read_fit(tmp_path):
             [0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
             dtype=float,
             index=["Threshold", "width", "gamma", "lambda", "err+", "err-"],
-            name=("U", "2000-01-01", 0, 0, 0, 0, 0, 0, 0),
+            name=("U", pd.to_datetime("2000-01-01"), 0, 0, 0, 0, 0, 0),
         ),
     )

@@ -42,12 +42,7 @@ def display_day(day):
 def display_ref_stimulus_table(monkey, day):
     blocks = pa.blocks.load(monkey=monkey, day=day)
     session_cols = ["Monkey", "Date"]
-    ref_stim_cols = [
-        "Amp2",
-        "Width2",
-        "Freq2",
-        "Dur2",
-    ]
+    ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
     return (
         blocks.reset_index()
         .drop(
@@ -81,7 +76,6 @@ def plot_selected_block(monkey, day, row_numbers, n_clicks):
         points = pd.DataFrame({"x": [], "Hit Rate": []})
     else:
         if len(row_numbers):
-            session = {"Monkey": monkey, "Day": day}
             blocks = pa.blocks.load(monkey=monkey, day=day)
             blocks = blocks.iloc[row_numbers]
             points = pa.points.load()
@@ -110,15 +104,12 @@ def plot_selected_block(monkey, day, row_numbers, n_clicks):
             if n_clicks:
                 fit = pa.points.fit(
                     points, save_to="data/fit.csv", block=blocks.index[0]
-                ).values
+                )
                 return (
                     go.Figure(
                         data=pa.points.plot(points).data
                         + pa.plot.psychometric(
-                            threshold=fit[0],
-                            width=fit[1],
-                            lambda_=fit[3],
-                            gamma=fit[2],
+                            fit=fit,
                             x_range=x_range,
                         ).data,
                         layout_template=pa.plot.template,

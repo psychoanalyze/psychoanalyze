@@ -142,33 +142,21 @@ def days(blocks, intervention_dates):
 
 
 def n_trials(trials):
-    return trials.groupby(
-        [
-            "Monkey",
-            "Date",
-            "Amp2",
-            "Width2",
-            "Freq2",
-            "Dur2",
-            "Active Channels",
-            "Return Channels",
-        ]
-    )["Result"].count()
+    session_cols = ["Monkey", "Date"]
+    ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
+    channel_config = ["Active Channels", "Return Channels"]
+    return trials.groupby(session_cols + ref_stim_cols + channel_config)[
+        "Result"
+    ].count()
 
 
 def read_fit(path, block):
+    session_cols = ["Monkey", "Date"]
+    ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
+    channel_config = ["Active Channels", "Return Channels"]
     fits = pd.read_csv(
         path,
-        index_col=[
-            "Monkey",
-            "Date",
-            "Amp2",
-            "Width2",
-            "Freq2",
-            "Dur2",
-            "Active Channels",
-            "Return Channels",
-        ],
+        index_col=session_cols + ref_stim_cols + channel_config,
         parse_dates=["Date"],
     )
     fits["err+"] = 0.0
@@ -176,14 +164,4 @@ def read_fit(path, block):
     if block in fits.index:
         return fits.loc[block]
     else:
-        return pd.Series(
-            {
-                "Threshold": 0.0,
-                "width": 1.0,
-                "gamma": 0.0,
-                "lambda": 0.0,
-                "err+": 0.0,
-                "err-": 0.0,
-            },
-            name=block,
-        )
+        return pd.Series()
