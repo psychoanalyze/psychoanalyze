@@ -83,24 +83,26 @@ def plot_selected_block(monkey, day, row_numbers, n_clicks):
             x_range = (points["x"].min(), points["x"].max())
             if os.path.exists("data/fit.csv"):
                 fit = pa.blocks.read_fit("data/fit.csv", blocks.index[0])
-
-                fig = go.Figure(
-                    data=pa.points.plot(points).data
-                    + pa.plot.psychometric(
-                        fit,
-                        x_range=x_range,
-                    ).data,
-                    layout_template=pa.plot.template,
-                )
-                return (
-                    fig,
-                    f'{fit["Threshold"]: .2f}',
-                    f'{fit["width"]: .2f}',
-                    f'{fit["gamma"]: .2f}',
-                    f'{fit["lambda"]: .2f}',
-                    None,
-                    None,
-                )
+                if len(fit):
+                    fig = go.Figure(
+                        data=pa.points.plot(points).data
+                        + pa.plot.psychometric(
+                            fit,
+                            x_range=x_range,
+                        ).data,
+                        layout_template=pa.plot.template,
+                    )
+                    return (
+                        fig,
+                        f'{fit["Threshold"]: .2f}',
+                        f'{fit["width"]: .2f}',
+                        f'{fit["gamma"]: .2f}',
+                        f'{fit["lambda"]: .2f}',
+                        None,
+                        None,
+                    )
+                else:
+                    return
             if n_clicks:
                 fit = pa.points.fit(
                     points, save_to="data/fit.csv", block=blocks.index[0]
