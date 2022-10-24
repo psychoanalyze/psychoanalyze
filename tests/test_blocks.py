@@ -155,25 +155,17 @@ def test_load_pre_fitted(tmp_path, blocks, three_trials):
     assert ptypes.is_datetime64_any_dtype(dates)
 
 
-def test_blocks_load_monkey(tmp_path, blocks):
-    pd.DataFrame(
-        {"Surgery Date": [datetime.date(2000, 12, 31)]},
-        index=pd.Index(["U"], name="Monkey"),
-    ).to_csv(tmp_path / "subjects.csv")
-    blocks.to_csv(tmp_path / "blocks.csv")
-    blocks = pa.blocks.load(tmp_path, monkey="U")
-    assert all(blocks.index.get_level_values("Monkey") == "U")
-
-
 def test_blocks_load_monkey_day(tmp_path, blocks):
-    pd.DataFrame(
+    subjects = pd.DataFrame(
         {"Surgery Date": [datetime.date(2000, 12, 31)]},
         index=pd.Index(["U"], name="Monkey"),
-    ).to_csv(tmp_path / "subjects.csv")
+    )
+    subjects.to_csv(tmp_path / "subjects.csv")
     blocks.to_csv(tmp_path / "blocks.csv")
-    blocks = pa.blocks.load(tmp_path, monkey="U", day=1)
+    blocks = pa.blocks.load(tmp_path, monkey="U", day=1, dim="Amp")
     assert all(blocks.index.get_level_values("Monkey") == "U")
     assert all(blocks["Day"] == 1)
+    assert all(blocks["Dimension"] == "Amp")
 
 
 def test_from_points_amp_dim():

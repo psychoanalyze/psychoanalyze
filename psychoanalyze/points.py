@@ -167,9 +167,9 @@ def combine_plots(fig1, fig2):
 def fixed_magnitude(points):
     dim = dimension(points)
     if dim == "Amp":
-        return 0
+        return points.index.get_level_values("Width1")[0]
     if dim == "Width":
-        return 0
+        return points.index.get_level_values("Amp1")[0]
 
 
 def n(points):

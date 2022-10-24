@@ -38,9 +38,10 @@ def display_day(day):
     Output("ref-stimulus-table", "data"),
     Input("monkey-select", "value"),
     Input("day-select", "value"),
+    Input("dim-select", "value"),
 )
-def display_ref_stimulus_table(monkey, day):
-    blocks = pa.blocks.load(monkey=monkey, day=day)
+def display_ref_stimulus_table(monkey, day, dim):
+    blocks = pa.blocks.load(monkey=monkey, day=day, dim=dim)
     session_cols = ["Monkey", "Date"]
     ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
     return (
@@ -102,7 +103,7 @@ def plot_selected_block(monkey, day, row_numbers, n_clicks):
                         None,
                     )
                 else:
-                    return
+                    return pa.points.plot(points), None, None, None, None, None, None
             if n_clicks:
                 fit = pa.points.fit(
                     points, save_to="data/fit.csv", block=blocks.index[0]

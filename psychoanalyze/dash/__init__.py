@@ -11,10 +11,19 @@ layout = dbc.Container(
                     [
                         dbc.RadioItems(
                             options=[
+                                {"label": "Detection", "value": "Detection"},
+                                {"label": "Discrimination", "value": "Discrimination"},
+                            ],
+                            value="Detection",
+                            inline=True,
+                            id="experiment-select",
+                        ),
+                        dbc.RadioItems(
+                            options=[
                                 {"label": monkey, "value": monkey}
                                 for monkey in ["U", "Y", "Z"]
                             ],
-                            value="Z",
+                            value="U",
                             inline=True,
                             id="monkey-select",
                         ),

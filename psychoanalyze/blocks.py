@@ -106,7 +106,7 @@ def plot_fits(df):
     return px.line(df.reset_index(), x=x, y=y)
 
 
-def load(data_path=pathlib.Path("data"), monkey=None, day=None):
+def load(data_path=pathlib.Path("data"), monkey=None, day=None, dim=None):
     blocks_path = data_path / "blocks.csv"
     session_cols = ["Monkey", "Date"]
     ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
