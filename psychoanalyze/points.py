@@ -4,23 +4,27 @@ import plotly.express as px  # type: ignore
 from scipy.stats import binom  # type: ignore
 import psychoanalyze as pa
 from dash import dash_table  # type: ignore
+import pathlib
+from plotly import graph_objects as go
 import psignifit as ps
 
 
 def from_trials(trials):
     trials = trials[trials["Result"].isin([0, 1])]
-    df = (
+    points = (
         trials.groupby(trials.index.names)["Result"]
         .agg(["count", "sum"])
         .rename(columns={"count": "n", "sum": "Hits"})
     )
-    df["x"] = df.index.get_level_values("Amp1")
-    return df
+    points["x"] = points.index.get_level_values("Amp1")
+    return points
 
 
-def load(trials_path="data/trials.csv"):
-    trials = pa.trials.load(trials_path)
-    return from_trials(trials)
+def load(data_path=pathlib.Path("data")):
+    trials = pa.trials.load(data_path)
+    points = from_trials(trials)
+    points["Hit Rate"] = points["Hits"] / points["n"]
+    return points
 
 
 def dimension(points):
@@ -54,32 +58,61 @@ def model():
 #     return _model.sample(chains=4, data=ready_for_fit)
 
 
-def fit(points):
-    pass
+def fit(points, save_to=None, block=None):
+    points = points[["x", "Hits", "n"]]
+    if len(points):
+
+        options = {"expType": "YesNo"}
+        data = points.to_numpy()
+        fit = ps.psignifit(data, options)
+        fit = pd.DataFrame(
+            {
+                "Threshold": [fit["Fit"][0]],
+                "width": [fit["Fit"][1]],
+                "gamma": [fit["Fit"][2]],
+                "lambda": [fit["Fit"][3]],
+                "err+": [None],
+                "err-": [None],
+            },
+            index=pd.MultiIndex.from_tuples(
+                [block],
+                names=[
+                    "Monkey",
+                    "Date",
+                    "Amp2",
+                    "Width2",
+                    "Freq2",
+                    "Dur2",
+                    "Active Channels",
+                    "Return Channels",
+                ],
+            ),
+        )
+        if save_to:
+            fit.to_csv(save_to)
+        return fit
+    else:
+        return pd.Series(
+            {
+                "Threshold": None,
+                "width": None,
+                "lambda": None,
+                "gamma": None,
+                "err+": None,
+                "err-": None,
+            }
+        )
 
 
-#     if len(points):
-#         options = {"expType": "YesNo"}
-#         data = points.to_numpy()
-#         result = ps.psignifit(data, options)
-#         return {
-#             "Threshold": result["Fit"][0],
-#             "width": result["Fit"][1],
-#             "gamma": result["Fit"][2],
-#             "lambda": result["Fit"][3],
-#             "beta": result["Fit"][4],
-#         }
-
-
-def plot(df):
-    df["Hit Rate"] = df["Hits"] / df["n"]
-    df["Amplitude (µA)"] = df.index.get_level_values("Amp1")
+def plot(points, trendline=None):
     return px.scatter(
-        df.reset_index(),
-        x="Amplitude (µA)",
+        points.reset_index(),
+        x="x",
         y="Hit Rate",
-        color=df.get("Monkey"),
-        template="plotly_white",
+        size="n",
+        color=points.get("Monkey"),
+        template=pa.plot.template,
+        trendline=trendline,
     )
 
 
@@ -128,17 +161,15 @@ def from_store(store_data):
 
 
 def combine_plots(fig1, fig2):
-    for trace in fig2.data:
-        fig1.add_trace(trace)
-    return fig1
+    return go.Figure(data=fig1.data + fig2.data)
 
 
 def fixed_magnitude(points):
     dim = dimension(points)
     if dim == "Amp":
-        return 0
+        return points.index.get_level_values("Width1")[0]
     if dim == "Width":
-        return 0
+        return points.index.get_level_values("Amp1")[0]
 
 
 def n(points):

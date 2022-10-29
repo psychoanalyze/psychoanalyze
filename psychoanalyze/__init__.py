@@ -14,6 +14,7 @@ from psychoanalyze import (
     amp,
     strength_duration,
     subjects,
+    dash,
 )
 
 pd.options.plotting.backend = "plotly"
@@ -35,6 +36,7 @@ __all__ = [
     "blocks",
     "strength_duration",
     "subjects",
+    "dash",
 ]
 
 # def curve(trials: pd.DataFrame) -> pd.Series:
@@ -48,11 +50,12 @@ def weber_coefficient(curves: pd.DataFrame) -> float:
     return 1
 
 
-def psi() -> pd.Series:
+def psi(threshold=0, slope=1, lambda_=0, gamma=0, x_range=(-3, 3)) -> pd.Series:
     """Basic sigmoid psychometric function psi (Ψ) = expit/logistic"""
-    expected_x = np.linspace(-3, 3)
-    expected_y = expit(expected_x)
-    return pd.Series(expected_y, index=expected_x)  # type: ignore
+    x = np.linspace(x_range[0], x_range[1])
+    y = gamma + (1 - lambda_ - gamma) * 1 / (1 + np.exp((-slope) * (x - threshold)))
+    # y = gamma + (1 - lambda_ - gamma) * expit(x)
+    return pd.Series(y, index=x)  # type: ignore
 
 
 def fit(points):

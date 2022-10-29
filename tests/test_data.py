@@ -26,33 +26,6 @@ def test_nonstandard_logistic_slope():
     assert max(s) < max(s_control)
 
 
-def test_fit_curve(mocker):
-    mocker.patch("cmdstanpy.CmdStanModel")
-    df = pd.DataFrame({"Amp1": [], "n": [], "Hits": []})
-    pa.points.fit(df)
-
-
-def test_mu_two_groups(mocker):
-    mocker.patch(
-        "psychoanalyze.points.fit",
-        return_value=pd.DataFrame(
-            {"5%": [1], "50%": [2], "95%": [3]}, index=pd.Index(["mu"])
-        ),
-    )
-    data = pd.DataFrame(
-        {
-            "x": [1, 2],
-            "n": [10, 10],
-            "Hits": [1, 9],
-            "Subject": ["A", "A"],
-            "Day": [1, 2],
-        }
-    )
-    output = data.groupby(["Subject", "Day"]).apply(pa.data.mu)
-    assert len(output) == 2
-    assert {"5%", "50%", "95%"} <= set(output.columns)
-
-
 def test_params():
     x = pd.Index([])
     fit = pd.DataFrame({"5%": [], "50%": [], "95%": []})
@@ -72,6 +45,34 @@ def test_construct_index(mocker):
     assert len(index) == len(x) * len(days)
 
 
-def test_data_load():
-    data = pa.data.load()
-    assert data.keys() == {"Subjects", "Sessions"}
+def test_data_load(tmp_path):
+    pd.DataFrame(
+        {"Trial ID": [1, 2, 3], "Result": [1] * 3},
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame(
+                {
+                    "Monkey": ["U"] * 3,
+                    "Date": pd.to_datetime(["2000-01-01"] * 3),
+                    "Amp2": [0] * 3,
+                    "Width2": [0] * 3,
+                    "Freq2": [0] * 3,
+                    "Dur2": [0] * 3,
+                    "Active Channels": [0] * 3,
+                    "Return Channels": [0] * 3,
+                    "Amp1": [2] * 3,
+                    "Width1": [0] * 3,
+                    "Freq1": [0] * 3,
+                    "Dur1": [0] * 3,
+                }
+            )
+        ),
+    ).to_csv(tmp_path / "trials.csv")
+    pd.DataFrame(
+        {"Surgery Date": pd.to_datetime(["1999-12-31"])},
+        index=pd.Index(["U"], name="Monkey"),
+    ).to_csv(tmp_path / "subjects.csv")
+    pd.DataFrame({"Monkey": ["U"], "Date": ["2000-01-01"]}).to_csv(
+        tmp_path / "sessions.csv"
+    )
+    data = pa.data.load(tmp_path)
+    assert data.keys() == {"Subjects", "Sessions", "Blocks", "Points"}

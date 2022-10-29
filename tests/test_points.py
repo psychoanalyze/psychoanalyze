@@ -1,8 +1,11 @@
 import psychoanalyze as pa
 import pandas as pd
+import psignifit as ps
 from scipy.special import expit
 import json
 import plotly.express as px
+import os
+import datetime
 
 
 def test_from_trials():
@@ -55,7 +58,7 @@ def test_both_dimensions():
 
 def test_plot():
     s = pd.DataFrame(
-        {"Hits": [], "n": [], "Hit Rate": []},
+        {"x": [], "n": [], "Hit Rate": []},
         index=pd.MultiIndex.from_frame(
             pd.DataFrame({level: [] for level in pa.schemas.points_index_levels})
         ),
@@ -63,7 +66,7 @@ def test_plot():
     )
     fig = pa.points.plot(s)
     assert fig.layout.yaxis.title.text == "Hit Rate"
-    assert fig.layout.xaxis.title.text == "Amplitude (µA)"
+    assert fig.layout.xaxis.title.text == "x"
 
 
 def test_generate():
@@ -76,10 +79,31 @@ def test_generate():
 
 
 def test_load(tmp_path):
+    pd.DataFrame(
+        {"Trial ID": [1, 2, 3], "Result": [1] * 3},
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame(
+                {
+                    "Monkey": ["U"] * 3,
+                    "Date": pd.to_datetime(["2000-01-01"] * 3),
+                    "Amp2": [0] * 3,
+                    "Width2": [0] * 3,
+                    "Freq2": [0] * 3,
+                    "Dur2": [0] * 3,
+                    "Active Channels": [0] * 3,
+                    "Return Channels": [0] * 3,
+                    "Amp1": [2] * 3,
+                    "Width1": [0] * 3,
+                    "Freq1": [0] * 3,
+                    "Dur1": [0] * 3,
+                }
+            )
+        ),
+    ).to_csv(tmp_path / "trials.csv")
     pd.DataFrame(pa.schemas.trials.example(0).reset_index()).to_csv(
         tmp_path / "points.csv", index_label=False
     )
-    points = pa.points.load(tmp_path / "points.csv")
+    points = pa.points.load(tmp_path)
     assert "n" in points.columns
 
 
@@ -139,23 +163,20 @@ def test_fit_prep():
 
 
 def test_no_dimension():
+    session_cols = ["Monkey", "Date"]
+    ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
+    channel_config = ["Active Channels", "Return Channels"]
+    test_stim_cols = ["Amp1", "Width1", "Freq1", "Dur1"]
     points = pd.DataFrame(
         {"n": [], "Hits": []},
         index=pd.MultiIndex.from_frame(
             pd.DataFrame(
                 {
-                    "Monkey": [],
-                    "Date": [],
-                    "Amp2": [],
-                    "Width2": [],
-                    "Freq2": [],
-                    "Dur2": [],
-                    "Active Channels": [],
-                    "Return Channels": [],
-                    "Amp1": [],
-                    "Width1": [],
-                    "Freq1": [],
-                    "Dur1": [],
+                    field: []
+                    for field in session_cols
+                    + ref_stim_cols
+                    + channel_config
+                    + test_stim_cols
                 }
             )
         ),
@@ -214,3 +235,31 @@ def test_to_block():
     )
     block = pa.points.to_block(points)
     assert set(block.index) <= {"Threshold", "Fixed Magnitude", "Dimension", "n Levels"}
+
+
+def test_fit_no_data(mocker):
+    stub = mocker.stub("psignifit")
+    points = pd.DataFrame({"n": [], "Hits": [], "x": []})
+    fit = pa.points.fit(points)
+    assert {"Threshold", "err+", "err-"} <= set(fit.index.values)
+
+
+def test_fit_data(monkeypatch, tmp_path):
+    monkeypatch.setattr(
+        ps, "psignifit", lambda data, options: {"Fit": [None, None, None, None]}
+    )
+    points = pd.DataFrame({"n": [0], "Hits": [0], "x": [0]})
+    fit = pa.points.fit(
+        points,
+        save_to=tmp_path / "fit.csv",
+        block=("U", datetime.date(2000, 1, 1), 0, 0, 0, 0, 0, 0),
+    )
+    assert set(fit.columns) == {
+        "Threshold",
+        "width",
+        "gamma",
+        "lambda",
+        "err+",
+        "err-",
+    }
+    assert "Date" in pd.read_csv(tmp_path / "fit.csv").columns

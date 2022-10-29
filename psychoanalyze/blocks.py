@@ -5,6 +5,7 @@ from scipy.special import logit, expit  # type: ignore
 import psychoanalyze as pa
 import plotly.express as px  # type: ignore
 import os
+import pathlib
 
 
 dims = ["Amp2", "Width2", "Freq1", "Dur1", "Active Channels", "Return Channels"]
@@ -105,27 +106,74 @@ def plot_fits(df):
     return px.line(df.reset_index(), x=x, y=y)
 
 
-def load(path=None):
-    if path is None:
-        path = "data/blocks.csv"
-    if os.path.exists(path):
-        return pd.read_csv(path).set_index(
-            [
-                "Monkey",
-                "Date",
-                "Amp2",
-                "Width2",
-                "Freq2",
-                "Dur2",
-                "Active Channels",
-                "Return Channels",
-            ]
-        )
+def load_cached(data_path):
+    session_cols = ["Monkey", "Date"]
+    ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
+    channel_config = ["Active Channels", "Return Channels"]
+    blocks = pd.read_csv(data_path / "blocks.csv", parse_dates=["Date"]).set_index(
+        session_cols + ref_stim_cols + channel_config
+    )
+    blocks["Day"] = days(blocks, pa.subjects.load(data_path))
+    return blocks
+
+
+def load(data_path=pathlib.Path("data"), monkey=None, day=None, dim=None):
+    blocks_path = data_path / "blocks.csv"
+    if os.path.exists(blocks_path):
+        blocks = load_cached(data_path)
+        if monkey:
+            if day:
+                blocks = blocks[blocks["Day"] == day]
+            else:
+                blocks = blocks.xs(monkey, drop_level=False)
+        blocks = blocks[blocks["n Levels"] > 1]
+        return blocks
     else:
-        blocks = from_trials(pa.trials.load())
-        blocks.to_csv(path)
+        blocks = from_trials(pa.trials.load(data_path))
+        blocks.to_csv(blocks_path)
         return blocks
 
 
 def fixed_magnitudes(points):
     return points.groupby(pa.schemas.block_index_levels).agg(pa.points.fixed_magnitude)
+
+
+def days(blocks, intervention_dates):
+    blocks = blocks.join(intervention_dates, on="Monkey")
+    days = (blocks.index.get_level_values("Date") - blocks["Surgery Date"]).dt.days
+    days.name = "Days"
+    return days
+
+
+def n_trials(trials):
+    session_cols = ["Monkey", "Date"]
+    ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
+    channel_config = ["Active Channels", "Return Channels"]
+    return trials.groupby(session_cols + ref_stim_cols + channel_config)[
+        "Result"
+    ].count()
+
+
+def read_fit(path, block):
+    session_cols = ["Monkey", "Date"]
+    ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
+    channel_config = ["Active Channels", "Return Channels"]
+    fits = pd.read_csv(
+        path,
+        index_col=session_cols + ref_stim_cols + channel_config,
+        parse_dates=["Date"],
+    )
+    fits["err+"] = 0.0
+    fits["err-"] = 0.0
+    if block in fits.index:
+        return fits.loc[block]
+    else:
+        return pd.Series()
+
+
+def experiment_type(blocks):
+    ref_stim = blocks.reset_index()[["Amp2", "Width2", "Freq2", "Dur2"]]
+    ref_charge = ref_stim["Amp2"] * ref_stim["Width2"]
+    blocks.loc[ref_charge == 0, "Experiment Type"] = "Detection"
+    blocks.loc[ref_charge != 0, "Experiment Type"] = "Discrimination"
+    return blocks["Experiment Type"]

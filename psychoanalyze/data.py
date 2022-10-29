@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import List
 import pandas as pd
 import numpy as np
@@ -50,8 +51,7 @@ def logistic(threshold=0, scale=1, gamma=0, lambda_=0):
     )
 
 
-def mu(points: pd.DataFrame):
-    fit = pa.points.fit(points)
+def mu(fit):
     df = fit.loc["mu", ["5%", "50%", "95%"]]  # type: ignore
     return df.T
 
@@ -95,5 +95,10 @@ def filter(df, dim):
     return df[df["Dimension"] == dim]
 
 
-def load():
-    return {"Sessions": pd.DataFrame(), "Subjects": pd.DataFrame()}
+def load(data_dir=Path("data"), monkey=None, day=None):
+    return {
+        "Sessions": pa.sessions.load_cached(data_dir),
+        "Subjects": pa.subjects.load(data_dir),
+        "Blocks": pa.blocks.load(data_dir, monkey=monkey, day=day),
+        "Points": pa.points.load(data_dir),
+    }

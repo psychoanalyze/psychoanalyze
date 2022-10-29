@@ -1,5 +1,9 @@
+import os
 from typing import List
 import pandas as pd
+import pathlib
+
+import psychoanalyze as pa
 
 
 dims = ["Monkey", "Date"]
@@ -31,10 +35,33 @@ def cache():
     )
 
 
-def load():
-    return pd.read_csv("data/normalized/sessions.csv", parse_dates=["Date"])
+def load(data_path=pathlib.Path("data"), monkey=None):
+    if os.path.exists(data_path / "sessions.csv"):
+        sessions = pd.read_csv(data_path / "sessions.csv")
+    else:
+        trials = pa.trials.load(data_path)
+        if monkey:
+            trials = trials[trials.index.get_level_values("Monkey") == monkey]
+        sessions = (
+            trials.groupby(["Monkey", "Date"])[["Result"]]
+            .count()
+            .rename(columns={"Result": "n Trials"})
+        )
+    sessions["Day"] = days(sessions, pa.subjects.load(data_path))
+    return sessions
 
 
-def days(sessions, subjects):
+def days(sessions: pd.DataFrame, subjects):
     df = sessions.join(subjects, on="Monkey")
-    return (pd.to_datetime(df["Date"]) - df["Surgery Date"]).dt.days
+    return (
+        pd.to_datetime(df.index.get_level_values("Date")) - df["Surgery Date"]
+    ).dt.days
+
+
+def n_trials(sessions, trials):
+    return trials.groupby(["Monkey", "Date"])[["Result"]].count()
+
+
+def load_cached(data_dir, monkey=None):
+    sessions = pd.read_csv(data_dir / "sessions.csv", index_col=["Monkey", "Date"])
+    return sessions[sessions.index.get_level_values("Monkey") == monkey]

@@ -1,7 +1,9 @@
 import pandas as pd
 
 
-def load():
+def load(data_path):
     return pd.read_csv(
-        "data/normalized/subjects.csv", index_col="Monkey", parse_dates=["Surgery Date"]
+        data_path / "subjects.csv",
+        index_col="Monkey",
+        parse_dates=["Surgery Date"],
     )

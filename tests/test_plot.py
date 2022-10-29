@@ -124,3 +124,10 @@ def test_plot_counts_dim_facet():
         {"Monkey": ["U", "U"], "Day": [1, 2], "Dimension": ["Amp", "Width"]}
     )
     figs = pa.plot.counts(sessions, dim="Amp")
+
+
+def test_psychometric_function():
+    psychometric_plot = pa.plot.psychometric(
+        {"Threshold": 0, "width": 1, "gamma": 0, "lambda": 0}
+    )
+    assert len(psychometric_plot.data) == 1
