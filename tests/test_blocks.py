@@ -1,10 +1,10 @@
-import psychoanalyze as pa
+import datetime
 import pandas as pd
+import pandas.api.types as ptypes
 import datatest as dt  # type: ignore
 import pytest
-import datetime
-import numpy as np
-import pandas.api.types as ptypes
+
+import psychoanalyze as pa
 
 
 @pytest.fixture
