@@ -3,21 +3,22 @@ from dash import Dash, Output, Input
 import dash_bootstrap_components as dbc
 import psychoanalyze as pa
 import pandas as pd
-import plotly.express as px
+import dashboard as db
 import plotly.graph_objects as go
 import os
 
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
-app.layout = pa.dash.layout
+app.layout = db.layout
 
 
 @app.callback(
     Output("day-select", "marks"),
     Output("day-select", "value"),
     Input("monkey-select", "value"),
+    Input("dim-select", "value"),
 )
-def day_marks(monkey):
+def day_marks(monkey, dim):
     sessions = pa.sessions.load_cached(Path("data"), monkey=monkey)
     session_max_n_index = sessions["n Trials"].idxmax()
     day_value = sessions.loc[session_max_n_index, "Day"]
@@ -49,7 +50,6 @@ def display_ref_stimulus_table(monkey, day, dim):
         .drop(
             columns=session_cols
             + [
-                "Dimension",
                 "n Levels",
                 "Day",
             ]

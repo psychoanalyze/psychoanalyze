@@ -278,3 +278,13 @@ def test_read_fit(tmp_path):
             name=("U", pd.to_datetime("2000-01-01"), 0, 0, 0, 0, 0, 0),
         ),
     )
+
+
+def test_experiment_type():
+    blocks = pd.DataFrame(
+        {"Amp2": [0, 1], "Width2": [0, 1], "Freq2": [0, 1], "Dur2": [0, 1]}
+    )
+    exp_type = pa.blocks.experiment_type(blocks)
+    pd.testing.assert_series_equal(
+        exp_type, pd.Series(["Detection", "Discrimination"], name="Experiment Type")
+    )

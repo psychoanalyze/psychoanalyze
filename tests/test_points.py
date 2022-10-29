@@ -163,23 +163,20 @@ def test_fit_prep():
 
 
 def test_no_dimension():
+    session_cols = ["Monkey", "Date"]
+    ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
+    channel_config = ["Active Channels", "Return Channels"]
+    test_stim_cols = ["Amp1", "Width1", "Freq1", "Dur1"]
     points = pd.DataFrame(
         {"n": [], "Hits": []},
         index=pd.MultiIndex.from_frame(
             pd.DataFrame(
                 {
-                    "Monkey": [],
-                    "Date": [],
-                    "Amp2": [],
-                    "Width2": [],
-                    "Freq2": [],
-                    "Dur2": [],
-                    "Active Channels": [],
-                    "Return Channels": [],
-                    "Amp1": [],
-                    "Width1": [],
-                    "Freq1": [],
-                    "Dur1": [],
+                    field: []
+                    for field in session_cols
+                    + ref_stim_cols
+                    + channel_config
+                    + test_stim_cols
                 }
             )
         ),

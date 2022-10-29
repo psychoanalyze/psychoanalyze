@@ -106,22 +106,26 @@ def plot_fits(df):
     return px.line(df.reset_index(), x=x, y=y)
 
 
-def load(data_path=pathlib.Path("data"), monkey=None, day=None, dim=None):
-    blocks_path = data_path / "blocks.csv"
+def load_cached(data_path):
     session_cols = ["Monkey", "Date"]
     ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
     channel_config = ["Active Channels", "Return Channels"]
+    blocks = pd.read_csv(data_path / "blocks.csv", parse_dates=["Date"]).set_index(
+        session_cols + ref_stim_cols + channel_config
+    )
+    blocks["Day"] = days(blocks, pa.subjects.load(data_path))
+    return blocks
+
+
+def load(data_path=pathlib.Path("data"), monkey=None, day=None, dim=None):
+    blocks_path = data_path / "blocks.csv"
     if os.path.exists(blocks_path):
-        blocks = pd.read_csv(blocks_path, parse_dates=["Date"]).set_index(
-            session_cols + ref_stim_cols + channel_config
-        )
-        blocks["Day"] = days(blocks, pa.subjects.load(data_path))
+        blocks = load_cached(data_path)
         if monkey:
             if day:
                 blocks = blocks[blocks["Day"] == day]
             else:
                 blocks = blocks.xs(monkey, drop_level=False)
-
         blocks = blocks[blocks["n Levels"] > 1]
         return blocks
     else:
@@ -165,3 +169,11 @@ def read_fit(path, block):
         return fits.loc[block]
     else:
         return pd.Series()
+
+
+def experiment_type(blocks):
+    ref_stim = blocks.reset_index()[["Amp2", "Width2", "Freq2", "Dur2"]]
+    ref_charge = ref_stim["Amp2"] * ref_stim["Width2"]
+    blocks.loc[ref_charge == 0, "Experiment Type"] = "Detection"
+    blocks.loc[ref_charge != 0, "Experiment Type"] = "Discrimination"
+    return blocks["Experiment Type"]
