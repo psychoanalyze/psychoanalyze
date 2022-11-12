@@ -1,10 +1,10 @@
 from pathlib import Path
-from dash import Dash, Output, Input
-import dash_bootstrap_components as dbc
+from dash import Dash, Output, Input  # type: ignore
+import dash_bootstrap_components as dbc  # type: ignore
 import psychoanalyze as pa
 import pandas as pd
 import dashboard as db
-import plotly.graph_objects as go
+import plotly.graph_objects as go  # type: ignore
 import os
 
 

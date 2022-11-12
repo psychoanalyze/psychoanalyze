@@ -1,9 +1,9 @@
 import psychoanalyze as pa
 import pandas as pd
-import psignifit as ps
-from scipy.special import expit
+import psignifit as ps  # type: ignore
+from scipy.special import expit  # type: ignore
 import json
-import plotly.express as px
+import plotly.express as px  # type: ignore
 import datetime
 
 

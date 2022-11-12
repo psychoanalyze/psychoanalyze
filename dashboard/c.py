@@ -1,6 +1,6 @@
-from dash import Dash, dcc
-import dash_bootstrap_components as dbc
-import plotly.express as px
+from dash import Dash, dcc  # type: ignore
+import dash_bootstrap_components as dbc  # type: ignore
+import plotly.express as px  # type: ignore
 import pandas as pd
 
 import psychoanalyze as pa
