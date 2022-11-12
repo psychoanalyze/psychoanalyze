@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from scipy.special import expit  # type: ignore
 from psychoanalyze import (
     schemas,
     sessions,

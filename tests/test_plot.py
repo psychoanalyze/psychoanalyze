@@ -108,7 +108,7 @@ def test_strength_duration_data_filters_dimension():
         }
     )
     fig = pa.plot.strength_duration(dim="Amp", plot_type="linear", data=df)
-    # assert len(fig.data) == 0
+    assert len(fig.data) == 1
 
 
 def test_plot_counts():
@@ -124,6 +124,7 @@ def test_plot_counts_dim_facet():
         {"Monkey": ["U", "U"], "Day": [1, 2], "Dimension": ["Amp", "Width"]}
     )
     figs = pa.plot.counts(sessions, dim="Amp")
+    assert len(figs.data)
 
 
 def test_psychometric_function():

@@ -2,7 +2,6 @@ import plotly.express as px  # type: ignore
 import pandas as pd
 import psychoanalyze as pa
 from plotly import graph_objects as go
-import numpy as np
 
 axis_settings = {
     "ticks": "outside",

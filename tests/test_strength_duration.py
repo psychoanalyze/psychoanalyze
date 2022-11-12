@@ -2,7 +2,6 @@ import pandas as pd
 import pytest
 
 import psychoanalyze as pa
-from psychoanalyze import blocks
 
 
 @pytest.fixture
@@ -66,7 +65,7 @@ def test_strength_duration_points_arg():
         ),
     )
     fig = pa.plot.strength_duration(points=points, dim="Amp", plot_type="inverse")
-
+    assert len(fig.data) == 1
     # what tables does this need?
     # how does the data need to be transformed?
     #
