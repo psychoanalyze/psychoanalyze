@@ -43,6 +43,7 @@ kaleido = "0.2.1"
 pre-commit = "^2.20.0"
 dash-daq = "^0.5.0"
 pandas-profiling = {extras = ["notebook"], version = "^3.3.0"}
+psignifit = {git = "https://github.com/wichmann-lab/python-psignifit.git"}
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.2.0"

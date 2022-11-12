@@ -1476,6 +1476,26 @@ python-versions = ">=3.6.2"
 wcwidth = "*"
 
 [[package]]
+name = "psignifit"
+version = "0.1"
+description = "toolbox for Bayesian psychometric function estimation"
+category = "main"
+optional = false
+python-versions = "*"
+develop = false
+
+[package.dependencies]
+matplotlib = "*"
+pytest = "*"
+scipy = "*"
+
+[package.source]
+type = "git"
+url = "https://github.com/wichmann-lab/python-psignifit.git"
+reference = "HEAD"
+resolved_reference = "a3a812a4ef2babb77b6c4408b58a6552cadcf2c0"
+
+[[package]]
 name = "psutil"
 version = "5.9.4"
 description = "Cross-platform lib for process and system monitoring in Python."
@@ -2219,7 +2239,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.8"
-content-hash = "879c565af24ce36028b6647776da17bb83481345ce1d825bd35f79294fb79637"
+content-hash = "55e8cb5fed51916e2d22ee1c6f38c0b8cd034db558ffd4e95c0f3ea596835813"
 
 [metadata.files]
 appnope = [
@@ -3081,6 +3101,7 @@ prompt-toolkit = [
     {file = "prompt_toolkit-3.0.32-py3-none-any.whl", hash = "sha256:24becda58d49ceac4dc26232eb179ef2b21f133fecda7eed6018d341766ed76e"},
     {file = "prompt_toolkit-3.0.32.tar.gz", hash = "sha256:e7f2129cba4ff3b3656bbdda0e74ee00d2f874a8bcdb9dd16f5fec7b3e173cae"},
 ]
+psignifit = []
 psutil = [
     {file = "psutil-5.9.4-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:c1ca331af862803a42677c120aff8a814a804e09832f166f226bfd22b56feee8"},
     {file = "psutil-5.9.4-cp27-cp27m-manylinux2010_i686.whl", hash = "sha256:68908971daf802203f3d37e78d3f8831b6d1014864d7a85937941bb35f09aefe"},
