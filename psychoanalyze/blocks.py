@@ -107,11 +107,9 @@ def plot_fits(df):
 
 
 def load_cached(data_path):
-    session_cols = ["Monkey", "Date"]
-    ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
     channel_config = ["Active Channels", "Return Channels"]
     blocks = pd.read_csv(data_path / "blocks.csv", parse_dates=["Date"]).set_index(
-        session_cols + ref_stim_cols + channel_config
+        pa.sessions.dims + pa.stimulus.ref_dims + channel_config
     )
     blocks["Day"] = days(blocks, pa.subjects.load(data_path))
     return blocks

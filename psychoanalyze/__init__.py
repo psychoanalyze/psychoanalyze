@@ -13,6 +13,7 @@ from psychoanalyze import (
     amp,
     strength_duration,
     subjects,
+    stimulus,
 )
 
 pd.options.plotting.backend = "plotly"
@@ -34,6 +35,7 @@ __all__ = [
     "blocks",
     "strength_duration",
     "subjects",
+    "stimulus",
 ]
 
 # def curve(trials: pd.DataFrame) -> pd.Series:

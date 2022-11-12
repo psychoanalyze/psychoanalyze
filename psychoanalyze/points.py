@@ -105,6 +105,7 @@ def fit(points, save_to=None, block=None):
 
 
 def plot(points, trendline=None):
+    points["Hit Rate"] = points["Hits"] / points["n"]
     return px.scatter(
         points.reset_index(),
         x="x",
