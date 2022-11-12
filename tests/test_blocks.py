@@ -1,33 +1,118 @@
-import psychoanalyze as pa
+import datetime
 import pandas as pd
+import pandas.api.types as ptypes
 import datatest as dt  # type: ignore
 import pytest
-import datetime
-import numpy as np
-import pandas.api.types as ptypes
+
+import psychoanalyze as pa
 
 
 @pytest.fixture
-def points_empty():
+def session_fields():
+    return ["Monkey", "Date"]
+
+
+@pytest.fixture
+def session_data():
+    return {
+        "Monkey": ["U"],
+        "Date": ["2022-01-01"],
+    }
+
+
+@pytest.fixture
+def session_data_3():
+    return {
+        "Monkey": ["U"] * 3,
+        "Date": [datetime.date(2000, 1, 1)] * 3,
+    }
+
+
+@pytest.fixture
+def ref_stim_fields():
+    return ["Amp2", "Width2", "Freq2", "Dur2"]
+
+
+@pytest.fixture
+def ref_stim_data():
+    return {
+        "Amp2": [0],
+        "Width2": [0],
+        "Freq2": [0],
+        "Dur2": [0],
+    }
+
+
+@pytest.fixture
+def ref_stim_data_3():
+    return {
+        "Amp2": [0] * 3,
+        "Width2": [0] * 3,
+        "Freq2": [0] * 3,
+        "Dur2": [0] * 3,
+    }
+
+
+@pytest.fixture
+def channel_config_fields():
+    return ["Active Channels", "Return Channels"]
+
+
+@pytest.fixture
+def channel_config_data():
+    return {
+        "Active Channels": [0],
+        "Return Channels": [0],
+    }
+
+
+@pytest.fixture
+def channel_config_data_3():
+    return {
+        "Active Channels": [0] * 3,
+        "Return Channels": [0] * 3,
+    }
+
+
+@pytest.fixture
+def test_stim_fields():
+    return ["Amp1", "Width1", "Freq1", "Dur1"]
+
+
+@pytest.fixture
+def test_stim_data_3():
+    return {
+        "Amp1": [2] * 3,
+        "Width1": [0] * 3,
+        "Freq1": [0] * 3,
+        "Dur1": [0] * 3,
+    }
+
+
+@pytest.fixture
+def block_fields(
+    session_fields, ref_stim_fields, channel_config_fields, test_stim_fields
+):
+    return session_fields + ref_stim_fields + channel_config_fields + test_stim_fields
+
+
+@pytest.fixture
+def block_data():
+    return {
+        "Threshold": [1],
+        "Dimension": ["Amp"],
+        "Fixed Magnitude": [0],
+        "n Levels": [8],
+        "Day": [1],
+    }
+
+
+@pytest.fixture
+def points_empty(block_fields):
     return pd.DataFrame(
         {"n": [], "Hits": []},
         index=pd.MultiIndex.from_frame(
-            pd.DataFrame(
-                {
-                    "Monkey": [],
-                    "Date": [],
-                    "Amp2": [],
-                    "Width2": [],
-                    "Freq2": [],
-                    "Dur2": [],
-                    "Active Channels": [],
-                    "Return Channels": [],
-                    "Amp1": [],
-                    "Width1": [],
-                    "Freq1": [],
-                    "Dur1": [],
-                }
-            )
+            pd.DataFrame({field: [] for field in block_fields})
         ),
     )
 
@@ -38,46 +123,22 @@ def path(tmp_path):
 
 
 @pytest.fixture
-def blocks():
-    return pd.DataFrame(
-        {
-            "Monkey": ["U"],
-            "Date": ["2022-01-01"],
-            "Amp2": [0],
-            "Width2": [0],
-            "Freq2": [0],
-            "Dur2": [0],
-            "Active Channels": [0],
-            "Return Channels": [0],
-            "Threshold": [1],
-            "Dimension": ["Amp"],
-            "Fixed Magnitude": [0],
-            "n Levels": [8],
-            "Day": [1],
-        }
-    )
+def blocks(session_data, ref_stim_data, channel_config_data, block_data):
+    return pd.DataFrame(session_data | ref_stim_data | channel_config_data | block_data)
 
 
 @pytest.fixture
-def three_trials():
+def three_trials(
+    session_data_3, ref_stim_data_3, channel_config_data_3, test_stim_data_3
+):
     return pd.DataFrame(
         {"Result": [1] * 3},
         index=pd.MultiIndex.from_frame(
             pd.DataFrame(
-                {
-                    "Monkey": ["U"] * 3,
-                    "Date": [datetime.date(2000, 1, 1)] * 3,
-                    "Amp2": [0] * 3,
-                    "Width2": [0] * 3,
-                    "Freq2": [0] * 3,
-                    "Dur2": [0] * 3,
-                    "Active Channels": [0] * 3,
-                    "Return Channels": [0] * 3,
-                    "Amp1": [2] * 3,
-                    "Width1": [0] * 3,
-                    "Freq1": [0] * 3,
-                    "Dur1": [0] * 3,
-                }
+                session_data_3
+                | ref_stim_data_3
+                | channel_config_data_3
+                | test_stim_data_3
             )
         ),
     )
@@ -122,18 +183,13 @@ def test_transform():
     pa.blocks.transform(pd.Series(), y="p")
 
 
-def test_from_points(points_empty):
+def test_from_points(
+    points_empty, session_fields, ref_stim_fields, channel_config_fields
+):
     blocks = pa.blocks.from_points(points_empty)
-    assert blocks.index.names == [
-        "Monkey",
-        "Date",
-        "Amp2",
-        "Width2",
-        "Freq2",
-        "Dur2",
-        "Active Channels",
-        "Return Channels",
-    ]
+    assert (
+        blocks.index.names == session_fields + ref_stim_fields + channel_config_fields
+    )
 
 
 def test_plot_fits():
@@ -175,12 +231,18 @@ def test_from_points_amp_dim():
             {
                 "Monkey": ["U"] * 2,
                 "Date": ["2020-01-01"] * 2,
+            }
+            | {
                 "Amp2": [0] * 2,
                 "Width2": [0] * 2,
                 "Freq2": [0] * 2,
                 "Dur2": [0] * 2,
+            }
+            | {
                 "Active Channels": [0] * 2,
                 "Return Channels": [0] * 2,
+            }
+            | {
                 "Amp1": [0, 1],
                 "Width1": [0] * 2,
                 "Freq1": [0] * 2,
@@ -196,12 +258,18 @@ def test_from_points_amp_dim():
             {
                 "Monkey": ["U"] * 2,
                 "Date": ["2020-01-01"] * 2,
+            }
+            | {
                 "Amp2": [0] * 2,
                 "Width2": [0] * 2,
                 "Freq2": [0] * 2,
                 "Dur2": [0] * 2,
+            }
+            | {
                 "Active Channels": [0] * 2,
                 "Return Channels": [0] * 2,
+            }
+            | {
                 "Amp1": [0] * 2,
                 "Width1": [0, 1],
                 "Freq1": [0] * 2,
@@ -224,10 +292,14 @@ def test_blocks_day(tmp_path):
             {
                 "Monkey": ["U"],
                 "Date": [datetime.date(2001, 1, 1)],
+            }
+            | {
                 "Amp2": [0],
                 "Width2": [0],
                 "Freq2": [0],
                 "Dur2": [0],
+            }
+            | {
                 "Active Channels": [0],
                 "Return Channels": [0],
             }
@@ -254,12 +326,18 @@ def test_read_fit(tmp_path):
         {
             "Monkey": ["U"],
             "Date": pd.to_datetime(["2000-01-01"]),
+        }
+        | {
             "Amp2": [0],
             "Width2": [0],
             "Freq2": [0],
             "Dur2": [0],
+        }
+        | {
             "Active Channels": [0],
             "Return Channels": [0],
+        }
+        | {
             "Threshold": [0],
             "width": [1],
             "gamma": [0],

@@ -10,9 +10,13 @@ blocks["Experiment Type"] = pa.blocks.experiment_type(blocks)
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 app.layout = dbc.Container(
-    dcc.Graph(figure=px.bar(blocks, x="Experiment Type", color="Monkey"))
+    dcc.Graph(
+        figure=px.bar(
+            blocks, x="Experiment Type", color="Monkey", template=pa.plot.template
+        )
+    )
 )
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(debug=True, port=8051)
