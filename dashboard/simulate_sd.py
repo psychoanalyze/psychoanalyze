@@ -1,9 +1,41 @@
+from typing import List
 from dash import Dash, dcc
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import pandas as pd
 
 import psychoanalyze as pa
+
+
+def sd_data_inverse(
+    x: List[float], xlabel: str, y: List[float], ylabel: str
+) -> pd.DataFrame:
+    return pd.DataFrame(
+        {
+            xlabel: x,
+            ylabel: y,
+            "Monkey": ["U"] * 2 + ["Y"] * 3,
+            "Day": [1, 1, 2, 2, 2],
+            "error_y": [50] * 5,
+            "error_y_minus": [50] * 5,
+        }
+    )
+
+
+def sd_data_linear(
+    x: List[float], xlabel: str, y: List[float], ylabel: str
+) -> pd.DataFrame:
+    return pd.DataFrame(
+        {
+            xlabel: x,
+            ylabel: y,
+            "Monkey": ["U"] * 2 + ["Y"] * 3,
+            "Day": [1, 1, 2, 2, 2],
+            "Dimension": ["Amp"] * 2 + ["Width"] * 3,
+            "error_y": [50] * 5,
+            "error_y_minus": [50] * 5,
+        }
+    )
 
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
@@ -15,19 +47,11 @@ app.layout = dbc.Container(
                 dbc.Col(
                     dcc.Graph(
                         figure=px.line(
-                            pd.DataFrame(
-                                {
-                                    "Fixed Pulse Width (μs)": list(
-                                        range(100, 600, 100)
-                                    ),
-                                    "Threshold Amplitude (μA)": list(
-                                        range(1000, 0, -200)
-                                    ),
-                                    "Monkey": ["U"] * 2 + ["Y"] * 3,
-                                    "Day": [1, 1, 2, 2, 2],
-                                    "error_y": [50] * 5,
-                                    "error_y_minus": [50] * 5,
-                                }
+                            sd_data_inverse(
+                                x=list(range(100, 600, 100)),
+                                xlabel="Fixed Pulse Width (μs)",
+                                y=list(range(1000, 0, -200)),
+                                ylabel="Threshold Amplitude (μA)",
                             ),
                             x="Fixed Pulse Width (μs)",
                             y="Threshold Amplitude (μA)",
@@ -36,23 +60,17 @@ app.layout = dbc.Container(
                             color="Monkey",
                             symbol="Day",
                             template=pa.plot.template,
-                        )
-                    ),
+                        ),
+                    )
                 ),
                 dbc.Col(
                     dcc.Graph(
                         figure=px.line(
-                            pd.DataFrame(
-                                {
-                                    "Fixed Amplitude (μA)": list(range(100, 1100, 200)),
-                                    "Threshold Pulse Width (μs)": list(
-                                        range(600, 100, -100)
-                                    ),
-                                    "Monkey": ["U"] * 2 + ["Y"] * 3,
-                                    "Day": [1, 1, 2, 2, 2],
-                                    "error_y": [50] * 5,
-                                    "error_y_minus": [50] * 5,
-                                }
+                            sd_data_inverse(
+                                x=list(range(100, 1100, 200)),
+                                xlabel="Fixed Amplitude (μA)",
+                                y=list(range(600, 100, -100)),
+                                ylabel="Threshold Pulse Width (μs)",
                             ),
                             x="Fixed Amplitude (μA)",
                             y="Threshold Pulse Width (μs)",
@@ -71,15 +89,11 @@ app.layout = dbc.Container(
                 dbc.Col(
                     dcc.Graph(
                         figure=px.line(
-                            pd.DataFrame(
-                                {
-                                    "Pulse Width (μs)": list(range(50, 500, 100)),
-                                    "Threshold Charge (nC)": list(range(50, 500, 100)),
-                                    "Dimension": ["Amp"] * 2 + ["Width"] * 3,
-                                    "Day": [1, 1, 2, 2, 2],
-                                    "error_y": [50] * 5,
-                                    "error_y_minus": [50] * 5,
-                                }
+                            sd_data_linear(
+                                x=list(range(100, 600, 100)),
+                                xlabel="Pulse Width (μs)",
+                                y=list(range(100, 600, 100)),
+                                ylabel="Threshold Charge (nC)",
                             ),
                             x="Pulse Width (μs)",
                             y="Threshold Charge (nC)",
@@ -94,15 +108,11 @@ app.layout = dbc.Container(
                 dbc.Col(
                     dcc.Graph(
                         figure=px.line(
-                            pd.DataFrame(
-                                {
-                                    "Pulse Width (μs)": list(range(50, 500, 100)),
-                                    "Threshold Charge (nC)": list(range(5, 50, 10)),
-                                    "Dimension": ["Amp"] * 2 + ["Width"] * 3,
-                                    "Day": [1, 1, 2, 2, 2],
-                                    "error_y": [5] * 5,
-                                    "error_y_minus": [5] * 5,
-                                }
+                            sd_data_linear(
+                                x=list(range(100, 600, 100)),
+                                xlabel="Pulse Width (μs)",
+                                y=list(range(100, 600, 100)),
+                                ylabel="Threshold Charge (nC)",
                             ),
                             x="Pulse Width (μs)",
                             y="Threshold Charge (nC)",
