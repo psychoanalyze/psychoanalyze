@@ -21,7 +21,8 @@ def test_weber():
 def test_psi():
     x = np.linspace(-3, 3)
     y = expit(x)
-    dt.validate(pa.psi(), pd.Series(y, index=x))
+    with dt.accepted.tolerance(0.001):
+        dt.validate(pa.psi(), pd.Series(y, index=x))
 
 
 def test_psi_nuisance_params():
