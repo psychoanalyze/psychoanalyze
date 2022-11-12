@@ -198,10 +198,10 @@ def counts(sessions, dim=None):
     ).update_layout(yaxis_title_text="# of Sessions")
 
 
-def ecdf(blocks):
-    return px.ecdf(blocks.reset_index(), x="Threshold", color="Monkey").update_layout(
-        xaxis_title="Threshold"
-    )
+def ecdf(blocks, param):
+    return px.ecdf(
+        blocks.reset_index(), x=param, color=blocks.get("Monkey")
+    ).update_layout(xaxis_title=param)
 
 
 def psychometric(fit, x_range=(-3, 3)):

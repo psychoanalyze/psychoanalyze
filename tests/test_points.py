@@ -57,7 +57,7 @@ def test_both_dimensions():
 
 def test_plot():
     s = pd.DataFrame(
-        {"x": [], "n": [], "Hit Rate": []},
+        {"x": [], "n": [], "Hits": []},
         index=pd.MultiIndex.from_frame(
             pd.DataFrame({level: [] for level in pa.schemas.points_index_levels})
         ),

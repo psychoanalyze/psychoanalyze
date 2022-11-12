@@ -132,3 +132,9 @@ def test_psychometric_function():
         {"Threshold": 0, "width": 1, "gamma": 0, "lambda": 0}
     )
     assert len(psychometric_plot.data) == 1
+
+
+def test_ecdf():
+    blocks = pd.DataFrame({"location": []})
+    ecdf_fig = pa.plot.ecdf(blocks, "location")
+    assert ecdf_fig.layout.xaxis.title.text == "location"
