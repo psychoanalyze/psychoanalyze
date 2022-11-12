@@ -6,7 +6,7 @@ import psychoanalyze as pa
 from dash import dash_table  # type: ignore
 import pathlib
 from plotly import graph_objects as go
-import psignifit as ps
+import psignifit as ps  # type: ignore
 
 
 def from_trials(trials):

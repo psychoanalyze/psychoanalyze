@@ -1,10 +1,9 @@
 import psychoanalyze as pa
 import pandas as pd
-import psignifit as ps
-from scipy.special import expit
+import psignifit as ps  # type: ignore
+from scipy.special import expit  # type: ignore
 import json
-import plotly.express as px
-import os
+import plotly.express as px  # type: ignore
 import datetime
 
 
@@ -238,7 +237,7 @@ def test_to_block():
 
 
 def test_fit_no_data(mocker):
-    stub = mocker.stub("psignifit")
+    mocker.stub("psignifit")
     points = pd.DataFrame({"n": [], "Hits": [], "x": []})
     fit = pa.points.fit(points)
     assert {"Threshold", "err+", "err-"} <= set(fit.index.values)

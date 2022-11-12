@@ -2,9 +2,9 @@ from dash import Dash, dcc, Input, Output, State  # type: ignore
 import dash_bootstrap_components as dbc  # type: ignore
 import psychoanalyze as pa
 from psychoanalyze.layout import simulation_tab, experiment_tab
-from scipy.special import expit
+from scipy.special import expit  # type: ignore
 import pathlib
-import plotly.express as px
+import plotly.express as px  # type: ignore
 
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])

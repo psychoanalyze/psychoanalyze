@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from scipy.special import expit  # type: ignore
 from psychoanalyze import (
     schemas,
     sessions,
@@ -14,7 +13,6 @@ from psychoanalyze import (
     amp,
     strength_duration,
     subjects,
-    dash,
 )
 
 pd.options.plotting.backend = "plotly"
@@ -36,7 +34,6 @@ __all__ = [
     "blocks",
     "strength_duration",
     "subjects",
-    "dash",
 ]
 
 # def curve(trials: pd.DataFrame) -> pd.Series:
