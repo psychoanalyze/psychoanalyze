@@ -61,3 +61,7 @@ filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore::FutureWarning"
 ]
+
+[tool.bandit]
+targets = ["psychoanalyze/"]
+skips = ["B311"]

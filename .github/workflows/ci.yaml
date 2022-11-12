@@ -19,24 +19,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
+    - uses: actions/checkout@v3
+    - name: Install Poetry
+      run: pipx install poetry
     - name: Install Python 3.10
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
-
-    - name: Install, configure Poetry
-      run: |
-        curl -sSL https://install.python-poetry.org | python3 -
-        poetry config virtualenvs.in-project true
+        cache: 'poetry'
 
 
     - name: Install package dependencies
-      run: |
-        poetry env use python3
-        poetry install --no-interaction
+      run: poetry install
 
     - name: Build documentation
       run: poetry run mkdocs build
