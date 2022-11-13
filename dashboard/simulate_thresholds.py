@@ -15,7 +15,10 @@ def monkey_thresholds(mean: float, sd: float, n: int, monkey: str) -> pd.DataFra
         {
             "Day": [random.uniform(0, 1000) for _ in range(n)],
             "Threshold": [random.gauss(mean, sd) for _ in range(n)],
+            "err_y_plus": [random.gauss(sd, sd / 2) for _ in range(n)],
+            "err_y_minus": [random.gauss(sd, sd / 2) for _ in range(n)],
             "Monkey": [monkey] * n,
+            "Channel": [random.choice([1, 2, 3, 4]) for _ in range(n)],
         }
     )
 
@@ -31,7 +34,10 @@ app.layout = dbc.Container(
             ),
             x="Day",
             y="Threshold",
+            error_y="err_y_plus",
+            error_y_minus="err_y_minus",
             color="Monkey",
+            symbol="Channel",
             template=pa.plot.template,
         )
     )

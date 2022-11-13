@@ -7,6 +7,7 @@ from dash import dash_table  # type: ignore
 import pathlib
 from plotly import graph_objects as go
 import psignifit as ps  # type: ignore
+import numpy as np
 
 
 def from_trials(trials):
@@ -185,4 +186,10 @@ def to_block(points):
             "Fixed Magnitude": fixed_magnitude(points),
             "n Levels": n(points),
         }
+    )
+
+
+def psi(x: np.ndarray, threshold: float, width: float, gamma: float, lambda_: float):
+    return gamma + (1 - gamma - lambda_) / (
+        1 + np.exp(-gamma * (x - threshold) / width) ** lambda_
     )
