@@ -17,7 +17,7 @@ layout = dbc.Container(
                 dbc.Label("Number of Blocks"),
                 dbc.Input(type="number", value=50, id="n"),
             ],
-            width="auto",
+            width=2,
         ),
         dbc.Row(
             [
