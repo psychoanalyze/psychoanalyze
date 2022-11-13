@@ -1,4 +1,5 @@
-from dash import Dash, dcc, dash_table, Output, Input
+from dash import dcc, dash_table, Output, Input, callback
+import dash
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import pandas as pd
@@ -7,14 +8,14 @@ import numpy as np
 import psychoanalyze as pa
 
 
-app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
+dash.register_page(__name__)
 
 index = pd.Index(np.arange(100.0, 600, 100), name="Amplitude")
 x = np.arange(100.0, 600, 100)
 y_observed = pa.points.psi(x, 300.0, 0.50, 0.1, 0.1)
 
 
-app.layout = dbc.Container(
+layout = dbc.Container(
     dbc.Row(
         [
             dbc.Col(
@@ -35,7 +36,7 @@ app.layout = dbc.Container(
 )
 
 
-@app.callback(
+@callback(
     Output("block", "figure"),
     Output("points", "data"),
     Input("threshold", "value"),
@@ -76,7 +77,3 @@ def update_block(threshold, width, lambda_, gamma, n):
         ),
         block_table.reset_index().to_dict("records"),
     )
-
-
-if __name__ == "__main__":
-    app.run_server(debug=True, port=8055)

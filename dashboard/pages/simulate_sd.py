@@ -1,10 +1,14 @@
 from typing import List
-from dash import Dash, dcc
+from dash import dcc
+import dash
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import pandas as pd
 
 import psychoanalyze as pa
+
+
+dash.register_page(__name__)
 
 
 def sd_data_inverse(
@@ -38,9 +42,7 @@ def sd_data_linear(
     )
 
 
-app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
-
-app.layout = dbc.Container(
+layout = dbc.Container(
     [
         dbc.Row(
             [
@@ -128,6 +130,3 @@ app.layout = dbc.Container(
         ),
     ]
 )
-
-if __name__ == "__main__":
-    app.run_server(debug=True, port=8054)
