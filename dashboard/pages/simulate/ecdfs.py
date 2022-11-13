@@ -8,7 +8,7 @@ import random
 import psychoanalyze as pa
 
 
-dash.register_page(__name__, path="/")
+dash.register_page(__name__)
 
 layout = dbc.Container(
     [

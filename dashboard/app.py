@@ -9,12 +9,35 @@ app.layout = html.Div(
     [
         dbc.NavbarSimple(
             [
-                dbc.NavItem(dbc.NavLink("ECDF", href="/simulate-ecdfs")),
-                dbc.NavItem(dbc.NavLink("Strength-Duration", href="/simulate-sd")),
-                dbc.NavItem(dbc.NavLink("Thresholds", href="/simulate-thresholds")),
-                dbc.NavItem(dbc.NavLink("Bayes", href="/simulate-bayesian")),
+                dbc.NavItem(
+                    dbc.DropdownMenu(
+                        [
+                            dbc.DropdownMenuItem("ECDF", href="/simulate/ecdfs"),
+                            dbc.DropdownMenuItem("Strength-Duration", href="sd"),
+                            dbc.DropdownMenuItem("Thresholds", href="thresholds"),
+                            dbc.DropdownMenuItem("Bayes", href="bayes"),
+                        ],
+                        label="Simulate",
+                        nav=True,
+                        in_navbar=True,
+                    )
+                ),
+                dbc.NavItem(
+                    dbc.DropdownMenu(
+                        [
+                            dbc.DropdownMenuItem("Summary", href="/paper/summary"),
+                        ],
+                        label="JNE Data",
+                        nav=True,
+                        in_navbar=True,
+                    )
+                ),
+                dbc.NavItem(
+                    dbc.DropdownMenu([], label="Upload", nav=True, in_navbar=True)
+                ),
             ],
             brand="PsychoAnalyze",
+            brand_href="/",
         ),
         dash.page_container,
     ]
