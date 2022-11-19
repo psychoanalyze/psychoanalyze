@@ -1,4 +1,5 @@
-from dash import Dash, dcc
+from dash import dcc
+import dash
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import pandas as pd
@@ -7,7 +8,7 @@ import random
 import psychoanalyze as pa
 
 
-app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
+dash.register_page(__name__)
 
 
 def monkey_thresholds(mean: float, sd: float, n: int, monkey: str) -> pd.DataFrame:
@@ -23,7 +24,7 @@ def monkey_thresholds(mean: float, sd: float, n: int, monkey: str) -> pd.DataFra
     )
 
 
-app.layout = dbc.Container(
+layout = dbc.Container(
     dcc.Graph(
         figure=px.scatter(
             pd.concat(
@@ -42,6 +43,3 @@ app.layout = dbc.Container(
         )
     )
 )
-
-if __name__ == "__main__":
-    app.run_server(debug=True, port=8053)

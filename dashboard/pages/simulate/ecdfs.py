@@ -1,4 +1,5 @@
-from dash import Dash, dcc, Output, Input
+from dash import dcc, Output, Input, callback
+import dash
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import pandas as pd
@@ -6,11 +7,18 @@ import random
 
 import psychoanalyze as pa
 
-app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB])
 
-app.layout = dbc.Container(
+dash.register_page(__name__)
+
+layout = dbc.Container(
     [
-        dcc.Input(type="number", value=50, id="n"),
+        dbc.Col(
+            [
+                dbc.Label("Number of Blocks"),
+                dbc.Input(type="number", value=50, id="n"),
+            ],
+            width=2,
+        ),
         dbc.Row(
             [
                 dbc.Col(dcc.Graph(id="ecdf-amp")),
@@ -67,7 +75,7 @@ def condition_blocks(n: int, condition: str) -> pd.DataFrame:
     return blocks
 
 
-@app.callback(
+@callback(
     Output("ecdf-amp", "figure"),
     Output("ecdf-width", "figure"),
     Output("ecdf-nuisance", "figure"),
@@ -91,7 +99,3 @@ def plot_ecdfs(n):
         plot_ecdf(melt_blocks(width_blocks), "Pulse Width"),
         plot_nuisance_ecdf(nuisance_df),
     )
-
-
-if __name__ == "__main__":
-    app.run_server(debug=True, port=8052)

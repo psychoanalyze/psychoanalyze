@@ -1,22 +1,17 @@
 {
 	"name": "Python 3",
-	"build": {
-		"dockerfile": "Dockerfile",
-		"context": "..",
-		"args": {
-			// Update 'VARIANT' to pick a Python version: 3, 3.10, 3.9, 3.8, 3.7, 3.6
-			// Append -bullseye or -buster to pin to an OS version.
-			// Use -bullseye variants on local on arm64/Apple Silicon.
-			"VARIANT": "3.10-bullseye",
-			// Options
-			"NODE_VERSION": "none"
-		}
+	"image": "mcr.microsoft.com/devcontainers/python:3.10",
+	"features": {
+		"ghcr.io/devcontainers/features/node:1": {
+			"version": "none"
+		},
+		"ghcr.io/devcontainers-contrib/features/poetry:1": {},
+		"ghcr.io/devcontainers-contrib/features/pre-commit:1": {}
 	},
-	// Configure tool-specific properties.
+	"postCreateCommand": "poetry config virtualenvs.in-project true && poetry install && pre-commit install",
+	"postStartCommand": "poetry run python dashboard/app.py",
 	"customizations": {
-		// Configure properties specific to VS Code.
 		"vscode": {
-			// Set *default* container specific settings.json values on container create.
 			"settings": {
 				"python.venvPath": "/workspaces/psychoanalyze/.venv",
 				"python.defaultInterpreterPath": "/workspaces/psychoanalyze/.venv/bin/python",
@@ -24,25 +19,7 @@
 				"python.linting.banditPath": "/usr/local/py-utils/bin/bandit",
 				"python.linting.flake8Path": "/usr/local/py-utils/bin/flake8",
 				"python.linting.mypyPath": "/usr/local/py-utils/bin/mypy"
-			},
-			// Add the IDs of extensions you want installed when the container is created.
-			"extensions": [
-				"ms-python.python",
-				"ms-python.vscode-pylance",
-				"eamodio.gitlens"
-			]
+			}
 		}
-	},
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-	// Use 'postCreateCommand' to run commands after the container is created.
-	"postStartCommand": "poetry run python dashboard/b.py",
-	"postCreateCommand": "poetry update && pre-commit install",
-	// "postCreateCommand": "pip3 install --user -r requirements.txt",
-	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
-	"remoteUser": "vscode",
-	"features": {
-		"ghcr.io/devcontainers-contrib/features/poetry:1": {},
-		"ghcr.io/devcontainers-contrib/features/pre-commit:1": {}
 	}
 }
