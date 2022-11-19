@@ -32,7 +32,7 @@ layout = dbc.Container(
                 dbc.Col(
                     dbc.Card(
                         [
-                            dbc.CardLink(html.H4("Upload"), href="/"),
+                            dbc.CardLink(html.H4("Upload"), href="/upload"),
                             html.P("Upload your own data set"),
                         ],
                         body=True,

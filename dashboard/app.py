@@ -21,14 +21,15 @@ app.layout = html.Div(
                 #     nav=True,
                 #     in_navbar=True,
                 # ),
-                dbc.DropdownMenu(
-                    [
-                        dbc.DropdownMenuItem("Summary", href="/paper/summary"),
-                    ],
-                    label="JNE Data",
-                    nav=True,
-                    in_navbar=True,
-                ),
+                # dbc.DropdownMenu(
+                #     [
+                #         dbc.DropdownMenuItem("Summary", href="/paper/summary"),
+                #     ],
+                #     label="JNE Data",
+                #     nav=True,
+                #     in_navbar=True,
+                # ),
+                dbc.NavItem(dbc.NavLink("JNE Paper", href="/paper")),
                 dbc.NavItem(dbc.NavLink("Upload", href="/upload")),
             ],
             brand="PsychoAnalyze",
