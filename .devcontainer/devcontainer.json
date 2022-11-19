@@ -1,6 +1,6 @@
 {
 	"name": "Python 3",
-	"image": "mcr.microsoft.com/devcontainers/python:3.11",
+	"image": "mcr.microsoft.com/devcontainers/python:3.10",
 	"features": {
 		"ghcr.io/devcontainers/features/node:1": {
 			"version": "none"
@@ -8,8 +8,8 @@
 		"ghcr.io/devcontainers-contrib/features/poetry:1": {},
 		"ghcr.io/devcontainers-contrib/features/pre-commit:1": {}
 	},
-	// "postCreateCommand": "poetry config virtualenvs.in-project true && poetry install && pre-commit install",
-	// "postStartCommand": "poetry run python dashboard/app.py",
+	"postCreateCommand": "poetry config virtualenvs.in-project true && poetry install && pre-commit install",
+	"postStartCommand": "poetry run python dashboard/app.py",
 	"customizations": {
 		"vscode": {
 			"settings": {
