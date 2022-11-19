@@ -4,7 +4,6 @@ import dash_bootstrap_components as dbc
 import base64
 import pandas as pd
 import io
-import plotly.express as px
 
 
 dash.register_page(__name__, path="/upload")
@@ -36,25 +35,19 @@ layout = dbc.Container(
 def show_contents(contents):
     if contents is not None:
         _, contents = contents.split(",")
-        trials = pd.read_csv(io.StringIO(base64.b64decode(contents).decode("utf-8")))
-        blocks = trials[
-            [
-                "Monkey",
-                "Date",
-                "Amp2",
-                "Width2",
-                "Freq2",
-                "Dur2",
-                "Active Channels",
-                "Return Channels",
-            ]
-        ].drop_duplicates()
+        blocks = pd.read_csv(io.StringIO(base64.b64decode(contents).decode("utf-8")))
+        # blocks = trials[
+        #     [
+        #         "Monkey",
+        #         "Date",
+        #         "Amp2",
+        #         "Width2",
+        #         "Freq2",
+        #         "Dur2",
+        #         "Active Channels",
+        #         "Return Channels",
+        #     ]
+        # ].drop_duplicates()
         subjects = blocks["Monkey"].value_counts().to_frame()
-        # print(decoded)
-        return html.Div(dcc.Graph(figure=px.bar(subjects)))
-
-    # if contents is not None:
-    #     decoded = base64.b64decode(contents)
-    #     return dash.dash_table.DataTable(
-    #         pd.read_csv(io.StringIO(decoded.decode("ascii"))).to_dict("records")
-    #     )
+        return dash.dash_table.DataTable(subjects.to_dict("records"))
+        # return html.Div(dcc.Graph(figure=px.bar(subjects)))
