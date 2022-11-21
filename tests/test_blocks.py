@@ -366,3 +366,17 @@ def test_experiment_type():
     pd.testing.assert_series_equal(
         exp_type, pd.Series(["Detection", "Discrimination"], name="Experiment Type")
     )
+
+
+def test_block_is_valid():
+    block1 = pd.DataFrame({"Hit Rate": [0, 1]}, index=pd.Index([0, 0], name="block"))
+    block2 = pd.DataFrame({"Hit Rate": [0, 1]}, index=pd.Index([1, 1], name="block"))
+    blocks = pd.concat([block1, block2])
+    pd.testing.assert_series_equal(
+        blocks.groupby("block").apply(pa.blocks.isValid),
+        pd.Series([True, True], index=pd.Index([0, 1], name="block")),
+    )
+
+
+# def test_invalid_block():
+#     block =
