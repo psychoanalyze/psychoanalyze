@@ -7,6 +7,7 @@ import psychoanalyze as pa
 
 
 dims = ["Monkey", "Date"]
+index_levels = dims
 
 
 def generate(n: int) -> List[int]:

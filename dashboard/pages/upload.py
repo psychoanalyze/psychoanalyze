@@ -41,19 +41,10 @@ def show_contents(contents, filename):
         data = pd.read_csv(io.StringIO(base64.b64decode(contents).decode("utf-8")))
         if "trials" in filename:
             data = data.set_index(
-                [
-                    "Monkey",
-                    "Date",
-                    "Amp2",
-                    "Width2",
-                    "Freq2",
-                    "Dur2",
-                    "Active Channels",
-                    "Return Channels",
-                    "Amp1",
-                    "Width1",
-                    "Freq1",
-                    "Dur1",
+                pa.sessions.index_levels
+                + pa.blocks.index_levels
+                + pa.points.index_levels
+                + [
                     "Trial ID",
                 ]
             )

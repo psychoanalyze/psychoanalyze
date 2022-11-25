@@ -8,7 +8,8 @@ import os
 import pathlib
 
 
-dims = ["Amp2", "Width2", "Freq1", "Dur1", "Active Channels", "Return Channels"]
+dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
+index_levels = dims
 
 
 def add_posterior(data, posterior):

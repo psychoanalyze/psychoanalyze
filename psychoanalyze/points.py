@@ -10,6 +10,9 @@ import psignifit as ps  # type: ignore
 import numpy as np
 
 
+index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
+
+
 def from_trials(trials):
     trials = trials[trials["Result"].isin([0, 1])]
     points = (
