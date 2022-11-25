@@ -4,6 +4,7 @@ import dash_bootstrap_components as dbc
 import base64
 import pandas as pd
 import io
+import plotly.express as px
 
 import psychoanalyze as pa
 
@@ -52,6 +53,8 @@ def show_contents(contents, filename):
         elif filename == "blocks.csv":
             blocks = data
         subjects = pa.blocks.monkey_counts(blocks)
-        return dash.dash_table.DataTable(
-            subjects.to_frame().reset_index().to_dict("records")
-        )
+        output_data = subjects.to_frame().reset_index()
+        return [
+            dash.dash_table.DataTable(output_data.to_dict("records")),
+            dcc.Graph(figure=px.bar(output_data, x="Monkey", y="Total Blocks")),
+        ]
