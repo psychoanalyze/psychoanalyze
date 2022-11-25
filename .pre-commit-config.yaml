@@ -14,3 +14,13 @@ repos:
     hooks:
     - id: bandit
       args: [--skip, "B101,B311"]
+
+-   repo: local
+    hooks:
+    -   id: pytest
+        name: pytest
+        stages: [push]
+        entry: poetry run pytest
+        language: system
+        types: [python]
+        pass_filenames: false
