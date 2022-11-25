@@ -36,7 +36,6 @@ layout = dbc.Container(
     State("upload-data", "filename"),
 )
 def show_contents(contents, filename):
-    print(filename)
     if contents is not None:
         _, contents = contents.split(",")
         data = pd.read_csv(io.StringIO(base64.b64decode(contents).decode("utf-8")))
