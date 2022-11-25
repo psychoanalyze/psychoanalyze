@@ -175,3 +175,7 @@ def experiment_type(blocks):
     blocks.loc[ref_charge == 0, "Experiment Type"] = "Detection"
     blocks.loc[ref_charge != 0, "Experiment Type"] = "Discrimination"
     return blocks["Experiment Type"]
+
+
+def isValid(block):
+    return any(block["Hit Rate"] > 0.5) & any(block["Hit Rate"] < 0.5)
