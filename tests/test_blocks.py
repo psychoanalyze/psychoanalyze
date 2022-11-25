@@ -376,3 +376,10 @@ def test_block_is_valid():
         blocks.groupby("block").apply(pa.blocks.isValid),
         pd.Series([True, True], index=pd.Index([0, 1], name="block")),
     )
+
+
+def test_monkey_counts():
+    data = pd.DataFrame({}, index=pd.Index(["U", "U"], name="Monkey"))
+    summary = pa.blocks.monkey_counts(data)
+    assert summary.index.values == ["U"]
+    assert summary["U"] == 2

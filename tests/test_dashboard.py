@@ -1,7 +1,6 @@
 import psychoanalyze as pa
 import base64
 import dash
-import pandas as pd
 
 from dashboard import app  # noqa: F401
 from dashboard.pages.upload import show_contents
@@ -43,6 +42,5 @@ def test_upload_csv():
     ).decode("utf-8")
     contents = f"{header},{text}"
     filename = "trials_blank.csv"
-    subjects = pd.DataFrame({"Monkey": []})
     output = show_contents(contents, filename)
-    assert output.data == dash.dash_table.DataTable(subjects.to_dict("records")).data
+    assert output.data == dash.dash_table.DataTable([]).data

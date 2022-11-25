@@ -179,3 +179,11 @@ def experiment_type(blocks):
 
 def isValid(block):
     return any(block["Hit Rate"] > 0.5) & any(block["Hit Rate"] < 0.5)
+
+
+def monkey_counts(data):
+    summary = (
+        data.index.get_level_values("Monkey").value_counts().rename("Total Blocks")
+    )
+    summary.index.name = "Monkey"
+    return summary

@@ -60,5 +60,7 @@ def show_contents(contents, filename):
             blocks = pa.blocks.from_trials(data)
         elif filename == "blocks.csv":
             blocks = data
-        subjects = blocks.index.get_level_values("Monkey").value_counts().to_frame()
-        return dash.dash_table.DataTable(subjects.to_dict("records"))
+        subjects = pa.blocks.monkey_counts(blocks)
+        return dash.dash_table.DataTable(
+            subjects.to_frame().reset_index().to_dict("records")
+        )
