@@ -9,7 +9,6 @@
 		"ghcr.io/devcontainers-contrib/features/pre-commit:1": {}
 	},
 	"postCreateCommand": "poetry config virtualenvs.in-project true && poetry install && pre-commit install && pre-commit install --hook-type pre-push",
-	"postAttachCommand": "poetry run python dashboard/app.py",
 	"customizations": {
 		"vscode": {
 			"settings": {
