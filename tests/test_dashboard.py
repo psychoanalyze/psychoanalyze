@@ -33,6 +33,6 @@ def test_upload_csv():
     ).decode("utf-8")
     contents = f"{header},{text}"
     filename = "trials_blank.csv"
-    output = show_contents(contents, filename)
+    output = show_contents([contents], [filename])
     assert output[0].data == dash.dash_table.DataTable([]).data
     assert len(output[1].figure.data) == 1

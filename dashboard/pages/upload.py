@@ -25,6 +25,7 @@ layout = dbc.Container(
                 "borderRadius": "5px",
                 "textAlign": "center",
             },
+            multiple=True,
         ),
         html.Div(id="output-data-upload"),
     ]
@@ -37,7 +38,9 @@ layout = dbc.Container(
     State("upload-data", "filename"),
 )
 def show_contents(contents, filename):
-    if contents is not None:
+    if contents:
+        contents = contents[0]
+        filename = filename[0]
         _, contents = contents.split(",")
         data = pd.read_csv(io.StringIO(base64.b64decode(contents).decode("utf-8")))
         if "trials" in filename:
