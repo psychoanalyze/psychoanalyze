@@ -70,10 +70,8 @@ def fit_curves(n_clicks, trials):
     if n_clicks:
         fits = pa.points.fit(points)
         trace = pa.data.logistic(fits["Threshold"].iloc[0])
-        print(trace)
         fit_plot = px.line(trace)
         return fit_plot
-        # return pa.points.combine_plots(pa.points.plot(experiment_points), fit_plot)
     else:
         return pa.points.plot(experiment_points)
 

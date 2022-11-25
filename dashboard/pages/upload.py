@@ -36,12 +36,30 @@ layout = dbc.Container(
     State("upload-data", "filename"),
 )
 def show_contents(contents, filename):
+    print(filename)
     if contents is not None:
         _, contents = contents.split(",")
         data = pd.read_csv(io.StringIO(base64.b64decode(contents).decode("utf-8")))
-        if filename == "trials.csv":
+        if "trials" in filename:
+            data = data.set_index(
+                [
+                    "Monkey",
+                    "Date",
+                    "Amp2",
+                    "Width2",
+                    "Freq2",
+                    "Dur2",
+                    "Active Channels",
+                    "Return Channels",
+                    "Amp1",
+                    "Width1",
+                    "Freq1",
+                    "Dur1",
+                    "Trial ID",
+                ]
+            )
             blocks = pa.blocks.from_trials(data)
         elif filename == "blocks.csv":
             blocks = data
-        subjects = blocks["Monkey"].value_counts().to_frame()
+        subjects = blocks.index.get_level_values("Monkey").value_counts().to_frame()
         return dash.dash_table.DataTable(subjects.to_dict("records"))
