@@ -134,6 +134,7 @@ dmypy.json
 .vscode/
 
 data/*
+!data/blocks.csv
 
 docs/tables/*
 
