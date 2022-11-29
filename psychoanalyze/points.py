@@ -6,7 +6,6 @@ import psychoanalyze as pa
 from dash import dash_table  # type: ignore
 import pathlib
 from plotly import graph_objects as go
-import psignifit as ps  # type: ignore
 import numpy as np
 
 
@@ -68,7 +67,7 @@ def fit(points, save_to=None, block=None):
 
         options = {"expType": "YesNo"}
         data = points.to_numpy()
-        fit = ps.psignifit(data, options)
+        fit = pa.fit(data, options)
         fit = pd.DataFrame(
             {
                 "Threshold": [fit["Fit"][0]],

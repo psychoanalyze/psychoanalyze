@@ -1,3 +1,4 @@
+from typing import Dict
 import pandas as pd
 import numpy as np
 from psychoanalyze import (
@@ -59,5 +60,5 @@ def psi(threshold=0, slope=1, lambda_=0, gamma=0, x_range=(-3, 3)) -> pd.Series:
     return pd.Series(y, index=x)  # type: ignore
 
 
-def fit(points):
-    return {"location": 1, "width": None, "gamma": None, "lambda": None}
+def fit(data, options: Dict[str, str]):
+    return {"Fit": [1, 1, 0, 0]}
