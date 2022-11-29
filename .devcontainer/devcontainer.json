@@ -6,7 +6,8 @@
 			"version": "none"
 		},
 		"ghcr.io/devcontainers-contrib/features/poetry:1": {},
-		"ghcr.io/devcontainers-contrib/features/pre-commit:1": {}
+		"ghcr.io/devcontainers-contrib/features/pre-commit:1": {},
+		"ghcr.io/devcontainers-contrib/features/heroku-cli:1": {}
 	},
 	"postCreateCommand": "poetry config virtualenvs.in-project true && poetry install && pre-commit install && pre-commit install --hook-type pre-push",
 	"customizations": {
