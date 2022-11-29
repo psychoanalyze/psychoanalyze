@@ -30,7 +30,7 @@ layout = dbc.Container(
         ),
         html.H2("Or,"),
         html.P("Process this randomly generated dataset:"),
-        dbc.Button("Process", id="process-upload"),
+        dbc.Input(id="n", type="number", value=2),
         html.H4("trials.csv"),
         dash_table.DataTable(
             data=[
@@ -78,10 +78,11 @@ def show_contents(contents, filename):
 
 @dash.callback(
     Output("trial-summary", "children"),
-    Input("process-upload", "n_clicks"),
-    State("sample-trials", "data"),
+    Output("sample-trials", "data"),
+    Input("n", "value"),
 )
-def summarize_trials(n_clicks, data):
-    if n_clicks:
-        n = sum([pa.trials.codes[trial["Result"]] for trial in data])
-        return f"n trials: {n}, hit rate: {n/len(data)}"
+def summarize_trials(n):
+    results = pa.trials.results(n)
+    labels = [pa.trials.codes[result] for result in results]
+    datatable_input = pa.trials.datatable_data(labels)
+    return (f"hit rate: {sum(results)/n}", datatable_input)

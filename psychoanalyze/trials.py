@@ -1,8 +1,9 @@
+from typing import TypedDict
 import pandas as pd
 import numpy as np
 import psychoanalyze as pa
 from pathlib import Path
-import random
+from random import random, choices
 from datetime import datetime
 import json
 import pandera as pr
@@ -12,11 +13,18 @@ schema = pr.SeriesSchema(bool, name="Test Trials")
 
 data_path = Path("data/trials.csv")
 
-codes = {"Miss": 0, "Hit": 1, "False Alarm": 2, "Correct Rejection": 3}
+codes = {False: "Miss", True: "Hit"}
 
 
 def n(trials: pd.Series) -> int:
     return len(trials)
+
+
+Trial = TypedDict("Trial", {"Trial ID": int, "Result": str})
+
+
+def datatable_data(results: list[str]) -> list[Trial]:
+    return [{"Trial ID": id, "Result": result} for id, result in enumerate(results)]
 
 
 def generate_hits(n, p):
@@ -46,7 +54,7 @@ def generate(n, stim_levels=None):
                         "Dur2": [0.0] * n,
                         "Active Channels": [1] * n,
                         "Return Channels": [1] * n,
-                        "Amp1": random.choices(list(range(8)), k=n),
+                        "Amp1": choices(list(range(8)), k=n),
                         "Width1": [0.0] * n,
                         "Freq1": [0.0] * n,
                         "Dur1": [0.0] * n,
@@ -90,3 +98,7 @@ def normalize(trials):
         "Channel Config": trials[["Active Channels", "Return Channels"]],
         "Test Stimulus": trials[["Amp1", "Width1", "Freq1", "Dur1"]],
     }
+
+
+def results(n: int) -> list[bool]:
+    return [random() >= 0.5 for _ in range(n)]
