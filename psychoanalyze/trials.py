@@ -5,9 +5,18 @@ from pathlib import Path
 import random
 from datetime import datetime
 import json
+import pandera as pr
+
+schema = pr.SeriesSchema(bool, name="Test Trials")
 
 
 data_path = Path("data/trials.csv")
+
+codes = {"Miss": 0, "Hit": 1, "False Alarm": 2, "Correct Rejection": 3}
+
+
+def n(trials: pd.Series) -> int:
+    return len(trials)
 
 
 def generate_hits(n, p):

@@ -2,6 +2,7 @@ import pytest
 import pandas as pd
 import psychoanalyze as pa
 import json
+from hypothesis import given
 
 
 @pytest.fixture
@@ -79,3 +80,8 @@ def test_generate_block():
     block = pa.trials.generate_block()
     assert set(block.columns) == {"Hits", "n"}
     assert block.index.name == "x"
+
+
+@given(pa.trials.schema.strategy())
+def test_n(trials: pd.Series):
+    assert pa.trials.n(trials) == len(trials)
