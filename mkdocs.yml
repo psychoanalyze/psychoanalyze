@@ -7,8 +7,6 @@ plugins:
  - mkdocstrings:
     watch:
     - psychoanalyze
- - mknotebooks
-#  - mkdocs-jupyter
 repo_url: https://github.com/schlich/psychoanalyze
 edit_uri: edit/main/docs/
 markdown_extensions:
