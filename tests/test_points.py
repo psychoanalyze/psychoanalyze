@@ -1,6 +1,5 @@
 import psychoanalyze as pa
 import pandas as pd
-import psignifit as ps  # type: ignore
 from scipy.special import expit  # type: ignore
 import json
 import plotly.express as px  # type: ignore
@@ -243,10 +242,8 @@ def test_fit_no_data(mocker):
     assert {"Threshold", "err+", "err-"} <= set(fit.index.values)
 
 
-def test_fit_data(monkeypatch, tmp_path):
-    monkeypatch.setattr(
-        ps, "psignifit", lambda data, options: {"Fit": [None, None, None, None]}
-    )
+def test_fit_data(tmp_path):
+
     points = pd.DataFrame({"n": [0], "Hits": [0], "x": [0]})
     fit = pa.points.fit(
         points,

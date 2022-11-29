@@ -65,9 +65,8 @@ def fit(points, save_to=None, block=None):
     points = points[["x", "Hits", "n"]]
     if len(points):
 
-        options = {"expType": "YesNo"}
         data = points.to_numpy()
-        fit = pa.fit(data, options)
+        fit = pa.fit(data)
         fit = pd.DataFrame(
             {
                 "Threshold": [fit["Fit"][0]],

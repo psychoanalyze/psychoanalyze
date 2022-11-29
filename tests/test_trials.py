@@ -51,11 +51,6 @@ def test_from_store():
     pa.schemas.trials.validate(df)
 
 
-def test_to_store():
-    data_json = pa.trials.to_store(pa.schemas.trials.example(1))
-    assert "index_names" in json.loads(data_json).keys()
-
-
 def test_normalize():
     fields = {
         "Session": ["Monkey", "Day"],

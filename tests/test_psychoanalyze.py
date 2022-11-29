@@ -39,10 +39,10 @@ def test_psi_xrange():
 def test_curve_fit():
     points = pd.DataFrame({"Hit Rate": [0, 2], "x": [0, 2]})
     fit = pa.fit(points)
-    assert fit["location"] == 1
+    assert fit["Fit"][0] == 1
 
 
 def test_curve_fit_fields():
     points = pd.Series([0, 2], name="Hit Rate", index=pd.Index([0, 2], name="x"))
     fit = pa.fit(points)
-    assert fit.keys() == {"location", "width", "gamma", "lambda"}
+    assert fit.keys() == {"Fit"}
