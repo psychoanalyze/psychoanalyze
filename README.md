@@ -22,7 +22,7 @@ poetry add psychoanalyze
 ```
 
 ## Dashboard
-See what `psychoanalyze` can do by [viewing our dashboard](https://psychoanalyze.herokuapp.com/).
+See what `psychoanalyze` can do by [viewing our dashboard](https://psychoanalyze-io.herokuapp.com/).
 
 ## Documentation
 View documentation on [Read the Docs](https://psychoanalyze.readthedocs.io/en/latest/)
