@@ -85,3 +85,7 @@ def test_generate_block():
 @given(pa.trials.schema.strategy())
 def test_n(trials: pd.Series):
     assert pa.trials.n(trials) == len(trials)
+
+
+def test_labels():
+    assert pa.trials.labels([0, 1]) == ["Miss", "Hit"]

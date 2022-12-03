@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import psychoanalyze as pa
 from pathlib import Path
-from random import random, choices
+from random import random, choices, choice
 from datetime import datetime
 import json
 import pandera as pr
@@ -20,11 +20,7 @@ def n(trials: pd.Series) -> int:
     return len(trials)
 
 
-Trial = TypedDict("Trial", {"Trial ID": int, "Result": str})
-
-
-def datatable_data(results: list[str]) -> list[Trial]:
-    return [{"Trial ID": id, "Result": result} for id, result in enumerate(results)]
+Trial = TypedDict("Trial", {"Result": bool, "Stimulus Magnitude": float})
 
 
 def generate_hits(n, p):
@@ -100,5 +96,25 @@ def normalize(trials):
     }
 
 
-def results(n: int) -> list[bool]:
-    return [random() >= 0.5 for _ in range(n)]
+def result(p: float) -> bool:
+    return random() < p
+
+
+def results(n: int, p_x: pd.Series) -> list[Trial]:
+    results = []
+    for _ in range(n):
+        stimulus_magnitude = choice(p_x.index.to_list())
+        _result = result(p_x[stimulus_magnitude])
+        results.append(
+            Trial(
+                {
+                    "Stimulus Magnitude": stimulus_magnitude,
+                    "Result": _result,
+                }
+            )
+        )
+    return results
+
+
+def labels(results: list[bool]) -> list[str]:
+    return [pa.trials.codes[result] for result in results]

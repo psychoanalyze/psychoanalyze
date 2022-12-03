@@ -4,6 +4,7 @@ import dash
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import pandas as pd
+from dashboard.layout.nav import simulate
 
 import psychoanalyze as pa
 
@@ -44,6 +45,7 @@ def sd_data_linear(
 
 layout = dbc.Container(
     [
+        simulate,
         dbc.Row(
             [
                 dbc.Col(

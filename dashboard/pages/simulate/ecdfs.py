@@ -4,6 +4,7 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 import pandas as pd
 import random
+from dashboard.layout.nav import simulate
 
 import psychoanalyze as pa
 
@@ -12,6 +13,7 @@ dash.register_page(__name__)
 
 layout = dbc.Container(
     [
+        simulate,
         dbc.Col(
             [
                 dbc.Label("Number of Blocks"),

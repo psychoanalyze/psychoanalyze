@@ -6,6 +6,7 @@ import pandas as pd
 import random
 
 import psychoanalyze as pa
+from dashboard.layout.nav import simulate
 
 
 dash.register_page(__name__)
@@ -25,21 +26,24 @@ def monkey_thresholds(mean: float, sd: float, n: int, monkey: str) -> pd.DataFra
 
 
 layout = dbc.Container(
-    dcc.Graph(
-        figure=px.scatter(
-            pd.concat(
-                [
-                    monkey_thresholds(100, 5, 50, "U"),
-                    monkey_thresholds(200, 10, 75, "Y"),
-                ]
-            ),
-            x="Day",
-            y="Threshold",
-            error_y="err_y_plus",
-            error_y_minus="err_y_minus",
-            color="Monkey",
-            symbol="Channel",
-            template=pa.plot.template,
-        )
-    )
+    [
+        simulate,
+        dcc.Graph(
+            figure=px.scatter(
+                pd.concat(
+                    [
+                        monkey_thresholds(100, 5, 50, "U"),
+                        monkey_thresholds(200, 10, 75, "Y"),
+                    ]
+                ),
+                x="Day",
+                y="Threshold",
+                error_y="err_y_plus",
+                error_y_minus="err_y_minus",
+                color="Monkey",
+                symbol="Channel",
+                template=pa.plot.template,
+            )
+        ),
+    ]
 )

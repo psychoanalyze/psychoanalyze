@@ -35,4 +35,3 @@ def test_upload_csv():
     filename = "trials_blank.csv"
     output = show_contents([contents], [filename])
     assert output[0].data == dash.dash_table.DataTable([]).data
-    assert len(output[1].figure.data) == 1

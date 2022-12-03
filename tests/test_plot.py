@@ -1,6 +1,7 @@
 import pandas as pd
 import psychoanalyze as pa
 import pytest
+import plotly.express as px
 
 
 @pytest.fixture
@@ -127,7 +128,7 @@ def test_plot_counts_dim_facet():
     assert len(figs.data)
 
 
-def test_psychometric_function():
+def test_psychometric():
     psychometric_plot = pa.plot.psychometric(
         {"Threshold": 0, "width": 1, "gamma": 0, "lambda": 0}
     )
@@ -144,3 +145,22 @@ def test_ecdf_width_no_data():
     blocks = pd.DataFrame({"width": []})
     ecdf_fig = pa.plot.ecdf(blocks, "width")
     assert ecdf_fig.layout.xaxis.title.text == "width"
+
+
+def test_combine_line_and_scatter():
+    fig1 = px.scatter(
+        pd.DataFrame(
+            {"Stimulus Magnitude": [0], "Hit Rate": [0.5]},
+        ),
+        x="Stimulus Magnitude",
+        y="Hit Rate",
+    )
+    fig2 = px.line(
+        pd.DataFrame({"Stimulus Magnitude": [0], "Hit Rate": [0.5]}),
+        x="Stimulus Magnitude",
+        y="Hit Rate",
+    )
+    fig = pa.plot.combine_figs(fig1, fig2)
+    assert fig.layout.xaxis.title.text == "Stimulus Magnitude"
+    assert fig.layout.yaxis.title.text == "Hit Rate"
+    assert len(fig.data) == 2

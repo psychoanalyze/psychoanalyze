@@ -4,12 +4,11 @@ import dash_bootstrap_components as dbc
 import base64
 import pandas as pd
 import io
-import plotly.express as px
-
 import psychoanalyze as pa
 
 
 dash.register_page(__name__, path="/upload")
+
 
 layout = dbc.Container(
     [
@@ -28,19 +27,7 @@ layout = dbc.Container(
             },
             multiple=True,
         ),
-        html.H2("Or,"),
-        html.P("Process this randomly generated dataset:"),
-        dbc.Input(id="n", type="number", value=2),
-        html.H4("trials.csv"),
-        dash_table.DataTable(
-            data=[
-                {"Trial ID": 1, "Result": "Miss"},
-                {"Trial ID": 2, "Result": "Hit"},
-            ],
-            id="sample-trials",
-        ),
         html.Div(id="output-data-upload"),
-        html.P(id="trial-summary"),
     ]
 )
 
@@ -70,19 +57,4 @@ def show_contents(contents, filename):
             blocks = data
         subjects = pa.blocks.monkey_counts(blocks)
         output_data = subjects.to_frame().reset_index()
-        return [
-            dash_table.DataTable(output_data.to_dict("records")),
-            dcc.Graph(figure=px.bar(output_data, x="Monkey", y="Total Blocks")),
-        ]
-
-
-@dash.callback(
-    Output("trial-summary", "children"),
-    Output("sample-trials", "data"),
-    Input("n", "value"),
-)
-def summarize_trials(n):
-    results = pa.trials.results(n)
-    labels = [pa.trials.codes[result] for result in results]
-    datatable_input = pa.trials.datatable_data(labels)
-    return (f"hit rate: {sum(results)/n}", datatable_input)
+        return [dash_table.DataTable(output_data.to_dict("records"))]

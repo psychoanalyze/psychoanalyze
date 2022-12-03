@@ -1,9 +1,10 @@
-from dash import dcc, dash_table, Output, Input, callback
+from dash import html, dcc, dash_table, Output, Input, callback
 import dash
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import pandas as pd
 import numpy as np
+from dashboard.layout.nav import simulate
 
 import psychoanalyze as pa
 
@@ -15,24 +16,65 @@ x = np.arange(100.0, 600, 100)
 y_observed = pa.points.psi(x, 300.0, 0.50, 0.1, 0.1)
 
 
-layout = dbc.Container(
-    dbc.Row(
-        [
-            dbc.Col(
+layout = html.Div(
+    [
+        simulate,
+        dbc.Container(
+            dbc.Row(
                 [
-                    dcc.Input(id="threshold", type="number", value=300, step=50),
-                    dcc.Input(id="width", type="number", value=0.5, step=0.1),
-                    dcc.Input(id="lambda", type="number", value=0.1, step=0.01),
-                    dcc.Input(id="gamma", type="number", value=0.1, step=0.01),
-                    dcc.Input(id="n", type="number", value=10),
-                    dash_table.DataTable(id="points"),
+                    dbc.Col(
+                        [
+                            dbc.InputGroup(
+                                [
+                                    dbc.InputGroupText("Threshold:"),
+                                    dbc.Input(
+                                        id="threshold",
+                                        type="number",
+                                        value=300,
+                                        step=50,
+                                    ),
+                                ]
+                            ),
+                            dbc.InputGroup(
+                                [
+                                    dbc.InputGroupText("Width:"),
+                                    dbc.Input(
+                                        id="width", type="number", value=0.5, step=0.1
+                                    ),
+                                ]
+                            ),
+                            dbc.InputGroup(
+                                [
+                                    dbc.InputGroupText("Lapse Rate:"),
+                                    dbc.Input(
+                                        id="lambda", type="number", value=0.1, step=0.01
+                                    ),
+                                ]
+                            ),
+                            dbc.InputGroup(
+                                [
+                                    dbc.InputGroupText("Guess Rate:"),
+                                    dbc.Input(
+                                        id="gamma", type="number", value=0.1, step=0.01
+                                    ),
+                                ]
+                            ),
+                            dbc.InputGroup(
+                                [
+                                    dbc.InputGroupText("n trials per level:"),
+                                    dbc.Input(id="n", type="number", value=10),
+                                ]
+                            ),
+                            dash_table.DataTable(id="points"),
+                        ]
+                    ),
+                    dbc.Col(
+                        dcc.Graph(id="block"),
+                    ),
                 ]
             ),
-            dbc.Col(
-                dcc.Graph(id="block"),
-            ),
-        ]
-    )
+        ),
+    ]
 )
 
 

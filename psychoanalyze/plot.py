@@ -207,3 +207,12 @@ def ecdf(blocks, param):
 def psychometric(fit, x_range=(-3, 3)):
     s = pa.psi(fit["Threshold"], fit["width"], fit["lambda"], fit["gamma"], x_range)
     return px.line(s, template=pa.plot.template)
+
+
+def combine_figs(fig1: go.Figure, fig2: go.Figure) -> go.Figure:
+    return go.Figure(
+        data=fig1.data + fig2.data,
+        layout_xaxis_title_text="Stimulus Magnitude",
+        layout_yaxis_title_text="Hit Rate",
+        layout_template=pa.plot.template,
+    )
