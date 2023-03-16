@@ -9,7 +9,7 @@
 		"ghcr.io/devcontainers-contrib/features/pre-commit:1": {},
 		"ghcr.io/devcontainers-contrib/features/heroku-cli:1": {}
 	},
-	"postCreateCommand": "poetry config virtualenvs.in-project true && poetry install && pre-commit install && pre-commit install --hook-type pre-push",
+	"postCreateCommand": "poetry config virtualenvs.in-project true && poetry install && pre-commit install",
 	"customizations": {
 		"vscode": {
 			"settings": {
@@ -19,7 +19,8 @@
 				"python.linting.banditPath": "/usr/local/py-utils/bin/bandit",
 				"python.linting.flake8Path": "/usr/local/py-utils/bin/flake8",
 				"python.linting.mypyPath": "/usr/local/py-utils/bin/mypy"
-			}
+			},
+			"extensions": ["bungcip.better-toml"]
 		}
 	}
 }
