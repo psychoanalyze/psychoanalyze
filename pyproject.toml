@@ -2,8 +2,9 @@
 name = "psychoanalyze"
 version = "0.1.2"
 description = "A Pythonic analysis package for psychophysics data"
-authors = ["Ty Schlichenmeyer <ty.schlich@gmail.com>"]
+authors = ["Ty Schlichenmeyer <t.schlic@wustl.edu>"]
 license = "GPL-3.0-or-later"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "3.11.2"

@@ -1,27 +1,28 @@
 {
-	"name": "Python 3",
-	"image": "mcr.microsoft.com/devcontainers/python:3.11",
-	"features": {
-		"ghcr.io/devcontainers/features/node:1": {
-			"version": "none"
-		},
-		"ghcr.io/devcontainers-contrib/features/poetry:1": {},
-		"ghcr.io/devcontainers-contrib/features/pre-commit:1": {},
-		"ghcr.io/devcontainers-contrib/features/heroku-cli:1": {}
-	},
-	"postCreateCommand": "poetry config virtualenvs.in-project true && poetry install && pre-commit install && pre-commit install --hook-type pre-push",
-	"customizations": {
-		"vscode": {
-			"settings": {
-				"python.defaultInterpreterPath": ".venv/bin/python",
-				"python.formatting.blackPath": "/usr/local/py-utils/bin/black",
-				"python.linting.banditPath": "/usr/local/py-utils/bin/bandit",
-				"python.linting.flake8Path": "/usr/local/py-utils/bin/flake8",
-				"python.linting.mypyPath": "/usr/local/py-utils/bin/mypy",
-				"files.associations": {
-					"*.psyexp": "xml"
-				}
-			}
-		}
-	}
+  "name": "Python 3",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "none"
+    },
+    "ghcr.io/devcontainers-contrib/features/poetry:1": {},
+    "ghcr.io/devcontainers-contrib/features/pre-commit:1": {},
+    "ghcr.io/devcontainers-contrib/features/heroku-cli:1": {}
+  },
+  "postCreateCommand": "poetry config virtualenvs.in-project true && poetry install && pre-commit install",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": ".venv/bin/python",
+        "python.formatting.blackPath": "/usr/local/py-utils/bin/black",
+        "python.linting.banditPath": "/usr/local/py-utils/bin/bandit",
+        "python.linting.flake8Path": "/usr/local/py-utils/bin/flake8",
+        "python.linting.mypyPath": "/usr/local/py-utils/bin/mypy",
+        "files.associations": {
+          "*.psyexp": "xml"
+        }
+      },
+      "extensions": ["bungcip.better-toml"]
+    }
+  }
 }
