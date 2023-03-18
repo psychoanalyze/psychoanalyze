@@ -15,6 +15,8 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
   - tables
 extra_javascript:
  - https://cdn.plot.ly/plotly-2.12.1.min.js

@@ -4,21 +4,22 @@ Psychophysics analysis in Python.
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/psychoanalyze) ![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/schlich/psychoanalyze/blob/main/docs/notebook.ipynb)
-
-
 
 ## Installation
 
-```console
-$ pip install psychoanalyze
-```
+=== "Poetry"
 
-## Dashboard
+    ```console
+    poetry add psychoanalyze
+    ```
 
-See what `psychoanalyze` can do by [visiting our dashboard](https://psychoanalyze.herokuapp.com/).
+=== "Pip"
 
-## Usage 
+    ```console
+    pip install psychoanalyze
+    ```
+
+## Getting Started
 
 ``` py
 import psychoanalyze as pa
@@ -30,6 +31,11 @@ Generate 100 random Bernoulli trials where x (the intensity of the modulated sti
 trials = pa.trial.generate(100,list(range(-4,5)))
 trials.T
 ```
+
+## Dashboard
+
+See what `psychoanalyze` can do by [visiting our dashboard](https://psychoanalyze.herokuapp.com/).
+
 
 --8<-- "docs/tables/table1.html"
 
