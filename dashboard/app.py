@@ -28,8 +28,8 @@ app.layout = html.Div(
             brand=dbc.Col(
                 [
                     dbc.Row(html.H1("PsychoAnalyze")),
-                    dbc.Row(html.P("Psychophysics analysis in Python.")),
-                ]
+                    dbc.Row(html.P("Interactive data exploration for psychophysics.")),
+                ],
             ),
             brand_href="/",
         ),
