@@ -13,12 +13,14 @@
 	"customizations": {
 		"vscode": {
 			"settings": {
-				"python.venvPath": "/workspaces/psychoanalyze/.venv",
-				"python.defaultInterpreterPath": "/workspaces/psychoanalyze/.venv/bin/python",
+				"python.defaultInterpreterPath": ".venv/bin/python",
 				"python.formatting.blackPath": "/usr/local/py-utils/bin/black",
 				"python.linting.banditPath": "/usr/local/py-utils/bin/bandit",
 				"python.linting.flake8Path": "/usr/local/py-utils/bin/flake8",
-				"python.linting.mypyPath": "/usr/local/py-utils/bin/mypy"
+				"python.linting.mypyPath": "/usr/local/py-utils/bin/mypy",
+				"files.associations": {
+					"*.psyexp": "xml"
+				}
 			}
 		}
 	}
