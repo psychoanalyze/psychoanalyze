@@ -1,6 +1,6 @@
 # PsychoAnalyze
 
-Psychophysics analysis in Python.
+Interactive data exploration for psychophysics.
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/psychoanalyze) ![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)
 
