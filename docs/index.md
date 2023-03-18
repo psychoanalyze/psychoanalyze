@@ -16,26 +16,9 @@ Interactive data exploration for psychophysics.
     pip install psychoanalyze
     ```
 
-## Getting Started
+## Why PsychoAnalyze?
 
-``` py
-import psychoanalyze as pa
-```
+PsychoAnalyze provides researchers with:
 
-Generate 100 random Bernoulli trials where x (the intensity of the modulated stimulus dimension) is chosen from x=-4 to x=4:
-
-``` py
-trials = pa.trial.generate(100,list(range(-4,5)))
-trials.T
-```
-
-## Dashboard
-
-See what `psychoanalyze` can do by [visiting our dashboard](https://psychoanalyze.herokuapp.com/).
-
-
---8<-- "docs/tables/table1.html"
-
---8<-- "docs/figures/fig1.html"
-
---8<-- "docs/jupyterlite.html"
+ - [`psychoanalyze`](https://pypi.org/project/psychoanalyze/), a Python package to assist with common data transformations and visualizations in psychophysics.
+ - [psychoanalyze.io](https://psychoanalyze.io), a no-code dashboard for psychophysics data analysis and exploration.

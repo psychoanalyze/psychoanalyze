@@ -6,7 +6,6 @@ import random
 import pandas as pd
 
 import psychoanalyze as pa
-from dashboard.layout.nav import simulate
 
 
 dash.register_page(__name__, path="/simulate")
@@ -27,7 +26,6 @@ def monkey_thresholds(mean: float, sd: float, n: int, monkey: str) -> pd.DataFra
 
 layout = dbc.Container(
     [
-        simulate,
         dbc.Row(
             [
                 dbc.Col(
@@ -82,6 +80,7 @@ layout = dbc.Container(
                             color="Monkey",
                             symbol="Channel",
                             template=pa.plot.template,
+                            # animation_frame="Day",
                         )
                     )
                 ),

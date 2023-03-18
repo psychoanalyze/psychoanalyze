@@ -22,7 +22,17 @@ app.layout = html.Div(
                         ),
                         html.I(className="bi bi-github"),
                     ],
-                    className="d-flex align-items-center",
+                    className="d-flex align-items-center mx-2",
+                ),
+                dbc.NavItem(
+                    [
+                        dbc.NavLink(
+                            "Documentation",
+                            href="https://psychoanalyze.github.io",
+                        ),
+                        html.I(className="bi bi-book"),
+                    ],
+                    className="d-flex align-items-center mx-2",
                 ),
             ],
             brand=dbc.Col(

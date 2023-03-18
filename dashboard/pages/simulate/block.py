@@ -4,7 +4,6 @@ from dash import html, dcc, dash_table, Output, Input
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.express as px
-from dashboard.layout.nav import simulate
 
 import psychoanalyze as pa
 
@@ -42,7 +41,6 @@ moc_param_form = dbc.Card(
 
 layout = dbc.Container(
     [
-        simulate,
         dbc.Row(
             [
                 dbc.Col(moc_param_form, width=6),

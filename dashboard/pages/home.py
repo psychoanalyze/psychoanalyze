@@ -11,7 +11,7 @@ layout = dbc.Container(
                 dbc.Col(
                     dbc.Card(
                         [
-                            dbc.CardLink(html.H4("Simulate"), href="/simulate/ecdfs"),
+                            dbc.CardLink(html.H4("Simulate"), href="/simulate"),
                             html.P("Simulate data from a Yes/No task."),
                         ],
                         body=True,
@@ -20,12 +20,10 @@ layout = dbc.Container(
                 dbc.Col(
                     dbc.Card(
                         [
-                            dbc.CardLink(
-                                html.H4("Experiment Data"), href="/paper/summary"
-                            ),
+                            dbc.CardLink(html.H4("Experiments"), href="/paper/summary"),
                             html.P(
                                 "View interactive versions of the figures"
-                                + " from Schlichenmeyer et al., 2022"
+                                + " from Schlichenmeyer et al., 2022."
                             ),
                         ],
                         body=True,

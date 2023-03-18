@@ -4,7 +4,6 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 import pandas as pd
 import numpy as np
-from dashboard.layout.nav import simulate
 
 import psychoanalyze as pa
 
@@ -18,7 +17,6 @@ y_observed = pa.points.psi(x, 300.0, 0.50, 0.1, 0.1)
 
 layout = html.Div(
     [
-        simulate,
         dbc.Container(
             dbc.Row(
                 [
