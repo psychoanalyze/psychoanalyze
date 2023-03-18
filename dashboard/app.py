@@ -3,7 +3,11 @@ import dash
 import dash_bootstrap_components as dbc
 
 
-app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB], use_pages=True)
+app = Dash(
+    __name__,
+    external_stylesheets=[dbc.themes.SUPERHERO, dbc.icons.BOOTSTRAP],
+    use_pages=True,
+)
 server = app.server
 
 app.layout = html.Div(
@@ -11,15 +15,22 @@ app.layout = html.Div(
         dbc.NavbarSimple(
             [
                 dbc.NavItem(
-                    dbc.NavLink(
-                        "GitHub", href="https://github.com/psychoanalyze/psychoanalyze"
-                    )
+                    [
+                        dbc.NavLink(
+                            "GitHub",
+                            href="https://github.com/psychoanalyze/psychoanalyze",
+                        ),
+                        html.I(className="bi bi-github"),
+                    ],
+                    className="d-flex align-items-center",
                 ),
-                dbc.NavItem(dbc.NavLink("Simulate", href="/simulate")),
-                dbc.NavItem(dbc.NavLink("JNE Paper", href="/paper")),
-                dbc.NavItem(dbc.NavLink("Upload", href="/upload")),
             ],
-            brand="PsychoAnalyze",
+            brand=dbc.Col(
+                [
+                    dbc.Row(html.H1("PsychoAnalyze")),
+                    dbc.Row(html.P("Psychophysics analysis in Python.")),
+                ]
+            ),
             brand_href="/",
         ),
         dash.page_container,

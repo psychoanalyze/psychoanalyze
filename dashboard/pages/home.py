@@ -6,16 +6,13 @@ dash.register_page(__name__, path="/")
 
 layout = dbc.Container(
     [
-        html.H1("Welcome to PsychoAnalyze!"),
-        html.P("Analyze psychophysics data with ease."),
-        html.P("Get started by choosing an option below"),
         dbc.Row(
             [
                 dbc.Col(
                     dbc.Card(
                         [
                             dbc.CardLink(html.H4("Simulate"), href="/simulate/ecdfs"),
-                            html.P("Simulate psychophysics data"),
+                            html.P("Simulate data from a Yes/No task."),
                         ],
                         body=True,
                     )
@@ -23,8 +20,13 @@ layout = dbc.Container(
                 dbc.Col(
                     dbc.Card(
                         [
-                            dbc.CardLink(html.H4("JNE Data"), href="/paper/summary"),
-                            html.P("View the dataset from Schlichenmeyer et al., 2022"),
+                            dbc.CardLink(
+                                html.H4("Experiment Data"), href="/paper/summary"
+                            ),
+                            html.P(
+                                "View interactive versions of the figures"
+                                + " from Schlichenmeyer et al., 2022"
+                            ),
                         ],
                         body=True,
                     )
@@ -33,7 +35,11 @@ layout = dbc.Container(
                     dbc.Card(
                         [
                             dbc.CardLink(html.H4("Upload"), href="/upload"),
-                            html.P("Upload your own data set"),
+                            html.P(
+                                "Upload your own data set and try our "
+                                + "interactive data exploration tool. Your "
+                                + "data never leaves the browser."
+                            ),
                         ],
                         body=True,
                     )
