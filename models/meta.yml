@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: sessions
+    description: A session consists of a full day of trials for a given subject.
