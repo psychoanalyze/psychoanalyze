@@ -1,3 +1,6 @@
 name: psychoanalyze
 
+config-version: 2
 version: '0.0.1'
+
+profile: pa-duckdb

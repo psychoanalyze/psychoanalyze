@@ -1,0 +1,6 @@
+pa-duckdb:
+  target: dev
+  outputs:
+    dev: 
+      type: duckdb
+      path: ':memory:'
