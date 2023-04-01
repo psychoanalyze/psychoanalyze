@@ -3,3 +3,12 @@ version: 2
 models:
   - name: sessions
     description: A session consists of a full day of trials for a given subject.
+
+
+exposures:
+  - name: longitudinal_thresholds
+    label: Longitudinal Thresholds
+    type: dashboard
+    owner: 
+      name: PsychoAnalyze
+      email: support@psychoanalyze.io
