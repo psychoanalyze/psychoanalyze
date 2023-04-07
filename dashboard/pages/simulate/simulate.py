@@ -24,6 +24,14 @@ def monkey_thresholds(mean: float, sd: float, n: int, monkey: str) -> pd.DataFra
     )
 
 
+data = pd.concat(
+    [
+        monkey_thresholds(100, 5, 50, "U"),
+        monkey_thresholds(200, 10, 75, "Y"),
+    ]
+)
+
+
 layout = dbc.Container(
     [
         dbc.Row(
@@ -67,12 +75,7 @@ layout = dbc.Container(
                 dbc.Col(
                     dcc.Graph(
                         figure=px.scatter(
-                            pd.concat(
-                                [
-                                    monkey_thresholds(100, 5, 50, "U"),
-                                    monkey_thresholds(200, 10, 75, "Y"),
-                                ]
-                            ),
+                            data,
                             x="Day",
                             y="Threshold",
                             error_y="err_y_plus",
