@@ -49,6 +49,11 @@ nbformat = "^5.8.0"
 pre-commit = "^2.20.0"
 ipykernel = "^6.21.3"
 
+
+
+[tool.poetry.group.ci.dependencies]
+ruff = "^0.0.261"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

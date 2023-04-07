@@ -30,7 +30,7 @@ jobs:
 
 
     - name: Install package dependencies
-      run: poetry install
+      run: poetry install --with ci
 
     - name: Build documentation
       run: poetry run mkdocs build
