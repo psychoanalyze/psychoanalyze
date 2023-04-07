@@ -16,9 +16,11 @@ jobs:
         with:
           python-version: 3.11.2
       
+      - name: Install Poetry
+        run: pipx install poetry
+      
       - name: Export requirements.txt
-        run: |
-          pipx install poetry && poetry export -f requirements.txt --output requirements.txt
+        run: poetry export -f requirements.txt --output requirements.txt
 
       - name: Deploy docs
         uses: mhausenblas/mkdocs-deploy-gh-pages@master
