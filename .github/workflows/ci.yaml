@@ -35,8 +35,8 @@ jobs:
     - name: Build documentation
       run: poetry run mkdocs build
 
-    - name: Flake8 lint
-      run: poetry run flake8
+    - name: Ruff lint
+      run: poetry run ruff check .
 
     - name: MyPy type check
       run: poetry run mypy psychoanalyze
