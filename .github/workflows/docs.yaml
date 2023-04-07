@@ -10,12 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3\
+      
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.11.1
       
       - name: Export requirements.txt
         run: |
-          pipx install poetry
-          poetry export -f requirements.txt --output requirements.txt
+          pipx install poetry && poetry export -f requirements.txt --output requirements.txt
 
       - name: Deploy docs
         uses: mhausenblas/mkdocs-deploy-gh-pages@master
