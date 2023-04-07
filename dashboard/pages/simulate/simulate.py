@@ -12,22 +12,25 @@ dash.register_page(__name__, path="/simulate")
 
 
 def monkey_thresholds(mean: float, sd: float, n: int, monkey: str) -> pd.DataFrame:
-    return pd.DataFrame(
-        {
-            "Day": [random.uniform(0, 1000) for _ in range(n)],
-            "Threshold": [random.gauss(mean, sd) for _ in range(n)],
-            "err_y_plus": [random.gauss(sd, sd / 2) for _ in range(n)],
-            "err_y_minus": [random.gauss(sd, sd / 2) for _ in range(n)],
-            "Monkey": [monkey] * n,
-            "Channel": [random.choice([1, 2, 3, 4]) for _ in range(n)],
-        }
+    return pd.DataFrame.from_records(
+        [
+            {
+                "Day": random.uniform(0, 1000),
+                "Threshold": random.gauss(mean, sd),
+                "err_y_plus": random.gauss(sd, sd / 2),
+                "err_y_minus": random.gauss(sd, sd / 2),
+                "Monkey": monkey,
+                "Channel": random.choice([1, 2, 3, 4]),
+            }
+            for _ in range(n)
+        ]
     )
 
 
 data = pd.concat(
     [
-        monkey_thresholds(100, 5, 50, "U"),
-        monkey_thresholds(200, 10, 75, "Y"),
+        monkey_thresholds(mean=100, sd=5, n=50, monkey="U"),
+        monkey_thresholds(mean=200, sd=10, n=75, monkey="Y"),
     ]
 )
 
