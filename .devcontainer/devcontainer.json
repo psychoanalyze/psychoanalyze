@@ -7,7 +7,8 @@
     },
     "ghcr.io/devcontainers-contrib/features/poetry:1": {},
     "ghcr.io/devcontainers-contrib/features/pre-commit:1": {},
-    "ghcr.io/devcontainers-contrib/features/heroku-cli:1": {}
+    "ghcr.io/devcontainers-contrib/features/heroku-cli:1": {},
+    "ghcr.io/devcontainers-contrib/features/act-asdf:2": {}
   },
   "postCreateCommand": "poetry config virtualenvs.in-project true && poetry install && pre-commit install && pre-commit install --hook-type commit-msg",
   "customizations": {
