@@ -51,4 +51,4 @@ jobs:
       run: poetry run pytest
 
     - name: Deploy docs
-      run: poetry run mkdocs gh-deploy
+      run: poetry run mkdocs gh-deploy --no-history
