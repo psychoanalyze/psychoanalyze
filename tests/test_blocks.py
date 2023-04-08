@@ -225,7 +225,6 @@ def test_blocks_load_monkey_day(tmp_path, blocks):
 
 
 def test_from_points_amp_dim():
-
     amp_points_index = pd.MultiIndex.from_frame(
         pd.DataFrame(
             {

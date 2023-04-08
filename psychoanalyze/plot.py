@@ -170,7 +170,6 @@ def get_labels_given_dim(labels, dim, plot_type):
 def strength_duration(
     data=None, dim=None, plot_type=None, x_data=[], y_data=[], points=None
 ):
-
     labels_given_dim = get_labels_given_dim(labels=labels, dim=dim, plot_type=plot_type)
     x = labels_given_dim["x"]
     y = labels_given_dim["y"]

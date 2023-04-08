@@ -1,9 +1,9 @@
 import dash
 import dash_bootstrap_components as dbc
-from dash import dcc
+from dash import dcc, html, dash_table
 import plotly.express as px
-import random
 import pandas as pd
+import random
 
 import psychoanalyze as pa
 
@@ -11,29 +11,20 @@ import psychoanalyze as pa
 dash.register_page(__name__, path="/simulate")
 
 
-def monkey_thresholds(mean: float, sd: float, n: int, monkey: str) -> pd.DataFrame:
+def thresholds(mean: float, sd: float, n: int) -> pd.DataFrame:
     return pd.DataFrame.from_records(
         [
             {
-                "Day": random.uniform(0, 1000),
-                "Threshold": random.gauss(mean, sd),
-                "err_y_plus": random.gauss(sd, sd / 2),
-                "err_y_minus": random.gauss(sd, sd / 2),
-                "Monkey": monkey,
-                "Channel": random.choice([1, 2, 3, 4]),
+                "TrialID": i,
+                "TrialType": random.choice(["Catch", "Test"]),
+                "Intensity": random.choice([-3, -2, -1, 0, 1, 2, 3]),
             }
-            for _ in range(n)
+            for i in range(n)
         ]
     )
 
 
-data = pd.concat(
-    [
-        monkey_thresholds(mean=100, sd=5, n=50, monkey="U"),
-        monkey_thresholds(mean=200, sd=10, n=75, monkey="Y"),
-    ]
-)
-
+data = thresholds(mean=200, sd=10, n=1)
 
 layout = dbc.Container(
     [
@@ -43,54 +34,82 @@ layout = dbc.Container(
                     [
                         dbc.InputGroup(
                             [
-                                dbc.Input(type="number", value=3),
-                                dbc.InputGroupText("subjects"),
+                                dbc.Input(type="number", value=1),
+                                dbc.InputGroupText("trials"),
                             ]
                         ),
+                        html.H2("Simulation parameters"),
+                        dcc.Markdown("Simulated threshold *l*"),
                         dbc.InputGroup(
                             [
-                                dbc.Input(type="number", value=100),
-                                dbc.InputGroupText("blocks per subject"),
-                            ]
-                        ),
-                        dbc.InputGroup(
-                            [
-                                dbc.Input(type="number", value=1000),
-                                dbc.InputGroupText("trials per block"),
-                            ]
-                        ),
-                        dbc.Label("True Threshold"),
-                        dbc.InputGroup(
-                            [
-                                dbc.Input(type="number", value=200),
+                                dbc.Input(type="number", value=0),
                                 dbc.InputGroupText("μA"),
                             ]
                         ),
-                        dbc.Label("True Slope"),
-                        dbc.Input(type="number", value=0.5, step=0.01),
-                        dbc.Label("True Guess Rate"),
+                        dcc.Markdown("Simulated slope *m*"),
+                        dbc.Input(type="number", value=1, step=0.01),
+                        dcc.Markdown("Simulated guess rate *γ*"),
                         dbc.Input(type="number", value=0.1, step=0.01),
-                        dbc.Label("True Lapse Rate"),
+                        dcc.Markdown("Simulated lapse rate *λ*"),
                         dbc.Input(type="number", value=0.1, step=0.01),
+                        html.Br(),
                     ],
                     width=3,
                 ),
                 dbc.Col(
-                    dcc.Graph(
-                        figure=px.scatter(
-                            data,
-                            x="Day",
-                            y="Threshold",
-                            error_y="err_y_plus",
-                            error_y_minus="err_y_minus",
-                            color="Monkey",
-                            symbol="Channel",
-                            template=pa.plot.template,
-                            # animation_frame="Day",
-                        )
-                    )
+                    [
+                        dcc.Graph(figure=px.scatter(template=pa.plot.template)),
+                        dash_table.DataTable(data.to_dict("records")),
+                        dcc.Markdown(
+                            """
+                            $$
+                            Ψ(x;l,m,γ,λ)=γ+(1-γ-λ)F(x;l,m)
+                            $$
+                            """,
+                            mathjax=True,
+                        ),
+                        dcc.Markdown(
+                            """
+                            $$
+                            Ψ(x)=.1+(1-.1-.1)F(x)
+                            $$
+                            """,
+                            mathjax=True,
+                        ),
+                        # ( 1+\exp( \frac{x-μ}{σ\sqrt{2}} ) )
+                        # \frac{ ( 1+\exp( \frac{x-μ}{σ\sqrt{2}} ) ) }{2}
+                        dcc.Markdown(
+                            """
+                            $$
+                            Ψ(x)=.1+.8\\frac{  1+\\exp( \\frac{x-0}{1\\sqrt{2}} )) }{2}
+                            $$
+                            """,
+                            mathjax=True,
+                        ),
+                        dcc.Markdown(
+                            """
+                            $$
+                            Ψ(x)=.5 + \\exp(\\frac{x}{\\sqrt{2}})/2
+                            $$
+                            """,
+                            mathjax=True,
+                        ),
+                        dcc.Markdown(
+                            """
+                            $$
+                            Ψ(x)=\\frac{1 + \\exp(\\frac{x}{\\sqrt{2}})}{2}
+                            $$
+                            """,
+                            mathjax=True,
+                        ),
+                    ]
                 ),
             ]
         ),
     ]
 )
+
+
+# @dash.callback(
+#     Output()
+# )

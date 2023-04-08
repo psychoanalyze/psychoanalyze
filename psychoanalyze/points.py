@@ -64,7 +64,6 @@ def model():
 def fit(points, save_to=None, block=None):
     points = points[["x", "Hits", "n"]]
     if len(points):
-
         data = points.to_numpy()
         fit = pa.fit(data)
         fit = pd.DataFrame(

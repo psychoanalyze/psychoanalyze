@@ -243,7 +243,6 @@ def test_fit_no_data(mocker):
 
 
 def test_fit_data(tmp_path):
-
     points = pd.DataFrame({"n": [0], "Hits": [0], "x": [0]})
     fit = pa.points.fit(
         points,
