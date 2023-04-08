@@ -81,7 +81,7 @@ layout = dbc.Container(
                         dcc.Markdown(
                             """
                             $$
-                            Ψ(x)=.1+.8\\frac{  1+\\exp( \\frac{x-0}{1\\sqrt{2}} )) }{2}
+                            Ψ(x)=.1+.8\\int_{-\\infty}^x\\exp(-t^2/2)\\,dt \\]
                             $$
                             """,
                             mathjax=True,
