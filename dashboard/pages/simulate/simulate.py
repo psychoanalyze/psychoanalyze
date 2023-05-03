@@ -10,8 +10,8 @@ import psychoanalyze as pa
 dash.register_page(__name__, path="/simulate")
 
 trials = pd.read_csv("data/test/trials.csv")
-points = pa.points.from_trials(trials)
-points = points.reset_index().rename(columns={"Outcome": "Hit Rate"})
+points = pd.read_csv("data/test/points.csv")
+# points = points.reset_index().rename(columns={"Outcome": "Hit Rate"})
 
 
 layout = html.Div(

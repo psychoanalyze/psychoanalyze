@@ -12,7 +12,7 @@ import numpy as np
 index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
 
 
-def from_trials(trials):
+def from_trials(trials: pd.DataFrame) -> pd.Series:
     test_trials = trials[trials["Result"].isin([0, 1])]
     points = (
         test_trials.groupby(test_trials.index.names)["Result"]
