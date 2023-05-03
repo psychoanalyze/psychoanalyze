@@ -142,3 +142,5 @@ docs/tables/*
 
 notebooks/*
 figures/*
+
+*.duckdb*
