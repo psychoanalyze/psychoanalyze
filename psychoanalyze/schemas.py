@@ -12,20 +12,10 @@ points_index_levels = block_index_levels + point_dims
 
 points = pr.DataFrameSchema(
     {
-        "n": pr.Column(int, coerce=True),
-        "x": pr.Column(float, coerce=True),
-        "Hits": pr.Column(float, coerce=True),
-    },
-    index=pr.MultiIndex(
-        [
-            pr.Index(str, name="Monkey"),
-            pr.Index("datetime64", name="Date", coerce=True),
-        ]
-        + [pr.Index(float, name=dim) for dim in block_stim_dims]
-        + [pr.Index(int, name=dim) for dim in block_channel_dims]
-        + [pr.Index(float, name=dim) for dim in point_dims]
-    ),
-    coerce=True,
+        "n": pr.Column(int),
+        "Intensity": pr.Column(float),
+        "Hits": pr.Column(int),
+    }
 )
 
 blocks = pr.DataFrameSchema(
