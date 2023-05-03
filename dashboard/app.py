@@ -1,5 +1,5 @@
-from dash import Dash, html
 import dash
+from dash import Dash, html
 import dash_bootstrap_components as dbc
 
 
@@ -10,7 +10,8 @@ app = Dash(
 )
 server = app.server
 
-app.layout = html.Div(
+
+app.layout = dbc.Container(
     [
         dbc.NavbarSimple(
             [
@@ -38,7 +39,11 @@ app.layout = html.Div(
             brand=dbc.Col(
                 [
                     dbc.Row(html.H1("PsychoAnalyze")),
-                    dbc.Row(html.P("Interactive data exploration for psychophysics.")),
+                    dbc.Row(
+                        html.P(
+                            "Interactive data simulation & analysis for psychophysics."
+                        )
+                    ),
                 ],
             ),
             brand_href="/",

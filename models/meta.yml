@@ -12,3 +12,19 @@ exposures:
     owner: 
       name: PsychoAnalyze
       email: support@psychoanalyze.io
+
+
+sources:
+  - name: Simulation
+    tables:
+      - name: Trials
+        meta:
+          external_location: 'data/test/trials.csv'
+        columns:
+          - name: TrialID
+            type: int
+          - name: Outcome
+            type: int
+      - name: Outcomes
+        meta:
+          external_location: 'data/test/outcomes.csv'

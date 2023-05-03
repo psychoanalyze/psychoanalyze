@@ -34,7 +34,7 @@ dash-daq = "^0.5.0"
 pandas-stubs = "^1.5.3.230321"
 cmdstanpy = "^1.0.8"
 dbt-core = "^1.4.5"
-dash = "^2.9.2"
+dash = "^2.9.3"
 dbt-duckdb = "^1.4.1"
 ydata-profiling = "^4.1.2"
 

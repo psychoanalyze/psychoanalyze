@@ -3,4 +3,4 @@ pa-duckdb:
   outputs:
     dev: 
       type: duckdb
-      path: ':memory:'
+      path: 'psychoanalyze.duckdb'
