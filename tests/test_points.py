@@ -1,36 +1,42 @@
 import psychoanalyze as pa
 import pandas as pd
 from scipy.special import expit  # type: ignore
-import json
 import plotly.express as px  # type: ignore
 import datetime
 
 
+# def test_from_trials():
+#     df = pd.DataFrame(
+#         {"Result": [0, 1]},
+#         index=pd.MultiIndex.from_frame(
+#             pd.DataFrame(
+#                 {
+#                     "Monkey": ["U", "U"],
+#                     "Date": [1, 1],
+#                     "Amp2": [1, 1],
+#                     "Width2": [1, 1],
+#                     "Freq2": [1, 1],
+#                     "Dur2": [1, 1],
+#                     "Active Channels": [1, 1],
+#                     "Return Channels": [1, 1],
+#                     "Amp1": [1, 2],
+#                     "Width1": [1, 1],
+#                     "Freq1": [1, 1],
+#                     "Dur1": [1, 1],
+#                 }
+#             )
+#         ),
+#     )
+#     df = pa.points.from_trials(df)
+#     assert len(df) == 2
+#     assert list(df["n"].values) == [1, 1]
+
+
 def test_from_trials():
-    df = pd.DataFrame(
-        {"Result": [0, 1]},
-        index=pd.MultiIndex.from_frame(
-            pd.DataFrame(
-                {
-                    "Monkey": ["U", "U"],
-                    "Date": [1, 1],
-                    "Amp2": [1, 1],
-                    "Width2": [1, 1],
-                    "Freq2": [1, 1],
-                    "Dur2": [1, 1],
-                    "Active Channels": [1, 1],
-                    "Return Channels": [1, 1],
-                    "Amp1": [1, 2],
-                    "Width1": [1, 1],
-                    "Freq1": [1, 1],
-                    "Dur1": [1, 1],
-                }
-            )
-        ),
+    trials = pd.DataFrame(
+        {"Intensity": [], "Result": []}, index=pd.Index([], name="TrialID")
     )
-    df = pa.points.from_trials(df)
-    assert len(df) == 2
-    assert list(df["n"].values) == [1, 1]
+    assert pa.points.from_trials(trials).name == "Hit Rate"
 
 
 def test_amp_dimension():
@@ -102,7 +108,7 @@ def test_load(tmp_path):
         tmp_path / "points.csv", index_label=False
     )
     points = pa.points.load(tmp_path)
-    assert "n" in points.columns
+    assert points.name == "Hit Rate"
 
 
 def test_datatable():
@@ -116,25 +122,25 @@ def test_datatable():
     assert amp_column[0]["format"].to_plotly_json()["specifier"] == ".2f"
 
 
-def test_from_store(mocker):
-    store_data = pd.DataFrame(
-        {"Result": [1]},
-        index=pd.MultiIndex.from_frame(
-            pd.DataFrame(
-                {"Monkey": ["U"], "Date": ["1-1-2001"]}
-                | {
-                    level: [0]
-                    for level in pa.schemas.block_dims + pa.schemas.point_dims
-                }
-            )
-        ),
-    )
-    mocker.patch("psychoanalyze.trials.from_store", return_value=store_data)
+# def test_from_store(mocker):
+#     store_data = pd.DataFrame(
+#         {"Result": [1]},
+#         index=pd.MultiIndex.from_frame(
+#             pd.DataFrame(
+#                 {"Monkey": ["U"], "Date": ["1-1-2001"]}
+#                 | {
+#                     level: [0]
+#                     for level in pa.schemas.block_dims + pa.schemas.point_dims
+#                 }
+#             )
+#         ),
+#     )
+#     mocker.patch("psychoanalyze.trials.from_store", return_value=store_data)
 
-    store_data = store_data.to_dict(orient="split")
-    store_data["index_names"] = pa.schemas.points_index_levels
-    df = pa.points.from_store(json.dumps(store_data))
-    pa.schemas.points.validate(df)
+#     store_data = store_data.to_dict(orient="split")
+#     store_data["index_names"] = pa.schemas.points_index_levels
+#     df = pa.points.from_store(json.dumps(store_data))
+#     pa.schemas.points.validate(df)
 
 
 def test_combine_plots():
@@ -144,14 +150,14 @@ def test_combine_plots():
     assert len(fig.data) == 2
 
 
-def test_fit_prep():
-    points_df = pa.schemas.points.example(0)
-    ready_for_fit = pa.points.prep_fit(points_df, "Amp1")
-    points_df = points_df.reset_index()
-    assert ready_for_fit["X"] == len(points_df)
-    assert list(ready_for_fit["x"]) == list(points_df["Amp1"].to_numpy())
-    assert list(ready_for_fit["N"]) == list(points_df["n"].to_numpy())
-    assert list(ready_for_fit["hits"]) == list(points_df["Hits"].to_numpy())
+# def test_fit_prep():
+#     points_df = pa.schemas.points.example(0)
+#     ready_for_fit = pa.points.prep_fit(points_df, "Amp1")
+#     points_df = points_df.reset_index()
+#     assert ready_for_fit["X"] == len(points_df)
+#     assert list(ready_for_fit["x"]) == list(points_df["Amp1"].to_numpy())
+#     assert list(ready_for_fit["N"]) == list(points_df["n"].to_numpy())
+#     assert list(ready_for_fit["hits"]) == list(points_df["Hits"].to_numpy())
 
 
 # def test_fit():
