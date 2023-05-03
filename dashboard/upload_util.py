@@ -1,5 +1,5 @@
 import pandas as pd
-from dash import dash_table
+import dash
 import base64
 import io
 
@@ -26,4 +26,4 @@ def contents(contents, filename):
             blocks = data
         subjects = pa.blocks.monkey_counts(blocks)
         output_data = subjects.to_frame().reset_index()
-        return [dash_table.DataTable(output_data.to_dict("records"))]
+        return [dash.dash_table.DataTable(output_data.to_dict("records"))]

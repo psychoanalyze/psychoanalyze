@@ -86,10 +86,6 @@ def psi(psi_observed=None, psi_model=None, psi_simulated=None) -> pd.DataFrame:
     return s.reset_index()
 
 
-def hit_rate(trials: pd.Series) -> pd.DataFrame:
-    return trials.value_counts().get("Hit", 0) / len(trials)
-
-
 @check_output(points_schema)
 def hit_rates(trials: pd.DataFrame):
     hits = trials.groupby("Intensity")["Outcome"].sum().rename("Hits")
