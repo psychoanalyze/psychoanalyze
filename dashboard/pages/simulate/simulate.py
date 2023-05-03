@@ -9,18 +9,32 @@ dash.register_page(__name__, path="/simulate")
 
 trials = pd.read_csv("data/test/trials.csv")
 points = pd.read_csv("data/test/points.csv")
-# points = points.reset_index().rename(columns={"Outcome": "Hit Rate"})
+
+
+# def psi():
 intensity_levels = [0, 1, 2]
 intensity_index = pd.Index(intensity_levels, name="Intensity")
-after_trial_1 = pd.Series([0, None, None], name="Hit Rate", index=intensity_index)
-after_trial_2 = pd.Series([0, 1, None], name="Hit Rate", index=intensity_index)
-after_trial_3 = pd.Series([0, 1, 1], name="Hit Rate", index=intensity_index)
-after_trial_4 = pd.Series([0, 0.5, 1], name="Hit Rate", index=intensity_index)
+measures = [
+    [0, None, None],
+    [0, 1, None],
+    [0, 1, 1],
+    [0, 0.5, 1],
+    [0, 0.5, 0.5],
+]
+
+
+def snapshot(i: int):
+    return pd.Series(measures[i], name="Hit Rate", index=intensity_index)
+
+
+snapshots = [snapshot(i) for i in range(5)]
+last_trial = snapshot(4)
 df = pd.concat(
-    [after_trial_1, after_trial_2, after_trial_3, after_trial_4],
-    keys=[0, 1, 2, 3],
+    snapshots,
+    keys=[0, 1, 2, 3, 4],
     names=["Trial", "Intensity"],
 ).reset_index()
+
 
 layout = html.Div(
     [
@@ -30,7 +44,7 @@ layout = html.Div(
                     [
                         dbc.InputGroup(
                             [
-                                dbc.Input(id="n-trials", type="number", value=3),
+                                dbc.Input(id="n-trials", type="number", value=4),
                                 dbc.InputGroupText("trials"),
                             ]
                         ),
@@ -60,7 +74,7 @@ layout = html.Div(
                         ),
                         html.Br(),
                         dash_table.DataTable(
-                            data=points.to_dict("records"),
+                            data=last_trial.reset_index().to_dict("records"),
                             id="trials-table",
                             style_data={"color": "black"},
                             style_header={"color": "black"},
