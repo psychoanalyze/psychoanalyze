@@ -2,9 +2,7 @@
   "name": "Python 3",
   "image": "mcr.microsoft.com/devcontainers/python:0-3.11",
   "features": {
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "none"
-    },
+    "ghcr.io/devcontainers/features/node:1": {},
     "ghcr.io/devcontainers-contrib/features/poetry:1": {},
     "ghcr.io/devcontainers-contrib/features/pre-commit:1": {},
     "ghcr.io/devcontainers-contrib/features/heroku-cli:1": {}
@@ -23,7 +21,8 @@
         }
       },
       "extensions": [
-        "bungcip.better-toml"
+        "bungcip.better-toml",
+        "innoverio.vscode-dbt-power-user"
       ]
     }
   }
