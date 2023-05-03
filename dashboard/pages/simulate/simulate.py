@@ -1,32 +1,20 @@
 import dash
 import dash_bootstrap_components as dbc
 from dash import dcc, html, dash_table
-import plotly.express as px
 import pandas as pd
-import random
 
+import plotly.express as px
 import psychoanalyze as pa
 
 
 dash.register_page(__name__, path="/simulate")
 
-
-def thresholds(mean: float, sd: float, n: int) -> pd.DataFrame:
-    return pd.DataFrame.from_records(
-        [
-            {
-                "TrialID": i,
-                "TrialType": random.choice(["Catch", "Test"]),
-                "Intensity": random.choice([-3, -2, -1, 0, 1, 2, 3]),
-            }
-            for i in range(n)
-        ]
-    )
+trials = pd.read_csv("data/test/trials.csv")
+points = pa.points.from_trials(trials)
+points = points.reset_index().rename(columns={"Outcome": "Hit Rate"})
 
 
-data = thresholds(mean=200, sd=10, n=1)
-
-layout = dbc.Container(
+layout = html.Div(
     [
         dbc.Row(
             [
@@ -34,7 +22,7 @@ layout = dbc.Container(
                     [
                         dbc.InputGroup(
                             [
-                                dbc.Input(type="number", value=1),
+                                dbc.Input(id="n-trials", type="number", value=1),
                                 dbc.InputGroupText("trials"),
                             ]
                         ),
@@ -58,8 +46,24 @@ layout = dbc.Container(
                 ),
                 dbc.Col(
                     [
-                        dcc.Graph(figure=px.scatter(template=pa.plot.template)),
-                        dash_table.DataTable(data.to_dict("records")),
+                        dcc.Graph(
+                            id="psi-plot",
+                            figure=px.line(
+                                points,
+                                x="Intensity",
+                                y="Hit Rate",
+                                # color="Source",
+                                markers=True,
+                                template=pa.plot.template,
+                            ),
+                        ),
+                        html.Br(),
+                        dash_table.DataTable(
+                            data=points.to_dict("records"),
+                            id="trials-table",
+                            style_data={"color": "black"},
+                            style_header={"color": "black"},
+                        ),
                         dcc.Markdown(
                             """
                             $$
@@ -81,7 +85,7 @@ layout = dbc.Container(
                         dcc.Markdown(
                             """
                             $$
-                            Ψ(x)=.1+.8\\int_{-\\infty}^x\\exp(-t^2/2)\\,dt \\]
+                            Ψ(x)=.1+.8\\int_{-\\infty}^x\\exp(-t^2/2)\\,dt
                             $$
                             """,
                             mathjax=True,
@@ -110,6 +114,22 @@ layout = dbc.Container(
 )
 
 
-# @dash.callback(
-#     Output()
+# @callback(
+#     [Output("psi-plot", "figure"), Output("trials-table", "data")],
+#     Input("n-trials", "value"),
 # )
+# def update_figure(n_trials):
+#     _trials = trials.iloc[:n_trials]
+#     points = _trials.groupby("Intensity")[["Outcome"]].sum() / len(_trials)
+#     points = points.reset_index().rename(columns={"Outcome": "Hit Rate"})
+#     return (
+#         px.line(
+#             points.reset_index(),
+#             x="Intensity",
+#             y="Hit Rate",
+#             # color="Source",
+#             markers=True,
+#             template=pa.plot.template,
+#         ),
+#         points.to_dict("records"),
+#     )
