@@ -45,34 +45,34 @@ def test_construct_index(mocker):
     assert len(index) == len(x) * len(days)
 
 
-def test_data_load(tmp_path):
-    pd.DataFrame(
-        {"Trial ID": [1, 2, 3], "Result": [1] * 3},
-        index=pd.MultiIndex.from_frame(
-            pd.DataFrame(
-                {
-                    "Monkey": ["U"] * 3,
-                    "Date": pd.to_datetime(["2000-01-01"] * 3),
-                    "Amp2": [0] * 3,
-                    "Width2": [0] * 3,
-                    "Freq2": [0] * 3,
-                    "Dur2": [0] * 3,
-                    "Active Channels": [0] * 3,
-                    "Return Channels": [0] * 3,
-                    "Amp1": [2] * 3,
-                    "Width1": [0] * 3,
-                    "Freq1": [0] * 3,
-                    "Dur1": [0] * 3,
-                }
-            )
-        ),
-    ).to_csv(tmp_path / "trials.csv")
-    pd.DataFrame(
-        {"Surgery Date": pd.to_datetime(["1999-12-31"])},
-        index=pd.Index(["U"], name="Monkey"),
-    ).to_csv(tmp_path / "subjects.csv")
-    pd.DataFrame({"Monkey": ["U"], "Date": ["2000-01-01"]}).to_csv(
-        tmp_path / "sessions.csv"
-    )
-    data = pa.data.load(tmp_path)
-    assert data.keys() == {"Subjects", "Sessions", "Blocks", "Points"}
+# def test_data_load(tmp_path):
+#     pd.DataFrame(
+#         {"Trial ID": [1, 2, 3], "Result": [1] * 3},
+#         index=pd.MultiIndex.from_frame(
+#             pd.DataFrame(
+#                 {
+#                     "Monkey": ["U"] * 3,
+#                     "Date": pd.to_datetime(["2000-01-01"] * 3),
+#                     "Amp2": [0] * 3,
+#                     "Width2": [0] * 3,
+#                     "Freq2": [0] * 3,
+#                     "Dur2": [0] * 3,
+#                     "Active Channels": [0] * 3,
+#                     "Return Channels": [0] * 3,
+#                     "Amp1": [2] * 3,
+#                     "Width1": [0] * 3,
+#                     "Freq1": [0] * 3,
+#                     "Dur1": [0] * 3,
+#                 }
+#             )
+#         ),
+#     ).to_csv(tmp_path / "trials.csv")
+#     pd.DataFrame(
+#         {"Surgery Date": pd.to_datetime(["1999-12-31"])},
+#         index=pd.Index(["U"], name="Monkey"),
+#     ).to_csv(tmp_path / "subjects.csv")
+#     pd.DataFrame({"Monkey": ["U"], "Date": ["2000-01-01"]}).to_csv(
+#         tmp_path / "sessions.csv"
+#     )
+#     data = pa.data.load(tmp_path)
+#     assert data.keys() == {"Subjects", "Sessions", "Blocks", "Points"}

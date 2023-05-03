@@ -1,4 +1,6 @@
 import pandera as pr
+from pandera.typing import Series
+
 
 session_dims = ["Monkey", "Date"]
 block_stim_dims = ["Amp2", "Width2", "Freq2", "Dur2"]
@@ -44,3 +46,22 @@ trials = pr.DataFrameSchema(
     ),
     coerce=True,
 )
+
+psi_animation = pr.DataFrameSchema(
+    {
+        "Trial": pr.Column(int),
+        "Intensity": pr.Column(float),
+        "Hit Rate": pr.Column(float),
+    }
+)
+
+
+class PsiAnimation(pr.DataFrameModel):
+    trial_id: Series[int]
+    intensity: Series[float]
+    hit_rate: Series[float]
+
+
+class PsiAnimationFrame(pr.DataFrameModel):
+    intensity: Series[float]
+    hit_rate: Series[float]

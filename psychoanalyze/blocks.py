@@ -61,7 +61,7 @@ def from_points(points: pd.DataFrame, dim=None):
 
 def from_trials(trials: pd.DataFrame) -> pd.Series:
     points = pa.points.from_trials(trials)
-    return from_points(points)
+    return from_points(points.reset_index())
 
 
 def dimensions(points, dims=None):

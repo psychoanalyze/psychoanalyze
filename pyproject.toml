@@ -27,7 +27,7 @@ importlib-resources = "^5.8.0"
 safety = "^2.0.0"
 mkdocs-material = "^8.3.9"
 tabulate = "^0.8.10"
-pandera = "^0.14.5"
+pandera = {extras = ["mypy"], version = "^0.14.5"}
 kaleido = "0.2.1"
 pre-commit = "^2.20.0"
 dash-daq = "^0.5.0"
@@ -37,6 +37,7 @@ dbt-core = "^1.4.5"
 dash = "^2.9.3"
 dbt-duckdb = "^1.4.1"
 ydata-profiling = "^4.1.2"
+nbformat = "^5.8.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^2.20.0"

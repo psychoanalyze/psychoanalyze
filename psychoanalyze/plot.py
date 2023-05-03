@@ -2,6 +2,8 @@ import plotly.express as px  # type: ignore
 import pandas as pd
 import psychoanalyze as pa
 from plotly import graph_objects as go
+from psychoanalyze.schemas import PsiAnimation
+from pandera.typing import DataFrame
 
 axis_settings = {
     "ticks": "outside",
@@ -90,18 +92,17 @@ def hits_animation(cumulative_draws: pd.DataFrame):
     )
 
 
-def hit_rate_animation(cumulative_draws: pd.DataFrame):
-    df = cumulative_draws.reset_index()
-    return px.scatter(
+def psi_animation(df: DataFrame[PsiAnimation]):
+    return px.line(
         df,
-        x="x",
+        x="Intensity",
         y="Hit Rate",
-        error_y="err+",
-        error_y_minus="err-",
-        color=df.get("Subject") or df.get("Type"),
-        symbol=df.get("Day"),
-        animation_group="x",
-        animation_frame="n",
+        # error_y="err+",
+        # error_y_minus="err-",
+        # color=df.get("Subject") or df.get("Type"),
+        # symbol=df.get("Day"),
+        animation_group="Intensity",
+        animation_frame="Trial",
         template=template,
     )
 
