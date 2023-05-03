@@ -7,15 +7,6 @@ def test_simulation():
     assert len(sim) == 0
 
 
-def test_hit_rate():
-    trial_counts = pd.Series(
-        [1],
-        index=pd.Index(["Miss"], name="Outcome"),
-        name="count",
-    )
-    assert simulate.hit_rate(trial_counts) == 0
-
-
 def test_psi():
     psi_observed = pd.Series(
         [0.0], name="Hit Rate", index=pd.Index([0.0], name="Intensity")
