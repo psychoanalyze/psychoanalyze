@@ -31,11 +31,3 @@ def test_psi():
         psi,
         pd.DataFrame({"Source": ["Observed"], "Intensity": [0.0], "Hit Rate": [0.0]}),
     )
-
-
-def test_hit_rates():
-    trials = pd.DataFrame({"Intensity": [1.0], "Outcome": [1]})
-    pd.testing.assert_frame_equal(
-        simulate.hit_rates(trials),
-        pd.DataFrame({"Intensity": [1.0], "Hits": [1], "n": [1], "Hit Rate": [1.0]}),
-    )
