@@ -13,21 +13,21 @@ index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
 
 
 def from_trials(trials):
-    trials = trials[trials["Result"].isin([0, 1])]
+    test_trials = trials[trials["Result"].isin([0, 1])]
     points = (
-        trials.groupby(trials.index.names)["Result"]
+        test_trials.groupby(test_trials.index.names)["Result"]
         .agg(["count", "sum"])
         .rename(columns={"count": "n", "sum": "Hits"})
     )
-    points["x"] = points.index.get_level_values("Amp1")
-    return points
+    # points["x"] = points.index.get_level_values("Amp1")
+    hit_rates = points["Hits"] / points["n"]
+    hit_rates.name = "Hit Rate"
+    return hit_rates
 
 
 def load(data_path=pathlib.Path("data")):
     trials = pa.trials.load(data_path)
-    points = from_trials(trials)
-    points["Hit Rate"] = points["Hits"] / points["n"]
-    return points
+    return from_trials(trials)
 
 
 def dimension(points):
