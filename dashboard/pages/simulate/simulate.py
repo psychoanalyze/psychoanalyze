@@ -41,7 +41,6 @@ layout = html.Div(
                         style_data={"color": "black"},
                         style_header={"color": "black"},
                         page_size=10,
-                        sort_by=[{"column_id": "Trial", "direction": "desc"}],
                     ),
                 ),
                 dbc.Col(
@@ -49,6 +48,7 @@ layout = html.Div(
                         id="points-table",
                         style_data={"color": "black"},
                         style_header={"color": "black"},
+                        page_size=10,
                     )
                 ),
             ]
@@ -60,8 +60,8 @@ layout = html.Div(
 @callback(
     [
         Output("psi-plot", "figure"),
-        Output("points-table", "data"),
         Output("trials-table", "data"),
+        Output("points-table", "data"),
     ],
     Input("n-trials", "value"),
 )
