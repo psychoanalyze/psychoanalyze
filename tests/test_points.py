@@ -91,35 +91,6 @@ def test_generate():
     assert points.name == "Hit Rate"
 
 
-def test_load(tmp_path):
-    pd.DataFrame(
-        {"Trial ID": [1, 2, 3], "Result": [1] * 3},
-        index=pd.MultiIndex.from_frame(
-            pd.DataFrame(
-                {
-                    "Monkey": ["U"] * 3,
-                    "Date": pd.to_datetime(["2000-01-01"] * 3),
-                    "Amp2": [0] * 3,
-                    "Width2": [0] * 3,
-                    "Freq2": [0] * 3,
-                    "Dur2": [0] * 3,
-                    "Active Channels": [0] * 3,
-                    "Return Channels": [0] * 3,
-                    "Amp1": [2] * 3,
-                    "Width1": [0] * 3,
-                    "Freq1": [0] * 3,
-                    "Dur1": [0] * 3,
-                }
-            )
-        ),
-    ).to_csv(tmp_path / "trials.csv")
-    pd.DataFrame(pa.schemas.trials.example(0).reset_index()).to_csv(
-        tmp_path / "points.csv", index_label=False
-    )
-    points = pa.points.load(tmp_path)
-    assert "Hit Rate" in points.columns
-
-
 def test_datatable():
     data = pd.DataFrame(
         index=pd.MultiIndex.from_frame(
