@@ -5,33 +5,6 @@ import plotly.express as px  # type: ignore
 import datetime
 
 
-# def test_from_trials():
-#     df = pd.DataFrame(
-#         {"Result": [0, 1]},
-#         index=pd.MultiIndex.from_frame(
-#             pd.DataFrame(
-#                 {
-#                     "Monkey": ["U", "U"],
-#                     "Date": [1, 1],
-#                     "Amp2": [1, 1],
-#                     "Width2": [1, 1],
-#                     "Freq2": [1, 1],
-#                     "Dur2": [1, 1],
-#                     "Active Channels": [1, 1],
-#                     "Return Channels": [1, 1],
-#                     "Amp1": [1, 2],
-#                     "Width1": [1, 1],
-#                     "Freq1": [1, 1],
-#                     "Dur1": [1, 1],
-#                 }
-#             )
-#         ),
-#     )
-#     df = pa.points.from_trials(df)
-#     assert len(df) == 2
-#     assert list(df["n"].values) == [1, 1]
-
-
 def test_from_trials():
     trials = pd.DataFrame(
         {"Intensity": [], "Result": []}, index=pd.Index([], name="TrialID")
@@ -102,48 +75,11 @@ def test_datatable():
     assert amp_column[0]["format"].to_plotly_json()["specifier"] == ".2f"
 
 
-# def test_from_store(mocker):
-#     store_data = pd.DataFrame(
-#         {"Result": [1]},
-#         index=pd.MultiIndex.from_frame(
-#             pd.DataFrame(
-#                 {"Monkey": ["U"], "Date": ["1-1-2001"]}
-#                 | {
-#                     level: [0]
-#                     for level in pa.schemas.block_dims + pa.schemas.point_dims
-#                 }
-#             )
-#         ),
-#     )
-#     mocker.patch("psychoanalyze.trials.from_store", return_value=store_data)
-
-#     store_data = store_data.to_dict(orient="split")
-#     store_data["index_names"] = pa.schemas.points_index_levels
-#     df = pa.points.from_store(json.dumps(store_data))
-#     pa.schemas.points.validate(df)
-
-
 def test_combine_plots():
     plot1 = px.scatter(pd.DataFrame({"A": [1]}))
     plot2 = px.line(pd.DataFrame({"B": [1]}))
     fig = pa.points.combine_plots(plot1, plot2)
     assert len(fig.data) == 2
-
-
-# def test_fit_prep():
-#     points_df = pa.schemas.points.example(0)
-#     ready_for_fit = pa.points.prep_fit(points_df, "Amp1")
-#     points_df = points_df.reset_index()
-#     assert ready_for_fit["X"] == len(points_df)
-#     assert list(ready_for_fit["x"]) == list(points_df["Amp1"].to_numpy())
-#     assert list(ready_for_fit["N"]) == list(points_df["n"].to_numpy())
-#     assert list(ready_for_fit["hits"]) == list(points_df["Hits"].to_numpy())
-
-
-# def test_fit():
-#     points = pd.DataFrame({"x": [], "n": [], "Hits": []})
-#     fit = pa.points.fit(points)
-#     assert fit.keys() <= {"Threshold", "width", "gamma", "lambda", "beta"}
 
 
 def test_no_dimension():
