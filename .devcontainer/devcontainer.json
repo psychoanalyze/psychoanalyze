@@ -22,7 +22,8 @@
       },
       "extensions": [
         "bungcip.better-toml",
-        "innoverio.vscode-dbt-power-user"
+        "innoverio.vscode-dbt-power-user",
+        "GitHub.copilot"
       ]
     }
   }
