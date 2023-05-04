@@ -21,7 +21,16 @@ layout = html.Div(
                                 dbc.Input(id="n-trials", type="number", value=100),
                                 dbc.InputGroupText("trials"),
                             ]
-                        )
+                        ),
+                        html.H3("Intensity Levels"),
+                        dbc.InputGroup(
+                            [
+                                dbc.InputGroupText("Min"),
+                                dbc.Input(id="min-intensity", type="number", value=-4),
+                                dbc.Input(id="max-intensity", type="number", value=4),
+                                dbc.InputGroupText("Max"),
+                            ]
+                        ),
                     ],
                     width=3,
                 ),
@@ -60,10 +69,14 @@ layout = html.Div(
         Output("trials-table", "data"),
         Output("points-table", "data"),
     ],
-    Input("n-trials", "value"),
+    [
+        Input("n-trials", "value"),
+        Input("min-intensity", "value"),
+        Input("max-intensity", "value"),
+    ],
 )
-def update_figure(n_trials):
-    intensity_choices = list(range(-2,3))
+def update_figure(n_trials, min_intensity, max_intensity):
+    intensity_choices = list(range(min_intensity, max_intensity + 1))
     intensities = [random.choice(intensity_choices) for _ in range(n_trials)]
     results = [random.random() <= expit(intensity) for intensity in intensities]
     trials = pd.DataFrame(
