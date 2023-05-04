@@ -36,7 +36,16 @@ def test_from_trials():
     trials = pd.DataFrame(
         {"Intensity": [], "Result": []}, index=pd.Index([], name="TrialID")
     )
-    assert pa.points.from_trials(trials).name == "Hit Rate"
+    points = pa.points.from_trials(trials)
+    assert "Hit Rate" in points.columns
+
+
+def test_from_trials_sums_n_per_intensity_level():
+    trials = pd.DataFrame(
+        {"Intensity": [0, 1], "Result": [0, 0]}, index=pd.Index([0, 1], name="TrialID")
+    )
+    points = pa.points.from_trials(trials)
+    assert all(points["n"] == pd.Series([1, 1]))
 
 
 def test_amp_dimension():
@@ -108,7 +117,7 @@ def test_load(tmp_path):
         tmp_path / "points.csv", index_label=False
     )
     points = pa.points.load(tmp_path)
-    assert points.name == "Hit Rate"
+    assert "Hit Rate" in points.columns
 
 
 def test_datatable():

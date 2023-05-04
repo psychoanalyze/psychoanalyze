@@ -12,17 +12,15 @@ import numpy as np
 index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
 
 
-def from_trials(trials: pd.DataFrame) -> pd.Series:
+def from_trials(trials: pd.DataFrame) -> pd.DataFrame:
     test_trials = trials[trials["Result"].isin([0, 1])]
     points = (
-        test_trials.groupby(test_trials.index.names)["Result"]
+        test_trials.groupby("Intensity")["Result"]
         .agg(["count", "sum"])
         .rename(columns={"count": "n", "sum": "Hits"})
     )
-    # points["x"] = points.index.get_level_values("Amp1")
-    hit_rates = points["Hits"] / points["n"]
-    hit_rates.name = "Hit Rate"
-    return hit_rates
+    points["Hit Rate"] = points["Hits"] / points["n"]
+    return points
 
 
 def load(data_path=pathlib.Path("data")):

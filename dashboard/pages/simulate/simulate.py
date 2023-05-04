@@ -3,7 +3,8 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html, dash_table, Output, Input, callback
 import plotly.express as px
 import pandas as pd
-from random import random
+import random
+import psychoanalyze as pa
 
 dash.register_page(__name__, path="/simulate")
 
@@ -16,86 +17,12 @@ layout = html.Div(
                     [
                         dbc.InputGroup(
                             [
-                                dbc.Input(id="n-trials", type="number", value=10),
+                                dbc.Input(id="n-trials", type="number", value=100),
                                 dbc.InputGroupText("trials"),
                             ]
                         )
-                        # html.H2("Simulation parameters"),
-                        # dcc.Markdown("Simulated threshold *l*"),
-                        # dbc.InputGroup(
-                        #     [
-                        #         dbc.Input(type="number", value=0),
-                        #         dbc.InputGroupText("μA"),
-                        #     ]
-                        # ),
-                        # dcc.Markdown("Simulated slope *m*"),
-                        # dbc.Input(type="number", value=1, step=0.01),
-                        # dcc.Markdown("Simulated guess rate *γ*"),
-                        # dbc.Input(type="number", value=0.1, step=0.01),
-                        # dcc.Markdown("Simulated lapse rate *λ*"),
-                        # dbc.Input(type="number", value=0.1, step=0.01),
-                        # html.Br(),
                     ],
                     width=3,
-                ),
-                dbc.Col(
-                    [
-                        # dcc.Graph(
-                        #     id="psi-plot",
-                        #     # figure=pa.plot.psi_animation(df),
-                        #     figure=px.scatter(s),
-                        # ),
-                        html.Br(),
-                        dash_table.DataTable(
-                            id="points-table",
-                            style_data={"color": "black"},
-                            style_header={"color": "black"},
-                            page_size=10,
-                            sort_by=[{"column_id": "Trial", "direction": "desc"}],
-                        ),
-                        # dcc.Markdown(
-                        #     """
-                        #     $$
-                        #     Ψ(x;l,m,γ,λ)=γ+(1-γ-λ)F(x;l,m)
-                        #     $$
-                        #     """,
-                        #     mathjax=True,
-                        # ),
-                        # dcc.Markdown(
-                        #     """
-                        #     $$
-                        #     Ψ(x)=.1+(1-.1-.1)F(x)
-                        #     $$
-                        #     """,
-                        #     mathjax=True,
-                        # ),
-                        # ( 1+\exp( \frac{x-μ}{σ\sqrt{2}} ) )
-                        # \frac{ ( 1+\exp( \frac{x-μ}{σ\sqrt{2}} ) ) }{2}
-                        # dcc.Markdown(
-                        #     """
-                        #     $$
-                        #     Ψ(x)=.1+.8\\int_{-\\infty}^x\\exp(-t^2/2)\\,dt
-                        #     $$
-                        #     """,
-                        #     mathjax=True,
-                        # ),
-                        # dcc.Markdown(
-                        #     """
-                        #     $$
-                        #     Ψ(x)=.5 + \\exp(\\frac{x}{\\sqrt{2}})/2
-                        #     $$
-                        #     """,
-                        #     mathjax=True,
-                        # ),
-                        # dcc.Markdown(
-                        #     """
-                        #     $$
-                        #     Ψ(x)=\\frac{1 + \\exp(\\frac{x}{\\sqrt{2}})}{2}
-                        #     $$
-                        #     """,
-                        #     mathjax=True,
-                        # ),
-                    ]
                 ),
             ]
         ),
@@ -104,7 +31,26 @@ layout = html.Div(
                 dbc.Col(
                     dcc.Graph(id="psi-plot"),
                 ),
-                dbc.Col(dcc.Graph(id="trial-convergence")),
+            ]
+        ),
+        dbc.Row(
+            [
+                dbc.Col(
+                    dash_table.DataTable(
+                        id="trials-table",
+                        style_data={"color": "black"},
+                        style_header={"color": "black"},
+                        page_size=10,
+                        sort_by=[{"column_id": "Trial", "direction": "desc"}],
+                    ),
+                ),
+                dbc.Col(
+                    dash_table.DataTable(
+                        id="points-table",
+                        style_data={"color": "black"},
+                        style_header={"color": "black"},
+                    )
+                ),
             ]
         ),
     ]
@@ -112,69 +58,34 @@ layout = html.Div(
 
 
 @callback(
-    # Output("psi-plot", "figure"),
     [
-        Output("points-table", "data"),
         Output("psi-plot", "figure"),
-        Output("trial-convergence", "figure"),
+        Output("points-table", "data"),
+        Output("trials-table", "data"),
     ],
     Input("n-trials", "value"),
 )
 def update_figure(n_trials):
-    results = [random() <= 0.5 for _ in range(n_trials)]
-    results1 = [random() <= 0.75 for _ in range(n_trials)]
-    results2 = [random() <= 0.25 for _ in range(n_trials)]
-    points_history = (
-        [
-            {
-                "Trial": i,
-                "Result": results[i],
-                "Intensity": 0,
-                "Hits": sum(results[: i + 1]),
-                "Hit Rate": sum(results[: i + 1]) / (i + 1),
-                "n": i + 1,
-            }
-            for i in range(n_trials)
-        ]
-        + [
-            {
-                "Trial": i,
-                "Result": results1[i],
-                "Intensity": 1,
-                "Hits": sum(results1[: i + 1]),
-                "Hit Rate": sum(results1[: i + 1]) / (i + 1),
-                "n": i + 1,
-            }
-            for i in range(n_trials)
-        ]
-        + [
-            {
-                "Trial": i,
-                "Result": results2[i],
-                "Intensity": -1,
-                "Hits": sum(results2[: i + 1]),
-                "Hit Rate": sum(results2[: i + 1]) / (i + 1),
-                "n": i + 1,
-            }
-            for i in range(n_trials)
-        ]
+    p_x = {-1: 0.25, 0: 0.5, 1: 0.75}
+    intensities = [random.choice([-1, 0, 1]) for _ in range(n_trials)]
+    results = [random.random() <= p_x[intensity] for intensity in intensities]
+    trials = pd.DataFrame(
+        {
+            "Intensity": intensities,
+            "Result": results,
+        }
     )
-
+    points = pa.points.from_trials(trials)
     return (
-        points_history,
-        px.line(
-            pd.DataFrame.from_records(points_history),
-            x="Trial",
-            y="Hit Rate",
-            color="Intensity",
-        ),
         px.scatter(
-            pd.DataFrame.from_records(points_history),
+            points.reset_index(),
             x="Intensity",
             y="Hit Rate",
-            animation_group="Intensity",
-            animation_frame="Trial",
+            size="n",
+            template=pa.plot.template,
         ),
+        trials.reset_index().to_dict("records"),
+        points.reset_index().to_dict("records"),
     )
 
 
