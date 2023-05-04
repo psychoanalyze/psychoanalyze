@@ -4,6 +4,7 @@ from dash import dcc, html, dash_table, Output, Input, callback
 import plotly.express as px
 import pandas as pd
 import random
+from scipy.special import expit
 import psychoanalyze as pa
 
 dash.register_page(__name__, path="/simulate")
@@ -24,10 +25,6 @@ layout = html.Div(
                     ],
                     width=3,
                 ),
-            ]
-        ),
-        dbc.Row(
-            [
                 dbc.Col(
                     dcc.Graph(id="psi-plot"),
                 ),
@@ -66,9 +63,9 @@ layout = html.Div(
     Input("n-trials", "value"),
 )
 def update_figure(n_trials):
-    p_x = {-1: 0.25, 0: 0.5, 1: 0.75}
-    intensities = [random.choice([-1, 0, 1]) for _ in range(n_trials)]
-    results = [random.random() <= p_x[intensity] for intensity in intensities]
+    intensity_choices = list(range(-2,3))
+    intensities = [random.choice(intensity_choices) for _ in range(n_trials)]
+    results = [random.random() <= expit(intensity) for intensity in intensities]
     trials = pd.DataFrame(
         {
             "Intensity": intensities,
