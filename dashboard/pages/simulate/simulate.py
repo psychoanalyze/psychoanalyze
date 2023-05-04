@@ -87,19 +87,3 @@ def update_figure(n_trials):
         trials.reset_index().to_dict("records"),
         points.reset_index().to_dict("records"),
     )
-
-
-#     _trials = trials.iloc[:n_trials]
-#     points = _trials.groupby("Intensity")[["Outcome"]].sum() / len(_trials)
-#     points = points.reset_index().rename(columns={"Outcome": "Hit Rate"})
-#     return (
-#         px.line(
-#             points.reset_index(),
-#             x="Intensity",
-#             y="Hit Rate",
-#             # color="Source",
-#             markers=True,
-#             template=pa.plot.template,
-#         ),
-#         points.to_dict("records"),
-#     )
