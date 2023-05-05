@@ -146,5 +146,7 @@ def update_figure(n_trials, min_intensity, max_intensity, k, n_blocks):
             symbol="Source",
             template=pa.plot.template,
         ),
-        px.scatter({"k": [fits1.coef_[0][0], fits2.coef_[0][0]]}),
+        px.scatter(
+            {"k": [fits1.coef_[0][0], fits2.coef_[0][0]]}, template=pa.plot.template
+        ),
     )
