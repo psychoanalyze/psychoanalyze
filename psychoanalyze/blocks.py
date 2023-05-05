@@ -192,7 +192,11 @@ def monkey_counts(data):
 
 
 def model_hit_rates(intensity_choices, k):
-    return 1 / (1 + np.exp(-k * intensity_choices))
+    return pd.Series(
+        [1 / (1 + np.exp(-k * x)) for x in intensity_choices],
+        index=intensity_choices,
+        name="Hit Rate",
+    )
 
 
 def moc_sample(intensity_choices, n_trials, k):
@@ -205,4 +209,15 @@ def moc_sample(intensity_choices, n_trials, k):
             "Intensity": intensities,
             "Result": results,
         }
+    )
+
+
+def make_predictions(fits, intensity_choices):
+    return pd.DataFrame(
+        {
+            "Hit Rate": fits.predict_proba(
+                pd.DataFrame({"Intensity": intensity_choices})
+            )[:, 1],
+        },
+        index=pd.Index(intensity_choices, name="Intensity"),
     )

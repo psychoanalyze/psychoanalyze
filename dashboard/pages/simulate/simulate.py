@@ -4,7 +4,6 @@ from dash import dcc, html, Output, Input, callback
 import plotly.express as px
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
-import numpy as np
 import psychoanalyze as pa
 
 dash.register_page(__name__, path="/simulate")
@@ -78,39 +77,25 @@ layout = html.Div(
     ],
 )
 def update_figure(n_trials, min_intensity, max_intensity, k, n_blocks):
-    intensity_choices = np.array(list(range(min_intensity, max_intensity + 1)))
+    intensity_choices = pd.Index(
+        range(min_intensity, max_intensity + 1), name="Intensity"
+    )
 
-    hit_rates = pd.Series(
-        pa.blocks.model_hit_rates(intensity_choices, k),
-        name="Hit Rate",
-        index=pd.Index(intensity_choices, name="Intensity"),
-    )
+    hit_rates = pa.blocks.model_hit_rates(intensity_choices, k)
     trials1 = pa.blocks.moc_sample(intensity_choices, n_trials, k)
-    fits1 = LogisticRegression(fit_intercept=False).fit(
-        trials1[["Intensity"]], trials1["Result"]
-    )
-    observed_points1 = pa.points.from_trials(trials1)[["Hit Rate", "n"]]
-    predictions1 = pd.DataFrame(
-        {
-            "Hit Rate": fits1.predict_proba(
-                pd.DataFrame({"Intensity": intensity_choices})
-            )[:, 1],
-        },
-        index=pd.Index(intensity_choices, name="Intensity"),
-    )
+
+    def get_fit(trials):
+        return LogisticRegression(fit_intercept=False).fit(
+            trials[["Intensity"]], trials["Result"]
+        )
+
+    fits1 = get_fit(trials1)
+    observed_points1 = pa.points.from_trials(trials1)
+    predictions1 = pa.blocks.make_predictions(fits1, intensity_choices)
     trials2 = pa.blocks.moc_sample(intensity_choices, n_trials, k)
-    fits2 = LogisticRegression(fit_intercept=False).fit(
-        trials2[["Intensity"]], trials2["Result"]
-    )
-    observed_points2 = pa.points.from_trials(trials2)[["Hit Rate", "n"]]
-    predictions2 = pd.DataFrame(
-        {
-            "Hit Rate": fits2.predict_proba(
-                pd.DataFrame({"Intensity": intensity_choices})
-            )[:, 1],
-        },
-        index=pd.Index(intensity_choices, name="Intensity"),
-    )
+    fits2 = get_fit(trials2)
+    observed_points2 = pa.points.from_trials(trials2)
+    predictions2 = pa.blocks.make_predictions(fits2, intensity_choices)
     trials = pd.concat([trials1, trials2], keys=["1", "2"], names=["Block"])
     observed = pd.concat(
         [observed_points1, observed_points2], keys=["1", "2"], names=["Block"]
