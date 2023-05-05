@@ -95,6 +95,7 @@ def update_figure(n_trials, min_intensity, max_intensity, k, n_blocks, n_subject
     hit_rates = pa.blocks.model_hit_rates(intensity_choices, k)
 
     subject_fits = []
+    subject_points = []
     for _ in range(n_subjects):
         trials = [
             pa.trials.moc_sample(intensity_choices, n_trials, k)
@@ -127,12 +128,17 @@ def update_figure(n_trials, min_intensity, max_intensity, k, n_blocks, n_subject
             keys=["Observed", "Posterior Prediction", "Prediction"],
             names=["Source"],
         )
+        subject_points.append(points)
+    all_points = pd.concat(
+        {i: subject_points[i] for i in range(n_subjects)},
+        names=["Subject"],
+    ).reset_index()
     return (
-        px.scatter(
-            points.reset_index(),
+        px.box(
+            all_points.reset_index(),
             x="Intensity",
             y="Hit Rate",
-            symbol="Source",
+            color="Subject",
             template=pa.plot.template,
         ),
         px.ecdf(
