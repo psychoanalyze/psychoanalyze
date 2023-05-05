@@ -24,7 +24,8 @@
         "ms-python.black-formatter",
         "bungcip.better-toml",
         "innoverio.vscode-dbt-power-user",
-        "GitHub.copilot"
+        "GitHub.copilot",
+        "charliermarsh.ruff"
       ]
     }
   }
