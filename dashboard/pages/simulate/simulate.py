@@ -38,6 +38,15 @@ layout = html.Div(
                                 dbc.InputGroupText("Max"),
                             ]
                         ),
+                        html.H3("Model Parameters"),
+                        html.H4("Logistic Regression"),
+                        dbc.InputGroup(
+                            [
+                                dbc.InputGroupText("k"),
+                                dbc.Input(id="model-k", type="number", value=1),
+                                dbc.InputGroupText(id="fit-output")
+                            ]
+                        ),
                     ],
                     width=3,
                 ),
@@ -54,7 +63,6 @@ layout = html.Div(
                             style_data={"color": "black"},
                             style_header={"color": "black"},
                         ),
-                        html.Div(id="fit-output"),
                     ]
                 ),
             ]
@@ -124,5 +132,5 @@ def update_figure(n_trials, min_intensity, max_intensity):
             template=pa.plot.template,
         ),
         observed_points.reset_index().to_dict("records"),
-        f"logistic growth rate (k): {fits.coef_[0][0]}",
+        str(fits.coef_[0][0]),
     )
