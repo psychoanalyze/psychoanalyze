@@ -7,6 +7,7 @@ import plotly.express as px  # type: ignore
 import os
 import pathlib
 import random
+from sklearn.linear_model import LogisticRegression
 
 
 dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
@@ -220,4 +221,10 @@ def make_predictions(fits, intensity_choices):
             )[:, 1],
         },
         index=pd.Index(intensity_choices, name="Intensity"),
+    )
+
+
+def get_fit(trials):
+    return LogisticRegression(fit_intercept=False).fit(
+        trials[["Intensity"]], trials["Result"]
     )
