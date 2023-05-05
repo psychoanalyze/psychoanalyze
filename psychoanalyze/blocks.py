@@ -6,6 +6,7 @@ import psychoanalyze as pa
 import plotly.express as px  # type: ignore
 import os
 import pathlib
+import random
 
 
 dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
@@ -188,3 +189,20 @@ def monkey_counts(data):
     )
     summary.index.name = "Monkey"
     return summary
+
+
+def model_hit_rates(intensity_choices, k):
+    return 1 / (1 + np.exp(-k * intensity_choices))
+
+
+def moc_sample(intensity_choices, n_trials, k):
+    intensities = [random.choice(intensity_choices) for _ in range(n_trials)]
+    results = [
+        random.random() <= 1 / (1 + np.exp(-k * intensity)) for intensity in intensities
+    ]
+    return pd.DataFrame(
+        {
+            "Intensity": intensities,
+            "Result": results,
+        }
+    )
