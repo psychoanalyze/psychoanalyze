@@ -12,6 +12,7 @@
     "vscode": {
       "settings": {
         "python.defaultInterpreterPath": ".venv/bin/python",
+        "editor.defaultFormatter": "ms-python.black-formatter",
         "files.associations": {
           "*.psyexp": "xml",
           "*.sql": "jinja-sql"

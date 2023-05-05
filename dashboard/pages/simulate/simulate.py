@@ -42,7 +42,8 @@ layout = html.Div(
                     width=3,
                 ),
                 dbc.Col(
-                    [dcc.Graph(id="psi-plot"),
+                    [
+                        dcc.Graph(id="psi-plot"),
                         dash_table.DataTable(
                             id="points-table",
                             style_data={"color": "black"},
@@ -85,20 +86,32 @@ def update_figure(n_trials, min_intensity, max_intensity):
             "Result": results,
         }
     )
-    points = pd.concat(
-            [
-                pa.points.from_trials(trials)[["Hit Rate", "n"]],
-                pd.DataFrame(
-                    {"Hit Rate": model_hit_rates,
-                    "n": 1,},
-                    index=pd.Index(intensity_choices, name="Intensity"),
-                ),
-            ],
-            keys=["Observed", "Model"],
-            names=["Source"],
-        )
     fits = LogisticRegression(fit_intercept=False).fit(
         trials[["Intensity"]], trials["Result"]
+    )
+    predictions = fits.predict_proba(pd.DataFrame({"Intensity": intensity_choices}))[
+        :, 1
+    ]
+    points = pd.concat(
+        [
+            pa.points.from_trials(trials)[["Hit Rate", "n"]],
+            pd.DataFrame(
+                {
+                    "Hit Rate": model_hit_rates,
+                    "n": 1,
+                },
+                index=pd.Index(intensity_choices, name="Intensity"),
+            ),
+            pd.DataFrame(
+                {
+                    "Hit Rate": predictions,
+                    "n": 1,
+                },
+                index=pd.Index(intensity_choices, name="Intensity"),
+            ),
+        ],
+        keys=["Observed", "Prior Prediction", "Posterior Prediction"],
+        names=["Source"],
     )
     observed_points = points.loc["Observed"]
     return (
