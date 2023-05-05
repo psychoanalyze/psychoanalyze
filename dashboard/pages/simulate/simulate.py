@@ -4,8 +4,8 @@ from dash import dcc, html, dash_table, Output, Input, callback
 import plotly.express as px
 import pandas as pd
 import random
-from scipy.special import expit
 from sklearn.linear_model import LogisticRegression
+import numpy as np
 import psychoanalyze as pa
 
 dash.register_page(__name__, path="/simulate")
@@ -43,8 +43,10 @@ layout = html.Div(
                         dbc.InputGroup(
                             [
                                 dbc.InputGroupText("k"),
-                                dbc.Input(id="model-k", type="number", value=1),
-                                dbc.InputGroupText(id="fit-output")
+                                dbc.Input(
+                                    id="model-k", type="number", value=1, step=0.1
+                                ),
+                                dbc.InputGroupText(id="fit-output"),
                             ]
                         ),
                     ],
@@ -81,13 +83,16 @@ layout = html.Div(
         Input("n-trials", "value"),
         Input("min-intensity", "value"),
         Input("max-intensity", "value"),
+        Input("model-k", "value"),
     ],
 )
-def update_figure(n_trials, min_intensity, max_intensity):
-    intensity_choices = list(range(min_intensity, max_intensity + 1))
-    model_hit_rates = expit(intensity_choices)
+def update_figure(n_trials, min_intensity, max_intensity, k):
+    intensity_choices = np.array(list(range(min_intensity, max_intensity + 1)))
+    model_hit_rates = 1 / (1 + np.exp(-k * intensity_choices))
     intensities = [random.choice(intensity_choices) for _ in range(n_trials)]
-    results = [random.random() <= expit(intensity) for intensity in intensities]
+    results = [
+        random.random() <= 1 / (1 + np.exp(-k * intensity)) for intensity in intensities
+    ]
     trials = pd.DataFrame(
         {
             "Intensity": intensities,
