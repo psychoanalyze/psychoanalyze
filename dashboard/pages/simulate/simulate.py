@@ -49,7 +49,7 @@ component_column = dbc.Col(
         dbc.InputGroup(
             [
                 dbc.InputGroupText("x_0"),
-                dbc.Input(id="x_0", type="number", value=0, step=0.1),
+                dbc.Input(id="x_0", type="number", value=0.0, step=0.1),
             ]
         ),
     ],
@@ -64,10 +64,12 @@ layout = html.Div(
                 dbc.Col(
                     [
                         dcc.Graph(id="psi-plot"),
-                        dcc.Graph(id="blocks-plot"),
                     ]
                 ),
             ]
+        ),
+        dbc.Row(
+            [dbc.Col(dcc.Graph(id="blocks-plot")), dbc.Col(dcc.Graph(id="ecdf-plot"))]
         ),
     ]
 )
@@ -77,28 +79,30 @@ layout = html.Div(
     [
         Output("psi-plot", "figure"),
         Output("blocks-plot", "figure"),
+        Output("ecdf-plot", "figure"),
     ],
     [
         Input("n-trials", "value"),
         Input("min-intensity", "value"),
         Input("max-intensity", "value"),
         Input("model-k", "value"),
+        Input("x_0", "value"),
         Input("n-blocks", "value"),
         Input("n-subjects", "value"),
     ],
 )
-def update_figure(n_trials, min_intensity, max_intensity, k, n_blocks, n_subjects):
+def update_figure(n_trials, min_intensity, max_intensity, k, x_0, n_blocks, n_subjects):
     intensity_choices = pd.Index(
         range(min_intensity, max_intensity + 1), name="Intensity"
     )
 
-    hit_rates = pa.blocks.model_hit_rates(intensity_choices, k)
+    hit_rates = pa.blocks.model_hit_rates(intensity_choices, k, x_0)
 
     subject_fits = []
     subject_points = []
     for _ in range(n_subjects):
         trials = [
-            pa.trials.moc_sample(intensity_choices, n_trials, k)
+            pa.trials.moc_sample(intensity_choices, n_trials, k, x_0)
             for _ in range(n_blocks)
         ]
         observed_points = [pa.points.from_trials(trial_block) for trial_block in trials]
@@ -150,6 +154,20 @@ def update_figure(n_trials, min_intensity, max_intensity, k, n_blocks, n_subject
                 names=["Subject"],
             ).reset_index(),
             x="k",
+            color="Subject",
+            template=pa.plot.template,
+        ),
+        px.ecdf(
+            pd.concat(
+                {
+                    i: pd.Series(
+                        [fit.intercept_[0] for fit in subject_fits[i]], name="x_0"
+                    )
+                    for i in range(n_subjects)
+                },
+                names=["Subject"],
+            ).reset_index(),
+            x="x_0",
             color="Subject",
             template=pa.plot.template,
         ),
