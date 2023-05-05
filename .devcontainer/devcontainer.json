@@ -17,10 +17,13 @@
         "python.linting.flake8Path": "/usr/local/py-utils/bin/flake8",
         "python.linting.mypyPath": "/usr/local/py-utils/bin/mypy",
         "files.associations": {
-          "*.psyexp": "xml"
+          "*.psyexp": "xml",
+          "*.sql": "jinja-sql"
         }
       },
       "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
         "bungcip.better-toml",
         "innoverio.vscode-dbt-power-user",
         "GitHub.copilot"
