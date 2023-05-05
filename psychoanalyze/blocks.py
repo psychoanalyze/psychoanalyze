@@ -6,7 +6,6 @@ import psychoanalyze as pa
 import plotly.express as px  # type: ignore
 import os
 import pathlib
-import random
 from sklearn.linear_model import LogisticRegression
 
 
@@ -197,19 +196,6 @@ def model_hit_rates(intensity_choices, k):
         [1 / (1 + np.exp(-k * x)) for x in intensity_choices],
         index=intensity_choices,
         name="Hit Rate",
-    )
-
-
-def moc_sample(intensity_choices, n_trials, k):
-    intensities = [random.choice(intensity_choices) for _ in range(n_trials)]
-    results = [
-        random.random() <= 1 / (1 + np.exp(-k * intensity)) for intensity in intensities
-    ]
-    return pd.DataFrame(
-        {
-            "Intensity": intensities,
-            "Result": results,
-        }
     )
 
 

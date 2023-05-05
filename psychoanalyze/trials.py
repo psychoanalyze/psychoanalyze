@@ -3,10 +3,10 @@ import pandas as pd
 import numpy as np
 import psychoanalyze as pa
 from pathlib import Path
-from random import random, choices, choice
 from datetime import datetime
 import json
 import pandera as pr
+import random
 
 schema = pr.SeriesSchema(bool, name="Test Trials")
 
@@ -50,7 +50,7 @@ def generate(n, stim_levels=None):
                         "Dur2": [0.0] * n,
                         "Active Channels": [1] * n,
                         "Return Channels": [1] * n,
-                        "Amp1": choices(list(range(8)), k=n),
+                        "Amp1": random.choices(list(range(8)), k=n),
                         "Width1": [0.0] * n,
                         "Freq1": [0.0] * n,
                         "Dur1": [0.0] * n,
@@ -97,13 +97,13 @@ def normalize(trials):
 
 
 def result(p: float) -> bool:
-    return random() < p
+    return random.random() < p
 
 
 def results(n: int, p_x: pd.Series) -> list[Trial]:
     results = []
     for _ in range(n):
-        stimulus_magnitude = choice(p_x.index.to_list())
+        stimulus_magnitude = random.choice(p_x.index.to_list())
         _result = result(p_x[stimulus_magnitude])
         results.append(
             Trial(
@@ -118,3 +118,16 @@ def results(n: int, p_x: pd.Series) -> list[Trial]:
 
 def labels(results: list[bool]) -> list[str]:
     return [pa.trials.codes[result] for result in results]
+
+
+def moc_sample(intensity_choices, n_trials, k):
+    intensities = [random.choice(intensity_choices) for _ in range(n_trials)]
+    results = [
+        random.random() <= 1 / (1 + np.exp(-k * intensity)) for intensity in intensities
+    ]
+    return pd.DataFrame(
+        {
+            "Intensity": intensities,
+            "Result": results,
+        }
+    )

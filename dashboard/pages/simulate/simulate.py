@@ -10,6 +10,7 @@ dash.register_page(__name__, path="/simulate")
 
 component_column = dbc.Col(
     [
+        html.H3("Counts"),
         dbc.InputGroup(
             [
                 dbc.Input(id="n-trials", type="number", value=100),
@@ -18,7 +19,7 @@ component_column = dbc.Col(
         ),
         dbc.InputGroup(
             [
-                dbc.Input(id="n-blocks", type="number", value=2),
+                dbc.Input(id="n-blocks", type="number", value=10),
                 dbc.InputGroupText("blocks"),
             ]
         ),
@@ -50,7 +51,6 @@ layout = html.Div(
                 component_column,
                 dbc.Col(
                     [
-                        dcc.Graph(id="intensity-histo"),
                         dcc.Graph(id="psi-plot"),
                         dcc.Graph(id="blocks-plot"),
                     ]
@@ -63,7 +63,6 @@ layout = html.Div(
 
 @callback(
     [
-        Output("intensity-histo", "figure"),
         Output("psi-plot", "figure"),
         Output("blocks-plot", "figure"),
     ],
@@ -82,25 +81,20 @@ def update_figure(n_trials, min_intensity, max_intensity, k, n_blocks):
 
     hit_rates = pa.blocks.model_hit_rates(intensity_choices, k)
 
-    trials1 = pa.blocks.moc_sample(intensity_choices, n_trials, k)
-    observed_points1 = pa.points.from_trials(trials1)
-    fits1 = pa.blocks.get_fit(trials1)
-    predictions1 = pa.blocks.make_predictions(fits1, intensity_choices)
+    trials = [
+        pa.trials.moc_sample(intensity_choices, n_trials, k) for _ in range(n_blocks)
+    ]
+    observed_points = [pa.points.from_trials(trial_block) for trial_block in trials]
+    fits = [pa.blocks.get_fit(trial_block) for trial_block in trials]
+    predictions = [
+        pa.blocks.make_predictions(block_fit, intensity_choices) for block_fit in fits
+    ]
 
-    trials2 = pa.blocks.moc_sample(intensity_choices, n_trials, k)
-    observed_points2 = pa.points.from_trials(trials2)
-    fits2 = pa.blocks.get_fit(trials2)
-    predictions2 = pa.blocks.make_predictions(fits2, intensity_choices)
+    trials = pd.concat(trials, keys=range(n_blocks), names=["Block"])
 
-    trials = pd.concat([trials1, trials2], keys=["1", "2"], names=["Block"])
+    observed = pd.concat(observed_points, keys=range(n_blocks), names=["Block"])
 
-    observed = pd.concat(
-        [observed_points1, observed_points2], keys=["1", "2"], names=["Block"]
-    )
-
-    predictions = pd.concat(
-        [predictions1, predictions2], keys=["1", "2"], names=["Block"]
-    )
+    predictions = pd.concat(predictions, keys=range(n_blocks), names=["Block"])
 
     hit_rates = hit_rates.reset_index()
     hit_rates["Block"] = "Prior"
@@ -116,13 +110,6 @@ def update_figure(n_trials, min_intensity, max_intensity, k, n_blocks):
         names=["Source"],
     )
     return (
-        px.histogram(
-            trials.reset_index(),
-            x="Intensity",
-            color="Block",
-            barmode="group",
-            template=pa.plot.template,
-        ),
         px.scatter(
             points.reset_index(),
             x="Intensity",
@@ -131,7 +118,7 @@ def update_figure(n_trials, min_intensity, max_intensity, k, n_blocks):
             symbol="Source",
             template=pa.plot.template,
         ),
-        px.scatter(
-            {"k": [fits1.coef_[0][0], fits2.coef_[0][0]]}, template=pa.plot.template
+        px.ecdf(
+            {"k": [fit.coef_[0][0] for fit in fits]}, x="k", template=pa.plot.template
         ),
     )
