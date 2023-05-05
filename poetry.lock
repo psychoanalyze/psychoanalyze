@@ -3280,6 +3280,28 @@ testing = ["build[virtualenv]", "filelock (>=3.4.0)", "flake8 (<5)", "flake8-202
 testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "pytest", "pytest-enabler", "pytest-xdist", "tomli", "virtualenv (>=13.0.0)", "wheel"]
 
 [[package]]
+name = "shandy-sqlfmt"
+version = "0.18.0"
+description = "sqlfmt is an opinionated CLI tool that formats your sql files"
+category = "main"
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "shandy_sqlfmt-0.18.0-py3-none-any.whl", hash = "sha256:241338d9944a813dab2d160650919ad3c62f8ced1ffc291bd8e9c0a04b2978c8"},
+    {file = "shandy_sqlfmt-0.18.0.tar.gz", hash = "sha256:d2a60a160cce53d58ab3ddfac20cc9f7be15af455981a80c27bf701989226c00"},
+]
+
+[package.dependencies]
+black = {version = "*", optional = true, markers = "extra == \"jinjafmt\""}
+click = ">=8.0,<9.0"
+platformdirs = ">=2.4,<4.0"
+tqdm = ">=4.0,<5.0"
+
+[package.extras]
+jinjafmt = ["black"]
+sqlfmt-primer = ["gitpython (>=3.1.24,<4.0.0)"]
+
+[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -3865,4 +3887,4 @@ unicode = ["tangled-up-in-unicode (==0.2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.3"
-content-hash = "f97b710d190df76c6e1773ebf3684cb0a3580afb1d9285b3c71743bfc6cef290"
+content-hash = "5c93e4438d530816c2fcb5e5fe181ff1e0a9e2e26f3a92968b79774f0c962e18"
