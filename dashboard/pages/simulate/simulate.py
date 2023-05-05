@@ -19,7 +19,13 @@ layout = html.Div(
                         dbc.InputGroup(
                             [
                                 dbc.Input(id="n-trials", type="number", value=100),
-                                dbc.InputGroupText("trials"),
+                                dbc.InputGroupText("trials/block"),
+                            ]
+                        ),
+                        dbc.InputGroup(
+                            [
+                                dbc.Input(id="n-blocks", type="number", value=1),
+                                dbc.InputGroupText("blocks"),
                             ]
                         ),
                         html.H3("Intensity Levels"),
@@ -50,12 +56,16 @@ layout = html.Div(
                     ),
                 ),
                 dbc.Col(
-                    dash_table.DataTable(
+                    [dash_table.DataTable(
                         id="points-table",
                         style_data={"color": "black"},
                         style_header={"color": "black"},
-                        page_size=10,
-                    )
+                    ),
+                    dash_table.DataTable(
+                        id="blocks-table",
+                        style_data={"color": "black"},
+                        style_header={"color": "black"},
+                    )]
                 ),
             ]
         ),
