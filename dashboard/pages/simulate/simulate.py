@@ -5,6 +5,7 @@ import plotly.express as px
 import pandas as pd
 import random
 from scipy.special import expit
+from sklearn.linear_model import LogisticRegression
 import psychoanalyze as pa
 
 dash.register_page(__name__, path="/simulate")
@@ -41,31 +42,19 @@ layout = html.Div(
                     width=3,
                 ),
                 dbc.Col(
-                    dcc.Graph(id="psi-plot"),
-                ),
-            ]
-        ),
-        dbc.Row(
-            [
-                dbc.Col(
-                    dash_table.DataTable(
-                        id="trials-table",
-                        style_data={"color": "black"},
-                        style_header={"color": "black"},
-                        page_size=10,
-                    ),
-                ),
-                dbc.Col(
-                    [dash_table.DataTable(
-                        id="points-table",
-                        style_data={"color": "black"},
-                        style_header={"color": "black"},
-                    ),
-                    dash_table.DataTable(
-                        id="blocks-table",
-                        style_data={"color": "black"},
-                        style_header={"color": "black"},
-                    )]
+                    [dcc.Graph(id="psi-plot"),
+                        dash_table.DataTable(
+                            id="points-table",
+                            style_data={"color": "black"},
+                            style_header={"color": "black"},
+                        ),
+                        dash_table.DataTable(
+                            id="blocks-table",
+                            style_data={"color": "black"},
+                            style_header={"color": "black"},
+                        ),
+                        html.Div(id="fit-output"),
+                    ]
                 ),
             ]
         ),
@@ -76,8 +65,8 @@ layout = html.Div(
 @callback(
     [
         Output("psi-plot", "figure"),
-        Output("trials-table", "data"),
         Output("points-table", "data"),
+        Output("fit-output", "children"),
     ],
     [
         Input("n-trials", "value"),
@@ -87,6 +76,7 @@ layout = html.Div(
 )
 def update_figure(n_trials, min_intensity, max_intensity):
     intensity_choices = list(range(min_intensity, max_intensity + 1))
+    model_hit_rates = expit(intensity_choices)
     intensities = [random.choice(intensity_choices) for _ in range(n_trials)]
     results = [random.random() <= expit(intensity) for intensity in intensities]
     trials = pd.DataFrame(
@@ -95,15 +85,31 @@ def update_figure(n_trials, min_intensity, max_intensity):
             "Result": results,
         }
     )
-    points = pa.points.from_trials(trials)
+    points = pd.concat(
+            [
+                pa.points.from_trials(trials)[["Hit Rate", "n"]],
+                pd.DataFrame(
+                    {"Hit Rate": model_hit_rates,
+                    "n": 1,},
+                    index=pd.Index(intensity_choices, name="Intensity"),
+                ),
+            ],
+            keys=["Observed", "Model"],
+            names=["Source"],
+        )
+    fits = LogisticRegression(fit_intercept=False).fit(
+        trials[["Intensity"]], trials["Result"]
+    )
+    observed_points = points.loc["Observed"]
     return (
         px.scatter(
             points.reset_index(),
             x="Intensity",
             y="Hit Rate",
             size="n",
+            color="Source",
             template=pa.plot.template,
         ),
-        trials.reset_index().to_dict("records"),
-        points.reset_index().to_dict("records"),
+        observed_points.reset_index().to_dict("records"),
+        f"logistic growth rate (k): {fits.coef_[0][0]}",
     )
