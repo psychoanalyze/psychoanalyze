@@ -16,6 +16,3 @@ sources:
             type: int
           - name: Outcome
             type: int
-      - name: Outcomes
-        meta:
-          external_location: 'data/test/outcomes.csv'
