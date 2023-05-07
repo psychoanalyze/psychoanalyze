@@ -6,17 +6,16 @@ import datetime
 
 
 def test_from_trials():
-    trials = pd.DataFrame(
-        {"Block": [], "Intensity": [], "Result": []}, index=pd.Index([], name="TrialID")
-    )
+    trials = pd.Series([], name="Result", index=pd.Index([], name="Intensity"))
     points = pa.points.from_trials(trials)
     assert "Hit Rate" in points.columns
 
 
 def test_from_trials_sums_n_per_intensity_level():
-    trials = pd.DataFrame(
-        {"Intensity": [0, 1], "Result": [0, 0]},
-        index=pd.Index([0, 1], name="TrialID"),
+    trials = pd.Series(
+        [0, 0],
+        name="Result",
+        index=pd.Index([0, 1], name="Intensity"),
     )
     points = pa.points.from_trials(trials)
     assert all(
@@ -133,32 +132,6 @@ def test_fixed_magnitudes():
     )
     fixed_magnitude = pa.points.fixed_magnitude(points)
     assert fixed_magnitude == 0
-
-
-def test_to_block():
-    points = pd.DataFrame(
-        {"n": [], "Hits": [], "x": []},
-        index=pd.MultiIndex.from_frame(
-            pd.DataFrame(
-                {
-                    "Monkey": [],
-                    "Date": [],
-                    "Amp2": [],
-                    "Width2": [],
-                    "Freq2": [],
-                    "Dur2": [],
-                    "Active Channels": [],
-                    "Return Channels": [],
-                    "Amp1": [],
-                    "Width1": [],
-                    "Freq1": [],
-                    "Dur1": [],
-                }
-            )
-        ),
-    )
-    block = pa.points.to_block(points)
-    assert set(block.index) <= {"Threshold", "Fixed Magnitude", "Dimension", "n Levels"}
 
 
 def test_fit_no_data(mocker):

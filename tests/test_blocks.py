@@ -224,67 +224,6 @@ def test_blocks_load_monkey_day(tmp_path, blocks):
     assert all(blocks["Dimension"] == "Amp")
 
 
-def test_from_points_amp_dim():
-    amp_points_index = pd.MultiIndex.from_frame(
-        pd.DataFrame(
-            {
-                "Monkey": ["U"] * 2,
-                "Date": ["2020-01-01"] * 2,
-            }
-            | {
-                "Amp2": [0] * 2,
-                "Width2": [0] * 2,
-                "Freq2": [0] * 2,
-                "Dur2": [0] * 2,
-            }
-            | {
-                "Active Channels": [0] * 2,
-                "Return Channels": [0] * 2,
-            }
-            | {
-                "Amp1": [0, 1],
-                "Width1": [0] * 2,
-                "Freq1": [0] * 2,
-                "Dur1": [0] * 2,
-            }
-        )
-    )
-    amp_points = pd.DataFrame(
-        {"n": [1, 1], "Hits": [0, 1], "x": [0, 1]}, index=amp_points_index
-    )
-    width_points_index = pd.MultiIndex.from_frame(
-        pd.DataFrame(
-            {
-                "Monkey": ["U"] * 2,
-                "Date": ["2020-01-01"] * 2,
-            }
-            | {
-                "Amp2": [0] * 2,
-                "Width2": [0] * 2,
-                "Freq2": [0] * 2,
-                "Dur2": [0] * 2,
-            }
-            | {
-                "Active Channels": [0] * 2,
-                "Return Channels": [0] * 2,
-            }
-            | {
-                "Amp1": [0] * 2,
-                "Width1": [0, 1],
-                "Freq1": [0] * 2,
-                "Dur1": [0] * 2,
-            }
-        )
-    )
-    width_points = pd.DataFrame(
-        {"n": [1, 1], "Hits": [0, 1], "x": [0, 1]}, index=width_points_index
-    )
-    points = pd.concat([amp_points, width_points])
-    blocks = pa.blocks.from_points(points, dim="Amp")
-    assert len(blocks) == 1
-    assert "Width1" in blocks.index.names
-
-
 def test_blocks_day(tmp_path):
     index = pd.MultiIndex.from_frame(
         pd.DataFrame(

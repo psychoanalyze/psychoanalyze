@@ -13,11 +13,11 @@ index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
 
 
 def from_trials(trials: pd.Series) -> pd.Series:
-    grouped = trials.groupby(trials.index.names)
-    hits = grouped.sum()
-    n = grouped.count()
-    hr = hits / n
-    return pd.concat([hits, n, hr], axis=1, keys=["Hits", "n", "Hit Rate"])
+    grouped = trials.groupby(level=trials.index.names)
+    hits = grouped.sum().rename("Hits")
+    n = grouped.count().rename("n")
+    hr = (hits / n).rename("Hit Rate")
+    return pd.concat([hits, n, hr], axis=1)
 
 
 def load(data_path=pathlib.Path("data")):
