@@ -47,6 +47,7 @@ app.layout = dbc.Container(
                 ],
             ),
             brand_href="/",
+            class_name="mb-5",
         ),
         dash.page_container,
     ]

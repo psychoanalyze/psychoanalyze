@@ -1,6 +1,6 @@
 import dash
 import dash_bootstrap_components as dbc
-from dash import dcc, html, Output, Input, callback
+from dash import dcc, html, Output, Input, State, callback
 import plotly.express as px
 import pandas as pd
 import psychoanalyze as pa
@@ -27,7 +27,8 @@ component_column = dbc.Col(
             [
                 dbc.Input(id="n-subjects", type="number", value=2),
                 dbc.InputGroupText("subject"),
-            ]
+            ],
+            class_name="mb-4",
         ),
         html.H3("Intensity Levels"),
         dbc.InputGroup(
@@ -36,7 +37,8 @@ component_column = dbc.Col(
                 dbc.Input(id="min-intensity", type="number", value=-4),
                 dbc.Input(id="max-intensity", type="number", value=4),
                 dbc.InputGroupText("Max"),
-            ]
+            ],
+            class_name="mb-4",
         ),
         html.H3("Model Parameters"),
         html.H4("Logistic Regression"),
@@ -50,8 +52,10 @@ component_column = dbc.Col(
             [
                 dbc.InputGroupText("x_0"),
                 dbc.Input(id="x_0", type="number", value=0.0, step=0.1),
-            ]
+            ],
+            class_name="mb-3",
         ),
+        dbc.Button("Show/Hide ECDF Plots", className="mb-3", id="ecdf-button"),
     ],
     width=3,
 )
@@ -62,14 +66,41 @@ layout = html.Div(
             [
                 component_column,
                 dbc.Col(
-                    [
-                        dcc.Graph(id="psi-plot"),
-                    ]
+                    dbc.Tabs(
+                        [
+                            dbc.Tab(
+                                dcc.Graph(id="psi-plot"),
+                                label="Psychometric Function",
+                                activeTabClassName="fw-bold fst-italic",
+                            ),
+                            dbc.Tab(
+                                dcc.Graph(
+                                    figure=px.scatter(
+                                        pd.DataFrame({"Day": [], "Threshold": []}),
+                                        x="Day",
+                                        y="Threshold",
+                                        template=pa.plot.template,
+                                    ),
+                                    id="longitudinal-plot",
+                                ),
+                                tab_id="longitudinal-tab",
+                                label="Longitudinal Plot",
+                                activeTabClassName="fw-bold fst-italic",
+                            ),
+                        ],
+                        active_tab="longitudinal-tab",
+                    )
                 ),
             ]
         ),
-        dbc.Row(
-            [dbc.Col(dcc.Graph(id="blocks-plot")), dbc.Col(dcc.Graph(id="ecdf-plot"))]
+        dbc.Collapse(
+            dbc.Row(
+                [
+                    dbc.Col(dcc.Graph(id="blocks-plot")),
+                    dbc.Col(dcc.Graph(id="ecdf-plot")),
+                ]
+            ),
+            id="collapse",
         ),
     ]
 )
@@ -80,6 +111,7 @@ layout = html.Div(
         Output("psi-plot", "figure"),
         Output("blocks-plot", "figure"),
         Output("ecdf-plot", "figure"),
+        Output("longitudinal-plot", "figure"),
     ],
     [
         Input("n-trials", "value"),
@@ -137,6 +169,20 @@ def update_figure(n_trials, min_intensity, max_intensity, k, x_0, n_blocks, n_su
         {i: subject_points[i] for i in range(n_subjects)},
         names=["Subject"],
     ).reset_index()
+    slopes = pd.concat(
+        {
+            i: pd.Series([fit.coef_[0][0] for fit in subject_fits[i]], name="k")
+            for i in range(n_subjects)
+        },
+        names=["Subject"],
+    )
+    thresholds = pd.concat(
+        {
+            i: pd.Series([fit.intercept_[0] for fit in subject_fits[i]], name="x_0")
+            for i in range(n_subjects)
+        },
+        names=["Subject"],
+    )
     return (
         px.box(
             all_points.reset_index(),
@@ -146,29 +192,35 @@ def update_figure(n_trials, min_intensity, max_intensity, k, x_0, n_blocks, n_su
             template=pa.plot.template,
         ),
         px.ecdf(
-            pd.concat(
-                {
-                    i: pd.Series([fit.coef_[0][0] for fit in subject_fits[i]], name="k")
-                    for i in range(n_subjects)
-                },
-                names=["Subject"],
-            ).reset_index(),
+            slopes.reset_index(),
             x="k",
             color="Subject",
             template=pa.plot.template,
         ),
         px.ecdf(
-            pd.concat(
-                {
-                    i: pd.Series(
-                        [fit.intercept_[0] for fit in subject_fits[i]], name="x_0"
-                    )
-                    for i in range(n_subjects)
-                },
-                names=["Subject"],
-            ).reset_index(),
+            thresholds.reset_index(),
             x="x_0",
             color="Subject",
             template=pa.plot.template,
         ),
+        px.scatter(
+            thresholds.reset_index().rename(
+                columns={"x_0": "Thresholds", "level_1": "Day"}
+            ),
+            x="Day",
+            y="Thresholds",
+            symbol="Subject",
+            template=pa.plot.template,
+        ),
     )
+
+
+@callback(
+    Output("collapse", "is_open"),
+    [Input("ecdf-button", "n_clicks")],
+    [State("collapse", "is_open")],
+)
+def toggle_ecdf(n, is_open):
+    if n:
+        return not is_open
+    return is_open

@@ -1,6 +1,9 @@
 SELECT
     BlockID,
-    Threshold,
+    "Day",
+    "Subject",
+    Threshold AS x_0,
+    slope AS k,
     "err+" AS UpperConfidenceInterval,
     "err-" AS LowerConfidenceInterval
 FROM
