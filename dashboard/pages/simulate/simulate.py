@@ -21,12 +21,6 @@ component_column = dbc.Col(
         ),
         dbc.InputGroup(
             [
-                dbc.Input(id="n-blocks", type="number", value=10),
-                dbc.InputGroupText("blocks per subject"),
-            ]
-        ),
-        dbc.InputGroup(
-            [
                 dbc.Input(id="n-subjects", type="number", value=2),
                 dbc.InputGroupText("subjects"),
             ],
