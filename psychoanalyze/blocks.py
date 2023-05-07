@@ -6,7 +6,7 @@ import psychoanalyze as pa
 import plotly.express as px  # type: ignore
 import os
 import pathlib
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression  # type: ignore
 
 
 dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
