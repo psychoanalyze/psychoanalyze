@@ -169,13 +169,7 @@ def update_figure(n_trials, min_intensity, max_intensity, k, x_0, n_blocks, n_su
         duckdb.sql("INSERT INTO LastTrials SELECT Intensity, Result FROM trials")
         observed = pa.points.from_trials(trials)
         fits = pa.blocks.get_fits(trials)
-        predictions = pd.concat(
-            {
-                block: pa.blocks.make_predictions(fits[block], intensity_choices)
-                for block in fits
-            },
-            names=["Block"],
-        )
+        predictions = pa.subjects.make_predictions(fits, intensity_choices)
         fit_params = pd.concat(
             {
                 "slope": pd.Series({block: fits[block].coef_[0][0] for block in fits}),
