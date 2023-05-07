@@ -15,18 +15,13 @@ def test_from_trials():
 
 def test_from_trials_sums_n_per_intensity_level():
     trials = pd.DataFrame(
-        {"Block": [0, 0], "Intensity": [0, 1], "Result": [0, 0]},
+        {"Intensity": [0, 1], "Result": [0, 0]},
         index=pd.Index([0, 1], name="TrialID"),
     )
     points = pa.points.from_trials(trials)
     assert all(
         points["n"]
-        == pd.Series(
-            [1, 1],
-            index=pd.MultiIndex.from_frame(
-                pd.DataFrame({"Block": [0, 0], "Intensity": [0, 1]})
-            ),
-        )
+        == pd.Series([1, 1], index=pd.Index([0, 1], name="Intensity"), name="n")
     )
 
 

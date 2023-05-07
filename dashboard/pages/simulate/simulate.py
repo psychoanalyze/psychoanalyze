@@ -160,47 +160,26 @@ def update_figure(n_trials, min_intensity, max_intensity, k, x_0, n_blocks, n_su
         range(min_intensity, max_intensity + 1), name="Intensity"
     )
 
-    hit_rates = pa.blocks.model_hit_rates(intensity_choices, k, x_0)
-
-    subject_fits = []
-    subject_points = []
-    for _ in range(n_subjects):
-        trials = pa.trials.moc_sample(intensity_choices, n_trials, k, x_0, n_blocks)
-        duckdb.sql("INSERT INTO LastTrials SELECT Intensity, Result FROM trials")
-        observed = pa.points.from_trials(trials)
-        fits = pa.blocks.get_fits(trials)
-        predictions = pa.subjects.make_predictions(fits, intensity_choices)
-        fit_params = pa.subjects.fit_params(fits)
-
-        subject_fits.append(fit_params)
-        hit_rates = hit_rates.reset_index()
-        hit_rates["Block"] = "Prior"
-        hit_rates = hit_rates.set_index(["Block", "Intensity"])
-
-        points = pd.concat(
-            [
-                observed,
-                predictions,
-                hit_rates,
-            ],
-            keys=["Observed", "Posterior Prediction", "Prediction"],
-            names=["Source"],
-        )
-        subject_points.append(points)
-    all_points = pd.concat(
-        {i: subject_points[i] for i in range(n_subjects)},
-        names=["Subject"],
-    ).reset_index()
-    params = pd.concat(
-        {i: subject_fits[i] for i in range(n_subjects)},
-        names=["Subject"],
+    trials = pa.sessions.from_frames_dict(
+        {
+            subj: pa.trials.moc_sample(intensity_choices, n_trials, k, x_0, n_blocks)
+            for subj in range(n_subjects)
+        }
     )
+    points = trials.groupby(["Subject", "Block"]).apply(pa.points.from_trials)
+
+    fits = trials.groupby(["Subject", "Block"]).apply(pa.blocks.get_fit)
+
+    # predictions = fits.apply(
+    #     pa.blocks.make_predictions, intensity_choices=intensity_choices
+    # )
+    params = fits.apply(pa.blocks.fit_params)
     params = params.reset_index().rename(columns={"intercept": "Threshold"})
     params["Day"] = params["Block"]
     params["Fixed Intensity"] = 0
     return (
         px.box(
-            all_points.reset_index(),
+            points.reset_index(),
             x="Intensity",
             y="Hit Rate",
             color="Subject",

@@ -135,5 +135,5 @@ def moc_sample(intensity_choices, n_trials, k, x_0=0.0, n_blocks=1):
             )
             for i in range(n_blocks)
         },
-        names=["Block"],
+        names=["Block", "TrialID"],
     )

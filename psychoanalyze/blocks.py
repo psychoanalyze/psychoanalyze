@@ -191,7 +191,7 @@ def monkey_counts(data):
     return summary
 
 
-def model_hit_rates(intensity_choices, k, x_0=0.0):
+def model_predictions(intensity_choices, k, x_0=0.0):
     return pd.Series(
         [1 / (1 + np.exp(-k * (x - x_0))) for x in intensity_choices],
         index=intensity_choices,
@@ -199,21 +199,22 @@ def model_hit_rates(intensity_choices, k, x_0=0.0):
     )
 
 
-def make_predictions(fit, intensity_choices):
-    return pd.DataFrame(
-        {
-            "Hit Rate": fit.predict_proba(
-                pd.DataFrame({"Intensity": intensity_choices})
-            )[:, 1],
-        },
+def make_predictions(fit, intensity_choices) -> pd.Series:
+    return pd.Series(
+        fit.predict_proba(pd.DataFrame({"Intensity": intensity_choices}))[:, 1],
+        name="Hit Rate",
         index=pd.Index(intensity_choices, name="Intensity"),
     )
 
 
-def get_fits(trials):
-    return {
-        block: LogisticRegression().fit(
-            trials.xs(block)[["Intensity"]], trials.xs(block)["Result"]
-        )
-        for block in trials.index.unique(level="Block")
-    }
+def get_fit(trials):
+    return LogisticRegression().fit(trials[["Intensity"]], trials["Result"])
+
+
+def fit_params(fit):
+    return pd.Series(
+        {
+            "slope": fit.coef_[0][0],
+            "intercept": fit.intercept_[0],
+        }
+    )
