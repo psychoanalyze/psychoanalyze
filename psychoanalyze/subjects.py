@@ -19,3 +19,16 @@ def make_predictions(fits, intensity_choices):
         },
         names=["Block"],
     )
+
+
+def fit_params(fits):
+    return pd.DataFrame.from_records(
+        [
+            {
+                "slope": fit.coef_[0][0],
+                "intercept": fit.intercept_[0],
+            }
+            for fit in fits.values()
+        ],
+        index=pd.Index(fits.keys(), name="Block"),
+    )

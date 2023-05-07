@@ -170,15 +170,7 @@ def update_figure(n_trials, min_intensity, max_intensity, k, x_0, n_blocks, n_su
         observed = pa.points.from_trials(trials)
         fits = pa.blocks.get_fits(trials)
         predictions = pa.subjects.make_predictions(fits, intensity_choices)
-        fit_params = pd.concat(
-            {
-                "slope": pd.Series({block: fits[block].coef_[0][0] for block in fits}),
-                "intercept": pd.Series(
-                    {block: fits[block].intercept_[0] for block in fits}
-                ),
-            },
-            names=["param", "Block"],
-        )
+        fit_params = pa.subjects.fit_params(fits)
 
         subject_fits.append(fit_params)
         hit_rates = hit_rates.reset_index()
@@ -203,13 +195,9 @@ def update_figure(n_trials, min_intensity, max_intensity, k, x_0, n_blocks, n_su
         {i: subject_fits[i] for i in range(n_subjects)},
         names=["Subject"],
     )
-    slopes = params.xs("slope", level="param", drop_level=False)
-    slopes.name = "slope"
-    thresholds = params.xs("intercept", level="param", drop_level=False)
-    thresholds.name = "Threshold"
-    thresholds = thresholds.reset_index()
-    thresholds["Day"] = thresholds["Block"]
-    thresholds["Fixed Intensity"] = 0
+    params = params.reset_index().rename(columns={"intercept": "Threshold"})
+    params["Day"] = params["Block"]
+    params["Fixed Intensity"] = 0
     return (
         px.box(
             all_points.reset_index(),
@@ -219,26 +207,26 @@ def update_figure(n_trials, min_intensity, max_intensity, k, x_0, n_blocks, n_su
             template=pa.plot.template,
         ),
         px.ecdf(
-            slopes.reset_index(),
+            params.reset_index(),
             x="slope",
             color="Subject",
             template=pa.plot.template,
         ),
         px.ecdf(
-            thresholds,
+            params,
             x="Threshold",
             color="Subject",
             template=pa.plot.template,
         ),
         px.scatter(
-            thresholds,
+            params,
             x="Day",
             y="Threshold",
             symbol="Subject",
             template=pa.plot.template,
         ),
         px.box(
-            thresholds.rename(columns={"Threshold": "Threshold (modulated dimension)"}),
+            params.rename(columns={"Threshold": "Threshold (modulated dimension)"}),
             x="Fixed Intensity",
             y="Threshold (modulated dimension)",
             template=pa.plot.template,
