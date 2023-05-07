@@ -15,7 +15,7 @@ index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
 def from_trials(trials: pd.DataFrame) -> pd.DataFrame:
     test_trials = trials[trials["Result"].isin([0, 1])]
     points = (
-        test_trials.groupby("Intensity")["Result"]
+        test_trials.groupby(["Block", "Intensity"])["Result"]
         .agg(["count", "sum"])
         .rename(columns={"count": "n", "sum": "Hits"})
     )

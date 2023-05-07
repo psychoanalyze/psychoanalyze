@@ -4,9 +4,11 @@ from dash import dcc, html, Output, Input, callback
 import plotly.express as px
 import pandas as pd
 import psychoanalyze as pa
+import duckdb
 
 dash.register_page(__name__, path="/simulate")
 
+duckdb.sql("CREATE TEMP TABLE LastTrials (Intensity INTEGER, Result INTEGER)")
 
 component_column = dbc.Col(
     [
@@ -163,24 +165,28 @@ def update_figure(n_trials, min_intensity, max_intensity, k, x_0, n_blocks, n_su
     subject_fits = []
     subject_points = []
     for _ in range(n_subjects):
-        trials = [
-            pa.trials.moc_sample(intensity_choices, n_trials, k, x_0)
-            for _ in range(n_blocks)
-        ]
-        observed_points = [pa.points.from_trials(trial_block) for trial_block in trials]
-        fits = [pa.blocks.get_fit(trial_block) for trial_block in trials]
-        subject_fits.append(fits)
-        predictions = [
-            pa.blocks.make_predictions(block_fit, intensity_choices)
-            for block_fit in fits
-        ]
+        trials = pa.trials.moc_sample(intensity_choices, n_trials, k, x_0, n_blocks)
+        duckdb.sql("INSERT INTO LastTrials SELECT Intensity, Result FROM trials")
+        observed = pa.points.from_trials(trials)
+        fits = pa.blocks.get_fits(trials)
+        predictions = pd.concat(
+            {
+                block: pa.blocks.make_predictions(fits[block], intensity_choices)
+                for block in fits
+            },
+            names=["Block"],
+        )
+        fit_params = pd.concat(
+            {
+                "slope": pd.Series({block: fits[block].coef_[0][0] for block in fits}),
+                "intercept": pd.Series(
+                    {block: fits[block].intercept_[0] for block in fits}
+                ),
+            },
+            names=["param", "Block"],
+        )
 
-        trials = pd.concat(trials, keys=range(n_blocks), names=["Block"])
-
-        observed = pd.concat(observed_points, keys=range(n_blocks), names=["Block"])
-
-        predictions = pd.concat(predictions, keys=range(n_blocks), names=["Block"])
-
+        subject_fits.append(fit_params)
         hit_rates = hit_rates.reset_index()
         hit_rates["Block"] = "Prior"
         hit_rates = hit_rates.set_index(["Block", "Intensity"])
@@ -199,21 +205,16 @@ def update_figure(n_trials, min_intensity, max_intensity, k, x_0, n_blocks, n_su
         {i: subject_points[i] for i in range(n_subjects)},
         names=["Subject"],
     ).reset_index()
-    slopes = pd.concat(
-        {
-            i: pd.Series([fit.coef_[0][0] for fit in subject_fits[i]], name="k")
-            for i in range(n_subjects)
-        },
+    params = pd.concat(
+        {i: subject_fits[i] for i in range(n_subjects)},
         names=["Subject"],
     )
-    thresholds = pd.concat(
-        {
-            i: pd.Series([fit.intercept_[0] for fit in subject_fits[i]], name="x_0")
-            for i in range(n_subjects)
-        },
-        names=["Subject"],
-    )
+    slopes = params.xs("slope", level="param", drop_level=False)
+    slopes.name = "slope"
+    thresholds = params.xs("intercept", level="param", drop_level=False)
+    thresholds.name = "Threshold"
     thresholds = thresholds.reset_index()
+    thresholds["Day"] = thresholds["Block"]
     thresholds["Fixed Intensity"] = 0
     return (
         px.box(
@@ -225,29 +226,25 @@ def update_figure(n_trials, min_intensity, max_intensity, k, x_0, n_blocks, n_su
         ),
         px.ecdf(
             slopes.reset_index(),
-            x="k",
+            x="slope",
             color="Subject",
             template=pa.plot.template,
         ),
         px.ecdf(
-            thresholds.reset_index(),
-            x="x_0",
+            thresholds,
+            x="Threshold",
             color="Subject",
             template=pa.plot.template,
         ),
         px.scatter(
-            thresholds.reset_index().rename(
-                columns={"x_0": "Thresholds", "level_1": "Day"}
-            ),
+            thresholds,
             x="Day",
-            y="Thresholds",
+            y="Threshold",
             symbol="Subject",
             template=pa.plot.template,
         ),
         px.box(
-            thresholds.reset_index().rename(
-                columns={"x_0": "Threshold (modulated dimension)"}
-            ),
+            thresholds.rename(columns={"Threshold": "Threshold (modulated dimension)"}),
             x="Fixed Intensity",
             y="Threshold (modulated dimension)",
             template=pa.plot.template,

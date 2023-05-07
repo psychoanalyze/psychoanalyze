@@ -199,10 +199,10 @@ def model_hit_rates(intensity_choices, k, x_0=0.0):
     )
 
 
-def make_predictions(fits, intensity_choices):
+def make_predictions(fit, intensity_choices):
     return pd.DataFrame(
         {
-            "Hit Rate": fits.predict_proba(
+            "Hit Rate": fit.predict_proba(
                 pd.DataFrame({"Intensity": intensity_choices})
             )[:, 1],
         },
@@ -210,5 +210,10 @@ def make_predictions(fits, intensity_choices):
     )
 
 
-def get_fit(trials):
-    return LogisticRegression().fit(trials[["Intensity"]], trials["Result"])
+def get_fits(trials):
+    return {
+        block: LogisticRegression().fit(
+            trials.xs(block)[["Intensity"]], trials.xs(block)["Result"]
+        )
+        for block in trials.index.unique(level="Block")
+    }

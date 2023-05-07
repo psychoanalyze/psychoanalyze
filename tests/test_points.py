@@ -7,7 +7,7 @@ import datetime
 
 def test_from_trials():
     trials = pd.DataFrame(
-        {"Intensity": [], "Result": []}, index=pd.Index([], name="TrialID")
+        {"Block": [], "Intensity": [], "Result": []}, index=pd.Index([], name="TrialID")
     )
     points = pa.points.from_trials(trials)
     assert "Hit Rate" in points.columns
@@ -15,10 +15,19 @@ def test_from_trials():
 
 def test_from_trials_sums_n_per_intensity_level():
     trials = pd.DataFrame(
-        {"Intensity": [0, 1], "Result": [0, 0]}, index=pd.Index([0, 1], name="TrialID")
+        {"Block": [0, 0], "Intensity": [0, 1], "Result": [0, 0]},
+        index=pd.Index([0, 1], name="TrialID"),
     )
     points = pa.points.from_trials(trials)
-    assert all(points["n"] == pd.Series([1, 1]))
+    assert all(
+        points["n"]
+        == pd.Series(
+            [1, 1],
+            index=pd.MultiIndex.from_frame(
+                pd.DataFrame({"Block": [0, 0], "Intensity": [0, 1]})
+            ),
+        )
+    )
 
 
 def test_amp_dimension():
