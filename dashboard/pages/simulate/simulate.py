@@ -157,30 +157,31 @@ def update_figure(
 ):
     trials = pd.concat(
         {
-            day: pa.sessions.from_frames_dict(
+            day: pd.concat(
                 {
-                    subj: pa.trials.moc_sample(
-                        min_intensity,
-                        max_intensity,
-                        n_trials,
-                        k,
-                        x_0,
-                        fixed_min,
-                        fixed_max,
+                    subj: pd.concat(
+                        {
+                            fixed_intensity: pa.trials.moc_sample(
+                                min_intensity, max_intensity, n_trials, k, x_0
+                            )
+                            for fixed_intensity in range(fixed_min, fixed_max + 1)
+                        },
+                        names=["Fixed Intensity"],
                     )
                     for subj in range(n_subjects)
-                }
+                },
+                names=["Subject"],
             )
             for day in range(5)
         },
         names=["Day"],
     )
-    points = trials.groupby(["Day", "Subject", "Fixed Intensity"]).apply(
-        pa.points.from_trials
-    )
+    points = pa.points.from_trials(trials)
 
-    fits = trials.groupby(["Day", "Subject", "Fixed Intensity"]).apply(
-        pa.blocks.get_fit
+    fits = (
+        trials.reset_index(level="Intensity")
+        .groupby(["Day", "Subject", "Fixed Intensity"])
+        .apply(pa.blocks.get_fit)
     )
 
     params = fits.apply(pa.blocks.fit_params)

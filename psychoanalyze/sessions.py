@@ -66,7 +66,3 @@ def n_trials(sessions, trials):
 def load_cached(data_dir, monkey=None):
     sessions = pd.read_csv(data_dir / "sessions.csv", index_col=["Monkey", "Date"])
     return sessions[sessions.index.get_level_values("Monkey") == monkey]
-
-
-def from_frames_dict(subject_frames: dict[str, pd.DataFrame]) -> pd.DataFrame:
-    return pd.concat(subject_frames, names=["Subject"])

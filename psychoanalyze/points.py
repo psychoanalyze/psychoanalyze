@@ -12,15 +12,12 @@ import numpy as np
 index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
 
 
-def from_trials(trials: pd.DataFrame) -> pd.DataFrame:
-    test_trials = trials[trials["Result"].isin([0, 1])]
-    points = (
-        test_trials.groupby("Intensity")["Result"]
-        .agg(["count", "sum"])
-        .rename(columns={"count": "n", "sum": "Hits"})
-    )
-    points["Hit Rate"] = points["Hits"] / points["n"]
-    return points
+def from_trials(trials: pd.Series) -> pd.Series:
+    grouped = trials.groupby(trials.index.names)
+    hits = grouped.sum()
+    n = grouped.count()
+    hr = hits / n
+    return pd.concat([hits, n, hr], axis=1, keys=["Hits", "n", "Hit Rate"])
 
 
 def load(data_path=pathlib.Path("data")):
@@ -172,8 +169,8 @@ def fixed_magnitude(points):
         return points.index.get_level_values("Amp1")[0]
 
 
-def n(points):
-    return len(points)
+def n(trials):
+    return trials.groupby(level=["Day", "Subject", "Fixed Intensity"]).count()
 
 
 def to_block(points):
