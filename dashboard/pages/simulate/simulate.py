@@ -68,65 +68,67 @@ component_column = dbc.Col(
     width=3,
 )
 
+plot_tabs = dbc.Col(
+    dbc.Tabs(
+        [
+            dbc.Tab(
+                dcc.Graph(id="psi-plot"),
+                label="Psychometric Function",
+                activeTabClassName="fw-bold fst-italic",
+            ),
+            dbc.Tab(
+                dbc.Row(
+                    [
+                        dbc.Col(dcc.Graph(id="blocks-plot"), width=6),
+                        dbc.Col(dcc.Graph(id="ecdf-plot"), width=6),
+                    ]
+                ),
+                label="eCDF",
+                tab_id="ecdf-tab",
+            ),
+            dbc.Tab(
+                dcc.Graph(
+                    figure=px.scatter(
+                        pd.DataFrame({"Day": [], "Threshold": []}),
+                        x="Day",
+                        y="Threshold",
+                        template=pa.plot.template,
+                    ),
+                    id="longitudinal-plot",
+                ),
+                tab_id="longitudinal-tab",
+                label="Longitudinal Plot",
+                activeTabClassName="fw-bold fst-italic",
+            ),
+            dbc.Tab(
+                dcc.Graph(
+                    figure=px.scatter(
+                        pd.DataFrame(
+                            {
+                                "Fixed Intensity": [],
+                                "Threshold (modulated dimension)": [],
+                            }
+                        ),
+                        x="Fixed Intensity",
+                        y="Threshold (modulated dimension)",
+                        template=pa.plot.template,
+                    ),
+                    id="sd-plot",
+                ),
+                label="Strength-Duration",
+                tab_id="sd-tab",
+            ),
+        ],
+        active_tab="sd-tab",
+    )
+)
+
 layout = html.Div(
     [
         dbc.Row(
             [
                 component_column,
-                dbc.Col(
-                    dbc.Tabs(
-                        [
-                            dbc.Tab(
-                                dcc.Graph(id="psi-plot"),
-                                label="Psychometric Function",
-                                activeTabClassName="fw-bold fst-italic",
-                            ),
-                            dbc.Tab(
-                                dbc.Row(
-                                    [
-                                        dbc.Col(dcc.Graph(id="blocks-plot"), width=6),
-                                        dbc.Col(dcc.Graph(id="ecdf-plot"), width=6),
-                                    ]
-                                ),
-                                label="eCDF",
-                                tab_id="ecdf-tab",
-                            ),
-                            dbc.Tab(
-                                dcc.Graph(
-                                    figure=px.scatter(
-                                        pd.DataFrame({"Day": [], "Threshold": []}),
-                                        x="Day",
-                                        y="Threshold",
-                                        template=pa.plot.template,
-                                    ),
-                                    id="longitudinal-plot",
-                                ),
-                                tab_id="longitudinal-tab",
-                                label="Longitudinal Plot",
-                                activeTabClassName="fw-bold fst-italic",
-                            ),
-                            dbc.Tab(
-                                dcc.Graph(
-                                    figure=px.scatter(
-                                        pd.DataFrame(
-                                            {
-                                                "Fixed Intensity": [],
-                                                "Threshold (modulated dimension)": [],
-                                            }
-                                        ),
-                                        x="Fixed Intensity",
-                                        y="Threshold (modulated dimension)",
-                                        template=pa.plot.template,
-                                    ),
-                                    id="sd-plot",
-                                ),
-                                label="Strength-Duration",
-                                tab_id="sd-tab",
-                            ),
-                        ],
-                        active_tab="sd-tab",
-                    )
-                ),
+                plot_tabs,
             ]
         ),
     ]
@@ -242,13 +244,12 @@ def update_figure(n_trials, min_intensity, max_intensity, k, x_0, n_blocks, n_su
             symbol="Subject",
             template=pa.plot.template,
         ),
-        px.scatter(
+        px.box(
             thresholds.reset_index().rename(
                 columns={"x_0": "Threshold (modulated dimension)"}
             ),
             x="Fixed Intensity",
             y="Threshold (modulated dimension)",
-            symbol="Subject",
             template=pa.plot.template,
         ),
     )
