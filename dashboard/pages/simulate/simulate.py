@@ -28,7 +28,7 @@ component_column = dbc.Col(
         dbc.InputGroup(
             [
                 dbc.Input(id="n-subjects", type="number", value=2),
-                dbc.InputGroupText("subject"),
+                dbc.InputGroupText("subjects"),
             ],
             class_name="mb-4",
         ),
@@ -46,8 +46,10 @@ component_column = dbc.Col(
         html.H4("Fixed Dimension"),
         dbc.InputGroup(
             [
-                dbc.InputGroupText("Fixed"),
-                dbc.Input(id="fixed-intensity", type="number", value=0),
+                dbc.InputGroupText("Min"),
+                dbc.Input(id="fixed-min", type="number", value=-4),
+                dbc.Input(id="fixed-max", type="number", value=4),
+                dbc.InputGroupText("Max"),
             ],
             class_name="mb-4",
         ),
@@ -156,13 +158,11 @@ layout = html.Div(
     ],
 )
 def update_figure(n_trials, min_intensity, max_intensity, k, x_0, n_blocks, n_subjects):
-    intensity_choices = pd.Index(
-        range(min_intensity, max_intensity + 1), name="Intensity"
-    )
-
     trials = pa.sessions.from_frames_dict(
         {
-            subj: pa.trials.moc_sample(intensity_choices, n_trials, k, x_0, n_blocks)
+            subj: pa.trials.moc_sample(
+                min_intensity, max_intensity, n_trials, k, x_0, n_blocks
+            )
             for subj in range(n_subjects)
         }
     )
@@ -170,9 +170,6 @@ def update_figure(n_trials, min_intensity, max_intensity, k, x_0, n_blocks, n_su
 
     fits = trials.groupby(["Subject", "Block"]).apply(pa.blocks.get_fit)
 
-    # predictions = fits.apply(
-    #     pa.blocks.make_predictions, intensity_choices=intensity_choices
-    # )
     params = fits.apply(pa.blocks.fit_params)
     params = params.reset_index().rename(columns={"intercept": "Threshold"})
     params["Day"] = params["Block"]
@@ -208,6 +205,7 @@ def update_figure(n_trials, min_intensity, max_intensity, k, x_0, n_blocks, n_su
             params.rename(columns={"Threshold": "Threshold (modulated dimension)"}),
             x="Fixed Intensity",
             y="Threshold (modulated dimension)",
+            color="Subject",
             template=pa.plot.template,
         ),
     )
