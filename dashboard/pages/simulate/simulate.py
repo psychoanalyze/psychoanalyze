@@ -153,27 +153,44 @@ layout = html.Div(
         Input("max-intensity", "value"),
         Input("model-k", "value"),
         Input("x_0", "value"),
-        Input("n-blocks", "value"),
         Input("n-subjects", "value"),
+        Input("fixed-min", "value"),
+        Input("fixed-max", "value"),
     ],
 )
-def update_figure(n_trials, min_intensity, max_intensity, k, x_0, n_blocks, n_subjects):
-    trials = pa.sessions.from_frames_dict(
+def update_figure(
+    n_trials, min_intensity, max_intensity, k, x_0, n_subjects, fixed_min, fixed_max
+):
+    trials = pd.concat(
         {
-            subj: pa.trials.moc_sample(
-                min_intensity, max_intensity, n_trials, k, x_0, n_blocks
+            day: pa.sessions.from_frames_dict(
+                {
+                    subj: pa.trials.moc_sample(
+                        min_intensity,
+                        max_intensity,
+                        n_trials,
+                        k,
+                        x_0,
+                        fixed_min,
+                        fixed_max,
+                    )
+                    for subj in range(n_subjects)
+                }
             )
-            for subj in range(n_subjects)
-        }
+            for day in range(5)
+        },
+        names=["Day"],
     )
-    points = trials.groupby(["Subject", "Block"]).apply(pa.points.from_trials)
+    points = trials.groupby(["Day", "Subject", "Fixed Intensity"]).apply(
+        pa.points.from_trials
+    )
 
-    fits = trials.groupby(["Subject", "Block"]).apply(pa.blocks.get_fit)
+    fits = trials.groupby(["Day", "Subject", "Fixed Intensity"]).apply(
+        pa.blocks.get_fit
+    )
 
     params = fits.apply(pa.blocks.fit_params)
     params = params.reset_index().rename(columns={"intercept": "Threshold"})
-    params["Day"] = params["Block"]
-    params["Fixed Intensity"] = 0
     return (
         px.box(
             points.reset_index(),
