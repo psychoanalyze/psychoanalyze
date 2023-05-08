@@ -122,7 +122,7 @@ def labels(results: list[bool]) -> list[str]:
 
 def moc_sample(n_trials, k, x_0, n_levels):
     intensity_choices = pd.Index(
-        np.linspace(x_0 - 4, x_0 + 4, n_levels), name="Intensity"
+        np.linspace(x_0 - 4 / k, x_0 + 4 / k, n_levels), name="Intensity"
     )
     intensities = [random.choice(intensity_choices) for _ in range(n_trials)]
     results = [
