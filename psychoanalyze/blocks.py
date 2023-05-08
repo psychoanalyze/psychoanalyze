@@ -220,11 +220,19 @@ def fit_params(fit):
     )
 
 
-def generate_trials(n_trials, model_params, n_levels, fixed_range):
+def generate_trials(
+    n_trials: int,
+    model_params: dict[str, float],
+    n_levels: int,
+    fixed_range: dict[str, float],
+    fixed_n: int,
+) -> pd.Series:
     return pd.concat(
         {
             fixed_intensity: pa.trials.moc_sample(n_trials, model_params, n_levels)
-            for fixed_intensity in range(fixed_range["min"], fixed_range["max"])
+            for fixed_intensity in np.linspace(
+                fixed_range["min"], fixed_range["max"], fixed_n
+            )
         },
         names=["Fixed Intensity"],
     )
