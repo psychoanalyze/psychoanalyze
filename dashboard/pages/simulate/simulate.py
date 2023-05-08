@@ -51,13 +51,25 @@ component_column = dbc.Col(
         html.H4("Logistic Regression"),
         dbc.InputGroup(
             [
+                dbc.InputGroupText("intercept"),
+                dbc.Input(id="x_0", type="number", value=0.0, step=0.1),
+            ],
+        ),
+        dbc.InputGroup(
+            [
                 dbc.InputGroupText("slope"),
                 dbc.Input(id="model-k", type="number", value=1, step=0.1),
             ]
         ),
         dbc.InputGroup(
             [
-                dbc.InputGroupText("intercept"),
+                dbc.InputGroupText("guess rate"),
+                dbc.Input(id="x_0", type="number", value=0.0, step=0.1),
+            ],
+        ),
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText("lapse rate"),
                 dbc.Input(id="x_0", type="number", value=0.0, step=0.1),
             ],
             class_name="mb-3",
@@ -84,8 +96,8 @@ plot_tabs = dbc.Col(
             dbc.Tab(
                 dbc.Row(
                     [
-                        dbc.Col(dcc.Graph(id="blocks-plot"), width=6),
-                        dbc.Col(dcc.Graph(id="ecdf-plot"), width=6),
+                        dbc.Col(dcc.Graph(id="ecdf-thresh"), width=6),
+                        dbc.Col(dcc.Graph(id="ecdf-slope"), width=6),
                     ]
                 ),
                 label="eCDF",
@@ -145,8 +157,8 @@ layout = html.Div(
 @callback(
     [
         Output("psi-plot", "figure"),
-        Output("blocks-plot", "figure"),
-        Output("ecdf-plot", "figure"),
+        Output("ecdf-thresh", "figure"),
+        Output("ecdf-slope", "figure"),
         Output("longitudinal-plot", "figure"),
         Output("sd-plot", "figure"),
     ],
@@ -201,14 +213,14 @@ def update_figure(n_trials, n_levels, k, x_0, n_subjects, fixed_min, fixed_max):
             template=pa.plot.template,
         ),
         px.ecdf(
-            params.reset_index(),
-            x="slope",
+            params,
+            x="Threshold",
             color="Subject",
             template=pa.plot.template,
         ),
         px.ecdf(
-            params,
-            x="Threshold",
+            params.reset_index(),
+            x="slope",
             color="Subject",
             template=pa.plot.template,
         ),
