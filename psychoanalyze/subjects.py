@@ -15,12 +15,12 @@ def generate_letter_names(n_subjects):
 
 
 def generate_trials(
-    n_trials, k, x_0, n_levels, fixed_min, fixed_max, n_days, n_subjects, gamma, lambda_
+    n_trials, model_params, n_levels, fixed_min, fixed_max, n_days, n_subjects
 ):
     return pd.concat(
         {
             subj: pa.sessions.generate_trials(
-                n_trials, k, x_0, n_levels, fixed_min, fixed_max, n_days, gamma, lambda_
+                n_trials, model_params, n_levels, fixed_min, fixed_max, n_days
             )
             for subj in range(n_subjects)
         },

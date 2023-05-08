@@ -178,17 +178,16 @@ def update_figure(
     n_trials, n_levels, k, x_0, gamma, lambda_, n_subjects, fixed_min, fixed_max
 ):
     n_days = 5
+    model_params = {"x_0": x_0, "k": k, "gamma": gamma, "lambda": lambda_}
+
     trials = pa.subjects.generate_trials(
         n_trials,
-        k,
-        x_0,
+        model_params,
         n_levels,
         fixed_min,
         fixed_max,
         n_days,
         n_subjects,
-        gamma,
-        lambda_,
     )
     points = pa.points.from_trials(trials)
 
