@@ -4,6 +4,7 @@ repos:
   rev: 'v0.0.256'
   hooks:
   - id: ruff
+    stages: [commit]
 
 - repo: https://github.com/pre-commit/mirrors-mypy
   rev: 'v0.971'
@@ -23,3 +24,11 @@ repos:
   hooks:
   - id: conventional-pre-commit
     stages: [commit-msg]
+
+- repo: local
+  hooks:
+    - id: pytest
+      name: pytest
+      entry: pytest
+      language: system
+      types: [python]
