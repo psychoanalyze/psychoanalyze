@@ -66,3 +66,15 @@ def n_trials(sessions, trials):
 def load_cached(data_dir, monkey=None):
     sessions = pd.read_csv(data_dir / "sessions.csv", index_col=["Monkey", "Date"])
     return sessions[sessions.index.get_level_values("Monkey") == monkey]
+
+
+def generate_trials(n_trials, k, x_0, n_levels, fixed_min, fixed_max, n_days):
+    return pd.concat(
+        {
+            day: pa.blocks.generate_trials(
+                n_trials, k, x_0, n_levels, fixed_min, fixed_max
+            )
+            for day in range(n_days)
+        },
+        names=["Day"],
+    )

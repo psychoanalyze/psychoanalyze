@@ -42,7 +42,7 @@ component_column = dbc.Col(
             [
                 dbc.InputGroupText("Min"),
                 dbc.Input(id="fixed-min", type="number", value=0),
-                dbc.Input(id="fixed-max", type="number", value=0),
+                dbc.Input(id="fixed-max", type="number", value=1),
                 dbc.InputGroupText("Max"),
             ],
             class_name="mb-4",
@@ -173,32 +173,15 @@ layout = html.Div(
     ],
 )
 def update_figure(n_trials, n_levels, k, x_0, n_subjects, fixed_min, fixed_max):
-    trials = pd.concat(
-        {
-            day: pd.concat(
-                {
-                    subj: pd.concat(
-                        {
-                            fixed_intensity: pa.trials.moc_sample(
-                                n_trials, k, x_0, n_levels
-                            )
-                            for fixed_intensity in range(fixed_min, fixed_max + 1)
-                        },
-                        names=["Fixed Intensity"],
-                    )
-                    for subj in range(n_subjects)
-                },
-                names=["Subject"],
-            )
-            for day in range(5)
-        },
-        names=["Day"],
+    n_days = 5
+    trials = pa.subjects.generate_trials(
+        n_trials, k, x_0, n_levels, fixed_min, fixed_max, n_days, n_subjects
     )
     points = pa.points.from_trials(trials)
 
     fits = (
         trials.reset_index(level="Intensity")
-        .groupby(["Day", "Subject", "Fixed Intensity"])
+        .groupby(["Subject", "Day", "Fixed Intensity"])
         .apply(pa.blocks.get_fit)
     )
 

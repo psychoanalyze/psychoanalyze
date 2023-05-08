@@ -218,3 +218,13 @@ def fit_params(fit):
             "intercept": fit.intercept_[0],
         }
     )
+
+
+def generate_trials(n_trials, k, x_0, n_levels, fixed_min, fixed_max):
+    return pd.concat(
+        {
+            fixed_intensity: pa.trials.moc_sample(n_trials, k, x_0, n_levels)
+            for fixed_intensity in range(fixed_min, fixed_max)
+        },
+        names=["Fixed Intensity"],
+    )

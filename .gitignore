@@ -144,3 +144,5 @@ notebooks/*
 figures/*
 
 *.duckdb*
+
+demo.ipynb
