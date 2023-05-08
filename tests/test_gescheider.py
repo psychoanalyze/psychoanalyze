@@ -10,4 +10,4 @@ def test_3_1():
     )
     layout = pa.gescheider.p3_1(data).layout
     assert layout.xaxis.title.text == "Stimulus Intensity"
-    assert layout.yaxis.title.text == "p(yes)"
+    assert layout.yaxis.title.text == "φ"

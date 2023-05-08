@@ -3,4 +3,4 @@ import pandas as pd
 
 
 def p3_1(data: pd.Series):
-    return px.scatter(data, y="p(yes)")
+    return px.scatter(data.rename("φ"), y="φ")
