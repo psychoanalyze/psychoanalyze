@@ -120,9 +120,9 @@ def labels(results: list[bool]) -> list[str]:
     return [pa.trials.codes[result] for result in results]
 
 
-def moc_sample(min_intensity, max_intensity, n_trials, k, x_0):
+def moc_sample(n_trials, k, x_0, n_levels):
     intensity_choices = pd.Index(
-        range(min_intensity, max_intensity + 1), name="Intensity"
+        np.linspace(x_0 - 4, x_0 + 4, n_levels), name="Intensity"
     )
     intensities = [random.choice(intensity_choices) for _ in range(n_trials)]
     results = [
