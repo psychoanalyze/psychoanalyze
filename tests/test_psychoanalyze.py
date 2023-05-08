@@ -1,7 +1,7 @@
 import pandas as pd
-import datatest as dt  # type: ignore
+import datatest as dt
 import numpy as np
-from scipy.special import expit  # type: ignore
+from scipy.special import expit
 
 import psychoanalyze as pa
 

@@ -1,4 +1,4 @@
-import plotly.express as px  # type: ignore
+import plotly.express as px
 import pandas as pd
 import psychoanalyze as pa
 from plotly import graph_objects as go
@@ -7,7 +7,6 @@ from pandera.typing import DataFrame
 
 axis_settings = {
     "ticks": "outside",
-    # "rangemode": "tozero",
     "showgrid": False,
     "showline": True,
     "zeroline": False,

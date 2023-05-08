@@ -7,3 +7,7 @@ def load(data_path):
         index_col="Monkey",
         parse_dates=["Surgery Date"],
     )
+
+
+def generate_letter_names(n_subjects):
+    return list("ABCDEFG"[:n_subjects])

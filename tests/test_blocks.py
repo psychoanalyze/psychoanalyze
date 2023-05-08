@@ -1,7 +1,7 @@
 import datetime
 import pandas as pd
 import pandas.api.types as ptypes
-import datatest as dt  # type: ignore
+import datatest as dt
 import pytest
 
 import psychoanalyze as pa

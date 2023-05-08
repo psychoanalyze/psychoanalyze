@@ -1,8 +1,8 @@
-import dash_bootstrap_components as dbc  # type: ignore
-from dash import html, dcc  # type: ignore
+import dash_bootstrap_components as dbc
+from dash import html, dcc
 import psychoanalyze as pa
-import dash_daq as daq  # type: ignore
-import plotly.express as px  # type: ignore
+import dash_daq as daq
+import plotly.express as px
 import pandas as pd
 
 defaults = {

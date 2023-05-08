@@ -1,4 +1,4 @@
-import plotly.express as px  # type: ignore
+import plotly.express as px
 import psychoanalyze as pa
 import pandas as pd
 

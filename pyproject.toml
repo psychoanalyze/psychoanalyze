@@ -65,3 +65,22 @@ filterwarnings = [
 [tool.bandit]
 targets = ["psychoanalyze/"]
 skips = ["B311"]
+
+[tool.mypy]
+exclude = [
+    'tests',
+]
+
+[[tool.mypy.overrides]]
+module = [
+    'dash',
+    'plotly',
+    'dash_bootstrap_components',
+    'plotly.express',
+    'scipy.stats',
+    'scipy.special',
+    'sklearn.linear_model',
+    'dash_daq',
+    'datatest'
+]
+ignore_missing_imports = true

@@ -1,12 +1,12 @@
 import pandas as pd
 import numpy as np
-from scipy.stats import logistic  # type: ignore
-from scipy.special import logit, expit  # type: ignore
+from scipy.stats import logistic
+from scipy.special import logit, expit
 import psychoanalyze as pa
-import plotly.express as px  # type: ignore
+import plotly.express as px
 import os
 import pathlib
-from sklearn.linear_model import LogisticRegression  # type: ignore
+from sklearn.linear_model import LogisticRegression
 
 
 dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]

@@ -1,9 +1,9 @@
 import pandas as pd
 import cmdstanpy as stan
-import plotly.express as px  # type: ignore
-from scipy.stats import binom  # type: ignore
+import plotly.express as px
+from scipy.stats import binom
 import psychoanalyze as pa
-from dash import dash_table  # type: ignore
+from dash import dash_table
 import pathlib
 from plotly import graph_objects as go
 import numpy as np

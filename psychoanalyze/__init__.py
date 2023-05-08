@@ -9,8 +9,6 @@ from psychoanalyze import (
     data,
     trials,
     weber,
-    detection,
-    amp,
     strength_duration,
     subjects,
     stimulus,
@@ -29,8 +27,6 @@ __all__ = [
     "blocks",
     "sessions",
     "weber",
-    "detection",
-    "amp",
     "points",
     "trials",
     "blocks",
@@ -55,8 +51,7 @@ def psi(threshold=0, slope=1, lambda_=0, gamma=0, x_range=(-3, 3)) -> pd.Series:
     """Basic sigmoid psychometric function psi (Ψ) = expit/logistic"""
     x = np.linspace(x_range[0], x_range[1])
     y = gamma + (1 - lambda_ - gamma) * 1 / (1 + np.exp((-slope) * (x - threshold)))
-    # y = gamma + (1 - lambda_ - gamma) * expit(x)
-    return pd.Series(y, index=x)  # type: ignore
+    return pd.Series(y, index=x)
 
 
 def fit(data):
