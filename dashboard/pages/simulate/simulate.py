@@ -45,14 +45,14 @@ component_column = dbc.Col(
                 dbc.Input(id="fixed-max", type="number", value=1),
                 dbc.InputGroupText("Max"),
             ],
-            class_name="mb-4",
+            class_name="mb-3",
         ),
         html.H3("Model Parameters"),
         html.H4("Logistic Regression"),
         dbc.InputGroup(
             [
                 dbc.InputGroupText("intercept"),
-                dbc.Input(id="x_0", type="number", value=0.0, step=0.1),
+                dbc.Input(id="x_0", type="number", value=50.0, step=0.1),
             ],
         ),
         dbc.InputGroup(
@@ -139,6 +139,7 @@ plot_tabs = dbc.Col(
             ),
         ],
         active_tab="psi-tab",
+        class_name="my-4",
     )
 )
 
