@@ -179,13 +179,13 @@ def update_figure(
 ):
     n_days = 5
     model_params = {"x_0": x_0, "k": k, "gamma": gamma, "lambda": lambda_}
+    fixed_range = {"max": fixed_max, "min": fixed_min}
 
     trials = pa.subjects.generate_trials(
         n_trials,
         model_params,
         n_levels,
-        fixed_min,
-        fixed_max,
+        fixed_range,
         n_days,
         n_subjects,
     )

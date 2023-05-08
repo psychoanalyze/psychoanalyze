@@ -220,11 +220,11 @@ def fit_params(fit):
     )
 
 
-def generate_trials(n_trials, model_params, n_levels, fixed_min, fixed_max):
+def generate_trials(n_trials, model_params, n_levels, fixed_range):
     return pd.concat(
         {
             fixed_intensity: pa.trials.moc_sample(n_trials, model_params, n_levels)
-            for fixed_intensity in range(fixed_min, fixed_max)
+            for fixed_intensity in range(fixed_range["min"], fixed_range["max"])
         },
         names=["Fixed Intensity"],
     )
