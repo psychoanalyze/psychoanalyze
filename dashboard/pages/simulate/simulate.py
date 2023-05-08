@@ -139,8 +139,8 @@ plot_tabs = dbc.Col(
             ),
         ],
         active_tab="psi-tab",
-        class_name="my-4",
-    )
+    ),
+    class_name="my-4",
 )
 
 layout = html.Div(
