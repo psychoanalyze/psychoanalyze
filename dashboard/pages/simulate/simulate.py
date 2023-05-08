@@ -64,13 +64,13 @@ component_column = dbc.Col(
         dbc.InputGroup(
             [
                 dbc.InputGroupText("guess rate"),
-                dbc.Input(id="x_0", type="number", value=0.0, step=0.1),
+                dbc.Input(id="gamma", type="number", value=0.0, step=0.1),
             ],
         ),
         dbc.InputGroup(
             [
                 dbc.InputGroupText("lapse rate"),
-                dbc.Input(id="x_0", type="number", value=0.0, step=0.1),
+                dbc.Input(id="lambda", type="number", value=0.0, step=0.1),
             ],
             class_name="mb-3",
         ),
@@ -167,15 +167,28 @@ layout = html.Div(
         Input("n-levels", "value"),
         Input("model-k", "value"),
         Input("x_0", "value"),
+        Input("gamma", "value"),
+        Input("lambda", "value"),
         Input("n-subjects", "value"),
         Input("fixed-min", "value"),
         Input("fixed-max", "value"),
     ],
 )
-def update_figure(n_trials, n_levels, k, x_0, n_subjects, fixed_min, fixed_max):
+def update_figure(
+    n_trials, n_levels, k, x_0, gamma, lambda_, n_subjects, fixed_min, fixed_max
+):
     n_days = 5
     trials = pa.subjects.generate_trials(
-        n_trials, k, x_0, n_levels, fixed_min, fixed_max, n_days, n_subjects
+        n_trials,
+        k,
+        x_0,
+        n_levels,
+        fixed_min,
+        fixed_max,
+        n_days,
+        n_subjects,
+        gamma,
+        lambda_,
     )
     points = pa.points.from_trials(trials)
 

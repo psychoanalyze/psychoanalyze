@@ -68,11 +68,13 @@ def load_cached(data_dir, monkey=None):
     return sessions[sessions.index.get_level_values("Monkey") == monkey]
 
 
-def generate_trials(n_trials, k, x_0, n_levels, fixed_min, fixed_max, n_days):
+def generate_trials(
+    n_trials, k, x_0, n_levels, fixed_min, fixed_max, n_days, gamma, lambda_
+):
     return pd.concat(
         {
             day: pa.blocks.generate_trials(
-                n_trials, k, x_0, n_levels, fixed_min, fixed_max
+                n_trials, k, x_0, n_levels, fixed_min, fixed_max, gamma, lambda_
             )
             for day in range(n_days)
         },
