@@ -60,7 +60,7 @@ def from_points(points: pd.DataFrame, dim=None):
     return points.groupby(levels).apply(pa.points.to_block)
 
 
-def from_trials(trials: pd.DataFrame) -> pd.Series:
+def from_trials(trials: pd.Series) -> pd.Series:
     points = pa.points.from_trials(trials)
     return from_points(points.reset_index())
 

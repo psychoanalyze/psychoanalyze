@@ -12,8 +12,8 @@ import numpy as np
 index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
 
 
-def from_trials(trials: pd.Series) -> pd.Series:
-    grouped = trials.groupby(level=trials.index.names)
+def from_trials(trials: pd.Series) -> pd.DataFrame:
+    grouped = trials.groupby(level=trials.index.names)  # type: ignore
     hits = grouped.sum().rename("Hits")
     n = grouped.count().rename("n")
     hr = (hits / n).rename("Hit Rate")
