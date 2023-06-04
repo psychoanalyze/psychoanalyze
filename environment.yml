@@ -1,0 +1,8 @@
+name: psychoanalyze
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - pymc>=5
+platforms:
+  - linux-64
