@@ -31,10 +31,8 @@ experiment_params = html.Div(
     ]
 )
 
-component_column = dbc.Col(
+stimulus_params = html.Div(
     [
-        html.H3("Simulation Parameters"),
-        experiment_params,
         html.H4("Stimulus"),
         html.H5("Modulated Dimension"),
         dcc.Dropdown(options={"amp": "Amplitude"}, value="amp"),
@@ -56,6 +54,11 @@ component_column = dbc.Col(
             ],
             class_name="mb-3",
         ),
+    ]
+)
+
+psi_params = html.Div(
+    [
         html.H4("Psychometric Function"),
         html.H5("Logistic Regression"),
         dbc.InputGroup(
@@ -83,6 +86,15 @@ component_column = dbc.Col(
             ],
             class_name="mb-3",
         ),
+    ]
+)
+
+component_column = dbc.Col(
+    [
+        html.H3("Simulation Parameters"),
+        experiment_params,
+        stimulus_params,
+        psi_params,
     ],
     width=3,
 )
