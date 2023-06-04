@@ -3,5 +3,5 @@ SELECT
     Intensity,
     SUM(Result) AS Hits,
     SUM(Result) / COUNT(TrialID) AS HitRate
-FROM {{ source("Simulation", "Trials") }}
+FROM {{ ref("trials") }}
 GROUP BY Intensity

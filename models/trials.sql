@@ -5,4 +5,4 @@ SELECT
     ,TrialID
     ,Intensity
     ,Result
-FROM 'data/test/trials.csv'
+FROM {{ source("Schlichenmeyer2022", "Trials") }}
