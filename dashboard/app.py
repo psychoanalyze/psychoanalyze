@@ -91,6 +91,7 @@ psi_params = html.Div(
 
 component_column = dbc.Col(
     [
+        dbc.Button("Re-run Simulation", color="primary", className="mb-3"),
         html.H3("Simulation Parameters"),
         experiment_params,
         stimulus_params,
@@ -124,6 +125,8 @@ dataset_component = dcc.Dropdown(
         },
     ],
     placeholder="Select an open dataset...",
+    value="schlich2022",
+    id="dataset",
 )
 
 empirical_data_components = html.Div(
@@ -281,71 +284,98 @@ app.layout = dbc.Container(
         Input("n-subjects", "value"),
         Input("fixed-min", "value"),
         Input("fixed-max", "value"),
+        Input("dataset", "value"),
     ],
 )
 def update_figure(
-    n_trials, n_levels, k, x_0, gamma, lambda_, n_subjects, fixed_min, fixed_max
+    n_trials,
+    n_levels,
+    k,
+    x_0,
+    gamma,
+    lambda_,
+    n_subjects,
+    fixed_min,
+    fixed_max,
+    dataset,
 ):
-    n_days = 5
-    model_params = {"x_0": x_0, "k": k, "gamma": gamma, "lambda": lambda_}
-    fixed_range = {"max": fixed_max, "min": fixed_min}
-    fixed_n = 2
+    if dataset == "schlich2022":
+        points = pd.read_csv("data/normalized/points.csv")
+        blocks = pd.read_csv("data/fit.csv")
+        return (
+            [
+                px.box(
+                    points,
+                    x="Charge",
+                    y="Hit Rate",
+                    # color="Subject",
+                    template=pa.plot.template,
+                )
+            ]
+            + [px.ecdf(blocks, x="Threshold", template=pa.plot.template)] * 2
+            + [px.scatter()] * 2
+        )
+    else:
+        n_days = 5
+        model_params = {"x_0": x_0, "k": k, "gamma": gamma, "lambda": lambda_}
+        fixed_range = {"max": fixed_max, "min": fixed_min}
+        fixed_n = 2
 
-    trials = pa.subjects.generate_trials(
-        n_trials,
-        model_params,
-        n_levels,
-        fixed_range,
-        fixed_n,
-        n_days,
-        n_subjects,
-    )
-    points = pa.points.from_trials(trials)
+        trials = pa.subjects.generate_trials(
+            n_trials,
+            model_params,
+            n_levels,
+            fixed_range,
+            fixed_n,
+            n_days,
+            n_subjects,
+        )
+        points = pa.points.from_trials(trials)
 
-    fits = (
-        trials.reset_index(level="Intensity")
-        .groupby(["Subject", "Day", "Fixed Intensity"])
-        .apply(pa.blocks.get_fit)
-    )
+        fits = (
+            trials.reset_index(level="Intensity")
+            .groupby(["Subject", "Day", "Fixed Intensity"])
+            .apply(pa.blocks.get_fit)
+        )
 
-    params = fits.apply(pa.blocks.fit_params)
-    params = params.reset_index().rename(columns={"intercept": "Threshold"})
-    return (
-        px.box(
-            points.reset_index(),
-            x="Intensity",
-            y="Hit Rate",
-            color="Subject",
-            template=pa.plot.template,
-        ),
-        px.ecdf(
-            params,
-            x="Threshold",
-            color="Subject",
-            template=pa.plot.template,
-        ),
-        px.ecdf(
-            params.reset_index(),
-            x="slope",
-            color="Subject",
-            template=pa.plot.template,
-        ),
-        px.scatter(
-            params,
-            x="Day",
-            y="Threshold",
-            symbol="Subject",
-            template=pa.plot.template,
-        ),
-        px.box(
-            params.rename(columns={"Threshold": "Threshold (modulated dimension)"}),
-            x="Fixed Intensity",
-            y="Threshold (modulated dimension)",
-            color="Subject",
-            template=pa.plot.template,
-        ),
-    )
+        params = fits.apply(pa.blocks.fit_params)
+        params = params.reset_index().rename(columns={"intercept": "Threshold"})
+        return (
+            px.box(
+                points.reset_index(),
+                x="Intensity",
+                y="Hit Rate",
+                color="Subject",
+                template=pa.plot.template,
+            ),
+            px.ecdf(
+                params,
+                x="Threshold",
+                color="Subject",
+                template=pa.plot.template,
+            ),
+            px.ecdf(
+                params.reset_index(),
+                x="slope",
+                color="Subject",
+                template=pa.plot.template,
+            ),
+            px.scatter(
+                params,
+                x="Day",
+                y="Threshold",
+                symbol="Subject",
+                template=pa.plot.template,
+            ),
+            px.box(
+                params.rename(columns={"Threshold": "Threshold (modulated dimension)"}),
+                x="Fixed Intensity",
+                y="Threshold (modulated dimension)",
+                color="Subject",
+                template=pa.plot.template,
+            ),
+        )
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(debug=True, dev_tools_hot_reload=False)
