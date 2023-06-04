@@ -99,42 +99,47 @@ component_column = dbc.Col(
     width=3,
 )
 
+upload_component = dcc.Upload(
+    """Upload your own data - 
+                        drag and drop or click to open file browser
+                        """,
+    id="upload-data",
+    style={
+        "width": "100%",
+        "height": "60px",
+        "lineHeight": "60px",
+        "borderWidth": "1px",
+        "borderStyle": "dashed",
+        "borderRadius": "5px",
+        "textAlign": "center",
+    },
+    multiple=True,
+)
 
-plot_tabs = dbc.Col(
+dataset_component = dcc.Dropdown(
+    options=[
+        {
+            "label": "Schlichenmeyer et al. 2022",
+            "value": "schlich2022",
+        },
+    ],
+    placeholder="Select an open dataset...",
+)
+
+empirical_data_components = html.Div(
     [
         dbc.Row(
             [
-                dbc.Col(
-                    dcc.Upload(
-                        """Upload your own data - 
-                        drag and drop or click to open file browser
-                        """,
-                        id="upload-data",
-                        style={
-                            "width": "100%",
-                            "height": "60px",
-                            "lineHeight": "60px",
-                            "borderWidth": "1px",
-                            "borderStyle": "dashed",
-                            "borderRadius": "5px",
-                            "textAlign": "center",
-                        },
-                        multiple=True,
-                    )
-                ),
-                dbc.Col(
-                    dcc.Dropdown(
-                        options=[
-                            {
-                                "label": "Schlichenmeyer et al. 2022",
-                                "value": "schlich2022",
-                            },
-                        ],
-                        placeholder="Select an open dataset...",
-                    )
-                ),
+                dbc.Col(upload_component),
+                dbc.Col(dataset_component),
             ]
         ),
+    ]
+)
+
+plot_tabs = dbc.Col(
+    [
+        empirical_data_components,
         dbc.Row(
             dbc.Tabs(
                 [
