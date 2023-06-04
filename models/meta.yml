@@ -6,8 +6,3 @@ sources:
       - name: Trials
         meta:
           external_location: 'data/test/trials.csv'
-        columns:
-          - name: TrialID
-            type: int
-          - name: Outcome
-            type: int
