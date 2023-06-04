@@ -15,6 +15,7 @@ server = app.server
 component_column = dbc.Col(
     [
         html.H3("Simulation Parameters"),
+        html.H4("Experimental Design"),
         dbc.InputGroup(
             [
                 dbc.Input(id="n-trials", type="number", value=100),
@@ -28,8 +29,8 @@ component_column = dbc.Col(
             ],
             class_name="mb-4",
         ),
-        html.H3("Intensity Levels"),
-        html.H4("Modulated Dimension"),
+        html.H4("Stimulus"),
+        html.H5("Modulated Dimension"),
         dcc.Dropdown(options={"amp": "Amplitude"}, value="amp"),
         dbc.InputGroup(
             [
@@ -38,7 +39,7 @@ component_column = dbc.Col(
             ],
             class_name="mb-3",
         ),
-        html.H4("Fixed Dimension"),
+        html.H5("Fixed Dimension"),
         dcc.Dropdown(options={"pw": "Pulse Width"}, value="pw"),
         dbc.InputGroup(
             [
@@ -49,8 +50,8 @@ component_column = dbc.Col(
             ],
             class_name="mb-3",
         ),
-        html.H3("Model Parameters"),
-        html.H4("Logistic Regression"),
+        html.H4("Psychometric Function"),
+        html.H5("Logistic Regression"),
         dbc.InputGroup(
             [
                 dbc.InputGroupText("intercept"),
@@ -82,68 +83,105 @@ component_column = dbc.Col(
 
 
 plot_tabs = dbc.Col(
-    dbc.Tabs(
-        [
-            dbc.Tab(
-                [
-                    dcc.Graph(id="psi-plot", className="mb-5"),
-                    dcc.Markdown(
-                        "$\hat{p}(x) = \\frac{1}{1 + \exp(-kx - x_0)}$",
-                        mathjax=True,
-                    ),
-                ],
-                tab_id="psi-tab",
-                label="Psychometric Function",
-                activeTabClassName="fw-bold fst-italic",
-            ),
-            dbc.Tab(
-                dbc.Row(
-                    [
-                        dbc.Col(dcc.Graph(id="ecdf-thresh"), width=6),
-                        dbc.Col(dcc.Graph(id="ecdf-slope"), width=6),
-                    ]
+    [
+        dbc.Row(
+            [
+                dbc.Col(
+                    dcc.Upload(
+                        """Upload your own data - 
+                        drag and drop or click to open file browser
+                        """,
+                        id="upload-data",
+                        style={
+                            "width": "100%",
+                            "height": "60px",
+                            "lineHeight": "60px",
+                            "borderWidth": "1px",
+                            "borderStyle": "dashed",
+                            "borderRadius": "5px",
+                            "textAlign": "center",
+                        },
+                        multiple=True,
+                    )
                 ),
-                label="eCDF",
-                tab_id="ecdf-tab",
-            ),
-            dbc.Tab(
-                dcc.Graph(
-                    figure=px.scatter(
-                        pd.DataFrame({"Day": [], "Threshold": []}),
-                        x="Day",
-                        y="Threshold",
-                        template=pa.plot.template,
-                    ),
-                    id="longitudinal-plot",
+                dbc.Col(
+                    dcc.Dropdown(
+                        options=[
+                            {
+                                "label": "Schlichenmeyer et al. 2022",
+                                "value": "schlich2022",
+                            },
+                        ],
+                        placeholder="Select an open dataset...",
+                    )
                 ),
-                tab_id="longitudinal-tab",
-                label="Time Series",
-                activeTabClassName="fw-bold fst-italic",
-            ),
-            dbc.Tab(
+            ]
+        ),
+        dbc.Row(
+            dbc.Tabs(
                 [
-                    dcc.Graph(
-                        figure=px.scatter(
-                            pd.DataFrame(
-                                {
-                                    "Fixed Intensity": [],
-                                    "Threshold (modulated dimension)": [],
-                                }
+                    dbc.Tab(
+                        [
+                            dcc.Graph(id="psi-plot", className="mb-5"),
+                            dcc.Markdown(
+                                "$\hat{p}(x) = \\frac{1}{1 + \exp(-kx - x_0)}$",
+                                mathjax=True,
                             ),
-                            x="Fixed Intensity",
-                            y="Threshold (modulated dimension)",
-                            template=pa.plot.template,
+                        ],
+                        tab_id="psi-tab",
+                        label="Psychometric Function",
+                        activeTabClassName="fw-bold fst-italic",
+                    ),
+                    dbc.Tab(
+                        dbc.Row(
+                            [
+                                dbc.Col(dcc.Graph(id="ecdf-thresh"), width=6),
+                                dbc.Col(dcc.Graph(id="ecdf-slope"), width=6),
+                            ]
                         ),
-                        id="sd-plot",
+                        label="eCDF",
+                        tab_id="ecdf-tab",
+                    ),
+                    dbc.Tab(
+                        dcc.Graph(
+                            figure=px.scatter(
+                                pd.DataFrame({"Day": [], "Threshold": []}),
+                                x="Day",
+                                y="Threshold",
+                                template=pa.plot.template,
+                            ),
+                            id="longitudinal-plot",
+                        ),
+                        tab_id="longitudinal-tab",
+                        label="Time Series",
+                        activeTabClassName="fw-bold fst-italic",
+                    ),
+                    dbc.Tab(
+                        [
+                            dcc.Graph(
+                                figure=px.scatter(
+                                    pd.DataFrame(
+                                        {
+                                            "Fixed Intensity": [],
+                                            "Threshold (modulated dimension)": [],
+                                        }
+                                    ),
+                                    x="Fixed Intensity",
+                                    y="Threshold (modulated dimension)",
+                                    template=pa.plot.template,
+                                ),
+                                id="sd-plot",
+                            ),
+                        ],
+                        label="Strength-Duration",
+                        tab_id="sd-tab",
                     ),
                 ],
-                label="Strength-Duration",
-                tab_id="sd-tab",
+                active_tab="psi-tab",
             ),
-        ],
-        active_tab="psi-tab",
-    ),
-    class_name="my-4",
+            class_name="my-4",
+        ),
+    ]
 )
 
 app.layout = dbc.Container(
@@ -183,39 +221,6 @@ app.layout = dbc.Container(
             ),
             brand_href="/",
             class_name="mb-3",
-        ),
-        dbc.Row(
-            [
-                dbc.Col(
-                    dcc.Upload(
-                        """Upload your own data - 
-                        drag and drop or click to open file browser
-                        """,
-                        id="upload-data",
-                        style={
-                            "width": "100%",
-                            "height": "60px",
-                            "lineHeight": "60px",
-                            "borderWidth": "1px",
-                            "borderStyle": "dashed",
-                            "borderRadius": "5px",
-                            "textAlign": "center",
-                        },
-                        multiple=True,
-                    )
-                ),
-                dbc.Col(
-                    dcc.Dropdown(
-                        options=[
-                            {
-                                "label": "Schlichenmeyer et al. 2022",
-                                "value": "schlich2022",
-                            },
-                        ],
-                        placeholder="Select an open dataset...",
-                    )
-                ),
-            ]
         ),
         dbc.Row(
             [
