@@ -9,11 +9,12 @@ app = Dash(
     __name__,
     external_stylesheets=[dbc.themes.SUPERHERO, dbc.icons.BOOTSTRAP],
 )
+
 server = app.server
 
 component_column = dbc.Col(
     [
-        html.H3("Generate n"),
+        html.H3("Simulation Parameters"),
         dbc.InputGroup(
             [
                 dbc.Input(id="n-trials", type="number", value=100),
@@ -182,6 +183,39 @@ app.layout = dbc.Container(
             ),
             brand_href="/",
             class_name="mb-3",
+        ),
+        dbc.Row(
+            [
+                dbc.Col(
+                    dcc.Upload(
+                        """Upload your own data - 
+                        drag and drop or click to open file browser
+                        """,
+                        id="upload-data",
+                        style={
+                            "width": "100%",
+                            "height": "60px",
+                            "lineHeight": "60px",
+                            "borderWidth": "1px",
+                            "borderStyle": "dashed",
+                            "borderRadius": "5px",
+                            "textAlign": "center",
+                        },
+                        multiple=True,
+                    )
+                ),
+                dbc.Col(
+                    dcc.Dropdown(
+                        options=[
+                            {
+                                "label": "Schlichenmeyer et al. 2022",
+                                "value": "schlich2022",
+                            },
+                        ],
+                        placeholder="Select an open dataset...",
+                    )
+                ),
+            ]
         ),
         dbc.Row(
             [

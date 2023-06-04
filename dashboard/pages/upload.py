@@ -14,7 +14,7 @@ layout = dbc.Container(
     [
         html.H2("Upload your own data:"),
         dcc.Upload(
-            ["Drag and Drop or ", html.A("Select a File")],
+            "Upload your own data - Drag and Drop or Select a File",
             id="upload-data",
             style={
                 "width": "100%",
