@@ -12,9 +12,8 @@ app = Dash(
 
 server = app.server
 
-component_column = dbc.Col(
+experiment_params = html.Div(
     [
-        html.H3("Simulation Parameters"),
         html.H4("Experimental Design"),
         dbc.InputGroup(
             [
@@ -29,6 +28,13 @@ component_column = dbc.Col(
             ],
             class_name="mb-4",
         ),
+    ]
+)
+
+component_column = dbc.Col(
+    [
+        html.H3("Simulation Parameters"),
+        experiment_params,
         html.H4("Stimulus"),
         html.H5("Modulated Dimension"),
         dcc.Dropdown(options={"amp": "Amplitude"}, value="amp"),
