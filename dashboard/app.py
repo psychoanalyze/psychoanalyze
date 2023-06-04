@@ -137,68 +137,76 @@ empirical_data_components = html.Div(
     ]
 )
 
+psi_tab = dbc.Tab(
+    [
+        dcc.Graph(id="psi-plot", className="mb-5"),
+        dcc.Markdown(
+            "$\hat{p}(x) = \\frac{1}{1 + \exp(-kx - x_0)}$",
+            mathjax=True,
+        ),
+    ],
+    tab_id="psi-tab",
+    label="Psychometric Function",
+    activeTabClassName="fw-bold fst-italic",
+)
+
+ecdf_tab = dbc.Tab(
+    dbc.Row(
+        [
+            dbc.Col(dcc.Graph(id="ecdf-thresh"), width=6),
+            dbc.Col(dcc.Graph(id="ecdf-slope"), width=6),
+        ]
+    ),
+    label="eCDF",
+    tab_id="ecdf-tab",
+)
+
+time_series_tab = dbc.Tab(
+    dcc.Graph(
+        figure=px.scatter(
+            pd.DataFrame({"Day": [], "Threshold": []}),
+            x="Day",
+            y="Threshold",
+            template=pa.plot.template,
+        ),
+        id="longitudinal-plot",
+    ),
+    tab_id="longitudinal-tab",
+    label="Time Series",
+    activeTabClassName="fw-bold fst-italic",
+)
+
+sd_tab = dbc.Tab(
+    [
+        dcc.Graph(
+            figure=px.scatter(
+                pd.DataFrame(
+                    {
+                        "Fixed Intensity": [],
+                        "Threshold (modulated dimension)": [],
+                    }
+                ),
+                x="Fixed Intensity",
+                y="Threshold (modulated dimension)",
+                template=pa.plot.template,
+            ),
+            id="sd-plot",
+        ),
+    ],
+    label="Strength-Duration",
+    tab_id="sd-tab",
+)
+
 plot_tabs = dbc.Col(
     [
         empirical_data_components,
         dbc.Row(
             dbc.Tabs(
                 [
-                    dbc.Tab(
-                        [
-                            dcc.Graph(id="psi-plot", className="mb-5"),
-                            dcc.Markdown(
-                                "$\hat{p}(x) = \\frac{1}{1 + \exp(-kx - x_0)}$",
-                                mathjax=True,
-                            ),
-                        ],
-                        tab_id="psi-tab",
-                        label="Psychometric Function",
-                        activeTabClassName="fw-bold fst-italic",
-                    ),
-                    dbc.Tab(
-                        dbc.Row(
-                            [
-                                dbc.Col(dcc.Graph(id="ecdf-thresh"), width=6),
-                                dbc.Col(dcc.Graph(id="ecdf-slope"), width=6),
-                            ]
-                        ),
-                        label="eCDF",
-                        tab_id="ecdf-tab",
-                    ),
-                    dbc.Tab(
-                        dcc.Graph(
-                            figure=px.scatter(
-                                pd.DataFrame({"Day": [], "Threshold": []}),
-                                x="Day",
-                                y="Threshold",
-                                template=pa.plot.template,
-                            ),
-                            id="longitudinal-plot",
-                        ),
-                        tab_id="longitudinal-tab",
-                        label="Time Series",
-                        activeTabClassName="fw-bold fst-italic",
-                    ),
-                    dbc.Tab(
-                        [
-                            dcc.Graph(
-                                figure=px.scatter(
-                                    pd.DataFrame(
-                                        {
-                                            "Fixed Intensity": [],
-                                            "Threshold (modulated dimension)": [],
-                                        }
-                                    ),
-                                    x="Fixed Intensity",
-                                    y="Threshold (modulated dimension)",
-                                    template=pa.plot.template,
-                                ),
-                                id="sd-plot",
-                            ),
-                        ],
-                        label="Strength-Duration",
-                        tab_id="sd-tab",
-                    ),
+                    psi_tab,
+                    ecdf_tab,
+                    time_series_tab,
+                    sd_tab,
                 ],
                 active_tab="psi-tab",
             ),
