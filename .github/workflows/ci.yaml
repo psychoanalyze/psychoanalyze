@@ -55,13 +55,9 @@ jobs:
     - name: Deploy docs
       run: poetry run mkdocs gh-deploy --no-history
 
-    - name: Release version
-      uses: grumpy-programmer/conventional-commits-semver-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Publish Package
-      uses: celsiusnarhwal/poetry-publish@v2
+    - name: Semantic Release
+      uses: relekang/python-semantic-release@master
       with:
-        token: ${{ secrets.PYPI_TOKEN }}
-        build: true
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        repository_username: __token__
+        repository_password: ${{ secrets.PYPI_TOKEN }}
