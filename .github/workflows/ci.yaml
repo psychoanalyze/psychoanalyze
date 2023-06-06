@@ -19,15 +19,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
     - uses: actions/checkout@v3
+    
     - name: Install Poetry
       run: pipx install poetry
+    
     - name: Install Python 3.11
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
         cache: 'poetry'
-
 
     - name: Install package dependencies
       run: poetry install --with ci
@@ -52,3 +54,8 @@ jobs:
 
     - name: Deploy docs
       run: poetry run mkdocs gh-deploy --no-history
+    
+    - name: Release version
+        uses: grumpy-programmer/conventional-commits-semver-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
