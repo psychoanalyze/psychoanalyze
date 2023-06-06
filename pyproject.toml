@@ -63,7 +63,6 @@ version_variable = [
     "pyproject.toml:version"
 ]
 branch = "main"
-upload_to_pypi = true
 upload_to_repository = true
 build_command = "pip install poetry && poetry build"
 major_on_zero = true
