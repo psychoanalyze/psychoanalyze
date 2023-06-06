@@ -15,6 +15,7 @@
     "vscode": {
       "settings": {
         "python.defaultInterpreterPath": "/opt/conda/envs/psychoanalyze/bin/python",
+        "python.condaPath": "/opt/conda/envs/psychoanalyze/bin/python",
         "editor.defaultFormatter": "ms-python.black-formatter",
         "files.associations": {
           "*.psyexp": "xml",
