@@ -21,10 +21,10 @@ jobs:
     steps:
 
     - uses: actions/checkout@v3
-    
+
     - name: Install Poetry
       run: pipx install poetry
-    
+
     - name: Install Python 3.11
       uses: actions/setup-python@v4
       with:
@@ -45,7 +45,7 @@ jobs:
 
     - name: Security w/bandit
       run: poetry run bandit -r psychoanalyze -s B311
-      
+
     - name: Security w/safety
       run: poetry export -f requirements.txt | poetry run safety check --stdin -i 55054
 
@@ -54,8 +54,11 @@ jobs:
 
     - name: Deploy docs
       run: poetry run mkdocs gh-deploy --no-history
-    
+
     - name: Release version
       uses: grumpy-programmer/conventional-commits-semver-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Publish to PyPI
+      run: poetry publish
