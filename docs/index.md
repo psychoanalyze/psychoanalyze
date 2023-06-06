@@ -27,3 +27,5 @@ PsychoAnalyze provides researchers with:
 ## Package management
 
 https://stackoverflow.com/questions/70851048/does-it-make-sense-to-use-conda-poetry
+
+Mamba is used exlusively to support PyMC.
