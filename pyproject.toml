@@ -56,6 +56,16 @@ ruff = "^0.0.261"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.semantic_release]
+version_variable = [
+    "psychoanalyze/__init__.py:__version__",
+    "pyproject.toml:version"
+]
+branch = "main"
+upload_to_pypi = true
+upload_to_release = true
+build_command = "pip install poetry && poetry build"
+
 [tool.pytest.ini_options]
 filterwarnings = [
     "ignore::DeprecationWarning",
