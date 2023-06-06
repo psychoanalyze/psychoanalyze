@@ -60,5 +60,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Publish to PyPI
-      run: poetry publish --build
+    - name: Publish Package
+      uses: celsiusnarhwal/poetry-publish@v2
+      with:
+        token: ${{ secrets.PYPI_TOKEN }}
+        build: true
