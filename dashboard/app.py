@@ -236,7 +236,7 @@ app.layout = dbc.Container(
                     [
                         dbc.NavLink(
                             "Docs",
-                            href="https://psychoanalyze.github.io",
+                            href="https://docs.psychoanalyze.io",
                         ),
                         html.I(className="bi bi-book"),
                     ],
