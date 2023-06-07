@@ -10,13 +10,13 @@ Psychophysics analysis in Python.
 
 
 ## Installation
+poetry (preferred):
+```console
+poetry add psychoanalyze
+```
 pip:
 ```console
 pip install psychoanalyze
-```
-poetry:
-```console
-poetry add psychoanalyze
 ```
 
 ## Dashboard
