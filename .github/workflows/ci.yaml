@@ -23,14 +23,6 @@ jobs:
 
     - uses: actions/checkout@v3
 
-    # - name: get current & previous commit SHA
-    #   run: echo "PREVIOUS_COMMIT_SHA=$(git rev-parse HEAD~1)" >> "$GITHUB_ENV"
-
-    # - name: Download mypy cache
-    #   uses: actions/download-artifact@v3
-    #   with:
-    #     name: "mypy-${{ env.PREVIOUS_COMMIT_SHA }}"
-
     - name: Install Poetry
       run: pipx install poetry
 
@@ -49,15 +41,14 @@ jobs:
     - name: Ruff lint
       run: poetry run ruff check .
 
-    - name: MyPy type check
-      run: |
-        poetry run mypy psychoanalyze
-
-    - name: Cache mypy run
-      uses: actions/upload-artifact@v3
+    - name: Cache mypy
+      uses: actions/cache@v3
       with:
-        name: mypy-cache
         path: .mypy_cache
+        key: mypy-${{ hashFiles('**/*.py') }}
+
+    - name: MyPy type check
+      run: poetry run mypy psychoanalyze
 
     - name: Security w/bandit
       run: poetry run bandit -r psychoanalyze -s B311
