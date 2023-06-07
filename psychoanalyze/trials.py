@@ -120,6 +120,10 @@ def labels(results: list[bool]) -> list[str]:
     return [pa.trials.codes[result] for result in results]
 
 
+def psi(gamma, lambda_, k, intensity, x_0):
+    return gamma + (1 - gamma - lambda_) * (1 / (1 + np.exp(-k * (intensity - x_0))))
+
+
 def moc_sample(
     n_trials: int, model_params: dict[str, float], n_levels: int
 ) -> pd.Series:
@@ -131,8 +135,7 @@ def moc_sample(
     intensities = [float(random.choice(intensity_choices)) for _ in range(n_trials)]
     intensity_index = pd.Index(intensities, name="Intensity")
     results = [
-        random.random()
-        <= gamma + (1 - gamma - lambda_) * (1 / (1 + np.exp(-k * (intensity - x_0))))
+        random.random() <= psi(gamma, lambda_, k, intensity, x_0)
         for intensity in intensities
     ]
     return pd.Series(results, name="Result", index=intensity_index)
