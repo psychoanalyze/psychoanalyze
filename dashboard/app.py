@@ -125,9 +125,11 @@ upload_component = dcc.Upload(
 dataset_component = dcc.Dropdown(
     options=[
         {
-            "label": "Schlichenmeyer et al. 2022",
+            "label": html.Span(
+                ["Schlichenmeyer et al. 2022"], style={"color": "black"}
+            ),
             "value": "schlich2022",
-        },
+        }
     ],
     placeholder="Select an open dataset...",
     id="dataset",
