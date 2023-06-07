@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.0.2 (2023-06-07)
+### Fix
+* Pin to older version of semantic release ([`d30bd9b`](https://github.com/psychoanalyze/psychoanalyze/commit/d30bd9bdda0ca7b42593c3acd89094dedae3ec60))
+
 ## v0.0.1 (2023-06-07)
 
 ### Fix
