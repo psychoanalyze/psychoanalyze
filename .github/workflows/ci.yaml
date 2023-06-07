@@ -56,7 +56,7 @@ jobs:
     - name: Cache mypy run
       uses: actions/upload-artifact@v3
       with:
-        name: "mypy-${{ GITHUB_SHA }}"
+        name: "mypy-${{ github.sha }}"
         path: .mypy_cache
 
     - name: Security w/bandit
