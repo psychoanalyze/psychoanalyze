@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "psychoanalyze"
-version = "0.0.1"
+version = "0.0.0"
 description = "A Pythonic analysis package for psychophysics data"
 authors = ["Ty Schlichenmeyer <t.schlic@wustl.edu>"]
 license = "GPL-3.0-or-later"
@@ -66,7 +66,7 @@ version_variable = [
 ]
 branch = "main"
 upload_to_repository = false
-build_command = "pipx install poetry && poetry build"
+build_command = "poetry build"
 major_on_zero = true
 
 [tool.pytest.ini_options]
