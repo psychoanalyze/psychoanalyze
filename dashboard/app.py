@@ -1,4 +1,5 @@
-from dash import Dash, html, dcc, Input, Output
+from dash import Dash, html, dcc, Input, Output, dash_table
+from dash.dash_table.Format import Format, Scheme
 import dash_bootstrap_components as dbc
 import psychoanalyze as pa
 import pandas as pd
@@ -60,7 +61,11 @@ stimulus_params = html.Div(
 psi_params = html.Div(
     [
         html.H4("Psychometric Function"),
-        html.H5("Logistic Regression"),
+        dcc.Dropdown(
+            id="f",
+            options=[{"label": "Logistic (expit)", "value": "expit"}],
+            value="expit",
+        ),
         dbc.InputGroup(
             [
                 dbc.InputGroupText("intercept"),
@@ -177,7 +182,37 @@ plot_tabs = dbc.Col(
             ),
             class_name="my-4",
         ),
-        dcc.Graph(id="plot"),
+        dbc.Row(
+            [
+                dbc.Col(dcc.Graph(id="plot"), width=7),
+                dbc.Col(
+                    dash_table.DataTable(
+                        id="table",
+                        columns=[
+                            {
+                                "name": "Day",
+                                "id": "Day",
+                            },
+                            {
+                                "name": "Slope",
+                                "id": "slope",
+                                "type": "numeric",
+                                "format": Format(precision=2, scheme=Scheme.fixed),
+                            },
+                            {
+                                "name": "Threshold",
+                                "id": "Threshold",
+                                "type": "numeric",
+                                "format": Format(precision=2, scheme=Scheme.fixed),
+                            },
+                        ],
+                        style_data={"color": "black"},
+                        style_header={"color": "black"},
+                    ),
+                    width=4,
+                ),
+            ]
+        ),
     ]
 )
 
@@ -232,10 +267,7 @@ app.layout = dbc.Container(
 @app.callback(
     [
         Output("plot", "figure"),
-        # Output("ecdf-thresh", "figure"),
-        # Output("ecdf-slope", "figure"),
-        # Output("longitudinal-plot", "figure"),
-        # Output("sd-plot", "figure"),
+        Output("table", "data"),
     ],
     [
         Input("n-trials", "value"),
@@ -314,6 +346,7 @@ def update_figure(
                     color="Subject",
                     template=pa.plot.template,
                 ),
+                params.to_dict("records"),
             )
         elif active_tab == "ecdf-tab":
             return (
@@ -323,6 +356,7 @@ def update_figure(
                     color="Subject",
                     template=pa.plot.template,
                 ),
+                params.to_dict("records"),
             )
         elif active_tab == "time-series-tab":
             return (
@@ -333,6 +367,7 @@ def update_figure(
                     symbol="Subject",
                     template=pa.plot.template,
                 ),
+                params.to_dict("records"),
             )
         elif active_tab == "sd-tab":
             return (
@@ -345,6 +380,7 @@ def update_figure(
                     color="Subject",
                     template=pa.plot.template,
                 ),
+                params.to_dict("records"),
             )
             # px.ecdf(
             #     params.reset_index(),
