@@ -46,6 +46,7 @@ jobs:
       with:
         path: .mypy_cache
         key: mypy-${{ hashFiles('**/*.py') }}
+        restore-keys: mypy-
 
     - name: MyPy type check
       run: poetry run mypy psychoanalyze

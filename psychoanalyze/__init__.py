@@ -56,3 +56,7 @@ def psi(threshold=0, slope=1, lambda_=0, gamma=0, x_range=(-3, 3)) -> pd.Series:
 
 def fit(data):
     return {"Fit": [1, 1, 0, 0]}
+
+
+def ci_test():
+    pass
