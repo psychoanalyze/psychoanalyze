@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.0 (2023-06-07)
+### Feature
+* Dash table w fit data ([`35c2fcb`](https://github.com/psychoanalyze/psychoanalyze/commit/35c2fcb523c8cec669fdd4d09a39ca01dae08867))
+
 ## v0.2.2 (2023-06-07)
 ### Performance
 * Calculate tab fig in callback ([`dbbd64f`](https://github.com/psychoanalyze/psychoanalyze/commit/dbbd64fab60a37a17fea31aeb3b65b5e3b59911e))
