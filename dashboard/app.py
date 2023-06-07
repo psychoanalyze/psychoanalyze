@@ -23,7 +23,7 @@ experiment_params = html.Div(
         ),
         dbc.InputGroup(
             [
-                dbc.Input(id="n-subjects", type="number", value=3),
+                dbc.Input(id="n-subjects", type="number", value=1),
                 dbc.InputGroupText("subjects"),
             ],
             class_name="mb-4",
@@ -91,11 +91,11 @@ psi_params = html.Div(
 
 component_column = dbc.Col(
     [
-        dbc.Button("Re-run Simulation", color="primary", className="mb-3"),
         html.H3("Simulation Parameters"),
         experiment_params,
         stimulus_params,
         psi_params,
+        dbc.Button("Resimulate", color="primary", className="mb-3"),
     ],
     width=3,
 )
@@ -125,7 +125,6 @@ dataset_component = dcc.Dropdown(
         },
     ],
     placeholder="Select an open dataset...",
-    value="schlich2022",
     id="dataset",
 )
 
@@ -141,61 +140,23 @@ empirical_data_components = html.Div(
 )
 
 psi_tab = dbc.Tab(
-    [
-        dcc.Graph(id="psi-plot", className="mb-5"),
-        dcc.Markdown(
-            "$\hat{p}(x) = \\frac{1}{1 + \exp(-kx - x_0)}$",
-            mathjax=True,
-        ),
-    ],
     tab_id="psi-tab",
     label="Psychometric Function",
     activeTabClassName="fw-bold fst-italic",
 )
 
 ecdf_tab = dbc.Tab(
-    dbc.Row(
-        [
-            dbc.Col(dcc.Graph(id="ecdf-thresh"), width=6),
-            dbc.Col(dcc.Graph(id="ecdf-slope"), width=6),
-        ]
-    ),
     label="eCDF",
     tab_id="ecdf-tab",
 )
 
 time_series_tab = dbc.Tab(
-    dcc.Graph(
-        figure=px.scatter(
-            pd.DataFrame({"Day": [], "Threshold": []}),
-            x="Day",
-            y="Threshold",
-            template=pa.plot.template,
-        ),
-        id="longitudinal-plot",
-    ),
-    tab_id="longitudinal-tab",
+    tab_id="time-series-tab",
     label="Time Series",
     activeTabClassName="fw-bold fst-italic",
 )
 
 sd_tab = dbc.Tab(
-    [
-        dcc.Graph(
-            figure=px.scatter(
-                pd.DataFrame(
-                    {
-                        "Fixed Intensity": [],
-                        "Threshold (modulated dimension)": [],
-                    }
-                ),
-                x="Fixed Intensity",
-                y="Threshold (modulated dimension)",
-                template=pa.plot.template,
-            ),
-            id="sd-plot",
-        ),
-    ],
     label="Strength-Duration",
     tab_id="sd-tab",
 )
@@ -212,9 +173,11 @@ plot_tabs = dbc.Col(
                     sd_tab,
                 ],
                 active_tab="psi-tab",
+                id="plot-tabs",
             ),
             class_name="my-4",
         ),
+        dcc.Graph(id="plot"),
     ]
 )
 
@@ -268,11 +231,11 @@ app.layout = dbc.Container(
 
 @app.callback(
     [
-        Output("psi-plot", "figure"),
-        Output("ecdf-thresh", "figure"),
-        Output("ecdf-slope", "figure"),
-        Output("longitudinal-plot", "figure"),
-        Output("sd-plot", "figure"),
+        Output("plot", "figure"),
+        # Output("ecdf-thresh", "figure"),
+        # Output("ecdf-slope", "figure"),
+        # Output("longitudinal-plot", "figure"),
+        # Output("sd-plot", "figure"),
     ],
     [
         Input("n-trials", "value"),
@@ -285,6 +248,7 @@ app.layout = dbc.Container(
         Input("fixed-min", "value"),
         Input("fixed-max", "value"),
         Input("dataset", "value"),
+        Input("plot-tabs", "active_tab"),
     ],
 )
 def update_figure(
@@ -298,6 +262,7 @@ def update_figure(
     fixed_min,
     fixed_max,
     dataset,
+    active_tab,
 ):
     if dataset == "schlich2022":
         points = pd.read_csv("data/normalized/points.csv")
@@ -340,42 +305,54 @@ def update_figure(
 
         params = fits.apply(pa.blocks.fit_params)
         params = params.reset_index().rename(columns={"intercept": "Threshold"})
-        return (
-            px.box(
-                points.reset_index(),
-                x="Intensity",
-                y="Hit Rate",
-                color="Subject",
-                template=pa.plot.template,
-            ),
-            px.ecdf(
-                params,
-                x="Threshold",
-                color="Subject",
-                template=pa.plot.template,
-            ),
-            px.ecdf(
-                params.reset_index(),
-                x="slope",
-                color="Subject",
-                template=pa.plot.template,
-            ),
-            px.scatter(
-                params,
-                x="Day",
-                y="Threshold",
-                symbol="Subject",
-                template=pa.plot.template,
-            ),
-            px.box(
-                params.rename(columns={"Threshold": "Threshold (modulated dimension)"}),
-                x="Fixed Intensity",
-                y="Threshold (modulated dimension)",
-                color="Subject",
-                template=pa.plot.template,
-            ),
-        )
+        if active_tab == "psi-tab":
+            return (
+                px.box(
+                    points.reset_index(),
+                    x="Intensity",
+                    y="Hit Rate",
+                    color="Subject",
+                    template=pa.plot.template,
+                ),
+            )
+        elif active_tab == "ecdf-tab":
+            return (
+                px.ecdf(
+                    params,
+                    x="Threshold",
+                    color="Subject",
+                    template=pa.plot.template,
+                ),
+            )
+        elif active_tab == "time-series-tab":
+            return (
+                px.scatter(
+                    params,
+                    x="Day",
+                    y="Threshold",
+                    symbol="Subject",
+                    template=pa.plot.template,
+                ),
+            )
+        elif active_tab == "sd-tab":
+            return (
+                px.box(
+                    params.rename(
+                        columns={"Threshold": "Threshold (modulated dimension)"}
+                    ),
+                    x="Fixed Intensity",
+                    y="Threshold (modulated dimension)",
+                    color="Subject",
+                    template=pa.plot.template,
+                ),
+            )
+            # px.ecdf(
+            #     params.reset_index(),
+            #     x="slope",
+            #     color="Subject",
+            #     template=pa.plot.template,
+            # ),
 
 
 if __name__ == "__main__":
-    app.run_server(host="localhost", debug=True, dev_tools_hot_reload=False)
+    app.run_server(host="localhost", debug=True)
