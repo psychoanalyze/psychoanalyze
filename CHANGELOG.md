@@ -6,6 +6,12 @@
 
 ### Fix
 
+* Delete remote tags and retry ([`ff333e5`](https://github.com/psychoanalyze/psychoanalyze/commit/ff333e5ced608e26483bf8ae8788ecb5d8ab499e))
+
+## v0.0.1 (2023-06-07)
+
+### Fix
+
 * Use pipx to install poetry in build command, retry release ([`94406fe`](https://github.com/psychoanalyze/psychoanalyze/commit/94406fe7a8dc34e48285e348801fa6ba0f424067))
 
 ## v0.0.1 (2023-06-07)
