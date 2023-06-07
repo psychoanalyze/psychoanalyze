@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.0 (2023-06-07)
+### Feature
+* Adjust docs; minor update to catch up to pypi ([`2c63d1e`](https://github.com/psychoanalyze/psychoanalyze/commit/2c63d1ecf4ce4dde8a6d14f1d3bfdf91b305c65e))
+
 ## v0.0.2 (2023-06-07)
 ### Fix
 * Pin to older version of semantic release ([`d30bd9b`](https://github.com/psychoanalyze/psychoanalyze/commit/d30bd9bdda0ca7b42593c3acd89094dedae3ec60))
