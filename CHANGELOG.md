@@ -6,6 +6,12 @@
 
 ### Fix
 
+* Git config for ci ([`d0f6a8e`](https://github.com/psychoanalyze/psychoanalyze/commit/d0f6a8e10d3c22ef447144c01a59f9feb1e0005c))
+
+## v0.0.1 (2023-06-07)
+
+### Fix
+
 * Delete remote tags and retry ([`ff333e5`](https://github.com/psychoanalyze/psychoanalyze/commit/ff333e5ced608e26483bf8ae8788ecb5d8ab499e))
 
 ## v0.0.1 (2023-06-07)
