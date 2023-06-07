@@ -54,4 +54,7 @@ jobs:
       run: poetry run mkdocs gh-deploy --no-history
 
     - name: Semantic Release
-      run: poetry run semantic-release publish
+      run: |
+        git config --global user.name "semantic-release (via GitHub Action)"
+        git config --global user.email "ci@psychoanalyze.io"
+        poetry run semantic-release publish
