@@ -49,9 +49,10 @@ jobs:
         poetry run mypy psychoanalyze
 
     - name: Cache mypy run
-      uses: actions/upload-artifacts@v3
+      uses: actions/upload-artifact@v3
       with:
         name: "mypy-${{ env.COMMIT_SHA }}"
+        path: .mypy_cache
 
     - name: Security w/bandit
       run: poetry run bandit -r psychoanalyze -s B311
