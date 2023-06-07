@@ -101,7 +101,7 @@ component_column = dbc.Col(
 )
 
 upload_component = dcc.Upload(
-    """Upload your own data - 
+    """Upload your own data -
                         drag and drop or click to open file browser
                         """,
     id="upload-data",
@@ -236,7 +236,7 @@ app.layout = dbc.Container(
                     [
                         dbc.NavLink(
                             "Docs",
-                            href="https://psychoanalyze.github.io",
+                            href="https://docs.psychoanalyze.io",
                         ),
                         html.I(className="bi bi-book"),
                     ],

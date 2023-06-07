@@ -6,9 +6,6 @@ from scipy.special import expit
 import psychoanalyze as pa
 
 
-def test_version():
-    assert pa.__version__ == "0.1.0"
-
 
 def test_weber():
     curves = pd.DataFrame(

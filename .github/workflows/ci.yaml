@@ -14,20 +14,20 @@ defaults:
     shell: bash
 
 jobs:
-
   ci:
     runs-on: ubuntu-latest
-
     steps:
+
     - uses: actions/checkout@v3
+
     - name: Install Poetry
       run: pipx install poetry
+
     - name: Install Python 3.11
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
         cache: 'poetry'
-
 
     - name: Install package dependencies
       run: poetry install --with ci
@@ -43,12 +43,19 @@ jobs:
 
     - name: Security w/bandit
       run: poetry run bandit -r psychoanalyze -s B311
-      
+
     - name: Security w/safety
-      run: poetry export -f requirements.txt | poetry run safety check --stdin -i 42194
+      run: poetry export -f requirements.txt | poetry run safety check --stdin -i 55054
 
     - name: Tests
       run: poetry run pytest
 
     - name: Deploy docs
       run: poetry run mkdocs gh-deploy --no-history
+
+    - name: Semantic Release
+      uses: relekang/python-semantic-release@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        repository_username: __token__
+        repository_password: ${{ secrets.PYPI_TOKEN }}
