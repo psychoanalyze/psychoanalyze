@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.2 (2023-06-07)
+### Performance
+* Calculate tab fig in callback ([`dbbd64f`](https://github.com/psychoanalyze/psychoanalyze/commit/dbbd64fab60a37a17fea31aeb3b65b5e3b59911e))
+
 ## v0.2.1 (2023-06-07)
 ### Fix
 * Add pypi secret to ci env ([`0543aa4`](https://github.com/psychoanalyze/psychoanalyze/commit/0543aa4d6ed89340f15f2c134cdf5a2fca52a95e))
