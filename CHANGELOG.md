@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.0 (2023-06-07)
+### Feature
+* Upload to pypi in ci ([`d5117d6`](https://github.com/psychoanalyze/psychoanalyze/commit/d5117d6f644f20f03a291a41b85d9d30ab914ba2))
+
 ## v0.1.0 (2023-06-07)
 ### Feature
 * Adjust docs; minor update to catch up to pypi ([`2c63d1e`](https://github.com/psychoanalyze/psychoanalyze/commit/2c63d1ecf4ce4dde8a6d14f1d3bfdf91b305c65e))
