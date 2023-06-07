@@ -24,4 +24,4 @@ poetry add psychoanalyze
 See what `psychoanalyze` can do by [viewing our dashboard](https://app.psychoanalyze.io/).
 
 ## Documentation
-View documentation on [Read the Docs](https://psychoanalyze.readthedocs.io/en/latest/)
+View the full documentation [here](https://docs.psychoanalyze.io).
