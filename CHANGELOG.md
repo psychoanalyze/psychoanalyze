@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.1 (2023-06-07)
+### Fix
+* Add pypi secret to ci env ([`0543aa4`](https://github.com/psychoanalyze/psychoanalyze/commit/0543aa4d6ed89340f15f2c134cdf5a2fca52a95e))
+
 ## v0.2.0 (2023-06-07)
 ### Feature
 * Upload to pypi in ci ([`d5117d6`](https://github.com/psychoanalyze/psychoanalyze/commit/d5117d6f644f20f03a291a41b85d9d30ab914ba2))
