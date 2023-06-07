@@ -64,7 +64,8 @@ version_variable = [
     "pyproject.toml:version"
 ]
 branch = "main"
-build_command = "pip install poetry && poetry build"
+upload_to_repository = false
+build_command = "poetry build"
 major_on_zero = true
 
 [tool.pytest.ini_options]
