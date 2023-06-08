@@ -148,3 +148,5 @@ figures/*
 demo.ipynb
 
 .luarc.json
+
+dashboard/.profiler

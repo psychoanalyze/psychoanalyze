@@ -4,6 +4,8 @@ import dash_bootstrap_components as dbc
 import psychoanalyze as pa
 import pandas as pd
 import plotly.express as px
+from werkzeug.middleware.profiler import ProfilerMiddleware
+import os
 
 
 app = Dash(
@@ -392,5 +394,15 @@ def update_figure(
             # ),
 
 
+PROF_DIR = ".profiler"
 if __name__ == "__main__":
+    if os.getenv("PROFILER", None):
+        app.server.config["PROFILE"] = True
+        app.server.wsgi_app = ProfilerMiddleware(
+            app.server.wsgi_app,
+            sort_by=("cumtime", "tottime"),
+            restrictions=[160],
+            stream=None,
+            profile_dir=PROF_DIR,
+        )
     app.run_server(host="localhost", debug=True)
