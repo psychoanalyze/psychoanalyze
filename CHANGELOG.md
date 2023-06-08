@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.0 (2023-06-08)
+### Feature
+* Model trace on psi plot ([`9ebdb17`](https://github.com/psychoanalyze/psychoanalyze/commit/9ebdb17b10f6849681eb85292bc6889f73688327))
+
 ## v0.3.0 (2023-06-07)
 ### Feature
 * Dash table w fit data ([`35c2fcb`](https://github.com/psychoanalyze/psychoanalyze/commit/35c2fcb523c8cec669fdd4d09a39ca01dae08867))
