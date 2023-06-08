@@ -4,9 +4,10 @@ import dash_bootstrap_components as dbc
 import psychoanalyze as pa
 import pandas as pd
 import plotly.express as px
+from plotly import graph_objects as go
 from werkzeug.middleware.profiler import ProfilerMiddleware
 import os
-
+import numpy as np
 
 app = Dash(
     __name__,
@@ -34,31 +35,6 @@ experiment_params = html.Div(
     ]
 )
 
-stimulus_params = html.Div(
-    [
-        html.H4("Stimulus"),
-        html.H5("Modulated Dimension"),
-        dcc.Dropdown(options={"amp": "Amplitude"}, value="amp"),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText("n levels"),
-                dbc.Input(id="n-levels", type="number", value=7),
-            ],
-            class_name="mb-3",
-        ),
-        html.H5("Fixed Dimension"),
-        dcc.Dropdown(options={"pw": "Pulse Width"}, value="pw"),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText("Min"),
-                dbc.Input(id="fixed-min", type="number", value=0),
-                dbc.Input(id="fixed-max", type="number", value=1),
-                dbc.InputGroupText("Max"),
-            ],
-            class_name="mb-3",
-        ),
-    ]
-)
 
 psi_params = html.Div(
     [
@@ -100,9 +76,7 @@ component_column = dbc.Col(
     [
         html.H3("Simulation Parameters"),
         experiment_params,
-        stimulus_params,
         psi_params,
-        dbc.Button("Resimulate", color="primary", className="mb-3"),
     ],
     width=3,
 )
@@ -188,31 +162,38 @@ plot_tabs = dbc.Col(
         ),
         dbc.Row(
             [
-                dbc.Col(dcc.Graph(id="plot"), width=7),
                 dbc.Col(
-                    dash_table.DataTable(
-                        id="table",
-                        columns=[
-                            {
-                                "name": "Day",
-                                "id": "Day",
-                            },
-                            {
-                                "name": "Slope",
-                                "id": "slope",
-                                "type": "numeric",
-                                "format": Format(precision=2, scheme=Scheme.fixed),
-                            },
-                            {
-                                "name": "Threshold",
-                                "id": "Threshold",
-                                "type": "numeric",
-                                "format": Format(precision=2, scheme=Scheme.fixed),
-                            },
-                        ],
-                        style_data={"color": "black"},
-                        style_header={"color": "black"},
-                    ),
+                    [
+                        dcc.Graph(id="plot"),
+                    ],
+                    width=7,
+                ),
+                dbc.Col(
+                    [
+                        dash_table.DataTable(
+                            id="table",
+                            columns=[
+                                {
+                                    "name": "Day",
+                                    "id": "Day",
+                                },
+                                {
+                                    "name": "Slope",
+                                    "id": "slope",
+                                    "type": "numeric",
+                                    "format": Format(precision=2, scheme=Scheme.fixed),
+                                },
+                                {
+                                    "name": "Threshold",
+                                    "id": "Threshold",
+                                    "type": "numeric",
+                                    "format": Format(precision=2, scheme=Scheme.fixed),
+                                },
+                            ],
+                            style_data={"color": "black"},
+                            style_header={"color": "black"},
+                        ),
+                    ],
                     width=4,
                 ),
             ]
@@ -269,34 +250,25 @@ app.layout = dbc.Container(
 
 
 @app.callback(
-    [
-        Output("plot", "figure"),
-        Output("table", "data"),
-    ],
+    [Output("plot", "figure"), Output("table", "data")],
     [
         Input("n-trials", "value"),
-        Input("n-levels", "value"),
         Input("model-k", "value"),
         Input("x_0", "value"),
         Input("gamma", "value"),
         Input("lambda", "value"),
         Input("n-subjects", "value"),
-        Input("fixed-min", "value"),
-        Input("fixed-max", "value"),
         Input("dataset", "value"),
         Input("plot-tabs", "active_tab"),
     ],
 )
 def update_figure(
     n_trials,
-    n_levels,
     k,
     x_0,
     gamma,
     lambda_,
     n_subjects,
-    fixed_min,
-    fixed_max,
     dataset,
     active_tab,
 ):
@@ -319,23 +291,21 @@ def update_figure(
     else:
         n_days = 5
         model_params = {"x_0": x_0, "k": k, "gamma": gamma, "lambda": lambda_}
-        fixed_range = {"max": fixed_max, "min": fixed_min}
-        fixed_n = 2
 
         trials = pa.subjects.generate_trials(
             n_trials,
             model_params,
-            n_levels,
-            fixed_range,
-            fixed_n,
             n_days,
             n_subjects,
         )
         points = pa.points.from_trials(trials)
+        intensities = points.reset_index()["Intensity"]
+        x = list(np.linspace(intensities.min(), intensities.max()))
+        y = [pa.trials.psi(gamma, lambda_, k, intensity, x_0) for intensity in x]
 
         fits = (
             trials.reset_index(level="Intensity")
-            .groupby(["Subject", "Day", "Fixed Intensity"])
+            .groupby(["Subject", "Day"])
             .apply(pa.blocks.get_fit)
         )
 
@@ -349,7 +319,7 @@ def update_figure(
                     y="Hit Rate",
                     color="Subject",
                     template=pa.plot.template,
-                ),
+                ).add_trace(go.Scatter(x=x, y=y, mode="lines", name="model")),
                 params.to_dict("records"),
             )
         elif active_tab == "ecdf-tab":
@@ -405,4 +375,4 @@ if __name__ == "__main__":
             stream=None,
             profile_dir=PROF_DIR,
         )
-    app.run_server(host="localhost", debug=True)
+    app.run_server(host="localhost", debug=True, use_reloader=False)

@@ -124,14 +124,12 @@ def psi(gamma, lambda_, k, intensity, x_0):
     return gamma + (1 - gamma - lambda_) * (1 / (1 + np.exp(-k * (intensity - x_0))))
 
 
-def moc_sample(
-    n_trials: int, model_params: dict[str, float], n_levels: int
-) -> pd.Series:
+def moc_sample(n_trials: int, model_params: dict[str, float]) -> pd.Series:
     x_0 = model_params["x_0"]
     k = model_params["k"]
     gamma = model_params["gamma"]
     lambda_ = model_params["lambda"]
-    intensity_choices = np.linspace(x_0 - 4 / k, x_0 + 4 / k, n_levels)
+    intensity_choices = np.linspace(x_0 - 4 / k, x_0 + 4 / k, 7)
     intensities = [float(random.choice(intensity_choices)) for _ in range(n_trials)]
     intensity_index = pd.Index(intensities, name="Intensity")
     results = [

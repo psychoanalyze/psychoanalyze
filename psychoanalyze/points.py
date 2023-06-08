@@ -170,7 +170,7 @@ def fixed_magnitude(points):
 
 
 def n(trials):
-    return trials.groupby(level=["Day", "Subject", "Fixed Intensity"]).count()
+    return trials.groupby(level=["Day", "Subject"]).count()
 
 
 def to_block(points):
