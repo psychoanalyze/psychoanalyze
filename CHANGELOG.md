@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.2 (2023-06-17)
+
+### Fix
+
+* Reinstall gunicorn ([`a4f3858`](https://github.com/psychoanalyze/psychoanalyze/commit/a4f3858bf0a2d7c66db6d72435762c4a458aa27b))
+
+### Documentation
+
+* Add pre-commit.ci badge to readme ([`66e2737`](https://github.com/psychoanalyze/psychoanalyze/commit/66e27375445ce157dc96b7962819313abf6c9f86))
+
 ## v0.4.1 (2023-06-17)
 
 ### Fix
