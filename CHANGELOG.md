@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.1 (2023-06-17)
+
+### Fix
+
+* Callback connections ([`c47fdcf`](https://github.com/psychoanalyze/psychoanalyze/commit/c47fdcf49b9dfa700d316f75b30f8c0d127ec275))
+* Use strs for subjects ([`c19a18f`](https://github.com/psychoanalyze/psychoanalyze/commit/c19a18f6b4739176eaf5a74e0f6afab447fb3b88))
+* Split out mkdocs so hot reloader works ([`6099ab6`](https://github.com/psychoanalyze/psychoanalyze/commit/6099ab65c44914a47d483f8693d586726c6a9f10))
+
 ## v0.4.0 (2023-06-08)
 ### Feature
 * Model trace on psi plot ([`9ebdb17`](https://github.com/psychoanalyze/psychoanalyze/commit/9ebdb17b10f6849681eb85292bc6889f73688327))

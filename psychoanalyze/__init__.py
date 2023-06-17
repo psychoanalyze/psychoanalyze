@@ -17,7 +17,7 @@ from psychoanalyze import (
 
 pd.options.plotting.backend = "plotly"
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 
 __all__ = [
     "schemas",
