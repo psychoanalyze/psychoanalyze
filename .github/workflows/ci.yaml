@@ -25,11 +25,6 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Security w/safety
-      uses: pyupio/safety@2.3.5
-      with:
-        api-key: ${{ secrets.SAFETY_API_KEY }}
-
     - name: Semantic Release
       run: |
         git config --global user.name "semantic-release (via GitHub Action)"
