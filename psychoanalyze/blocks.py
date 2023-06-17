@@ -7,10 +7,18 @@ import plotly.express as px
 import os
 import pathlib
 from sklearn.linear_model import LogisticRegression
+import pandera as pr
+from pandera.typing import DataFrame, Series
+from typing import Any, cast
 
 
 dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
 index_levels = dims
+
+
+class Blocks(pr.DataFrameModel):
+    slope: float
+    threshold: float
 
 
 def add_posterior(data, posterior):
@@ -51,20 +59,6 @@ def get_fit_param(fit: pd.DataFrame, name: str):
     return fit.loc[name, "50%"]
 
 
-def from_points(points: pd.DataFrame, dim=None):
-    levels = pa.schemas.block_index_levels
-    if dim == "Amp":
-        levels = levels + ["Width1"]
-        df = points.groupby(levels).apply(pa.points.to_block)
-        return df[df["n Levels"] > 1].drop(columns="Dimension")
-    return points.groupby(levels).apply(pa.points.to_block)
-
-
-def from_trials(trials: pd.Series) -> pd.Series:
-    points = pa.points.from_trials(trials)
-    return from_points(points.reset_index())
-
-
 def dimensions(points, dims=None):
     if dims is None:
         return pa.points.dimension(points)
@@ -82,7 +76,7 @@ def fits(points):
             index=pd.MultiIndex.from_frame(
                 pd.DataFrame(
                     {
-                        "Monkey": [],
+                        "Subject": [],
                         "Date": [],
                         "Amp2": [],
                         "Width2": [],
@@ -117,20 +111,16 @@ def load_cached(data_path):
     return blocks
 
 
-def load(data_path=pathlib.Path("data"), monkey=None, day=None, dim=None):
+def load(data_path=pathlib.Path("data"), Subject=None, day=None, dim=None):
     blocks_path = data_path / "blocks.csv"
     if os.path.exists(blocks_path):
         blocks = load_cached(data_path)
-        if monkey:
+        if Subject:
             if day:
                 blocks = blocks[blocks["Block"] == day]
             else:
-                blocks = blocks.xs(monkey, drop_level=False)
+                blocks = blocks.xs(Subject, drop_level=False)
         blocks = blocks[blocks["n Levels"] > 1]
-        return blocks
-    else:
-        blocks = from_trials(pa.trials.load(data_path))
-        blocks.to_csv(blocks_path)
         return blocks
 
 
@@ -139,14 +129,14 @@ def fixed_magnitudes(points):
 
 
 def days(blocks, intervention_dates):
-    blocks = blocks.join(intervention_dates, on="Monkey")
+    blocks = blocks.join(intervention_dates, on="Subject")
     days = (blocks.index.get_level_values("Date") - blocks["Surgery Date"]).dt.days
     days.name = "Days"
     return days
 
 
 def n_trials(trials):
-    session_cols = ["Monkey", "Date"]
+    session_cols = ["Subject", "Date"]
     ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
     channel_config = ["Active Channels", "Return Channels"]
     return trials.groupby(session_cols + ref_stim_cols + channel_config)[
@@ -155,7 +145,7 @@ def n_trials(trials):
 
 
 def read_fit(path, block):
-    session_cols = ["Monkey", "Date"]
+    session_cols = ["Subject", "Date"]
     ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
     channel_config = ["Active Channels", "Return Channels"]
     fits = pd.read_csv(
@@ -183,11 +173,11 @@ def isValid(block):
     return any(block["Hit Rate"] > 0.5) & any(block["Hit Rate"] < 0.5)
 
 
-def monkey_counts(data):
+def Subject_counts(data):
     summary = (
-        data.index.get_level_values("Monkey").value_counts().rename("Total Blocks")
+        data.index.get_level_values("Subject").value_counts().rename("Total Blocks")
     )
-    summary.index.name = "Monkey"
+    summary.index.name = "Subject"
     return summary
 
 
@@ -208,10 +198,7 @@ def make_predictions(fit, intensity_choices) -> pd.Series:
 
 
 def get_fit(trials):
-    return LogisticRegression().fit(trials[["Intensity"]], trials["Result"])
-
-
-def fit_params(fit):
+    fit = LogisticRegression().fit(trials[["Intensity"]], trials["Result"])
     return pd.Series(
         {
             "slope": fit.coef_[0][0],
@@ -222,3 +209,11 @@ def fit_params(fit):
 
 def generate_trials(n_trials: int, model_params: dict[str, float]) -> pd.Series:
     return pa.trials.moc_sample(n_trials, model_params)
+
+
+def from_points(points: DataFrame[pa.points.Points]) -> DataFrame[Blocks]:
+    return cast(DataFrame[Blocks], pd.DataFrame({"Block": []}))
+
+
+def from_trials(trials: Series[Any]) -> DataFrame[Blocks]:
+    return from_points(pa.points.from_trials(trials))

@@ -1,5 +1,4 @@
 import pandas as pd
-import cmdstanpy as stan
 import plotly.express as px
 from scipy.stats import binom
 import psychoanalyze as pa
@@ -7,20 +6,25 @@ from dash import dash_table
 import pathlib
 from plotly import graph_objects as go
 import numpy as np
+import pandera as pr
+from pandera.typing import DataFrame, Series
+from typing import cast
+import cmdstanpy as stan
 
 
 index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
 
 
-def from_trials(trials: pd.Series) -> pd.DataFrame:
-    grouped = trials.groupby(level=trials.index.names)  # type: ignore
-    hits = grouped.sum().rename("Hits")
-    n = grouped.count().rename("n")
-    hr = (hits / n).rename("Hit Rate")
-    return pd.concat([hits, n, hr], axis=1)
+class Points(pr.DataFrameModel):
+    n: int
+    Hits: int
 
 
-def load(data_path=pathlib.Path("data")):
+def from_trials(trials: Series[int]) -> DataFrame[Points]:
+    return cast(DataFrame[Points], trials.groupby("Intensity").agg(["count", "sum"]))
+
+
+def load(data_path=pathlib.Path("data")) -> DataFrame[Points]:
     trials = pa.trials.load(data_path)
     return from_trials(trials)
 
@@ -170,18 +174,11 @@ def fixed_magnitude(points):
 
 
 def n(trials):
-    return trials.groupby(level=["Block", "Subject"]).count()
+    return trials.groupby(level=["Subject", "Block"]).count()
 
 
 def to_block(points):
-    return pd.Series(
-        {
-            # "Threshold": fit(points),
-            "Dimension": dimension(points),
-            "Fixed Magnitude": fixed_magnitude(points),
-            "n Levels": n(points),
-        }
-    )
+    return points.groupby(level=["Subject", "Block"]).sum()
 
 
 def psi(x: np.ndarray, threshold: float, width: float, gamma: float, lambda_: float):

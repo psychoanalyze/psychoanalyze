@@ -1,6 +1,6 @@
 SELECT
-    BlockID,
-    "Block",
+    b.BlockID,
+    b."Block",
     "Subject",
     FixedIntensity,
     Threshold AS x_0,
@@ -8,4 +8,4 @@ SELECT
     "err+" AS UpperConfidenceInterval,
     "err-" AS LowerConfidenceInterval
 FROM
-    'data/fit.csv'
+    {{ ref("blocks") }} b

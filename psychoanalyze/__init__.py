@@ -3,17 +3,18 @@ import numpy as np
 from psychoanalyze import (
     schemas,
     sessions,
-    blocks,
     points,
     plot,
     data,
     trials,
+    blocks,
     weber,
     strength_duration,
     subjects,
     stimulus,
     simulate,
 )
+from psychoanalyze.dashboard import layout
 
 pd.options.plotting.backend = "plotly"
 
@@ -28,12 +29,13 @@ __all__ = [
     "sessions",
     "weber",
     "points",
-    "trials",
     "blocks",
+    "trials",
     "strength_duration",
     "subjects",
     "stimulus",
     "simulate",
+    "layout",
 ]
 
 # def curve(trials: pd.DataFrame) -> pd.Series:

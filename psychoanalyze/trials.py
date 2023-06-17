@@ -3,12 +3,15 @@ import pandas as pd
 import numpy as np
 import psychoanalyze as pa
 from pathlib import Path
-from datetime import datetime
 import json
 import pandera as pr
 import random
 
 schema = pr.SeriesSchema(bool, name="Test Trials")
+
+
+class Trials(pr.DataFrameModel):
+    result: int
 
 
 data_path = Path("data/trials.csv")
@@ -35,30 +38,8 @@ def generate_block(dim="x"):
     return pd.DataFrame({"Hits": hits, "n": [100] * 5}, index=pd.Index(x, name=dim))
 
 
-def generate(n, stim_levels=None):
-    return pa.schemas.trials.validate(
-        pd.DataFrame(
-            {"Result": np.random.binomial(1, 0.5, n)},
-            index=pd.MultiIndex.from_frame(
-                pd.DataFrame(
-                    {
-                        "Monkey": ["Z"] * n,
-                        "Date": [datetime.now()] * n,
-                        "Amp2": [0.0] * n,
-                        "Width2": [0.0] * n,
-                        "Freq2": [0.0] * n,
-                        "Dur2": [0.0] * n,
-                        "Active Channels": [1] * n,
-                        "Return Channels": [1] * n,
-                        "Amp1": random.choices(list(range(8)), k=n),
-                        "Width1": [0.0] * n,
-                        "Freq1": [0.0] * n,
-                        "Dur1": [0.0] * n,
-                    }
-                )
-            ),
-        )
-    )
+def generate(n: int) -> pd.Series:
+    return pd.Series(np.random.binomial(1, 0.5, n),dtype=int, name="Result")
 
 
 def load(data_path: Path = Path("data")):
