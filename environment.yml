@@ -4,5 +4,3 @@ channels:
   - nodefaults
 dependencies:
   - pymc>=5
-platforms:
-  - linux-64

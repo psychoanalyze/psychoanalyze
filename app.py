@@ -1,17 +1,18 @@
-from dash import Dash, html, dcc, Input, Output, dash_table
-from dash.dash_table.Format import Format, Scheme
+
+from dash import Dash, html, dcc, Input, Output, dash_table, callback
 import dash_bootstrap_components as dbc
-import psychoanalyze as pa
+
+# import psychoanalyze as pa
 import pandas as pd
 import plotly.express as px
-from plotly import graph_objects as go
-from werkzeug.middleware.profiler import ProfilerMiddleware
-import os
-import numpy as np
+import json
+import psychoanalyze as pa
+# from plotly import graph_objects as go
 
 app = Dash(
     __name__,
     external_stylesheets=[dbc.themes.SUPERHERO, dbc.icons.BOOTSTRAP],
+    add_log_handler=True,
 )
 
 server = app.server
@@ -181,17 +182,25 @@ plot_tabs = dbc.Col(
                                     "name": "Slope",
                                     "id": "slope",
                                     "type": "numeric",
-                                    "format": Format(precision=2, scheme=Scheme.fixed),
+                                    "format": dash_table.Format.Format(
+                                        precision=2,
+                                        scheme=dash_table.Format.Scheme.fixed,
+                                    ),
                                 },
                                 {
                                     "name": "Threshold",
                                     "id": "Threshold",
                                     "type": "numeric",
-                                    "format": Format(precision=2, scheme=Scheme.fixed),
+                                    "format": dash_table.Format.Format(
+                                        precision=2,
+                                        scheme=dash_table.Format.Scheme.fixed,
+                                    ),
                                 },
                             ],
+                            row_selectable="multi",
                             style_data={"color": "black"},
                             style_header={"color": "black"},
+                            page_size=15,
                         ),
                     ],
                     width=4,
@@ -245,12 +254,14 @@ app.layout = dbc.Container(
                 plot_tabs,
             ]
         ),
-    ]
+        dcc.Store(id="data-store"),
+    ],
 )
 
 
-@app.callback(
-    [Output("plot", "figure"), Output("table", "data")],
+@callback(
+    Output("data-store", "data"),
+    Output("table", "data"),
     [
         Input("n-trials", "value"),
         Input("model-k", "value"),
@@ -259,7 +270,6 @@ app.layout = dbc.Container(
         Input("lambda", "value"),
         Input("n-subjects", "value"),
         Input("dataset", "value"),
-        Input("plot-tabs", "active_tab"),
     ],
 )
 def update_figure(
@@ -270,7 +280,6 @@ def update_figure(
     lambda_,
     n_subjects,
     dataset,
-    active_tab,
 ):
     if dataset == "schlich2022":
         points = pd.read_csv("data/normalized/points.csv")
@@ -285,7 +294,14 @@ def update_figure(
                     template=pa.plot.template,
                 )
             ]
-            + [px.ecdf(blocks, x="Threshold", template=pa.plot.template)] * 2
+            + [
+                px.ecdf(
+                    blocks,
+                    x="Threshold",
+                    template=pa.plot.template,
+                )
+            ]
+            * 2
             + [px.scatter()] * 2
         )
     else:
@@ -299,9 +315,9 @@ def update_figure(
             n_subjects,
         )
         points = pa.points.from_trials(trials)
-        intensities = points.reset_index()["Intensity"]
-        x = list(np.linspace(intensities.min(), intensities.max()))
-        y = [pa.trials.psi(gamma, lambda_, k, intensity, x_0) for intensity in x]
+        points.reset_index()["Intensity"]
+        # x = list(np.linspace(intensities.min(), intensities.max()))
+        # y = [pa.trials.psi(gamma, lambda_, k, intensity, x_0) for intensity in x]
 
         fits = (
             trials.reset_index(level="Intensity")
@@ -311,68 +327,75 @@ def update_figure(
 
         params = fits.apply(pa.blocks.fit_params)
         params = params.reset_index().rename(columns={"intercept": "Threshold"})
-        if active_tab == "psi-tab":
-            return (
-                px.box(
-                    points.reset_index(),
-                    x="Intensity",
-                    y="Hit Rate",
-                    color="Subject",
-                    template=pa.plot.template,
-                ).add_trace(go.Scatter(x=x, y=y, mode="lines", name="model")),
-                params.to_dict("records"),
-            )
-        elif active_tab == "ecdf-tab":
-            return (
-                px.ecdf(
-                    params,
-                    x="Threshold",
-                    color="Subject",
-                    template=pa.plot.template,
-                ),
-                params.to_dict("records"),
-            )
-        elif active_tab == "time-series-tab":
-            return (
-                px.scatter(
-                    params,
-                    x="Day",
-                    y="Threshold",
-                    symbol="Subject",
-                    template=pa.plot.template,
-                ),
-                params.to_dict("records"),
-            )
-        elif active_tab == "sd-tab":
-            return (
-                px.box(
-                    params.rename(
-                        columns={"Threshold": "Threshold (modulated dimension)"}
-                    ),
-                    x="Fixed Intensity",
-                    y="Threshold (modulated dimension)",
-                    color="Subject",
-                    template=pa.plot.template,
-                ),
-                params.to_dict("records"),
-            )
-            # px.ecdf(
-            #     params.reset_index(),
-            #     x="slope",
-            #     color="Subject",
-            #     template=pa.plot.template,
-            # ),
+        points_dict = points.reset_index().to_dict(orient="split")
+        store = json.dumps(points_dict, indent=2)
+        return store, points.reset_index().to_dict(orient="records")
 
 
-PROF_DIR = ".profiler"
-if __name__ == "__main__":
-    if os.getenv("PROFILER", None):
-        app.server.config["PROFILE"] = True
-        app.server.wsgi_app = ProfilerMiddleware(
-            app.server.wsgi_app,
-            sort_by=("cumtime", "tottime"),
-            restrictions=[160],
-            stream=None,
-            profile_dir=PROF_DIR,
+@callback(
+    Output("plot", "figure"),
+    Input("table", "derived_virtual_selected_rows"),
+    Input("plot-tabs", "active_tab"),
+    Input("data-store", "data"),
+)
+def update_plot(selected_rows, active_tab, data):
+    points = pd.read_json(data, orient="split")
+    if selected_rows:
+        points = points.loc[selected_rows]
+    if active_tab == "psi-tab":
+        return (
+            px.box(
+                points.reset_index(),
+                x="Intensity",
+                y="Hit Rate",
+                color="Subject",
+                template=pa.plot.template,
+            )
+            # .add_trace(go.Scatter(x=x, y=y, mode="lines", name="model")),
         )
-    app.run_server(host="localhost", debug=True, use_reloader=False)
+    # elif active_tab == "ecdf-tab":
+    #     return (
+    #         px.ecdf(
+    #             params,
+    #             x="Threshold",
+    #             color="Subject",
+    #             template=pa.plot.template,
+    #         ),
+    #         params.to_dict("records"),
+    #     )
+    # elif active_tab == "time-series-tab":
+    #     return (
+    #         px.scatter(
+    #             params,
+    #             x="Day",
+    #             y="Threshold",
+    #             symbol="Subject",
+    #             template=pa.plot.template,
+    #         ),
+    #         params.to_dict("records"),
+    #     )
+    # elif active_tab == "sd-tab":
+    #     return (
+    #         px.box(
+    #             params.rename(columns={
+    # "Threshold": "Threshold (modulated dimension)"}),
+    #             x="Fixed Intensity",
+    #             y="Threshold (modulated dimension)",
+    #             color="Subject",
+    #             template=pa.plot.template,
+    #         ),
+    #         params.to_dict("records"),
+    #     )
+    # px.ecdf(
+    #     params.reset_index(),
+    #     x="slope",
+    #     color="Subject",
+    #     template=pa.plot.template,
+    # ),
+
+
+if __name__ == "__main__":
+    app.run(
+        host="localhost",
+        debug=True,
+    )

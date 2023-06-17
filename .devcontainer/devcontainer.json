@@ -7,18 +7,19 @@
     "ghcr.io/devcontainers-contrib/features/pre-commit:1": {},
     "ghcr.io/devcontainers-contrib/features/heroku-cli:1": {},
     "ghcr.io/eitsupi/devcontainer-features/duckdb-cli:1": {},
-    "ghcr.io/rocker-org/devcontainer-features/miniforge:1": {}
+    "ghcr.io/rocker-org/devcontainer-features/miniforge:1": {},
+    "ghcr.io/devcontainers-contrib/features/mkdocs:2": {}
   },
   "remoteEnv": {
     "PYTHONDONTWRITEBYTECODE": "true"
   },
   "onCreateCommand": "mamba init",
-  // "postCreateCommand": "mamba env create -f environment.yml && mamba run -n pa_venv poetry install && pre-commit install",
+  // "postCreateCommand": "mamba env create -f environment.yml && mamba run -n psychoanalyze poetry install && pre-commit install",
   "customizations": {
     "vscode": {
       "settings": {
-        "python.defaultInterpreterPath": "/opt/conda/envs/pa_venv/bin/python",
-        "python.condaPath": "/opt/conda/envs/pa_venv/bin/python",
+        "python.defaultInterpreterPath": "/opt/conda/envs/psychoanalyze/bin/python",
+        "python.condaPath": "/opt/conda/envs/psychoanalyze/bin/python",
         "files.associations": {
           "*.psyexp": "xml",
           "*.sql": "jinja-sql"
