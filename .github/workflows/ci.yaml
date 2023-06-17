@@ -31,8 +31,7 @@ jobs:
         api-key: ${{ secrets.SAFETY_API_KEY }}
 
     - name: Semantic Release
-      uses: relekang/python-semantic-release@master
-      with: |
+      run: |
         git config --global user.name "semantic-release (via GitHub Action)"
         git config --global user.email "ci@psychoanalyze.io"
         poetry run semantic-release publish
