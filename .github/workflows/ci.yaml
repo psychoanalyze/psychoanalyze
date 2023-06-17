@@ -22,6 +22,18 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Install Python Poetry
+      uses: pipx install poetry
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@4
+      with:
+        python-version: 3.11
+        cache: 'poetry'
+
+    - name: Install dependencies
+      run: poetry install
+
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
