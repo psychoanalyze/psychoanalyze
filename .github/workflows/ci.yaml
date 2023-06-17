@@ -29,4 +29,5 @@ jobs:
       run: |
         git config --global user.name "semantic-release (via GitHub Action)"
         git config --global user.email "ci@psychoanalyze.io"
-        poetry run semantic-release publish
+        pip install python-semantic-release
+        semantic-release publish
