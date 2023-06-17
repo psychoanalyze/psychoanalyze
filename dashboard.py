@@ -1,13 +1,11 @@
 from dash import Dash, html, dcc, Input, Output, dash_table, callback
 import dash_bootstrap_components as dbc
-
-# import psychoanalyze as pa
 import pandas as pd
 import plotly.express as px
 import psychoanalyze as pa
 import pandera as pr
 
-# from plotly import graph_objects as go
+
 blocks_schema = pr.DataFrameSchema(
     {
         "Subject": pr.Column(str),
