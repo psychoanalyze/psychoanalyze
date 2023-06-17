@@ -29,6 +29,7 @@
       "extensions": [
         "ms-python.python",
         "ms-python.vscode-pylance",
+        "ms-python.black-formatter",
         "bungcip.better-toml",
         "innoverio.vscode-dbt-power-user",
         "GitHub.copilot",
