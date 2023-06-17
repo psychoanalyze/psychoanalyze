@@ -3,4 +3,4 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
-  - pymc>=5
+  - pymc=5.5.0
