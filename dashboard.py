@@ -30,7 +30,6 @@ app = Dash(
     add_log_handler=True,
 )
 
-print("App initialized")
 server = app.server
 
 experiment_params = html.Div(
@@ -353,8 +352,6 @@ def update_data(
         blocks = blocks_schema.validate(points[["Subject", "Block"]].drop_duplicates())
         blocks_store = blocks.to_dict("records")
         points_store = points.to_dict("records")
-        print(f"blocks index: {blocks.index.unique()}")
-        print(f"blocks columns:{blocks.columns}")
         blocks = blocks_schema.validate(blocks)
         return (
             points_store,
@@ -371,8 +368,6 @@ def update_data(
     Input("points-store", "data"),
 )
 def update_plot(selected_blocks, active_tab, blocks_store, points_store):
-    print("updating plot...")
-    print(f"blocks store: {blocks_store}")
     blocks = blocks_schema.validate(
         pd.DataFrame.from_records(blocks_store)
         if blocks_store
@@ -388,18 +383,10 @@ def update_plot(selected_blocks, active_tab, blocks_store, points_store):
         if points_store
         else pd.DataFrame({"Subject": [], "Block": [], "Intensity": [], "Hit Rate": []})
     )
-    print(f"n points: {len(points.index)}")
-    print(f"n blocks: {len(blocks.index)}")
-    print(f"selected blocks: {selected_blocks}")
     if not selected_blocks:
         filtered_blocks = blocks
     else:
         filtered_blocks = blocks.loc[selected_blocks]
-    print(f"filtered blocks: {len(filtered_blocks.index)}")
-    print(f"block columns: {blocks.columns}")
-    print(f"block index_levels: {blocks.index.name}")
-    print(f"filtered block columns: {filtered_blocks.columns}")
-    print(f"points columns: {points.columns}")
     filtered_points = filtered_blocks.merge(points, on=["Subject", "Block"])
 
     if active_tab == "psi-tab":
