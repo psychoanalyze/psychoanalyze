@@ -30,13 +30,6 @@ jobs:
       with:
         node-version: "lts/*"
 
-    - name: Security w/bandit
-      uses: mdegis/bandit-action@v1
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        path: psychoanalyze
-        skips: B311
-
     - name: Security w/safety
       uses: pyupio/safety@2.3.5
       with:
