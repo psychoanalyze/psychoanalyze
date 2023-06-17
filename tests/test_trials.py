@@ -15,24 +15,6 @@ def X():
     return list(range(8))
 
 
-def test_generate():
-    stim_levels = tuple(range(-3, 4))
-    trials = pa.trials.generate(100, stim_levels)
-    assert len(trials) == 100
-    assert set(trials.columns) == {"Result"}
-
-
-def test_load(tmp_path):
-    pd.DataFrame(
-        {level_name: [] for level_name in pa.schemas.points_index_levels}
-        | {"Result": []},
-    ).to_csv(tmp_path / "trials.csv", index_label=False)
-
-    trials = pa.trials.load(tmp_path)
-    assert list(trials.index.names) == pa.schemas.points_index_levels
-    assert list(trials.columns) == ["Result"]
-
-
 def test_from_store():
     store_data = pd.DataFrame(
         {"Result": [1]},

@@ -21,7 +21,13 @@ class Points(pr.DataFrameModel):
 
 
 def from_trials(trials: Series[int]) -> DataFrame[Points]:
-    return cast(DataFrame[Points], trials.groupby("Intensity").agg(["count", "sum"]))
+    df = (
+        trials.groupby("Intensity")
+        .agg(["count", "sum"])
+        .rename(columns={"count": "n", "sum": "Hits"})
+    )
+    df["Hit Rate"] = df["Hits"] / df["n"]
+    return cast(DataFrame[Points], df)
 
 
 def load(data_path=pathlib.Path("data")) -> DataFrame[Points]:

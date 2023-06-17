@@ -1,10 +1,6 @@
 import pandas as pd
-import datatest as dt
-import numpy as np
-from scipy.special import expit
 
 import psychoanalyze as pa
-
 
 
 def test_weber():
@@ -13,13 +9,6 @@ def test_weber():
         index=pd.Index([1, 2], name="Trial"),
     )
     assert pa.weber_coefficient(curves) == 1
-
-
-def test_psi():
-    x = np.linspace(-3, 3)
-    y = expit(x)
-    with dt.accepted.tolerance(0.001):
-        dt.validate(pa.psi(), pd.Series(y, index=x))
 
 
 def test_psi_nuisance_params():

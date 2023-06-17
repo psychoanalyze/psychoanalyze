@@ -25,6 +25,8 @@ pandas-stubs = "^2.0.2.230605"
 pandera = {extras = ["mypy"], version = "^0.15.1"}
 pytest = "^7.3.2"
 hypothesis = "^6.79.0"
+datatest = "^0.11.1"
+pytest-mock = "^3.11.1"
 
 [tool.poetry.scripts]
 psychoanalyze = "psychoanalyze.__main__:main"

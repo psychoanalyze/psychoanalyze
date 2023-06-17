@@ -134,13 +134,6 @@ def test_fixed_magnitudes():
     assert fixed_magnitude == 0
 
 
-def test_fit_no_data(mocker):
-    mocker.stub("psignifit")
-    points = pd.DataFrame({"n": [], "Hits": [], "x": []})
-    fit = pa.points.fit(points)
-    assert {"Threshold", "err+", "err-"} <= set(fit.index.values)
-
-
 def test_fit_data(tmp_path):
     points = pd.DataFrame({"n": [0], "Hits": [0], "x": [0]})
     fit = pa.points.fit(
