@@ -24,6 +24,7 @@ cmdstanpy = "^1.1.0"
 pandas-stubs = "^2.0.2.230605"
 pandera = {extras = ["mypy"], version = "^0.15.1"}
 pytest = "^7.3.2"
+hypothesis = "^6.79.0"
 
 [tool.poetry.scripts]
 psychoanalyze = "psychoanalyze.__main__:main"
@@ -63,6 +64,7 @@ module = [
     'sklearn.linear_model',
     'dash_daq',
     'datatest',
-    'bambi'
+    'bambi',
+    'hypothesis'
 ]
 ignore_missing_imports = true
