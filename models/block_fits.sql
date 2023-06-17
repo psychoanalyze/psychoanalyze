@@ -1,6 +1,6 @@
 SELECT
     BlockID,
-    "Day",
+    "Block",
     "Subject",
     FixedIntensity,
     Threshold AS x_0,

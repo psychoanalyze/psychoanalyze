@@ -54,7 +54,7 @@ def test_from_store():
 
 def test_normalize():
     fields = {
-        "Session": ["Monkey", "Day"],
+        "Session": ["Monkey", "Block"],
         "Reference Stimulus": ["Amp2", "Width2", "Freq2", "Dur2"],
         "Channel Configuration": ["Active Channels", "Return Channels"],
         "Test Stimulus": ["Amp1", "Width1", "Freq1", "Dur1"],

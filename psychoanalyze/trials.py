@@ -89,7 +89,7 @@ def to_store(df):
 
 def normalize(trials):
     return {
-        "Session": trials[["Monkey", "Day"]].drop_duplicates(),
+        "Session": trials[["Monkey", "Block"]].drop_duplicates(),
         "Reference Stimulus": trials[["Amp2", "Width2", "Freq2", "Dur2"]],
         "Channel Config": trials[["Active Channels", "Return Channels"]],
         "Test Stimulus": trials[["Amp1", "Width1", "Freq1", "Dur1"]],

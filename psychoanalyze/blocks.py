@@ -113,7 +113,7 @@ def load_cached(data_path):
     blocks = pd.read_csv(data_path / "blocks.csv", parse_dates=["Date"]).set_index(
         pa.sessions.dims + pa.stimulus.ref_dims + channel_config
     )
-    blocks["Day"] = days(blocks, pa.subjects.load(data_path))
+    blocks["Block"] = days(blocks, pa.subjects.load(data_path))
     return blocks
 
 
@@ -123,7 +123,7 @@ def load(data_path=pathlib.Path("data"), monkey=None, day=None, dim=None):
         blocks = load_cached(data_path)
         if monkey:
             if day:
-                blocks = blocks[blocks["Day"] == day]
+                blocks = blocks[blocks["Block"] == day]
             else:
                 blocks = blocks.xs(monkey, drop_level=False)
         blocks = blocks[blocks["n Levels"] > 1]

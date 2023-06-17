@@ -74,7 +74,7 @@ def test_load_n_trials(tmp_path):
     pd.testing.assert_frame_equal(
         sessions,
         pd.DataFrame(
-            {"n Trials": [3], "Day": [1]},
+            {"n Trials": [3], "Block": [1]},
             index=pd.MultiIndex.from_frame(
                 pd.DataFrame(
                     {
@@ -125,7 +125,7 @@ def test_load_monkey(tmp_path):
             "Dur2": [0] * 2,
             "Active Channels": [0] * 2,
             "Return Channels": [0] * 2,
-            "Day": [1] * 2,
+            "Block": [1] * 2,
             "Result": [1] * 2,
             "Amp1": [0] * 2,
             "Width1": [0] * 2,

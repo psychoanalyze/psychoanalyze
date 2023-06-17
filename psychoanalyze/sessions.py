@@ -48,7 +48,7 @@ def load(data_path=pathlib.Path("data"), monkey=None):
             .count()
             .rename(columns={"Result": "n Trials"})
         )
-    sessions["Day"] = days(sessions, pa.subjects.load(data_path))
+    sessions["Block"] = days(sessions, pa.subjects.load(data_path))
     return sessions
 
 
@@ -78,5 +78,5 @@ def generate_trials(
             day: pa.blocks.generate_trials(n_trials, model_params)
             for day in range(n_days)
         },
-        names=["Day"],
+        names=["Block"],
     )

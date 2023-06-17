@@ -31,7 +31,7 @@ def thresholds(df):
     df = pa.data.transform_errors(df)
     return px.scatter(
         df,
-        x="Day",
+        x="Block",
         y="50%",
         error_y="err+",
         error_y_minus="err-",
@@ -55,7 +55,7 @@ def curves(curve_data):
         error_y_minus="err-",
         color=df.get("Subject"),  # or df["Type"],
         color_discrete_map=colormap,
-        symbol=df.get("Day"),
+        symbol=df.get("Block"),
         template=template,
     )
 
@@ -99,7 +99,7 @@ def psi_animation(df: DataFrame[PsiAnimation]):
         # error_y="err+",
         # error_y_minus="err-",
         # color=df.get("Subject") or df.get("Type"),
-        # symbol=df.get("Day"),
+        # symbol=df.get("Block"),
         animation_group="Intensity",
         animation_frame="Trial",
         template=template,
@@ -118,7 +118,7 @@ def posterior_animation(cumulative_draws: pd.DataFrame):
         animation_group="x",
         animation_frame="n",
         color=df.get("Subject"),
-        symbol=df.get("Day"),
+        symbol=df.get("Block"),
         template=template,
     )
 

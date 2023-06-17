@@ -103,7 +103,7 @@ def block_data():
         "Dimension": ["Amp"],
         "Fixed Magnitude": [0],
         "n Levels": [8],
-        "Day": [1],
+        "Block": [1],
     }
 
 
@@ -220,7 +220,7 @@ def test_blocks_load_monkey_day(tmp_path, blocks):
     blocks.to_csv(tmp_path / "blocks.csv")
     blocks = pa.blocks.load(tmp_path, monkey="U", day=1, dim="Amp")
     assert all(blocks.index.get_level_values("Monkey") == "U")
-    assert all(blocks["Day"] == 1)
+    assert all(blocks["Block"] == 1)
     assert all(blocks["Dimension"] == "Amp")
 
 

@@ -6,12 +6,14 @@ import psychoanalyze as pa
 
 @pytest.fixture
 def s_d_columns():
-    return {"Monkey", "Day", "Dimension"}
+    return {"Monkey", "Block", "Dimension"}
 
 
 def test_strength_duration(s_d_columns):
     df_index = pd.MultiIndex.from_frame(
-        pd.DataFrame({"Monkey": [], "Day": [], "Dimension": [], "Fixed Magnitude": []})
+        pd.DataFrame(
+            {"Monkey": [], "Block": [], "Dimension": [], "Fixed Magnitude": []}
+        )
     )
     blocks = pd.DataFrame({"Threshold": [], "Fixed Magnitude": []}, index=df_index)
     s_d = pa.strength_duration.from_blocks(blocks=blocks, dim="Amp")
@@ -59,7 +61,7 @@ def test_strength_duration_points_arg():
             pd.DataFrame(
                 {
                     "Monkey": [],
-                    "Day": [],
+                    "Block": [],
                 }
             )
         ),

@@ -1,13 +1,30 @@
-
 from dash import Dash, html, dcc, Input, Output, dash_table, callback
 import dash_bootstrap_components as dbc
 
 # import psychoanalyze as pa
 import pandas as pd
 import plotly.express as px
-import json
 import psychoanalyze as pa
+import pandera as pr
+
 # from plotly import graph_objects as go
+blocks_schema = pr.DataFrameSchema(
+    {
+        "Subject": pr.Column(str),
+        "Block": pr.Column(int, coerce=True),
+        "slope": pr.Column(float, required=False),
+        "Threshold": pr.Column(float, required=False),
+    }
+)
+
+points_schema = pr.DataFrameSchema(
+    {
+        "Subject": pr.Column(str),
+        "Block": pr.Column(int, coerce=True),
+        "Intensity": pr.Column(float),
+        "Hit Rate": pr.Column(float),
+    }
+)
 
 app = Dash(
     __name__,
@@ -15,6 +32,7 @@ app = Dash(
     add_log_handler=True,
 )
 
+print("App initialized")
 server = app.server
 
 experiment_params = html.Div(
@@ -22,13 +40,13 @@ experiment_params = html.Div(
         html.H4("Experimental Design"),
         dbc.InputGroup(
             [
-                dbc.Input(id="n-trials", type="number", value=100),
+                dbc.Input(id="n-trials", type="number", value=50),
                 dbc.InputGroupText("trials per block"),
             ]
         ),
         dbc.InputGroup(
             [
-                dbc.Input(id="n-subjects", type="number", value=1),
+                dbc.Input(id="n-subjects", type="number", value=2),
                 dbc.InputGroupText("subjects"),
             ],
             class_name="mb-4",
@@ -175,8 +193,12 @@ plot_tabs = dbc.Col(
                             id="table",
                             columns=[
                                 {
-                                    "name": "Day",
-                                    "id": "Day",
+                                    "name": "Subject",
+                                    "id": "Subject",
+                                },
+                                {
+                                    "name": "Block",
+                                    "id": "Block",
                                 },
                                 {
                                     "name": "Slope",
@@ -254,14 +276,16 @@ app.layout = dbc.Container(
                 plot_tabs,
             ]
         ),
-        dcc.Store(id="data-store"),
+        dcc.Store(id="blocks-store"),
+        dcc.Store(id="points-store"),
     ],
 )
 
 
 @callback(
-    Output("data-store", "data"),
+    Output("points-store", "data"),
     Output("table", "data"),
+    Output("blocks-store", "data"),
     [
         Input("n-trials", "value"),
         Input("model-k", "value"),
@@ -272,7 +296,7 @@ app.layout = dbc.Container(
         Input("dataset", "value"),
     ],
 )
-def update_figure(
+def update_data(
     n_trials,
     k,
     x_0,
@@ -281,9 +305,11 @@ def update_figure(
     n_subjects,
     dataset,
 ):
+    print("updating data...")
     if dataset == "schlich2022":
         points = pd.read_csv("data/normalized/points.csv")
         blocks = pd.read_csv("data/fit.csv")
+
         return (
             [
                 px.box(
@@ -314,38 +340,74 @@ def update_figure(
             n_days,
             n_subjects,
         )
-        points = pa.points.from_trials(trials)
-        points.reset_index()["Intensity"]
+        points = points_schema.validate(pa.points.from_trials(trials).reset_index())
         # x = list(np.linspace(intensities.min(), intensities.max()))
         # y = [pa.trials.psi(gamma, lambda_, k, intensity, x_0) for intensity in x]
 
-        fits = (
-            trials.reset_index(level="Intensity")
-            .groupby(["Subject", "Day"])
-            .apply(pa.blocks.get_fit)
-        )
+        # fits = (
+        #     trials.reset_index(level="Intensity")
+        #     .groupby(["Subject", "Block"])
+        #     .apply(pa.blocks.get_fit)
+        # )
 
-        params = fits.apply(pa.blocks.fit_params)
-        params = params.reset_index().rename(columns={"intercept": "Threshold"})
-        points_dict = points.reset_index().to_dict(orient="split")
-        store = json.dumps(points_dict, indent=2)
-        return store, points.reset_index().to_dict(orient="records")
+        # params = fits.apply(pa.blocks.fit_params)
+        # params = params.reset_index().rename(columns={"intercept": "Threshold"})
+        blocks = blocks_schema.validate(points[["Subject", "Block"]].drop_duplicates())
+        blocks_store = blocks.to_dict("records")
+        points_store = points.to_dict("records")
+        print(f"blocks index: {blocks.index.unique()}")
+        print(f"blocks columns:{blocks.columns}")
+        blocks = blocks_schema.validate(blocks)
+        return (
+            points_store,
+            blocks.to_dict("records"),
+            blocks_store,
+        )
 
 
 @callback(
     Output("plot", "figure"),
     Input("table", "derived_virtual_selected_rows"),
     Input("plot-tabs", "active_tab"),
-    Input("data-store", "data"),
+    Input("blocks-store", "data"),
+    Input("points-store", "data"),
 )
-def update_plot(selected_rows, active_tab, data):
-    points = pd.read_json(data, orient="split")
-    if selected_rows:
-        points = points.loc[selected_rows]
+def update_plot(selected_blocks, active_tab, blocks_store, points_store):
+    print("updating plot...")
+    print(f"blocks store: {blocks_store}")
+    blocks = blocks_schema.validate(
+        pd.DataFrame.from_records(blocks_store)
+        if blocks_store
+        else pd.DataFrame(
+            {
+                "Subject": [],
+                "Block": [],
+            }
+        )
+    )
+    points = points_schema.validate(
+        pd.DataFrame.from_records(points_store)
+        if points_store
+        else pd.DataFrame({"Subject": [], "Block": [], "Intensity": [], "Hit Rate": []})
+    )
+    print(f"n points: {len(points.index)}")
+    print(f"n blocks: {len(blocks.index)}")
+    print(f"selected blocks: {selected_blocks}")
+    if not selected_blocks:
+        filtered_blocks = blocks
+    else:
+        filtered_blocks = blocks.loc[selected_blocks]
+    print(f"filtered blocks: {len(filtered_blocks.index)}")
+    print(f"block columns: {blocks.columns}")
+    print(f"block index_levels: {blocks.index.name}")
+    print(f"filtered block columns: {filtered_blocks.columns}")
+    print(f"points columns: {points.columns}")
+    filtered_points = filtered_blocks.merge(points, on=["Subject", "Block"])
+
     if active_tab == "psi-tab":
         return (
-            px.box(
-                points.reset_index(),
+            px.scatter(
+                filtered_points,
                 x="Intensity",
                 y="Hit Rate",
                 color="Subject",
@@ -367,7 +429,7 @@ def update_plot(selected_rows, active_tab, data):
     #     return (
     #         px.scatter(
     #             params,
-    #             x="Day",
+    #             x="Block",
     #             y="Threshold",
     #             symbol="Subject",
     #             template=pa.plot.template,

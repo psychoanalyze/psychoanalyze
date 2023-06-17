@@ -16,13 +16,13 @@ def test_thresholds():
             "5%": [1, 2],
             "50%": [1, 2],
             "95%": [1, 2],
-            "Day": [1, 2],
+            "Block": [1, 2],
         }
     )
     fig = pa.plot.thresholds(data)
     subjects = {trace["legendgroup"] for trace in fig.data}
     assert subjects == {"A", "B"}
-    assert fig.layout.xaxis.title.text == "Day"
+    assert fig.layout.xaxis.title.text == "Block"
     assert fig.layout.yaxis.title.text == "50%"
 
 
@@ -114,7 +114,7 @@ def test_strength_duration_data_filters_dimension():
 
 def test_plot_counts():
     sessions = pd.DataFrame(
-        {"Monkey": ["U", "U"], "Day": [1, 2], "Dimension": ["Amp", "Amp"]}
+        {"Monkey": ["U", "U"], "Block": [1, 2], "Dimension": ["Amp", "Amp"]}
     )
     fig = pa.plot.counts(sessions, dim="Width")
     assert fig.layout.yaxis.title.text == "# of Sessions"
@@ -122,7 +122,7 @@ def test_plot_counts():
 
 def test_plot_counts_dim_facet():
     sessions = pd.DataFrame(
-        {"Monkey": ["U", "U"], "Day": [1, 2], "Dimension": ["Amp", "Width"]}
+        {"Monkey": ["U", "U"], "Block": [1, 2], "Dimension": ["Amp", "Width"]}
     )
     figs = pa.plot.counts(sessions, dim="Amp")
     assert len(figs.data)
