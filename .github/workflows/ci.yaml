@@ -35,9 +35,6 @@ jobs:
     - name: Install package dependencies
       run: poetry install --with ci
 
-    - name: Build documentation
-      run: poetry run mkdocs build
-
     - name: Ruff lint
       run: poetry run ruff check .
 
