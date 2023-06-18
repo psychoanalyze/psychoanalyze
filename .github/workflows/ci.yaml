@@ -44,8 +44,8 @@ jobs:
     - name: Build and run dev container task
       uses: devcontainers/ci@v0.3
       with:
-        imageName: schlich/psychoanalyze
-        cacheFrom: schlich/psychoanalyze
+        imageName: ghcr.io/schlich/psychoanalyze:devcontainer
+        cacheFrom: ghcr.io/schlich/psychoanalyze:devcontainer
         push: always
 
     - name: Semantic Release
