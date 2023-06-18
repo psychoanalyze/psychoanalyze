@@ -1,5 +1,5 @@
 {
-  "name": "Python 3",
+  "name": "PsychoAnalyzeDev",
   "image": "mcr.microsoft.com/devcontainers/python:0-3.11",
   "features": {
     "ghcr.io/devcontainers-contrib/features/poetry:1": {},
