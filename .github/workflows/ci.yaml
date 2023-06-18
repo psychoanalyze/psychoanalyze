@@ -46,7 +46,7 @@ jobs:
       with:
         imageName: schlich/psychoanalyze
         cacheFrom: schlich/psychoanalyze
-        push: never
+        push: always
 
     - name: Semantic Release
       run: |

@@ -1,6 +1,6 @@
 pa-duckdb:
   target: dev
   outputs:
-    dev: 
+    dev:
       type: duckdb
       path: 'psychoanalyze.duckdb'
