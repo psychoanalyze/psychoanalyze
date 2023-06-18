@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.3 (2023-06-18)
+
+### Fix
+
+* Sync version ([`3cb4974`](https://github.com/psychoanalyze/psychoanalyze/commit/3cb4974393dca0d2f27da62c2606534d16ba745b))
+
 ## v0.4.2 (2023-06-17)
 
 ### Fix
