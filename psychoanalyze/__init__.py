@@ -18,7 +18,7 @@ from psychoanalyze.dashboard import layout
 
 pd.options.plotting.backend = "plotly"
 
-__version__ = "0.4.3"
+__version__ = "0.4.4"
 
 __all__ = [
     "schemas",

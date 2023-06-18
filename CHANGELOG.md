@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.4 (2023-06-18)
+
+### Fix
+
+* Run pre-commit on all files ([`7d7d17d`](https://github.com/psychoanalyze/psychoanalyze/commit/7d7d17dfd5b3f587799a4807d454bf8c45b0aa42))
+
 ## v0.4.3 (2023-06-18)
 
 ### Fix
