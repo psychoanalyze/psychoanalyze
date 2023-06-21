@@ -1,7 +1,8 @@
 version: 2
 
 sources:
-  - name: Schlichenmeyer2022
+  - name: Cuff
+    identifier: Cuff_YN_MOC
     tables:
       - name: Trials
         meta:

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-import psychoanalyze as pa
+from psychoanalyze import strength_duration, plot
 
 
 @pytest.fixture
@@ -16,7 +16,7 @@ def test_strength_duration(s_d_columns):
         )
     )
     blocks = pd.DataFrame({"Threshold": [], "Fixed Magnitude": []}, index=df_index)
-    s_d = pa.strength_duration.from_blocks(blocks=blocks, dim="Amp")
+    s_d = strength_duration.from_blocks(blocks=blocks, dim="Amp")
     assert set(s_d.columns) == {
         "Fixed Pulse Width (μs)",
         "Threshold Amplitude (μA)",
@@ -30,7 +30,7 @@ def s_d_empty_df():
 
 def test_strength_duration_amp(s_d_columns, s_d_empty_df):
     blocks = s_d_empty_df
-    s_d = pa.strength_duration.from_blocks(blocks=blocks, dim="Amp")
+    s_d = strength_duration.from_blocks(blocks=blocks, dim="Amp")
     assert set(s_d.columns) <= s_d_columns | {
         "Threshold Amplitude (μA)",
         "Fixed Pulse Width (μs)",
@@ -38,7 +38,7 @@ def test_strength_duration_amp(s_d_columns, s_d_empty_df):
 
 
 def test_strength_duration_pw(s_d_columns, s_d_empty_df):
-    s_d = pa.strength_duration.from_blocks(
+    s_d = strength_duration.from_blocks(
         blocks=s_d_empty_df,
         dim="Width",
     )
@@ -49,7 +49,7 @@ def test_strength_duration_pw(s_d_columns, s_d_empty_df):
 
 
 def test_strength_duration_plot():
-    fig = pa.strength_duration.plot(plot_type="inverse", dim="Amp")
+    fig = strength_duration.plot(plot_type="inverse", dim="Amp")
     assert fig.layout.xaxis.title.text == "Fixed Pulse Width (μs)"
     assert fig.layout.yaxis.title.text == "Threshold Amplitude (μA)"
 
@@ -66,8 +66,5 @@ def test_strength_duration_points_arg():
             )
         ),
     )
-    fig = pa.plot.strength_duration(points=points, dim="Amp", plot_type="inverse")
+    fig = plot.strength_duration(points=points, dim="Amp", plot_type="inverse")
     assert len(fig.data) == 1
-    # what tables does this need?
-    # how does the data need to be transformed?
-    #

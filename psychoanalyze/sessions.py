@@ -3,8 +3,7 @@ from typing import List
 import pandas as pd
 import pathlib
 
-import psychoanalyze as pa
-
+from psychoanalyze import blocks, trials, subjects
 
 dims = ["Monkey", "Date"]
 index_levels = dims
@@ -40,15 +39,15 @@ def load(data_path=pathlib.Path("data"), monkey=None):
     if os.path.exists(data_path / "sessions.csv"):
         sessions = pd.read_csv(data_path / "sessions.csv")
     else:
-        trials = pa.trials.load(data_path)
+        _trials = trials.load(data_path)
         if monkey:
-            trials = trials[trials.index.get_level_values("Monkey") == monkey]
+            _trials = _trials[_trials.index.get_level_values("Monkey") == monkey]
         sessions = (
-            trials.groupby(["Monkey", "Date"])[["Result"]]
+            _trials.groupby(["Monkey", "Date"])[["Result"]]
             .count()
             .rename(columns={"Result": "n Trials"})
         )
-    sessions["Block"] = days(sessions, pa.subjects.load(data_path))
+    sessions["Block"] = days(sessions, subjects.load(data_path))
     return sessions
 
 
@@ -72,10 +71,10 @@ def generate_trials(
     n_trials: int,
     model_params: dict[str, float],
     n_days: int,
-) -> pd.Series:
+):
     return pd.concat(
         {
-            day: pa.blocks.generate_trials(n_trials, model_params)
+            day: blocks.generate_trials(n_trials, model_params)
             for day in range(n_days)
         },
         names=["Block"],

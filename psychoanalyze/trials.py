@@ -1,17 +1,20 @@
 from typing import TypedDict
 import pandas as pd
 import numpy as np
-import psychoanalyze as pa
 from pathlib import Path
 import json
-import pandera as pr
+from pandera import SeriesSchema, DataFrameModel
 import random
+from pandera.typing import Index
 
-schema = pr.SeriesSchema(bool, name="Test Trials")
+from psychoanalyze import schemas
+
+schema = SeriesSchema(bool, name="Test Trials")
 
 
-class Trials(pr.DataFrameModel):
+class Trials(DataFrameModel):
     result: int
+    intensity: Index[float]
 
 
 data_path = Path("data/trials.csv")
@@ -38,15 +41,22 @@ def generate_block(dim="x"):
     return pd.DataFrame({"Hits": hits, "n": [100] * 5}, index=pd.Index(x, name=dim))
 
 
-def generate(n: int) -> pd.Series:
-    return pd.Series(np.random.binomial(1, 0.5, n),dtype=int, name="Result")
+def generate(n: int, options, outcomes={0,1}):
+    return pd.DataFrame(
+        {
+            "Result": pd.Series([random.choice(outcomes) for _ in range(n)], dtype=int)
+        },
+        index=pd.Index(
+            [random.choice(options) for _ in range(n)], name="Intensity", dtype=float
+        ),
+    )
 
 
 def load(data_path: Path = Path("data")):
-    return pa.schemas.trials.validate(
+    return schemas.trials.validate(
         pd.read_csv(
             data_path / "trials.csv",
-            index_col=pa.schemas.points_index_levels,
+            index_col=schemas.points_index_levels,
             parse_dates=["Date"],
         )
     )
@@ -58,13 +68,13 @@ def from_store(store_data):
     index = pd.MultiIndex.from_tuples(df_dict["index"])
     df = pd.DataFrame({"Result": df_dict["data"][0]}, index=index)
     df.index.names = index_names
-    return pa.schemas.trials.validate(df)
+    return schemas.trials.validate(df)
 
 
 def to_store(df):
     df.index = df.index.set_levels(df.index.levels[1].astype(str), level=1)
     data_dict = df.to_dict(orient="split")
-    data_dict["index_names"] = pa.schemas.points_index_levels
+    data_dict["index_names"] = schemas.points_index_levels
     return json.dumps(data_dict)
 
 
@@ -98,14 +108,14 @@ def results(n: int, p_x: pd.Series) -> list[Trial]:
 
 
 def labels(results: list[bool]) -> list[str]:
-    return [pa.trials.codes[result] for result in results]
+    return [codes[result] for result in results]
 
 
 def psi(gamma, lambda_, k, intensity, x_0):
     return gamma + (1 - gamma - lambda_) * (1 / (1 + np.exp(-k * (intensity - x_0))))
 
 
-def moc_sample(n_trials: int, model_params: dict[str, float]) -> pd.Series:
+def moc_sample(n_trials: int, model_params: dict[str, float]):
     x_0 = model_params["x_0"]
     k = model_params["k"]
     gamma = model_params["gamma"]
@@ -114,7 +124,16 @@ def moc_sample(n_trials: int, model_params: dict[str, float]) -> pd.Series:
     intensities = [float(random.choice(intensity_choices)) for _ in range(n_trials)]
     intensity_index = pd.Index(intensities, name="Intensity")
     results = [
-        random.random() <= psi(gamma, lambda_, k, intensity, x_0)
+        int(random.random() <= psi(gamma, lambda_, k, intensity, x_0))
         for intensity in intensities
     ]
-    return pd.Series(results, name="Result", index=intensity_index)
+    return pd.DataFrame(
+        {
+            "Result": pd.Series(results, dtype=int)
+        },
+        index=intensity_index
+    )
+
+
+def fit(points):
+    return {"Fit": [None, None, None, None]}

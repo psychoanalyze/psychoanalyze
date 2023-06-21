@@ -1,14 +1,14 @@
 import pandas as pd
 import plotly.express as px
 from scipy.stats import binom
-import psychoanalyze as pa
+from psychoanalyze import trials
+from psychoanalyze.plot import template
 from dash import dash_table
 import pathlib
 from plotly import graph_objects as go
 import numpy as np
 import pandera as pr
-from pandera.typing import DataFrame, Series
-from typing import cast
+from pandera.typing import DataFrame
 import cmdstanpy as stan
 
 
@@ -18,21 +18,20 @@ index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
 class Points(pr.DataFrameModel):
     n: int
     Hits: int
+    blockID: int
 
 
-def from_trials(trials: Series[int]) -> DataFrame[Points]:
-    df = (
-        trials.groupby("Intensity")
+def from_trials(_trials: DataFrame[trials.Trials]):
+    return (
+        _trials.groupby("Intensity")[["Result"]]
         .agg(["count", "sum"])
         .rename(columns={"count": "n", "sum": "Hits"})
-    )
-    df["Hit Rate"] = df["Hits"] / df["n"]
-    return cast(DataFrame[Points], df)
+    )["Result"]
 
 
 def load(data_path=pathlib.Path("data")) -> DataFrame[Points]:
-    trials = pa.trials.load(data_path)
-    return from_trials(trials)
+    _trials = trials.load(data_path)
+    return from_trials(_trials)
 
 
 def dimension(points):
@@ -70,13 +69,13 @@ def fit(points, save_to=None, block=None):
     points = points[["x", "Hits", "n"]]
     if len(points):
         data = points.to_numpy()
-        fit = pa.fit(data)
-        fit = pd.DataFrame(
+        _fit = trials.fit(data)
+        _fit = pd.DataFrame(
             {
-                "Threshold": [fit["Fit"][0]],
-                "width": [fit["Fit"][1]],
-                "gamma": [fit["Fit"][2]],
-                "lambda": [fit["Fit"][3]],
+                "Threshold": [_fit["Fit"][0]],
+                "width": [_fit["Fit"][1]],
+                "gamma": [_fit["Fit"][2]],
+                "lambda": [_fit["Fit"][3]],
                 "err+": [None],
                 "err-": [None],
             },
@@ -95,8 +94,8 @@ def fit(points, save_to=None, block=None):
             ),
         )
         if save_to:
-            fit.to_csv(save_to)
-        return fit
+            _fit.to_csv(save_to)
+        return _fit
     else:
         return pd.Series(
             {
@@ -118,7 +117,7 @@ def plot(points, trendline=None):
         y="Hit Rate",
         size="n",
         color=points.get("Monkey"),
-        template=pa.plot.template,
+        template=template,
         trendline=trendline,
     )
 
@@ -163,8 +162,8 @@ def datatable(data):
 
 
 def from_store(store_data):
-    trials = pa.trials.from_store(store_data)
-    return from_trials(trials)
+    _trials = trials.from_store(store_data)
+    return from_trials(_trials)
 
 
 def combine_plots(fig1, fig2):

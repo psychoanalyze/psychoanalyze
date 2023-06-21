@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-import psychoanalyze as pa
+from psychoanalyze import trials, schemas
 import json
 from hypothesis import given
 
@@ -23,15 +23,15 @@ def test_from_store():
                 {"Monkey": ["U"], "Date": ["1-1-2001"]}
                 | {
                     level: [0]
-                    for level in pa.schemas.block_dims + pa.schemas.point_dims
+                    for level in schemas.block_dims + schemas.point_dims
                 }
             )
         ),
     )
     store_data = store_data.to_dict(orient="split")
-    store_data["index_names"] = pa.schemas.points_index_levels
-    df = pa.trials.from_store(json.dumps(store_data))
-    pa.schemas.trials.validate(df)
+    store_data["index_names"] = schemas.points_index_levels
+    df = trials.from_store(json.dumps(store_data))
+    schemas.trials.validate(df)
 
 
 def test_normalize():
@@ -48,8 +48,8 @@ def test_normalize():
         + fields["Channel Configuration"]
         + fields["Test Stimulus"]
     }
-    trials = pd.DataFrame(data)
-    normalized_data = pa.trials.normalize(trials)
+    _trials = pd.DataFrame(data)
+    normalized_data = trials.normalize(_trials)
     assert normalized_data.keys() == {
         "Session",
         "Reference Stimulus",
@@ -59,15 +59,15 @@ def test_normalize():
 
 
 def test_generate_block():
-    block = pa.trials.generate_block()
+    block = trials.generate_block()
     assert set(block.columns) == {"Hits", "n"}
     assert block.index.name == "x"
 
 
-@given(pa.trials.schema.strategy())
-def test_n(trials: pd.Series):
-    assert pa.trials.n(trials) == len(trials)
+@given(trials.schema.strategy())
+def test_n(_trials: pd.Series):
+    assert trials.n(_trials) == len(_trials)
 
 
 def test_labels():
-    assert pa.trials.labels([0, 1]) == ["Miss", "Hit"]
+    assert trials.labels([0, 1]) == ["Miss", "Hit"]

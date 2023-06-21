@@ -1,6 +1,6 @@
 import pandas as pd
-import psychoanalyze as pa
 import string
+from psychoanalyze import sessions
 
 def load(data_path):
     return pd.read_csv(
@@ -19,10 +19,10 @@ def generate_trials(
     model_params: dict[str, float],
     n_days: int,
     n_subjects: int,
-) -> pd.Series:
+):
     return pd.concat(
         {
-            subj: pa.sessions.generate_trials(n_trials, model_params, n_days)
+            subj: sessions.generate_trials(n_trials, model_params, n_days)
             for subj in string.ascii_uppercase[:n_subjects]
         },
         names=["Subject"],

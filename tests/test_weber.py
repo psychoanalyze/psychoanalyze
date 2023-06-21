@@ -1,4 +1,4 @@
-import psychoanalyze as pa
+from psychoanalyze import weber, schemas
 import pandas as pd
 from datetime import datetime
 
@@ -14,7 +14,7 @@ def test_plot():
     data["err_y"] = 1
     data["Date"] = datetime.now()
 
-    fig = pa.weber.plot(data)
+    fig = weber.plot(data)
 
     assert len(fig.data) == 8
     assert fig.layout.xaxis.title.text == y
@@ -32,13 +32,13 @@ def test_aggregate():
             pd.DataFrame({"Monkey": ["U", "U"], "Dimension": ["Amp", "Amp"]})
         ),
     )
-    df = pa.weber.aggregate(curve_data)
+    df = weber.aggregate(curve_data)
     assert df.at[df.index[0], "Difference Threshold (nC)"] == 1.0
 
 
 def test_load(tmp_path):
     pd.DataFrame(
-        {level_name: [] for level_name in pa.schemas.block_index_levels}
+        {level_name: [] for level_name in schemas.block_index_levels}
         | {
             "Reference Charge (nC)": [],
             "location_CI_5": [],
@@ -47,4 +47,4 @@ def test_load(tmp_path):
             "Threshold_Charge_nC": [],
         },
     ).to_csv(tmp_path / "weber_curves.csv", index_label=False)
-    assert len(pa.weber.load(tmp_path / "weber_curves.csv")) == 0
+    assert len(weber.load(tmp_path / "weber_curves.csv")) == 0

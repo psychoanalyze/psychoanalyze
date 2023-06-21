@@ -3,7 +3,7 @@ import pytest
 import datetime
 import pandas.api.types as ptypes
 
-import psychoanalyze as pa
+from psychoanalyze import sessions
 
 
 @pytest.fixture
@@ -12,7 +12,7 @@ def subjects():
 
 
 def test_generate_sessions():
-    assert pa.sessions.generate(3) == [0, 1, 2]
+    assert sessions.generate(3) == [0, 1, 2]
 
 
 def test_from_trials_csv(tmp_path):
@@ -23,24 +23,24 @@ def test_from_trials_csv(tmp_path):
     df = pd.DataFrame(data)
     df.to_csv(csv_path)
 
-    sessions = pa.sessions.from_trials_csv(csv_path, cache=False)
-    assert set(sessions.columns) == {"Monkey", "Date"}
+    _sessions = sessions.from_trials_csv(csv_path, cache=False)
+    assert set(_sessions.columns) == {"Monkey", "Date"}
 
 
 def test_day_marks_from_monkey_two_sessions(subjects):
-    sessions = pd.DataFrame(
+    _sessions = pd.DataFrame(
         {"Monkey": ["U", "U"], "Date": ["2020-01-02", "2020-01-03"]}
     )
-    assert pa.sessions.day_marks(subjects, sessions, "U") == {
+    assert sessions.day_marks(subjects, _sessions, "U") == {
         1: "2020-01-02",
         2: "2020-01-03",
     }
 
 
 def test_day_marks_from_monkey_one_session(subjects):
-    sessions = pd.DataFrame({"Monkey": ["U"], "Date": ["2020-01-02"]})
+    _sessions = pd.DataFrame({"Monkey": ["U"], "Date": ["2020-01-02"]})
 
-    assert pa.sessions.day_marks(subjects, sessions, "U") == {1: "2020-01-02"}
+    assert sessions.day_marks(subjects, _sessions, "U") == {1: "2020-01-02"}
 
 
 def test_load_n_trials(tmp_path):
@@ -70,9 +70,9 @@ def test_load_n_trials(tmp_path):
         {"Surgery Date": pd.to_datetime(["1999-12-31"])},
         index=pd.Index(["U"], name="Monkey"),
     ).to_csv(tmp_path / "subjects.csv")
-    sessions = pa.sessions.load(data_path=tmp_path)
+    _sessions = sessions.load(data_path=tmp_path)
     pd.testing.assert_frame_equal(
-        sessions,
+        _sessions,
         pd.DataFrame(
             {"n Trials": [3], "Block": [1]},
             index=pd.MultiIndex.from_frame(
@@ -97,19 +97,8 @@ def test_load(tmp_path):
     pd.DataFrame(
         {"Surgery Date": ["2019-12-31"]}, index=pd.Index(["U"], name="Monkey")
     ).to_csv(tmp_path / "subjects.csv")
-    sessions = pa.sessions.load(tmp_path)
-    assert ptypes.is_datetime64_any_dtype(sessions.index.get_level_values("Date"))
-
-
-def test_load_cached(tmp_path):
-    pd.DataFrame({"Surgery Date": []}, index=pd.Index([], name="Monkey")).to_csv(
-        tmp_path / "subjects.csv"
-    )
-    pd.DataFrame({"Monkey": [], "Date": []}).set_index(["Monkey", "Date"]).to_csv(
-        tmp_path / "sessions.csv"
-    )
-    sessions = pa.sessions.load_cached(tmp_path)
-    sessions.to_dict() == pd.DataFrame({"Monkey": [], "Date": []}).to_dict()
+    _sessions = sessions.load(tmp_path)
+    assert ptypes.is_datetime64_any_dtype(_sessions.index.get_level_values("Date"))
 
 
 def test_load_monkey(tmp_path):
@@ -137,5 +126,5 @@ def test_load_monkey(tmp_path):
         {"Surgery Date": pd.to_datetime(["2019-12-31"])},
         index=pd.Index(["U"], name="Monkey"),
     ).to_csv(subj_path)
-    sessions = pa.sessions.load(data_path=tmp_path, monkey="U")
-    assert all(sessions.index.get_level_values("Monkey") == "U")
+    _sessions = sessions.load(data_path=tmp_path, monkey="U")
+    assert all(_sessions.index.get_level_values("Monkey") == "U")

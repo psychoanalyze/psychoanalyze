@@ -2,21 +2,21 @@ import pandas as pd
 import numpy as np
 from scipy.stats import logistic
 from scipy.special import logit, expit
-import psychoanalyze as pa
+from psychoanalyze import points, data, schemas, sessions, stimulus, subjects, trials
+from psychoanalyze.trials import Trials
 import plotly.express as px
 import os
 import pathlib
 from sklearn.linear_model import LogisticRegression
-import pandera as pr
-from pandera.typing import DataFrame, Series
-from typing import Any, cast
+from pandera import DataFrameModel
+from pandera.typing import DataFrame
 
 
 dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
 index_levels = dims
 
 
-class Blocks(pr.DataFrameModel):
+class Blocks(DataFrameModel):
     slope: float
     threshold: float
 
@@ -50,8 +50,8 @@ def transform(hit_rate, y: str):
 
 def prep_psych_curve(curves_data: pd.DataFrame, x: pd.Index, y: str):
     curves_data.index = x
-    df = pa.points.fit(curves_data)
-    df = pa.data.reshape_fit_results(df, x, y)
+    df = points.fit(curves_data)
+    df = data.reshape_fit_results(df, x, y)
     return df
 
 
@@ -59,17 +59,17 @@ def get_fit_param(fit: pd.DataFrame, name: str):
     return fit.loc[name, "50%"]
 
 
-def dimensions(points, dims=None):
+def dimensions(_points, dims=None):
     if dims is None:
-        return pa.points.dimension(points)
-    return points.groupby(
-        [dim for dim in list(points.index.names) if dim not in dims]
-    ).apply(pa.points.dimension)
+        return points.dimension(points)
+    return _points.groupby(
+        [dim for dim in list(_points.index.names) if dim not in dims]
+    ).apply(points.dimension)
 
 
-def fits(points):
-    if len(points):
-        return points.groupby(pa.schemas.block_index_levels).apply(pa.points.fit)
+def fits(_points):
+    if len(_points):
+        return _points.groupby(schemas.block_index_levels).apply(points.fit)
     else:
         return pd.DataFrame(
             {"Threshold": [], "Fixed Magnitude": [], "Dimension": []},
@@ -105,9 +105,9 @@ def plot_fits(df):
 def load_cached(data_path):
     channel_config = ["Active Channels", "Return Channels"]
     blocks = pd.read_csv(data_path / "blocks.csv", parse_dates=["Date"]).set_index(
-        pa.sessions.dims + pa.stimulus.ref_dims + channel_config
+        sessions.dims + stimulus.ref_dims + channel_config
     )
-    blocks["Block"] = days(blocks, pa.subjects.load(data_path))
+    blocks["Block"] = days(blocks, subjects.load(data_path))
     return blocks
 
 
@@ -124,8 +124,8 @@ def load(data_path=pathlib.Path("data"), Subject=None, day=None, dim=None):
         return blocks
 
 
-def fixed_magnitudes(points):
-    return points.groupby(pa.schemas.block_index_levels).agg(pa.points.fixed_magnitude)
+def fixed_magnitudes(_points):
+    return _points.groupby(schemas.block_index_levels).agg(points.fixed_magnitude)
 
 
 def days(blocks, intervention_dates):
@@ -207,13 +207,9 @@ def get_fit(trials):
     )
 
 
-def generate_trials(n_trials: int, model_params: dict[str, float]) -> pd.Series:
-    return pa.trials.moc_sample(n_trials, model_params)
+def generate_trials(n_trials: int, model_params: dict[str, float]) -> DataFrame[Trials]:
+    return trials.moc_sample(n_trials, model_params)
 
 
-def from_points(points: DataFrame[pa.points.Points]) -> DataFrame[Blocks]:
-    return cast(DataFrame[Blocks], pd.DataFrame({"Block": []}))
-
-
-def from_trials(trials: Series[Any]) -> DataFrame[Blocks]:
-    return from_points(pa.points.from_trials(trials))
+def from_points(points: DataFrame[points.Points]):
+    return points.groupby("BlockID")[["n"]].sum()

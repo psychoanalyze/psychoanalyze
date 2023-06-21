@@ -1,5 +1,4 @@
-import psychoanalyze as pa
-
+from psychoanalyze import blocks
 # from dashboard.pages.upload import show_contents
 
 
@@ -9,10 +8,10 @@ def test_integrate_data(mocker):
     x_min = -3
     x_max = 3
     y = "p"
-    curves_data = pa.blocks.generate(n_trials_per_level)
+    curves_data = blocks.generate(n_trials_per_level)
 
-    x = pa.blocks.xrange_index(x_min, x_max)
-    assert pa.blocks.prep_psych_curve(curves_data=curves_data, x=x, y=y)
+    x = blocks.xrange_index(x_min, x_max)
+    assert blocks.prep_psych_curve(curves_data=curves_data, x=x, y=y)
 
 
 # def test_upload_csv():
@@ -20,7 +19,7 @@ def test_integrate_data(mocker):
 #     text = base64.b64encode(
 #         ",".join(
 #             pa.sessions.index_levels
-#             + pa.blocks.index_levels
+#             + blocks.index_levels
 #             + pa.points.index_levels
 #             + [
 #                 "Trial ID",
