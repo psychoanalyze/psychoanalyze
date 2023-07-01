@@ -1,6 +1,7 @@
-import plotly.express as px
-import psychoanalyze as pa
 import pandas as pd
+import plotly.express as px
+
+import psychoanalyze as pa
 
 
 def plot(

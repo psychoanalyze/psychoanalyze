@@ -1,16 +1,16 @@
-import pandas as pd
-import plotly.express as px
-from scipy.stats import binom
-from psychoanalyze import trials
-from psychoanalyze.plot import template
-from dash import dash_table
 import pathlib
-from plotly import graph_objects as go
-import numpy as np
-import pandera as pr
-from pandera.typing import DataFrame
-import cmdstanpy as stan
 
+import cmdstanpy as stan
+import numpy as np
+import pandas as pd
+import pandera as pr
+import plotly.express as px
+from dash import dash_table
+from pandera.typing import DataFrame
+from plotly import graph_objects as go
+from scipy.stats import binom
+
+from psychoanalyze import trials
 
 index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
 
@@ -109,19 +109,6 @@ def fit(points, save_to=None, block=None):
         )
 
 
-def plot(points, trendline=None):
-    points["Hit Rate"] = points["Hits"] / points["n"]
-    return px.scatter(
-        points.reset_index(),
-        x="x",
-        y="Hit Rate",
-        size="n",
-        color=points.get("Monkey"),
-        template=template,
-        trendline=trendline,
-    )
-
-
 def generate(x, n, p):
     return pd.Series(
         [binom.rvs(n[i], p[i]) for i in range(len(x))],
@@ -190,3 +177,7 @@ def psi(x: np.ndarray, threshold: float, width: float, gamma: float, lambda_: fl
     return gamma + (1 - gamma - lambda_) / (
         1 + np.exp(-gamma * (x - threshold) / width) ** lambda_
     )
+
+
+def plot(df):
+    return px.scatter(df.reset_index(), x="Intensity", y="Hit Rate")

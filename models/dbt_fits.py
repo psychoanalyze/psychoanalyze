@@ -1,6 +1,7 @@
+import random
+
 import arviz as az
 import bambi as bmb
-import random
 import pandas as pd
 
 

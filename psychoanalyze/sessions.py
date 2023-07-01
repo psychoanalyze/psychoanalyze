@@ -1,9 +1,10 @@
 import os
-from typing import List
-import pandas as pd
 import pathlib
+from typing import List
 
-from psychoanalyze import blocks, trials, subjects
+import pandas as pd
+
+from psychoanalyze import blocks, subjects, trials
 
 dims = ["Monkey", "Date"]
 index_levels = dims

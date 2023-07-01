@@ -1,7 +1,8 @@
 import random
-import pandas as pd
+
 import numpy as np
-from pandera import check_output, DataFrameSchema, Column, Index
+import pandas as pd
+from pandera import Column, DataFrameSchema, Index, check_output
 
 
 def weibull(x, alpha, beta):

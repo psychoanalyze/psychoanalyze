@@ -1,16 +1,17 @@
-import pandas as pd
-import numpy as np
-from scipy.stats import logistic
-from scipy.special import logit, expit
-from psychoanalyze import points, data, schemas, sessions, stimulus, subjects, trials
-from psychoanalyze.trials import Trials
-import plotly.express as px
 import os
 import pathlib
-from sklearn.linear_model import LogisticRegression
+
+import numpy as np
+import pandas as pd
+import plotly.express as px
 from pandera import DataFrameModel
 from pandera.typing import DataFrame
+from scipy.special import expit, logit
+from scipy.stats import logistic
+from sklearn.linear_model import LogisticRegression
 
+from psychoanalyze import data, points, schemas, sessions, stimulus, subjects, trials
+from psychoanalyze.trials import Trials
 
 dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
 index_levels = dims

@@ -21,14 +21,16 @@
         "files.associations": {
           "*.psyexp": "xml",
           "*.sql": "jinja-sql"
-        }
+        },
+        "editor.formatOnSave": true
       },
       "extensions": [
         "ms-python.python",
         "ms-python.vscode-pylance",
         "charliermarsh.ruff",
         "innoverio.vscode-dbt-power-user",
-        "ms-python.black-formatter"
+        "ms-python.black-formatter",
+        "bungcip.better-toml"
       ]
     }
   }

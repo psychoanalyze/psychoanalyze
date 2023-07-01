@@ -5,6 +5,8 @@ services:
     image: mcr.microsoft.com/devcontainers/python:0-3.11
     volumes:
       - ../..:/workspaces:cached
+    ports:
+      - 8050
     command: sleep infinity
   pymc:
     image: mcr.microsoft.com/devcontainers/miniconda

@@ -1,10 +1,11 @@
-from typing import TypedDict
-import pandas as pd
-import numpy as np
-from pathlib import Path
 import json
-from pandera import SeriesSchema, DataFrameModel
 import random
+from pathlib import Path
+from typing import TypedDict
+
+import numpy as np
+import pandas as pd
+from pandera import DataFrameModel, SeriesSchema
 from pandera.typing import Index
 
 from psychoanalyze import schemas
@@ -41,14 +42,20 @@ def generate_block(dim="x"):
     return pd.DataFrame({"Hits": hits, "n": [100] * 5}, index=pd.Index(x, name=dim))
 
 
-def generate(n: int, options, outcomes={0,1}):
-    return pd.DataFrame(
-        {
-            "Result": pd.Series([random.choice(outcomes) for _ in range(n)], dtype=int)
-        },
-        index=pd.Index(
-            [random.choice(options) for _ in range(n)], name="Intensity", dtype=float
-        ),
+def generate(n: int, options=[0.0], outcomes=[0, 1]):
+    return Trials.validate(
+        pd.DataFrame(
+            {
+                "result": pd.Series(
+                    [random.choice(outcomes) for _ in range(n)], dtype=int
+                )
+            },
+            index=pd.Index(
+                [random.choice(options) for _ in range(n)],
+                name="intensity",
+                dtype=float,
+            ),
+        )
     )
 
 
@@ -128,10 +135,7 @@ def moc_sample(n_trials: int, model_params: dict[str, float]):
         for intensity in intensities
     ]
     return pd.DataFrame(
-        {
-            "Result": pd.Series(results, dtype=int)
-        },
-        index=intensity_index
+        {"Result": pd.Series(results, dtype=int)}, index=intensity_index
     )
 
 

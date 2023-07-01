@@ -1,8 +1,10 @@
-import pytest
-import pandas as pd
-from psychoanalyze import trials, schemas
 import json
+
+import pandas as pd
+import pytest
 from hypothesis import given
+
+from psychoanalyze import schemas, trials
 
 
 @pytest.fixture

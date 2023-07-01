@@ -1,9 +1,11 @@
-import plotly.express as px
 import pandas as pd
-import psychoanalyze as pa
-from plotly import graph_objects as go
-from psychoanalyze.schemas import PsiAnimation
+import plotly.express as px
 from pandera.typing import DataFrame
+from plotly import graph_objects as go
+
+from psychoanalyze import data
+from psychoanalyze.data import filter
+from psychoanalyze.schemas import PsiAnimation
 
 axis_settings = {
     "ticks": "outside",
@@ -28,7 +30,7 @@ colormap = {"U": "#e41a1c", "Y": "#377eb8", "Z": "#4daf4a"}
 
 
 def thresholds(df):
-    df = pa.data.transform_errors(df)
+    df = data.transform_errors(df)
     return px.scatter(
         df,
         x="Block",
@@ -45,7 +47,7 @@ def curves(curve_data):
     df = curve_data["curves_df"]
     y = curve_data["y"]
     if "5%" in df.columns:
-        df = pa.data.transform_errors(df)
+        df = data.transform_errors(df)
     df = df.reset_index()
     return px.scatter(
         df,
@@ -91,6 +93,10 @@ def hits_animation(cumulative_draws: pd.DataFrame):
     )
 
 
+def psi(df):
+    return px.scatter(df.reset_index())
+
+
 def psi_animation(df: DataFrame[PsiAnimation]):
     return px.line(
         df,
@@ -108,7 +114,7 @@ def psi_animation(df: DataFrame[PsiAnimation]):
 
 def posterior_animation(cumulative_draws: pd.DataFrame):
     df = cumulative_draws
-    df = pa.data.transform_errors(df).reset_index()
+    df = data.transform_errors(df).reset_index()
     return px.scatter(
         df,
         x="x",
@@ -174,7 +180,7 @@ def strength_duration(
     x = labels_given_dim["x"]
     y = labels_given_dim["y"]
     if data is not None:
-        sd_df = pa.data.filter(data, dim=dim)
+        sd_df = filter(data, dim=dim)
     else:
         sd_df = pd.DataFrame({x: x_data, y: y_data})
     return px.scatter(
@@ -208,5 +214,5 @@ def combine_figs(fig1: go.Figure, fig2: go.Figure) -> go.Figure:
         data=fig1.data + fig2.data,
         layout_xaxis_title_text="Stimulus Magnitude",
         layout_yaxis_title_text="Hit Rate",
-        layout_template=pa.plot.template,
+        layout_template=template,
     )

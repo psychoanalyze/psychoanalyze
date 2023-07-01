@@ -1,6 +1,8 @@
-from psychoanalyze import weber, schemas
-import pandas as pd
 from datetime import datetime
+
+import pandas as pd
+
+from psychoanalyze import schemas, weber
 
 
 def test_plot():

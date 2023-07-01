@@ -1,6 +1,9 @@
-import pandas as pd
 import string
+
+import pandas as pd
+
 from psychoanalyze import sessions
+
 
 def load(data_path):
     return pd.read_csv(

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from psychoanalyze import strength_duration, plot
+from psychoanalyze import plot, strength_duration
 
 
 @pytest.fixture

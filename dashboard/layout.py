@@ -1,5 +1,6 @@
 import dash_bootstrap_components as dbc
-from dash import html, dcc, dash_table
+import plotly.express as px
+from dash import dash_table, dcc, html
 
 experiment_params = html.Div(
     [
@@ -68,7 +69,7 @@ component_column = dbc.Col(
 
 upload_component = dcc.Upload(
     """Upload your own data -
-                        drag and drop or click to open file browser
+                        drag and drop, or click to open file browser
                         """,
     id="upload-data",
     style={
@@ -149,7 +150,7 @@ plot_tabs = dbc.Col(
             [
                 dbc.Col(
                     [
-                        dcc.Graph(id="plot"),
+                        dcc.Graph(id="plot", figure=px.scatter()),
                     ],
                     width=7,
                 ),
@@ -241,8 +242,6 @@ layout = dbc.Container(
                 component_column,
                 plot_tabs,
             ]
-        ),
-        dcc.Store(id="blocks-store"),
-        dcc.Store(id="points-store"),
+        )
     ],
 )

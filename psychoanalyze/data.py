@@ -1,10 +1,12 @@
-from pathlib import Path
-import pandas as pd
-from numpy.random import default_rng
-from numpy import linspace
-from scipy.stats import logistic as scipy_logistic
-import psychoanalyze as pa
 from itertools import accumulate
+from pathlib import Path
+
+import pandas as pd
+from numpy import linspace
+from numpy.random import default_rng
+from scipy.stats import logistic as scipy_logistic
+
+from psychoanalyze import blocks, points, sessions, subjects
 
 
 def generate_outcomes(n_trials_per_stim_level, index, threshold, scale):
@@ -55,14 +57,11 @@ def generate_animation_curves():
     df = pd.concat(
         list(
             accumulate(
-                [
-                    pa.blocks.generate(n_trials_per_level_per_block)
-                    for _ in range(n_blocks)
-                ]
+                [blocks.generate(n_trials_per_level_per_block) for _ in range(n_blocks)]
             )
         )
     )
-    df["Hit Rate"] = pa.blocks.hit_rate
+    df["Hit Rate"] = blocks.hit_rate
     return df
 
 
@@ -72,8 +71,17 @@ def filter(df, dim):
 
 def load(data_dir=Path("data"), monkey=None, day=None):
     return {
-        "Sessions": pa.sessions.load_cached(data_dir),
-        "Subjects": pa.subjects.load(data_dir),
-        "Blocks": pa.blocks.load(data_dir, monkey=monkey, day=day),
-        "Points": pa.points.load(data_dir),
+        "Sessions": sessions.load_cached(data_dir),
+        "Subjects": subjects.load(data_dir),
+        "Blocks": blocks.load(data_dir, monkey=monkey, day=day),
+        "Points": points.load(data_dir),
     }
+
+
+def generate():
+    return pd.DataFrame(
+        {
+            "Intensity": [0.0],
+            "Hit Rate": [0.5],
+        }
+    )

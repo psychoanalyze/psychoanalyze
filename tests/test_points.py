@@ -1,8 +1,10 @@
-from psychoanalyze import points, schemas
-import pandas as pd
-from scipy.special import expit
-import plotly.express as px
 import datetime
+
+import pandas as pd
+import plotly.express as px
+from scipy.special import expit
+
+from psychoanalyze import points
 
 
 def test_from_trials_sums_n_per_intensity_level():
@@ -41,16 +43,12 @@ def test_both_dimensions():
 
 
 def test_plot():
-    s = pd.DataFrame(
-        {"x": [], "n": [], "Hits": []},
-        index=pd.MultiIndex.from_frame(
-            pd.DataFrame({level: [] for level in schemas.points_index_levels})
-        ),
-        dtype=float,
+    df = pd.DataFrame(
+        {"Intensity": [], "Hit Rate": []}
     )
-    fig = points.plot(s)
+    fig = points.plot(df)
     assert fig.layout.yaxis.title.text == "Hit Rate"
-    assert fig.layout.xaxis.title.text == "x"
+    assert fig.layout.xaxis.title.text == "Intensity"
 
 
 def test_generate():

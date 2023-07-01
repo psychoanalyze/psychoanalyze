@@ -1,7 +1,8 @@
-import pandas as pd
-import pytest
 import datetime
+
+import pandas as pd
 import pandas.api.types as ptypes
+import pytest
 
 from psychoanalyze import sessions
 

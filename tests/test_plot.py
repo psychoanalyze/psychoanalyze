@@ -1,7 +1,8 @@
 import pandas as pd
-from psychoanalyze import trials, plot, data
-import pytest
 import plotly.express as px
+import pytest
+
+from psychoanalyze import data, plot, trials
 
 
 @pytest.fixture
@@ -157,3 +158,7 @@ def test_combine_line_and_scatter():
     assert fig.layout.xaxis.title.text == "Stimulus Magnitude"
     assert fig.layout.yaxis.title.text == "Hit Rate"
     assert len(fig.data) == 2
+
+
+def test_psi():
+    assert plot.psi(pd.DataFrame({"Intensity": [], "Hit Rate": []}))

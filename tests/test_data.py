@@ -1,7 +1,8 @@
-from psychoanalyze import data
-import pytest
-import pandas as pd
 import datatest as dt
+import pandas as pd
+import pytest
+
+from psychoanalyze import data
 
 
 @pytest.fixture
@@ -32,3 +33,7 @@ def test_params():
     df = data.reshape_fit_results(fit=fit, x=x, y="p")
     dt.validate(df.index, x)
     assert set(df.columns) <= {"err+", "err-", "p"}
+
+
+def test_generate():
+    assert set(data.generate().columns) == {"Intensity", "Hit Rate"}
