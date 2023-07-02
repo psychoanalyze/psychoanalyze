@@ -109,10 +109,10 @@ def fit(points, save_to=None, block=None):
         )
 
 
-def generate(x, n, p):
+def generate(x: list[float], n: list[int], p: list[float]):
     return pd.Series(
         [binom.rvs(n[i], p[i]) for i in range(len(x))],
-        index=pd.Index(x, name="Amplitude (µA)"),
+        index=pd.Index(x, name="Intensity"),
         name="Hit Rate",
     )
 

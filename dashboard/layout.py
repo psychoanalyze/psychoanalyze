@@ -133,16 +133,6 @@ plot_tabs = dbc.Col(
                     [
                         dcc.Graph(
                             id="plot",
-                            # figure=px.scatter(
-                            #     pd.DataFrame(
-                            #         {
-                            #             "Intensity": [],
-                            #             "Hit Rate": [],
-                            #         }
-                            #     ),
-                            #     x="Intensity",
-                            #     y="Hit Rate",
-                            # ),
                         )
                     ],
                     width=7,

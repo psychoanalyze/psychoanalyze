@@ -53,11 +53,12 @@ def test_plot():
 
 def test_generate():
     x = list(range(-3, 4))
-    n = [10] * 8
+    n = [10] * 7
     p = expit(x)
     _points = points.generate(x, n, p)
     assert all(_points.index.values == x)
     assert _points.name == "Hit Rate"
+    assert _points.index.name == "Intensity"
 
 
 def test_datatable():

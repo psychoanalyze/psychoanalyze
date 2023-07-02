@@ -94,7 +94,12 @@ def hits_animation(cumulative_draws: pd.DataFrame):
 
 
 def psi(df):
-    return px.scatter(df.reset_index())
+    return px.scatter(
+        df.reset_index(),
+        x="Intensity",
+        y="Hit Rate",
+        template="plotly_white",
+    )
 
 
 def psi_animation(df: DataFrame[PsiAnimation]):

@@ -6,14 +6,14 @@ experiment_params = html.Div(
         html.H4("Experimental Design"),
         dbc.InputGroup(
             [
-                dbc.Input(id="n-trials", type="number", value=50),
-                dbc.InputGroupText("trials per block"),
+                dbc.Input(id="n-trials-per-level", type="number", value=10),
+                dbc.InputGroupText("trials per level"),
             ]
         ),
         dbc.InputGroup(
             [
-                dbc.Input(id="n-subjects", type="number", value=2),
-                dbc.InputGroupText("subjects"),
+                dbc.Input(id="n-levels", type="number", value=2),
+                dbc.InputGroupText("n levels"),
             ],
             class_name="mb-4",
         ),
