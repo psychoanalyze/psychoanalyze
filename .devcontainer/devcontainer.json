@@ -22,7 +22,8 @@
           "*.psyexp": "xml",
           "*.sql": "jinja-sql"
         },
-        "editor.formatOnSave": true
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "ms-python.black-formatter"
       },
       "extensions": [
         "ms-python.python",

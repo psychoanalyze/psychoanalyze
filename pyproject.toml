@@ -32,6 +32,7 @@ typer = {extras = ["all"], version = "^0.9.0"}
 tuna = "^0.5.11"
 nbdev = "^2.3.12"
 ruff = "^0.0.275"
+black = "^23.3.0"
 
 [tool.poetry.scripts]
 psychoanalyze = "psychoanalyze.__main__:main"

@@ -20,12 +20,13 @@ server = app.server
 )
 def update_data(n_levels: int):
     x = np.linspace(-4, 4, n_levels)
-    df = points.generate(x=x, n=[10] * n_levels, p=expit(x))
+    df = points.generate(
+        x=x,
+        n=[10] * n_levels,
+        p=expit(x),
+    )
     return plot.psi(df)
 
 
 if __name__ == "__main__":
-    app.run(
-        host="0.0.0.0",
-        debug=False,
-    )
+    app.run(host="0.0.0.0", debug=False)
