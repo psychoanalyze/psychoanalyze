@@ -18,11 +18,11 @@ server = app.server
     Input("n-trials-per-level", "value"),
     Input("n-levels", "value"),
 )
-def update_data(n_levels: int):
+def update_data(n_trials_per_level: int, n_levels: int):
     x = np.linspace(-4, 4, n_levels)
     df = points.generate(
         x=x,
-        n=[10] * n_levels,
+        n=[n_trials_per_level] * n_levels,
         p=expit(x),
     )
     return plot.psi(df)

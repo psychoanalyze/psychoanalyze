@@ -12,7 +12,7 @@ experiment_params = html.Div(
         ),
         dbc.InputGroup(
             [
-                dbc.Input(id="n-levels", type="number", value=2),
+                dbc.Input(id="n-levels", type="number", value=7),
                 dbc.InputGroupText("n levels"),
             ],
             class_name="mb-4",
