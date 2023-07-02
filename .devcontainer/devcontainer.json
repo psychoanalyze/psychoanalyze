@@ -31,7 +31,8 @@
         "charliermarsh.ruff",
         "innoverio.vscode-dbt-power-user",
         "ms-python.black-formatter",
-        "bungcip.better-toml"
+        "bungcip.better-toml",
+        "ms-azuretools.vscode-docker"
       ]
     }
   }
