@@ -1,26 +1,7 @@
 import dash_bootstrap_components as dbc
-import plotly.express as px
 from dash import dash_table, dcc, html
 
-experiment_params = html.Div(
-    [
-        html.H4("Experimental Design"),
-        dbc.InputGroup(
-            [
-                dbc.Input(id="n-trials", type="number", value=50),
-                dbc.InputGroupText("trials per block"),
-            ]
-        ),
-        dbc.InputGroup(
-            [
-                dbc.Input(id="n-subjects", type="number", value=2),
-                dbc.InputGroupText("subjects"),
-            ],
-            class_name="mb-4",
-        ),
-    ]
-)
-
+from dashboard.components import experiment_params
 
 psi_params = html.Div(
     [
@@ -150,7 +131,19 @@ plot_tabs = dbc.Col(
             [
                 dbc.Col(
                     [
-                        dcc.Graph(id="plot", figure=px.scatter()),
+                        dcc.Graph(
+                            id="plot",
+                            # figure=px.scatter(
+                            #     pd.DataFrame(
+                            #         {
+                            #             "Intensity": [],
+                            #             "Hit Rate": [],
+                            #         }
+                            #     ),
+                            #     x="Intensity",
+                            #     y="Hit Rate",
+                            # ),
+                        )
                     ],
                     width=7,
                 ),
@@ -242,6 +235,6 @@ layout = dbc.Container(
                 component_column,
                 plot_tabs,
             ]
-        )
+        ),
     ],
 )
