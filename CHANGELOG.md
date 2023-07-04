@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.6 (2023-07-04)
+
+### Fix
+
+* Dashboard ([`9a8f535`](https://github.com/psychoanalyze/psychoanalyze/commit/9a8f535c315cf8433661056d5b15c5f7615debc0))
+
+### Performance
+
+* Refactor api ([`2df70de`](https://github.com/psychoanalyze/psychoanalyze/commit/2df70de251f7b7257598219a8d945d9d0d80da14))
+
 ## v0.4.5 (2023-07-04)
 
 
