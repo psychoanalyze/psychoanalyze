@@ -1,35 +1,38 @@
 {
   "name": "PsychoAnalyzeDev",
-  "image": "mcr.microsoft.com/devcontainers/python:0-3.11",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "devcontainer",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "features": {
     "ghcr.io/devcontainers-contrib/features/poetry:1": {},
     "ghcr.io/devcontainers-contrib/features/pre-commit:1": {},
     "ghcr.io/eitsupi/devcontainer-features/duckdb-cli:1": {},
-    "ghcr.io/rocker-org/devcontainer-features/miniforge:1": {}
+    "ghcr.io/devcontainers/features/node:1": {}
   },
   "remoteEnv": {
     "PYTHONDONTWRITEBYTECODE": "true"
   },
-  "onCreateCommand": "mamba init && mamba env create -f environment.yml && mamba run -n psychoanalyze poetry install && pipx install sqlfmt",
-  "postCreateCommand": "",
-  "postStartCommand": "pre-commit install",
+  "remoteUser": "vscode",
+  "onCreateCommand": "poetry install && pre-commit install",
   "customizations": {
     "vscode": {
       "settings": {
+        "python.defaultInterpreterPath": ".venv/bin/python",
         "files.associations": {
           "*.psyexp": "xml",
           "*.sql": "jinja-sql"
         },
-        "python.condaPath": "/opt/conda/envs/psychoanalyze/bin/python",
+        "editor.formatOnSave": true,
         "editor.defaultFormatter": "ms-python.black-formatter"
       },
       "extensions": [
         "ms-python.python",
         "ms-python.vscode-pylance",
-        "bungcip.better-toml",
+        "charliermarsh.ruff",
         "innoverio.vscode-dbt-power-user",
-        "GitHub.copilot",
-        "charliermarsh.ruff"
+        "ms-python.black-formatter",
+        "bungcip.better-toml",
+        "ms-azuretools.vscode-docker"
       ]
     }
   }

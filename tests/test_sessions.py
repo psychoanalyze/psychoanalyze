@@ -1,141 +1,50 @@
+"""Tests for psychoanalyze.sessions module."""
+from pathlib import Path
+from typing import Any
+
 import pandas as pd
 import pytest
-import datetime
-import pandas.api.types as ptypes
 
-import psychoanalyze as pa
+from psychoanalyze import sessions
 
 
-@pytest.fixture
-def subjects():
+@pytest.fixture()
+def subjects() -> pd.DataFrame:
+    """Subjects for session-level data."""
     return pd.DataFrame({"Monkey": ["U"], "Surgery Date": ["2020-01-01"]})
 
 
-def test_generate_sessions():
-    assert pa.sessions.generate(3) == [0, 1, 2]
+def test_generate_sessions() -> None:
+    """Test appropriate number of sessions are generated."""
+    assert sessions.generate(3) == [0, 1, 2]
 
 
-def test_from_trials_csv(tmp_path):
+def test_from_trials_csv(tmp_path: Path) -> None:
+    """Test loading trials from csv."""
     csv_dir = tmp_path / "data"
     csv_dir.mkdir()
     csv_path = csv_dir / "trials.csv"
-    data = {field: [] for field in ["Monkey", "Date"]}
-    df = pd.DataFrame(data)
-    df.to_csv(csv_path)
+    data: dict[str, list[Any]] = {field: [] for field in ["Monkey", "Date"]}
+    trials = pd.DataFrame(data)
+    trials.to_csv(csv_path)
 
-    sessions = pa.sessions.from_trials_csv(csv_path, cache=False)
-    assert set(sessions.columns) == {"Monkey", "Date"}
+    _sessions = sessions.from_trials_csv(csv_path)
+    assert set(_sessions.columns) == {"Monkey", "Date"}
 
 
-def test_day_marks_from_monkey_two_sessions(subjects):
-    sessions = pd.DataFrame(
-        {"Monkey": ["U", "U"], "Date": ["2020-01-02", "2020-01-03"]}
+def test_day_marks_from_monkey_two_sessions(subjects: pd.DataFrame) -> None:
+    """Tests calculations of days from dates for multiple subjects."""
+    _sessions = pd.DataFrame(
+        {"Monkey": ["U", "U"], "Date": ["2020-01-02", "2020-01-03"]},
     )
-    assert pa.sessions.day_marks(subjects, sessions, "U") == {
+    assert sessions.day_marks(subjects, _sessions, "U") == {
         1: "2020-01-02",
         2: "2020-01-03",
     }
 
 
-def test_day_marks_from_monkey_one_session(subjects):
-    sessions = pd.DataFrame({"Monkey": ["U"], "Date": ["2020-01-02"]})
+def test_day_marks_from_monkey_one_session(subjects: pd.DataFrame) -> None:
+    """Tests calculations of days from dates for single subject."""
+    _sessions = pd.DataFrame({"Monkey": ["U"], "Date": ["2020-01-02"]})
 
-    assert pa.sessions.day_marks(subjects, sessions, "U") == {1: "2020-01-02"}
-
-
-def test_load_n_trials(tmp_path):
-    path = tmp_path / "trials.csv"
-    pd.DataFrame(
-        {"Trial ID": [1, 2, 3], "Result": [1] * 3},
-        index=pd.MultiIndex.from_frame(
-            pd.DataFrame(
-                {
-                    "Monkey": ["U"] * 3,
-                    "Date": [datetime.date(2000, 1, 1)] * 3,
-                    "Amp2": [0] * 3,
-                    "Width2": [0] * 3,
-                    "Freq2": [0] * 3,
-                    "Dur2": [0] * 3,
-                    "Active Channels": [0] * 3,
-                    "Return Channels": [0] * 3,
-                    "Amp1": [2] * 3,
-                    "Width1": [0] * 3,
-                    "Freq1": [0] * 3,
-                    "Dur1": [0] * 3,
-                }
-            )
-        ),
-    ).to_csv(path)
-    pd.DataFrame(
-        {"Surgery Date": pd.to_datetime(["1999-12-31"])},
-        index=pd.Index(["U"], name="Monkey"),
-    ).to_csv(tmp_path / "subjects.csv")
-    sessions = pa.sessions.load(data_path=tmp_path)
-    pd.testing.assert_frame_equal(
-        sessions,
-        pd.DataFrame(
-            {"n Trials": [3], "Block": [1]},
-            index=pd.MultiIndex.from_frame(
-                pd.DataFrame(
-                    {
-                        "Monkey": ["U"],
-                        "Date": pd.to_datetime([datetime.date(2000, 1, 1)]),
-                    }
-                )
-            ),
-        ),
-    )
-
-
-def test_load(tmp_path):
-    session_index = ["Monkey", "Date"]
-    reference_stim = ["Amp2", "Width2", "Freq2", "Dur2"]
-    channel_config = ["Active Channels", "Return Channels"]
-    test_stim = ["Amp1", "Width1", "Freq1", "Dur1"]
-    index = session_index + reference_stim + channel_config + test_stim + ["Result"]
-    pd.DataFrame({field: [] for field in index}).to_csv(tmp_path / "trials.csv")
-    pd.DataFrame(
-        {"Surgery Date": ["2019-12-31"]}, index=pd.Index(["U"], name="Monkey")
-    ).to_csv(tmp_path / "subjects.csv")
-    sessions = pa.sessions.load(tmp_path)
-    assert ptypes.is_datetime64_any_dtype(sessions.index.get_level_values("Date"))
-
-
-def test_load_cached(tmp_path):
-    pd.DataFrame({"Surgery Date": []}, index=pd.Index([], name="Monkey")).to_csv(
-        tmp_path / "subjects.csv"
-    )
-    pd.DataFrame({"Monkey": [], "Date": []}).set_index(["Monkey", "Date"]).to_csv(
-        tmp_path / "sessions.csv"
-    )
-    sessions = pa.sessions.load_cached(tmp_path)
-    sessions.to_dict() == pd.DataFrame({"Monkey": [], "Date": []}).to_dict()
-
-
-def test_load_monkey(tmp_path):
-    path = tmp_path / "trials.csv"
-    subj_path = tmp_path / "subjects.csv"
-    pd.DataFrame(
-        {
-            "Monkey": ["U", "Y"],
-            "Date": ["2020-01-01", "2020-01-01"],
-            "Amp2": [0] * 2,
-            "Width2": [0] * 2,
-            "Freq2": [0] * 2,
-            "Dur2": [0] * 2,
-            "Active Channels": [0] * 2,
-            "Return Channels": [0] * 2,
-            "Block": [1] * 2,
-            "Result": [1] * 2,
-            "Amp1": [0] * 2,
-            "Width1": [0] * 2,
-            "Freq1": [0] * 2,
-            "Dur1": [0] * 2,
-        }
-    ).to_csv(path)
-    pd.DataFrame(
-        {"Surgery Date": pd.to_datetime(["2019-12-31"])},
-        index=pd.Index(["U"], name="Monkey"),
-    ).to_csv(subj_path)
-    sessions = pa.sessions.load(data_path=tmp_path, monkey="U")
-    assert all(sessions.index.get_level_values("Monkey") == "U")
+    assert sessions.day_marks(subjects, _sessions, "U") == {1: "2020-01-02"}

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "psychoanalyze"
-version = "0.4.4"
+version = "0.4.6"
 description = "A Pythonic analysis package for psychophysics data"
 authors = ["Ty Schlichenmeyer <t.schlic@wustl.edu>"]
 license = "GPL-3.0-or-later"
@@ -18,8 +18,6 @@ dash = "^2.10.2"
 dbt-duckdb = "^1.5.1"
 scikit-learn = "^1.2.2"
 bambi = "^0.11.0"
-pymc = "5.5.0"
-mypy = "^1.3.0"
 cmdstanpy = "^1.1.0"
 pandas-stubs = "^2.0.2.230605"
 pandera = {extras = ["mypy"], version = "^0.15.1"}
@@ -28,9 +26,21 @@ hypothesis = "^6.79.0"
 datatest = "^0.11.1"
 pytest-mock = "^3.11.1"
 gunicorn = "^20.1.0"
+mypy = "^1.4.1"
+click = "^8.1.3"
+typer = {extras = ["all"], version = "^0.9.0"}
+tuna = "^0.5.11"
+nbdev = "^2.3.12"
+ruff = "^0.0.276"
+black = "^23.3.0"
 
 [tool.poetry.scripts]
 psychoanalyze = "psychoanalyze.__main__:main"
+
+
+[tool.poetry.group.dev.dependencies]
+ipython = "^8.14.0"
+ipykernel = "^6.23.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -51,15 +61,13 @@ skips = ["B311"]
 
 [tool.mypy]
 exclude = [
-    'tests',
     'target'
 ]
-plugins = ['pandera.mypy']
 
 [[tool.mypy.overrides]]
 module = [
     'dash',
-    'plotly',
+    'plotly.*',
     'dash_bootstrap_components',
     'plotly.express',
     'scipy.stats',
@@ -71,3 +79,8 @@ module = [
     'hypothesis'
 ]
 ignore_missing_imports = true
+
+[tool.ruff]
+fix = true
+select = ["ALL"]
+ignore = ["S101", "S311", "D211", "D213"]
