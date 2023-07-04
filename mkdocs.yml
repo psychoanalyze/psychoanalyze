@@ -1,5 +1,5 @@
 site_name: PsychoAnalyze
-site_url: https://github.com/schlich/psychoanalyze
+site_url: https://psychoanalyze.io
 theme:
     name: material
 plugins:
@@ -7,7 +7,7 @@ plugins:
  - mkdocstrings:
     watch:
     - psychoanalyze
-repo_url: https://github.com/schlich/psychoanalyze
+repo_url: https://github.com/psychoanalyze/psychoanalyze
 edit_uri: edit/main/docs/
 markdown_extensions:
   - pymdownx.highlight:
