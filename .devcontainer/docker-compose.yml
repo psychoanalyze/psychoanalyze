@@ -10,3 +10,6 @@ services:
     command: sleep infinity
   pymc:
     image: mcr.microsoft.com/devcontainers/miniconda
+  docs:
+    image: squidfunk/mkdocs-material
+    command: mkdocs serve
