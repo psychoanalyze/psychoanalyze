@@ -150,3 +150,7 @@ demo.ipynb
 .luarc.json
 
 dashboard/.profiler
+
+node_modules
+
+.vscode-server

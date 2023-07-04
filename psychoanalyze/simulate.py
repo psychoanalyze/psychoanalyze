@@ -1,27 +1,38 @@
+"""Simulate psychometric data."""
 import random
-import pandas as pd
+from typing import Any
+
 import numpy as np
-from pandera import check_output, DataFrameSchema, Column, Index
+import pandas as pd
+from pandera import Column, DataFrameSchema, Index, check_output
 
 
-def weibull(x, alpha, beta):
+def weibull(
+    x: np.ndarray[Any, np.dtype[np.floating[Any]]],
+    alpha: float,
+    beta: float,
+) -> float:
+    """Calculate psi using Weibull function."""
     return 1 - np.exp(-((x / alpha) ** beta))
 
 
-def gumbel(x, alpha, beta):
+def gumbel(x: np.ndarray[Any, np.dtype[Any]], alpha: float, beta: float) -> float:
+    """Calculate psi using gumbel function."""
     return 1 - np.exp(-(10 ** (beta * (x - alpha))))
 
 
-def quick(x, alpha, beta):
+def quick(x: float, alpha: float, beta: float) -> float:
+    """Calculate psi using quick function."""
     return 1 - 2 ** (-((x / alpha) ** beta))
 
 
-def log_quick(x, alpha, beta):
+def log_quick(x: float, alpha: float, beta: float) -> float:
+    """Calculate psi using log_quick function."""
     return 1 - 2 ** (-(10 ** (beta * (x - alpha))))
 
 
 def run(n_trials: int) -> pd.Series:
-    """Run a simulation"""
+    """Run a simulation."""
     return pd.Series(
         [random.random() for _ in range(n_trials)],
         index=pd.Index(list(range(n_trials)), name="TrialID"),
@@ -40,24 +51,26 @@ points_schema = DataFrameSchema(
         "n": Column(int),
         "Hits": Column(int),
         "Hit Rate": Column(float),
-    }
+    },
 )
 
 
 def trials(n: int) -> pd.DataFrame:
-    df = pd.DataFrame.from_records(
+    """Simulate trial data."""
+    trials = pd.DataFrame.from_records(
         [
             {
                 "TrialID": i,
                 "Intensity": random.choice([0.0, 0.25, 0.5, 0.75, 1.0]),
             }
             for i in range(n)
-        ]
+        ],
     )
-    return df.set_index("TrialID")
+    return trials.set_index("TrialID")
 
 
-def psi_simulated():
+def psi_simulated() -> pd.Series:
+    """Simulate psi. Possible duplicate."""
     n = [10] * 5
     x = np.array([0.0, 0.25, 0.5, 0.75, 1.0])
     p = gumbel(x, 0.5, 1.0)
@@ -68,26 +81,28 @@ def psi_simulated():
     )
 
 
-def psi_model(
-    # x: pd.Index
-) -> pd.Series:
-    """see:
-    https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.erf.html"""
+def psi_model() -> pd.Series:
+    """See scipy docs for erf."""
     x = np.linspace(0, 1)
     return pd.Series(weibull(x, 0.5, 1), pd.Index(x, name="Intensity"), name="Hit")
 
 
-def psi(psi_observed=None, psi_model=None, psi_simulated=None) -> pd.DataFrame:
+def psi(
+    psi_observed: pd.Series,
+    psi_model: pd.Series,
+    psi_simulated: pd.Series,
+) -> pd.DataFrame:
+    """Simulate psychometric data and combine with observed data & model predictions."""
     s = pd.concat(
         {"Model": psi_model, "Observed": psi_observed, "Simulated": psi_simulated},
         names=["Source"],
     )
-    s.name = "Hit Rate"
     return s.reset_index()
 
 
 @check_output(points_schema)
-def hit_rates(trials: pd.DataFrame):
+def hit_rates(trials: pd.DataFrame) -> pd.DataFrame:
+    """Calculate hit rates from point data."""
     hits = trials.groupby("Intensity")["Outcome"].sum().rename("Hits")
     n = trials.groupby("Intensity")["Outcome"].count().rename("n")
     hit_rate = (hits / n).rename("Hit Rate")

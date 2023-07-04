@@ -1,27 +1,32 @@
-import pandas as pd
-import numpy as np
-from scipy.stats import logistic
-from scipy.special import logit, expit
-import psychoanalyze as pa
-import plotly.express as px
-import os
-import pathlib
-from sklearn.linear_model import LogisticRegression
-import pandera as pr
-from pandera.typing import DataFrame, Series
-from typing import Any, cast
+"""Block-level data."""
+from pathlib import Path
 
+import numpy as np
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+from pandera import DataFrameModel
+from pandera.typing import DataFrame
+from scipy.special import expit, logit
+from scipy.stats import logistic
+from sklearn.linear_model import LogisticRegression
+
+from psychoanalyze import data, points, schemas, sessions, stimulus, subjects, trials
 
 dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
 index_levels = dims
 
 
-class Blocks(pr.DataFrameModel):
+class Blocks(DataFrameModel):
+
+    """Blocks type for Pandera."""
+
     slope: float
     threshold: float
 
 
-def add_posterior(data, posterior):
+def add_posterior(data: pd.Series, posterior: pd.Series) -> pd.DataFrame:
+    """Combine observed and simulated data."""
     return pd.concat(
         [data, posterior],
         keys=["Observed", "Posterior"],
@@ -29,113 +34,115 @@ def add_posterior(data, posterior):
     ).reset_index()
 
 
-def generate(n_trials_per_level=100):
+def generate(n_trials_per_level: int = 100) -> pd.DataFrame:
+    """Generate block-level data."""
     index = pd.Index(range(-3, 4), name="x")
     n = [n_trials_per_level] * len(index)
     p = logistic.cdf(index)
-    return pd.DataFrame({"n": n, "Hits": np.random.binomial(n, p)}, index=index)
+    return pd.DataFrame(
+        {"n": n, "Hits": np.random.default_rng().binomial(n, p)},
+        index=index,
+    )
 
 
 def hit_rate(df: pd.DataFrame) -> pd.Series:
+    """Calculate hit rate from hits and number of trials."""
     return df["Hits"] / df["n"]
 
 
-def xrange_index(x_min, x_max):
-    return pd.Index(list(range(x_min, x_max + 1)), name="x")
+def xrange_index(x_min: float, x_max: float, n_levels: int) -> pd.Index:
+    """Generate x range values from min and max."""
+    return pd.Index(np.linspace(x_min, x_max, n_levels), name="x")
 
 
-def transform(hit_rate, y: str):
+def transform(hit_rate: float, y: str) -> float:
+    """Logit transform hit rate."""
     return logit(hit_rate) if y == "alpha" else hit_rate
 
 
-def prep_psych_curve(curves_data: pd.DataFrame, x: pd.Index, y: str):
+def prep_psych_curve(curves_data: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame:
+    """Transform & fit curve data."""
     curves_data.index = x
-    df = pa.points.fit(curves_data)
-    df = pa.data.reshape_fit_results(df, x, y)
-    return df
+    fits = points.fit(curves_data)
+    return data.reshape_fit_results(fits, x, y)
 
 
-def get_fit_param(fit: pd.DataFrame, name: str):
-    return fit.loc[name, "50%"]
+def dimensions(_points: pd.DataFrame, dims: list[str]) -> pd.Series:
+    """Calculate dimensions for multiple blocks."""
+    return _points.groupby(
+        [dim for dim in list(_points.index.names) if dim not in dims],
+    ).apply(points.dimension)
 
 
-def dimensions(points, dims=None):
-    if dims is None:
-        return pa.points.dimension(points)
-    return points.groupby(
-        [dim for dim in list(points.index.names) if dim not in dims]
-    ).apply(pa.points.dimension)
-
-
-def fits(points):
-    if len(points):
-        return points.groupby(pa.schemas.block_index_levels).apply(pa.points.fit)
-    else:
-        return pd.DataFrame(
-            {"Threshold": [], "Fixed Magnitude": [], "Dimension": []},
-            index=pd.MultiIndex.from_frame(
-                pd.DataFrame(
-                    {
-                        "Subject": [],
-                        "Date": [],
-                        "Amp2": [],
-                        "Width2": [],
-                        "Freq2": [],
-                        "Dur2": [],
-                        "Active Channels": [],
-                        "Return Channels": [],
-                    }
-                )
+def fits(_points: pd.DataFrame) -> pd.DataFrame:
+    """Apply fits to multiple blocks."""
+    if len(_points):
+        return _points.groupby(schemas.block_index_levels).apply(points.fit)
+    return pd.DataFrame(
+        {"Threshold": [], "Fixed Magnitude": [], "Dimension": []},
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame(
+                {
+                    "Subject": [],
+                    "Date": [],
+                    "Amp2": [],
+                    "Width2": [],
+                    "Freq2": [],
+                    "Dur2": [],
+                    "Active Channels": [],
+                    "Return Channels": [],
+                },
             ),
-        )
-
-
-def empty():
-    return pd.Series(
-        [], name="Hit Rate", index=pd.Index([], name="Amplitude (µA)"), dtype=float
+        ),
     )
 
 
-def plot_fits(df):
+def empty() -> pd.Series:
+    """Return empty block Series."""
+    return pd.Series(
+        [],
+        name="Hit Rate",
+        index=pd.Index([], name="Amplitude (µA)"),
+        dtype=float,
+    )
+
+
+def plot_fits(blocks: pd.DataFrame) -> go.Figure:
+    """Plot fits."""
     x = np.linspace(-3, 3, 100)
     y = expit(x)
-    return px.line(df.reset_index(), x=x, y=y)
+    return px.line(blocks.reset_index(), x=x, y=y)
 
 
-def load_cached(data_path):
+def load_cached(data_path: Path) -> pd.DataFrame:
+    """Load block data from csv."""
     channel_config = ["Active Channels", "Return Channels"]
     blocks = pd.read_csv(data_path / "blocks.csv", parse_dates=["Date"]).set_index(
-        pa.sessions.dims + pa.stimulus.ref_dims + channel_config
+        sessions.dims + stimulus.ref_dims + channel_config,
     )
-    blocks["Block"] = days(blocks, pa.subjects.load(data_path))
+    blocks["Block"] = days(blocks, subjects.load(data_path))
     return blocks
 
 
-def load(data_path=pathlib.Path("data"), Subject=None, day=None, dim=None):
-    blocks_path = data_path / "blocks.csv"
-    if os.path.exists(blocks_path):
-        blocks = load_cached(data_path)
-        if Subject:
-            if day:
-                blocks = blocks[blocks["Block"] == day]
-            else:
-                blocks = blocks.xs(Subject, drop_level=False)
-        blocks = blocks[blocks["n Levels"] > 1]
-        return blocks
+def load(
+    data_path: Path = Path("data"),
+) -> pd.DataFrame:
+    """Load blocks data from csv."""
+    return load_cached(data_path / "blocks.csv")
 
 
-def fixed_magnitudes(points):
-    return points.groupby(pa.schemas.block_index_levels).agg(pa.points.fixed_magnitude)
-
-
-def days(blocks, intervention_dates):
+def days(blocks: pd.DataFrame, intervention_dates: pd.DataFrame) -> pd.Series:
+    """Calculate days for block-level data. Possible duplicate."""
     blocks = blocks.join(intervention_dates, on="Subject")
-    days = (blocks.index.get_level_values("Date") - blocks["Surgery Date"]).dt.days
+    days = pd.Series(
+        blocks.index.get_level_values("Date") - blocks["Surgery Date"],
+    ).dt.days
     days.name = "Days"
     return days
 
 
-def n_trials(trials):
+def n_trials(trials: pd.DataFrame) -> pd.Series:
+    """Calculate n trials for each block."""
     session_cols = ["Subject", "Date"]
     ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
     channel_config = ["Active Channels", "Return Channels"]
@@ -144,24 +151,8 @@ def n_trials(trials):
     ].count()
 
 
-def read_fit(path, block):
-    session_cols = ["Subject", "Date"]
-    ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
-    channel_config = ["Active Channels", "Return Channels"]
-    fits = pd.read_csv(
-        path,
-        index_col=session_cols + ref_stim_cols + channel_config,
-        parse_dates=["Date"],
-    )
-    fits["err+"] = 0.0
-    fits["err-"] = 0.0
-    if block in fits.index:
-        return fits.loc[block]
-    else:
-        return pd.Series()
-
-
-def experiment_type(blocks):
+def experiment_type(blocks: pd.DataFrame) -> pd.Series:
+    """Determine experimental type (detection/discrimination) from data."""
     ref_stim = blocks.reset_index()[["Amp2", "Width2", "Freq2", "Dur2"]]
     ref_charge = ref_stim["Amp2"] * ref_stim["Width2"]
     blocks.loc[ref_charge == 0, "Experiment Type"] = "Detection"
@@ -169,11 +160,13 @@ def experiment_type(blocks):
     return blocks["Experiment Type"]
 
 
-def isValid(block):
-    return any(block["Hit Rate"] > 0.5) & any(block["Hit Rate"] < 0.5)
+def is_valid(block: pd.DataFrame) -> bool:
+    """Determine if curve data is valid."""
+    return any(block["Hit Rate"] > 0.5) & any(block["Hit Rate"] < 0.5)  # noqa: PLR2004
 
 
-def Subject_counts(data):
+def subject_counts(data: pd.DataFrame) -> pd.DataFrame:
+    """Determine how many subjects are in the data."""
     summary = (
         data.index.get_level_values("Subject").value_counts().rename("Total Blocks")
     )
@@ -181,7 +174,12 @@ def Subject_counts(data):
     return summary
 
 
-def model_predictions(intensity_choices, k, x_0=0.0):
+def model_predictions(
+    intensity_choices: list[float],
+    k: float,
+    x_0: float = 0.0,
+) -> pd.Series:
+    """Calculate psi for array of x values. Possible duplicate."""
     return pd.Series(
         [1 / (1 + np.exp(-k * (x - x_0))) for x in intensity_choices],
         index=intensity_choices,
@@ -189,7 +187,8 @@ def model_predictions(intensity_choices, k, x_0=0.0):
     )
 
 
-def make_predictions(fit, intensity_choices) -> pd.Series:
+def make_predictions(fit: pd.Series, intensity_choices: list[float]) -> pd.Series:
+    """Get psi value for array of x values."""
     return pd.Series(
         fit.predict_proba(pd.DataFrame({"Intensity": intensity_choices}))[:, 1],
         name="Hit Rate",
@@ -197,23 +196,22 @@ def make_predictions(fit, intensity_choices) -> pd.Series:
     )
 
 
-def get_fit(trials):
+def get_fit(trials: pd.DataFrame) -> pd.Series:
+    """Get parameter fits for given trial data."""
     fit = LogisticRegression().fit(trials[["Intensity"]], trials["Result"])
     return pd.Series(
         {
             "slope": fit.coef_[0][0],
             "intercept": fit.intercept_[0],
-        }
+        },
     )
 
 
-def generate_trials(n_trials: int, model_params: dict[str, float]) -> pd.Series:
-    return pa.trials.moc_sample(n_trials, model_params)
+def generate_trials(n_trials: int, model_params: dict[str, float]) -> pd.DataFrame:
+    """Generate trials for block-level context."""
+    return trials.moc_sample(n_trials, model_params)
 
 
-def from_points(points: DataFrame[pa.points.Points]) -> DataFrame[Blocks]:
-    return cast(DataFrame[Blocks], pd.DataFrame({"Block": []}))
-
-
-def from_trials(trials: Series[Any]) -> DataFrame[Blocks]:
-    return from_points(pa.points.from_trials(trials))
+def from_points(points: DataFrame[points.Points]) -> pd.DataFrame:
+    """Aggregate block measures from points data."""
+    return points.groupby("BlockID")[["n"]].sum()

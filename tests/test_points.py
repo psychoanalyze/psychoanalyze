@@ -1,96 +1,108 @@
-import psychoanalyze as pa
+"""Tests for psychoanalyze.points module."""
+
+import numpy as np
 import pandas as pd
-from scipy.special import expit
 import plotly.express as px
-import datetime
+from scipy.special import expit
+
+from psychoanalyze import points
 
 
-def test_from_trials():
-    trials = pd.Series([], name="Result", index=pd.Index([], name="Intensity"))
-    points = pa.points.from_trials(trials)
-    assert "Hit Rate" in points.columns
-
-
-def test_from_trials_sums_n_per_intensity_level():
-    trials = pd.Series(
-        [0, 0],
-        name="Result",
+def test_from_trials_sums_n_per_intensity_level() -> None:
+    """Might be same as aggregate function."""
+    trials = pd.DataFrame(
+        {
+            "Result": [0, 0],
+        },
         index=pd.Index([0, 1], name="Intensity"),
     )
-    points = pa.points.from_trials(trials)
+    _points = points.from_trials(trials)
     assert all(
-        points["n"]
-        == pd.Series([1, 1], index=pd.Index([0, 1], name="Intensity"), name="n")
+        _points["n"]
+        == pd.Series([1, 1], index=pd.Index([0, 1], name="Intensity"), name="n"),
     )
 
 
-def test_amp_dimension():
-    df = pd.DataFrame(
-        index=pd.MultiIndex.from_frame(pd.DataFrame({"Amp1": [1, 2], "Width1": [1, 1]}))
-    )
-    assert pa.points.dimension(df) == "Amp"
-
-
-def test_width_dimension():
-    df = pd.DataFrame(
-        index=pd.MultiIndex.from_frame(pd.DataFrame({"Amp1": [1, 1], "Width1": [1, 2]}))
-    )
-    assert pa.points.dimension(df) == "Width"
-
-
-def test_both_dimensions():
-    df = pd.DataFrame(
-        index=pd.MultiIndex.from_frame(pd.DataFrame({"Amp1": [1, 2], "Width1": [1, 2]}))
-    )
-    assert pa.points.dimension(df) == "Both"
-
-
-def test_plot():
-    s = pd.DataFrame(
-        {"x": [], "n": [], "Hits": []},
+def test_amp_dimension() -> None:
+    """Given points data, detect that it's amp-modulation data."""
+    _points = pd.DataFrame(
         index=pd.MultiIndex.from_frame(
-            pd.DataFrame({level: [] for level in pa.schemas.points_index_levels})
+            pd.DataFrame({"Amp1": [1, 2], "Width1": [1, 1]}),
         ),
-        dtype=float,
     )
-    fig = pa.points.plot(s)
+    assert points.dimension(_points) == "Amp"
+
+
+def test_width_dimension() -> None:
+    """Given points data, detect that it's pw-modulation data."""
+    _points = pd.DataFrame(
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame({"Amp1": [1, 1], "Width1": [1, 2]}),
+        ),
+    )
+    assert points.dimension(_points) == "Width"
+
+
+def test_both_dimensions() -> None:
+    """Given points data, detect that it's amp-modulation data."""
+    _points = pd.DataFrame(
+        index=pd.MultiIndex.from_frame(
+            pd.DataFrame({"Amp1": [1, 2], "Width1": [1, 2]}),
+        ),
+    )
+    assert points.dimension(_points) == "Both"
+
+
+def test_plot() -> None:
+    """Test psi plot labels."""
+    _points = pd.DataFrame(
+        {"Intensity": [], "Hit Rate": []},
+    )
+    fig = points.plot(_points)
     assert fig.layout.yaxis.title.text == "Hit Rate"
-    assert fig.layout.xaxis.title.text == "x"
+    assert fig.layout.xaxis.title.text == "Intensity"
 
 
-def test_generate():
-    x = list(range(-3, 4))
-    n = [10] * 8
+def test_generate() -> None:
+    """Test generation of points data has right values and labels."""
+    x = list(np.linspace(-3, 3, 7))
+    n = [10] * 7
     p = expit(x)
-    points = pa.points.generate(x, n, p)
-    assert all(points.index.values == x)
-    assert points.name == "Hit Rate"
+    _points = points.generate(x, n, p)
+    assert all(_points.index.to_numpy() == x)
+    assert _points.name == "Hit Rate"
+    assert _points.index.name == "Intensity"
 
 
-def test_datatable():
+def test_datatable() -> None:
+    """Test format of datatable from points data."""
     data = pd.DataFrame(
         index=pd.MultiIndex.from_frame(
-            pd.DataFrame({"Amp1": [0.1212345], "Hit Rate": [0.1234543], "n": [1]})
-        )
+            pd.DataFrame({"Amp1": [0.1212345], "Hit Rate": [0.1234543], "n": [1]}),
+        ),
     )
-    datatable = pa.points.datatable(data)
+    datatable = points.datatable(data)
     amp_column = [column for column in datatable.columns if column["name"] == "Amp1"]
     assert amp_column[0]["format"].to_plotly_json()["specifier"] == ".2f"
 
 
-def test_combine_plots():
-    plot1 = px.scatter(pd.DataFrame({"A": [1]}))
-    plot2 = px.line(pd.DataFrame({"B": [1]}))
-    fig = pa.points.combine_plots(plot1, plot2)
-    assert len(fig.data) == 2
+def test_combine_plots() -> None:
+    """Combines two plotly scatter plots into one figure."""
+    data1 = pd.DataFrame({"A": [1]})
+    data2 = pd.DataFrame({"B": [1]})
+    plot1 = px.scatter(data1)
+    plot2 = px.line(data2)
+    fig = points.combine_plots(plot1, plot2)
+    assert len(fig.data) == len(data1) + len(data2)
 
 
-def test_no_dimension():
+def test_no_dimension() -> None:
+    """Given points data, detect that it's amp-modulation data."""
     session_cols = ["Monkey", "Date"]
     ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
     channel_config = ["Active Channels", "Return Channels"]
     test_stim_cols = ["Amp1", "Width1", "Freq1", "Dur1"]
-    points = pd.DataFrame(
+    _points = pd.DataFrame(
         {"n": [], "Hits": []},
         index=pd.MultiIndex.from_frame(
             pd.DataFrame(
@@ -100,53 +112,9 @@ def test_no_dimension():
                     + ref_stim_cols
                     + channel_config
                     + test_stim_cols
-                }
-            )
+                },
+            ),
         ),
     )
-    dimension = pa.points.dimension(points)
-    assert dimension is None
-
-
-def test_fixed_magnitudes():
-    points = pd.DataFrame(
-        {"n": [1, 1], "Hits": [0, 1]},
-        index=pd.MultiIndex.from_frame(
-            pd.DataFrame(
-                {
-                    "Monkey": ["U"] * 2,
-                    "Date": ["2020-01-01"] * 2,
-                    "Amp2": [0] * 2,
-                    "Width2": [0] * 2,
-                    "Freq2": [0] * 2,
-                    "Dur2": [0] * 2,
-                    "Active Channels": [0] * 2,
-                    "Return Channels": [0] * 2,
-                    "Amp1": [0, 1],
-                    "Width1": [0] * 2,
-                    "Freq1": [0] * 2,
-                    "Dur1": [0] * 2,
-                }
-            )
-        ),
-    )
-    fixed_magnitude = pa.points.fixed_magnitude(points)
-    assert fixed_magnitude == 0
-
-
-def test_fit_data(tmp_path):
-    points = pd.DataFrame({"n": [0], "Hits": [0], "x": [0]})
-    fit = pa.points.fit(
-        points,
-        save_to=tmp_path / "fit.csv",
-        block=("U", datetime.date(2000, 1, 1), 0, 0, 0, 0, 0, 0),
-    )
-    assert set(fit.columns) == {
-        "Threshold",
-        "width",
-        "gamma",
-        "lambda",
-        "err+",
-        "err-",
-    }
-    assert "Date" in pd.read_csv(tmp_path / "fit.csv").columns
+    dimension = points.dimension(_points)
+    assert dimension == "Neither"

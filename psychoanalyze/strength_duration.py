@@ -1,11 +1,9 @@
-import psychoanalyze as pa
+"""Functions relating to strength-duration analysis."""
+import pandas as pd
 
 
-def xlabel():
-    pass
-
-
-def from_blocks(blocks, dim=None):
+def from_blocks(blocks: pd.DataFrame, dim: str) -> pd.DataFrame:
+    """Calculate strength-duration measures from block data."""
     if dim == "Amp":
         ylabel = "Threshold Amplitude (μA)"
         xlabel = "Fixed Pulse Width (μs)"
@@ -16,7 +14,3 @@ def from_blocks(blocks, dim=None):
     blocks[ylabel] = blocks["Threshold"]
     blocks[xlabel] = blocks["Fixed Magnitude"]
     return blocks.drop(columns=["Threshold", "Fixed Magnitude"])
-
-
-def plot(plot_type, dim=None):
-    return pa.plot.strength_duration(dim=dim, plot_type=plot_type)
