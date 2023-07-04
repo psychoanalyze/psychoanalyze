@@ -1,3 +1,5 @@
+"""Layout for Dash dashboard."""
+
 import dash_bootstrap_components as dbc
 from dash import dash_table, dcc, html
 
@@ -21,7 +23,7 @@ psi_params = html.Div(
             [
                 dbc.InputGroupText("slope"),
                 dbc.Input(id="model-k", type="number", value=1, step=0.1),
-            ]
+            ],
         ),
         dbc.InputGroup(
             [
@@ -36,7 +38,7 @@ psi_params = html.Div(
             ],
             class_name="mb-3",
         ),
-    ]
+    ],
 )
 
 component_column = dbc.Col(
@@ -69,10 +71,11 @@ dataset_component = dcc.Dropdown(
     options=[
         {
             "label": html.Span(
-                ["Schlichenmeyer et al. 2022"], style={"color": "black"}
+                ["Schlichenmeyer et al. 2022"],
+                style={"color": "black"},
             ),
             "value": "schlich2022",
-        }
+        },
     ],
     placeholder="Select an open dataset...",
     id="dataset",
@@ -84,9 +87,9 @@ empirical_data_components = html.Div(
             [
                 dbc.Col(upload_component),
                 dbc.Col(dataset_component),
-            ]
+            ],
         ),
-    ]
+    ],
 )
 
 psi_tab = dbc.Tab(
@@ -133,7 +136,7 @@ plot_tabs = dbc.Col(
                     [
                         dcc.Graph(
                             id="plot",
-                        )
+                        ),
                     ],
                     width=7,
                 ),
@@ -177,9 +180,9 @@ plot_tabs = dbc.Col(
                     ],
                     width=4,
                 ),
-            ]
+            ],
         ),
-    ]
+    ],
 )
 
 layout = dbc.Container(
@@ -212,8 +215,8 @@ layout = dbc.Container(
                     dbc.Row(html.H1("PsychoAnalyze")),
                     dbc.Row(
                         html.P(
-                            "Interactive data simulation & analysis for psychophysics."
-                        )
+                            "Interactive data simulation & analysis for psychophysics.",
+                        ),
                     ),
                 ],
             ),
@@ -224,7 +227,7 @@ layout = dbc.Container(
             [
                 component_column,
                 plot_tabs,
-            ]
+            ],
         ),
     ],
 )

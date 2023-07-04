@@ -26,12 +26,12 @@ hypothesis = "^6.79.0"
 datatest = "^0.11.1"
 pytest-mock = "^3.11.1"
 gunicorn = "^20.1.0"
-mypy = "^1.3.0"
+mypy = "^1.4.1"
 click = "^8.1.3"
 typer = {extras = ["all"], version = "^0.9.0"}
 tuna = "^0.5.11"
 nbdev = "^2.3.12"
-ruff = "^0.0.275"
+ruff = "^0.0.276"
 black = "^23.3.0"
 
 [tool.poetry.scripts]
@@ -61,14 +61,13 @@ skips = ["B311"]
 
 [tool.mypy]
 exclude = [
-    'tests',
     'target'
 ]
 
 [[tool.mypy.overrides]]
 module = [
     'dash',
-    'plotly',
+    'plotly.*',
     'dash_bootstrap_components',
     'plotly.express',
     'scipy.stats',
@@ -83,4 +82,5 @@ ignore_missing_imports = true
 
 [tool.ruff]
 fix = true
-select = ["E", "F", "I"]
+select = ["ALL"]
+ignore = ["S101", "S311", "D211", "D213"]

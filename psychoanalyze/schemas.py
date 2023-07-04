@@ -1,3 +1,4 @@
+"""Pandera schemas for psychoanalyze dataframes."""
 from pandera import Column, DataFrameModel, DataFrameSchema, Index, MultiIndex
 from pandera.typing import Series
 
@@ -16,7 +17,7 @@ points = DataFrameSchema(
         "n": Column(int),
         "Intensity": Column(float),
         "Hits": Column(int),
-    }
+    },
 )
 
 blocks = DataFrameSchema(
@@ -27,7 +28,7 @@ blocks = DataFrameSchema(
             Index("datetime64", name="Date", coerce=True),
         ]
         + [Index(float, name=dim) for dim in block_stim_dims]
-        + [Index(int, name=dim) for dim in block_channel_dims]
+        + [Index(int, name=dim) for dim in block_channel_dims],
     ),
 )
 
@@ -41,7 +42,7 @@ trials = DataFrameSchema(
         ]
         + [Index(float, name=dim) for dim in block_stim_dims]
         + [Index(int, name=dim) for dim in block_channel_dims]
-        + [Index(float, name=dim) for dim in point_dims]
+        + [Index(float, name=dim) for dim in point_dims],
     ),
     coerce=True,
 )
@@ -51,16 +52,22 @@ psi_animation = DataFrameSchema(
         "Trial": Column(int),
         "Intensity": Column(float),
         "Hit Rate": Column(float),
-    }
+    },
 )
 
 
 class PsiAnimation(DataFrameModel):
+
+    """Pandera type for psychometric function animation dataset."""
+
     trial_id: Series[int]
     intensity: Series[float]
     hit_rate: Series[float]
 
 
 class PsiAnimationFrame(DataFrameModel):
+
+    """Pandera type for a single psychometric function animation frame."""
+
     intensity: Series[float]
     hit_rate: Series[float]

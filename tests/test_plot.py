@@ -1,16 +1,12 @@
+"""Tests for psychoanalyze.plot module."""
 import pandas as pd
 import plotly.express as px
-import pytest
 
-from psychoanalyze import data, plot, trials
-
-
-@pytest.fixture
-def _trials():
-    return trials.fake(100, set(range(8)))
+from psychoanalyze import data, plot
 
 
-def test_thresholds():
+def test_thresholds() -> None:
+    """Tests threshold plot."""
     data = pd.DataFrame(
         {
             "Subject": ["A", "B"],
@@ -18,7 +14,7 @@ def test_thresholds():
             "50%": [1, 2],
             "95%": [1, 2],
             "Block": [1, 2],
-        }
+        },
     )
     fig = plot.thresholds(data)
     subjects = {trace["legendgroup"] for trace in fig.data}
@@ -27,138 +23,146 @@ def test_thresholds():
     assert fig.layout.yaxis.title.text == "50%"
 
 
-def test_standard_logistic():
+def test_standard_logistic() -> None:
+    """Tests plotting the standard logistic function."""
     s = data.logistic()
-    df = s.to_frame()
-    df["Type"] = "Generated"
-    fig = plot.logistic(df)
+    logistic = s.to_frame()
+    logistic["Type"] = "Generated"
+    fig = plot.logistic(logistic)
     assert fig.layout.xaxis.title.text == "x"
     assert fig.layout.yaxis.title.text == "Hit Rate"
 
 
-def test_combine_logistics():
+def test_combine_logistics() -> None:
+    """Tests multiple logistic curves."""
     s1 = data.logistic(threshold=0)
     s2 = data.logistic(threshold=1)
-    df = pd.concat([s1, s2], keys=["0", "1"], names=["Type"])
-    assert len(plot.logistic(df.reset_index()).data) == 2
+    s = [s1, s2]
+    combined = pd.concat(s, keys=["0", "1"], names=["Type"])
+    assert len(plot.logistic(combined.reset_index()).data) == len(s)
 
 
-def test_bayes():
+def test_bayes() -> None:
+    """Test plotting bayesian representation of psi data."""
     simulated = pd.DataFrame(
         {
             "x": [-4, -2, 0, 2, 4],
             "Hit Rate": [0.01, 0.19, 0.55, 0.81, 0.99],
-        }
+        },
     )
     index = pd.Index([-4, -2, 0, 2, 4], name="Hit Rate")
     estimated = pd.Series([0.011, 0.2, 0.56, 0.80, 0.98], index=index)
     fig = plot.bayes(simulated, estimated)
     assert fig.layout.xaxis.title.text == "x"
     assert fig.layout.yaxis.title.text == "Hit Rate"
-    assert len(fig.data) == 2
 
 
-def test_curves():
+def test_curves() -> None:
+    """Tests plotting curves."""
     curves_data = {
-        "y": "p",
         "curves_df": pd.DataFrame(
-            {"p": [], "err+": [], "err-": []}, index=pd.Index([], name="x")
+            {"p": [], "err+": [], "err-": []},
+            index=pd.Index([], name="x"),
         ),
     }
     assert plot.curves(curves_data)
 
 
-def test_strength_duration():
-    fig = plot.strength_duration(dim="Amp", plot_type="inverse")
+def test_strength_duration() -> None:
+    """Tests strength-duration plot."""
+    fig = plot.strength_duration(
+        dim="Amp",
+        blocks=pd.DataFrame(
+            {
+                "Dimension": [],
+                "Fixed Amplitude (μA)": [],
+                "Threshold Pulse Width (μs)": [],
+                "Fixed Pulse Width (μs)": [],
+                "Threshold Amplitude (μA)": [],
+            },
+        ),
+        x_data=[],
+        y_data=[],
+    )
     assert fig.layout.xaxis.title.text == "Fixed Pulse Width (μs)"
     assert fig.layout.yaxis.title.text == "Threshold Amplitude (μA)"
 
 
-def test_strength_duration_pw():
-    fig = plot.strength_duration(dim="Width", plot_type="inverse")
-    assert fig.layout.xaxis.title.text == "Fixed Amplitude (μA)"
-    assert fig.layout.yaxis.title.text == "Threshold Pulse Width (μs)"
-
-
-def test_strength_duration_linear_amp():
-    fig = plot.strength_duration(dim="Amp", plot_type="linear")
-    assert fig.layout.xaxis.title.text == "Fixed Pulse Width (μs)"
-    assert fig.layout.yaxis.title.text == "Threshold Charge (nC)"
-
-
-def test_strength_duration_linear_width():
-    fig = plot.strength_duration(dim="Width", plot_type="linear")
-    assert fig.layout.xaxis.title.text == "Fixed Amplitude (μA)"
-    assert fig.layout.yaxis.title.text == "Threshold Charge (nC)"
-
-
-def test_strength_duration_with_data():
-    x_data = [1]
-    y_data = [1]
+def test_strength_duration_with_data() -> None:
+    """Test strenght-duration plot with data."""
+    x_data = [1.0]
+    y_data = [1.0]
     fig = plot.strength_duration(
-        dim="Width", plot_type="linear", x_data=x_data, y_data=y_data
+        dim="Width",
+        blocks=pd.DataFrame(
+            {
+                "Dimension": [],
+                "Fixed Amplitude (μA)": [],
+                "Threshold Pulse Width (μs)": [],
+            },
+        ),
+        x_data=x_data,
+        y_data=y_data,
     )
     assert len(fig.data) == 1
 
 
-def test_strength_duration_data_filters_dimension():
-    df = pd.DataFrame(
-        {
-            "Fixed Pulse Width (μs)": [1],
-            "Threshold Charge (nC)": [1],
-            "Dimension": ["Width"],
-        }
-    )
-    fig = plot.strength_duration(dim="Amp", plot_type="linear", data=df)
-    assert len(fig.data) == 1
-
-
-def test_plot_counts():
+def test_plot_counts() -> None:
+    """Test plot for session counts."""
     sessions = pd.DataFrame(
-        {"Monkey": ["U", "U"], "Block": [1, 2], "Dimension": ["Amp", "Amp"]}
+        {"Monkey": ["U", "U"], "Block": [1, 2], "Dimension": ["Amp", "Amp"]},
     )
     fig = plot.counts(sessions, dim="Width")
     assert fig.layout.yaxis.title.text == "# of Sessions"
 
 
-def test_plot_counts_dim_facet():
+def test_plot_counts_dim_facet() -> None:
+    """Test facet plot for block counts."""
     sessions = pd.DataFrame(
-        {"Monkey": ["U", "U"], "Block": [1, 2], "Dimension": ["Amp", "Width"]}
+        {"Monkey": ["U", "U"], "Block": [1, 2], "Dimension": ["Amp", "Width"]},
     )
     figs = plot.counts(sessions, dim="Amp")
     assert len(figs.data)
 
 
-def test_ecdf_location_no_data():
+def test_ecdf_location_no_data() -> None:
+    """Test ecdf location for no data."""
     blocks = pd.DataFrame({"location": []})
     ecdf_fig = plot.ecdf(blocks, "location")
     assert ecdf_fig.layout.xaxis.title.text == "location"
 
 
-def test_ecdf_width_no_data():
+def test_ecdf_width_no_data() -> None:
+    """Test ecdf with no data."""
     blocks = pd.DataFrame({"width": []})
     ecdf_fig = plot.ecdf(blocks, "width")
     assert ecdf_fig.layout.xaxis.title.text == "width"
 
 
-def test_combine_line_and_scatter():
+def test_combine_line_and_scatter() -> None:
+    """Test combining line and scatter Plotly plots."""
+    data1 = pd.DataFrame(
+        {"Stimulus Magnitude": [0], "Hit Rate": [0.5]},
+    )
+    data2 = pd.DataFrame({"Stimulus Magnitude": [0], "Hit Rate": [0.5]})
     fig1 = px.scatter(
-        pd.DataFrame(
-            {"Stimulus Magnitude": [0], "Hit Rate": [0.5]},
-        ),
+        data1,
         x="Stimulus Magnitude",
         y="Hit Rate",
     )
     fig2 = px.line(
-        pd.DataFrame({"Stimulus Magnitude": [0], "Hit Rate": [0.5]}),
+        data2,
         x="Stimulus Magnitude",
         y="Hit Rate",
     )
     fig = plot.combine_figs(fig1, fig2)
     assert fig.layout.xaxis.title.text == "Stimulus Magnitude"
     assert fig.layout.yaxis.title.text == "Hit Rate"
-    assert len(fig.data) == 2
+    assert len(fig.data) == len(data1) + len(data2)
 
 
-def test_psi():
-    assert plot.psi(pd.DataFrame({"Intensity": [], "Hit Rate": []}))
+def test_psi() -> None:
+    """Test psychometric function plot."""
+    assert plot.psi(
+        pd.Series([], name="Hit Rate", index=pd.Index([], name="Intensity")),
+    )

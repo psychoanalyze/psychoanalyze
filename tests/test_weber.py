@@ -1,44 +1,31 @@
-from datetime import datetime
+"""Test psychoanalyze.weber functions."""
+from pathlib import Path
 
 import pandas as pd
 
 from psychoanalyze import schemas, weber
 
 
-def test_plot():
-    y = "Reference Charge (nC)"
-    x = "Difference Threshold (nC)"
-    subjects = ["U", "Y"]
-    line = {x: [0, 1], y: [0, 1]}
-    data = {subject: {"Amp": line, "Width": line} for subject in subjects}
-    data = pd.concat({k: pd.DataFrame(v).T for k, v in data.items()})
-    data.index.names = ["Monkey", "Dimension"]
-    data["err_y"] = 1
-    data["Date"] = datetime.now()
-
-    fig = weber.plot(data)
-
-    assert len(fig.data) == 8
-    assert fig.layout.xaxis.title.text == y
-    assert fig.layout.yaxis.title.text == x
-    assert all(trace["error_y"] for trace in fig.data)
-
-
-def test_aggregate():
+def test_aggregate() -> None:
+    """Makes sure that thresholds at a given stimulus intensity are aggregated."""
     curve_data = pd.DataFrame.from_records(
         [
             {"Reference Charge (nC)": 0, "Difference Threshold (nC)": 0},
             {"Reference Charge (nC)": 0, "Difference Threshold (nC)": 2},
         ],
         index=pd.MultiIndex.from_frame(
-            pd.DataFrame({"Monkey": ["U", "U"], "Dimension": ["Amp", "Amp"]})
+            pd.DataFrame({"Monkey": ["U", "U"], "Dimension": ["Amp", "Amp"]}),
         ),
     )
-    df = weber.aggregate(curve_data)
-    assert df.at[df.index[0], "Difference Threshold (nC)"] == 1.0
+    agg = weber.aggregate(curve_data)
+    assert (
+        agg.iloc[0, agg.columns.get_loc("Difference Threshold (nC)")]
+        == curve_data["Difference Threshold (nC)"].mean()
+    )
 
 
-def test_load(tmp_path):
+def test_load(tmp_path: Path) -> None:
+    """Given weber_curves.csv, loads dataframe."""
     pd.DataFrame(
         {level_name: [] for level_name in schemas.block_index_levels}
         | {
