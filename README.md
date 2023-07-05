@@ -22,7 +22,7 @@ pip install psychoanalyze
 ```
 
 ## Dashboard
-See what `psychoanalyze` can do by [viewing our dashboard](https://app.psychoanalyze.io/).
+See what `psychoanalyze` can do by [viewing our dashboard](https://psychoanalyze.io/).
 
 ## Documentation
 View the full documentation [here](https://docs.psychoanalyze.io).
