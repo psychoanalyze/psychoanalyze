@@ -8,20 +8,18 @@
       
       
       
-        <link rel="canonical" href="https://psychoanalyze.io/API/">
+        <link rel="canonical" href="https://psychoanalyze.io/tooling/">
       
       
-        <link rel="prev" href="..">
+        <link rel="prev" href="../tests/">
       
-      
-        <link rel="next" href="../dashboard/">
       
       <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.18">
     
     
       
-        <title>API Reference - PsychoAnalyze</title>
+        <title>Tooling - PsychoAnalyze</title>
       
     
     
@@ -65,7 +63,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#api-reference" class="md-skip">
+        <a href="#tooling" class="md-skip">
           Skip to content
         </a>
       
@@ -100,7 +98,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              API Reference
+              Tooling
             
           </span>
         </div>
@@ -223,52 +221,11 @@
 
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          API Reference
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../API/" class="md-nav__link">
         API Reference
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#psychoanalyze" class="md-nav__link">
-    psychoanalyze
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -309,11 +266,21 @@
 
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../tooling/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Tooling
       </a>
+      
     </li>
   
 
@@ -338,21 +305,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#psychoanalyze" class="md-nav__link">
-    psychoanalyze
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -369,83 +321,16 @@
   
 
 
-<h1 id="api-reference">API Reference</h1>
-
-
-<div class="doc doc-object doc-module">
-
-
-<a id="psychoanalyze"></a>
-  <div class="doc doc-contents first">
-  
-      <p>Project architecture of <code>psychoanalyze</code>.</p>
-<p>Most submodules of <code>psychoanalyze</code> are organized according to the granularity
-of various levels in the hierarchy of the data. These submodules are as follows:</p>
+<h1 id="tooling">Tooling</h1>
+<p>Psychoanalyze uses</p>
 <ul>
-<li>
-<p><strong>Blocks</strong> are perhaps the most analytically significant objects in the hierarchy.
-They represent a specific set of experimental conditions and generally correspond
-to a single fit of the psychometric function.</p>
-</li>
-<li>
-<p><strong>Points</strong> correspond to the aggregate measures of method-of-constant-stimuli
-experiments at each stimulus level measured. For example, a block that samples 8
-stimulus intensity levels would have 8 corresponding points.</p>
-</li>
-<li>
-<p><strong>Sessions</strong> represent a single day of experiments performed by a subject. It may
-contain several blocks.</p>
-</li>
-<li>
-<p><strong>Subjects</strong> and <strong>trials</strong> are self-explanatory</p>
-</li>
-<li>
-<p>The <strong>data</strong> module performs general-purpose data transformation and analysis
-functions that do not fit easily into one of the above labels.</p>
-</li>
+<li>Python 3.11</li>
+<li><a href="https://python-poetry.org/">Poetry</a> for package and virtual environment management</li>
+<li><a href="https://docs.pytest.org/">Pytest</a> for automated testing</li>
+<li><a href="https://www.mkdocs.org/">MkDocs</a> for documentation static site generation</li>
+<li><a href="https://www.heroku.com/">Heroku</a> for dashboard deployment</li>
 </ul>
-<p><code>psychoanalyze</code> also contains other submodules relating to specific lines of
-psychophysical analysis.</p>
-<ul>
-<li>
-<p><strong>strength_duration</strong> contains functions assessing the relationship
-between the amplitude and the time course of the stimulus.</p>
-</li>
-<li>
-<p><strong>weber</strong> contains functions assessing how discriminability of two stimuli
-relates to the baseline intensities of the stimuli according to Weber's Law.</p>
-</li>
-<li>
-<p><strong>gescheider</strong> contains various examples of plots and measures included in
-George Gescheider's textbook, <em>Psychophysics: The Fundamentals</em>.</p>
-</li>
-<li>
-<p><strong>schemas</strong> contains data table schemas of the hierarchical entities described above.</p>
-</li>
-<li>
-<p><strong>plot</strong> contains functions assisting with the plotting of all of the above modules.</p>
-</li>
-</ul>
-
-  
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-  </div>
-
-</div>
+<p><a href="https://containers.dev/">Dev Containers</a> are the suggested way to set up a development environment. Running a dev container locally requires Docker Desktop on OSX and Windows.</p>
 
 
 
