@@ -1,4 +1,4 @@
-# PsychoAnalyze
+# Overview
 
 Interactive data exploration for psychophysics.
 
