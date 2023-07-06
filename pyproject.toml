@@ -35,7 +35,7 @@ ruff = "^0.0.276"
 black = "^23.3.0"
 mkdocs = "^1.4.3"
 mkdocs-material = "^9.1.18"
-mkdocstrings = "^0.22.0"
+mkdocstrings = {extras = ["python"], version = "^0.22.0"}
 
 [tool.poetry.scripts]
 psychoanalyze = "psychoanalyze.__main__:main"
