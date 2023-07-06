@@ -10,4 +10,14 @@
          <lastmod>2023-07-06</lastmod>
          <changefreq>daily</changefreq>
     </url>
+    <url>
+         <loc>https://psychoanalyze.io/dashboard/</loc>
+         <lastmod>2023-07-06</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://psychoanalyze.io/tests/</loc>
+         <lastmod>2023-07-06</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
 </urlset>
