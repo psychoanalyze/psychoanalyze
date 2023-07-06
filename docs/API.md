@@ -1,3 +1,3 @@
-# API Documentation
+# API Reference
 
 :::psychoanalyze
