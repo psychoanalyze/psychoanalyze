@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://psychoanalyze.io/paper/">
+        <link rel="canonical" href="https://psychoanalyze.io/API/">
       
       
         <link rel="prev" href="..">
@@ -19,7 +19,7 @@
     
     
       
-        <title>Paper - PsychoAnalyze</title>
+        <title>API Documentation - PsychoAnalyze</title>
       
     
     
@@ -62,6 +62,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#api-documentation" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -93,7 +98,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Paper
+              API Documentation
             
           </span>
         </div>
@@ -224,10 +229,43 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          API Documentation
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Paper
+        API Documentation
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#psychoanalyze" class="md-nav__link">
+    psychoanalyze
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -250,6 +288,23 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#psychoanalyze" class="md-nav__link">
+    psychoanalyze
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -267,9 +322,83 @@
   
 
 
-  <h1>Paper</h1>
+<h1 id="api-documentation">API Documentation</h1>
 
 
+<div class="doc doc-object doc-module">
+
+
+<a id="psychoanalyze"></a>
+  <div class="doc doc-contents first">
+  
+      <p>Project architecture of <code>psychoanalyze</code>.</p>
+<p>Most submodules of <code>psychoanalyze</code> are organized according to the granularity
+of various levels in the hierarchy of the data. These submodules are as follows:</p>
+<ul>
+<li>
+<p><strong>Blocks</strong> are perhaps the most analytically significant objects in the hierarchy.
+They represent a specific set of experimental conditions and generally correspond
+to a single fit of the psychometric function.</p>
+</li>
+<li>
+<p><strong>Points</strong> correspond to the aggregate measures of method-of-constant-stimuli
+experiments at each stimulus level measured. For example, a block that samples 8
+stimulus intensity levels would have 8 corresponding points.</p>
+</li>
+<li>
+<p><strong>Sessions</strong> represent a single day of experiments performed by a subject. It may
+contain several blocks.</p>
+</li>
+<li>
+<p><strong>Subjects</strong> and <strong>trials</strong> are self-explanatory</p>
+</li>
+<li>
+<p>The <strong>data</strong> module performs general-purpose data transformation and analysis
+functions that do not fit easily into one of the above labels.</p>
+</li>
+</ul>
+<p><code>psychoanalyze</code> also contains other submodules relating to specific lines of
+psychophysical analysis.</p>
+<ul>
+<li>
+<p><strong>strength_duration</strong> contains functions assessing the relationship
+between the amplitude and the time course of the stimulus.</p>
+</li>
+<li>
+<p><strong>weber</strong> contains functions assessing how discriminability of two stimuli
+relates to the baseline intensities of the stimuli according to Weber's Law.</p>
+</li>
+<li>
+<p><strong>gescheider</strong> contains various examples of plots and measures included in
+George Gescheider's textbook, <em>Psychophysics: The Fundamentals</em>.</p>
+</li>
+<li>
+<p><strong>schemas</strong> contains data table schemas of the hierarchical entities described above.</p>
+</li>
+<li>
+<p><strong>plot</strong> contains functions assisting with the plotting of all of the above modules.</p>
+</li>
+</ul>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
 
 
 

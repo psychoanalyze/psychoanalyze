@@ -2,12 +2,12 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://psychoanalyze.io/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <lastmod>2023-07-06</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://psychoanalyze.io/paper/</loc>
-         <lastmod>2023-07-05</lastmod>
+         <loc>https://psychoanalyze.io/API/</loc>
+         <lastmod>2023-07-06</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
