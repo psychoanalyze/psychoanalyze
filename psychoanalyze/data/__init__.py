@@ -7,7 +7,7 @@ from numpy import linspace
 from numpy.random import default_rng
 from scipy.stats import logistic as scipy_logistic
 
-from psychoanalyze import blocks, points, sessions, subjects
+from psychoanalyze.data import blocks, points, sessions, subjects
 
 
 def generate_outcomes(

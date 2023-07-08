@@ -11,7 +11,8 @@ from scipy.special import expit, logit
 from scipy.stats import logistic
 from sklearn.linear_model import LogisticRegression
 
-from psychoanalyze import data, points, schemas, sessions, stimulus, subjects, trials
+from psychoanalyze import data
+from psychoanalyze.data import points, schemas, sessions, stimulus, subjects, trials
 
 dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
 index_levels = dims

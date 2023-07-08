@@ -10,7 +10,7 @@ from dash import dash_table
 from plotly import graph_objects as go
 from scipy.stats import binom
 
-from psychoanalyze import trials
+from psychoanalyze.data import trials
 
 index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
 

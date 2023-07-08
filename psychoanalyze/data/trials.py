@@ -10,7 +10,7 @@ from pandera import DataFrameModel, SeriesSchema
 from pandera.typing import Index
 from sklearn.linear_model import LogisticRegression
 
-from psychoanalyze import schemas
+from psychoanalyze.data import schemas
 
 schema = SeriesSchema(bool, name="Test Trials")
 

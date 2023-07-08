@@ -7,7 +7,8 @@ from dash import Dash, Input, Output, callback
 from scipy.special import expit
 
 from dashboard.layout import layout
-from psychoanalyze import plot, points
+from psychoanalyze import plot
+from psychoanalyze.data import points
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO, dbc.icons.BOOTSTRAP])
 

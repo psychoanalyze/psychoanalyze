@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from psychoanalyze import sessions
+from psychoanalyze.data import sessions
 
 
 def load(data_path: Path) -> pd.DataFrame:

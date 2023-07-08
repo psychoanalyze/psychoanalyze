@@ -3,7 +3,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from psychoanalyze import schemas, weber
+from psychoanalyze.analysis import weber
+from psychoanalyze.data import schemas
 
 
 def test_aggregate() -> None:

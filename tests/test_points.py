@@ -5,7 +5,7 @@ import pandas as pd
 import plotly.express as px
 from scipy.special import expit
 
-from psychoanalyze import points
+from psychoanalyze.data import points
 
 
 def test_from_trials_sums_n_per_intensity_level() -> None:

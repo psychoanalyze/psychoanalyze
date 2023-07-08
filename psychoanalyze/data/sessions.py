@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from psychoanalyze import blocks
+from psychoanalyze.data import blocks
 
 dims = ["Monkey", "Date"]
 index_levels = dims

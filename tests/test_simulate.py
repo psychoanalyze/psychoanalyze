@@ -1,7 +1,7 @@
 """Test simulation functions in psychoanalyze.simulate."""
 import pandas as pd
 
-from psychoanalyze import simulate
+from psychoanalyze.data import simulate
 
 
 def test_simulation() -> None:

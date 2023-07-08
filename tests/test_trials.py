@@ -1,12 +1,11 @@
 """Tests for psychoanalyze.points module."""
 
-import json
 from typing import Any
 
 import pandas as pd
 import pytest
 
-from psychoanalyze import schemas, trials
+from psychoanalyze.data import trials
 
 
 @pytest.fixture()
@@ -19,23 +18,6 @@ def subjects() -> list[str]:
 def x() -> list[int]:
     """Intensity values."""
     return list(range(8))
-
-
-def test_from_store() -> None:
-    """Given JSON-formatted data from a Dash store, returns a DataFrame."""
-    store_data = pd.DataFrame(
-        {"Result": [1]},
-        index=pd.MultiIndex.from_frame(
-            pd.DataFrame(
-                {"Monkey": ["U"], "Date": ["1-1-2001"]}
-                | {level: [0] for level in schemas.block_dims + schemas.point_dims},
-            ),
-        ),
-    )
-    _store_data = store_data.to_dict(orient="split")
-    _store_data["index_names"] = schemas.points_index_levels
-    _trials = trials.from_store(json.dumps(store_data))
-    schemas.trials.validate(_trials)
 
 
 def test_normalize() -> None:

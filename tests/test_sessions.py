@@ -5,7 +5,7 @@ from typing import Any
 import pandas as pd
 import pytest
 
-from psychoanalyze import sessions
+from psychoanalyze.data import sessions
 
 
 @pytest.fixture()

@@ -2,7 +2,7 @@
 import pandas as pd
 import pytest
 
-from psychoanalyze import strength_duration
+from psychoanalyze.analysis import strength_duration
 
 
 @pytest.fixture()

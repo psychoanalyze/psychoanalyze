@@ -6,7 +6,7 @@ from plotly import graph_objects as go
 
 from psychoanalyze import data
 from psychoanalyze.data import dimension_filter
-from psychoanalyze.schemas import PsiAnimation
+from psychoanalyze.data.schemas import PsiAnimation
 
 axis_settings = {
     "ticks": "outside",
@@ -46,17 +46,17 @@ def thresholds(blocks: pd.DataFrame) -> go.Figure:
 
 def curves(curve_data: dict[str, pd.DataFrame]) -> go.Figure:
     """Maybe duplicate of thresholds."""
-    curves = curve_data["curves_df"]
-    y = curve_data["y"]
+    _curves = curve_data["curves_df"]
+    y = _curves["p"]
     return px.scatter(
-        curves.reset_index(),
+        _curves.reset_index(),
         x="x",
         y=y,
         error_y="err+",
         error_y_minus="err-",
-        color=curves.get("Subject"),  # or df["Type"],
+        color=_curves.get("Subject"),  # or df["Type"],
         color_discrete_map=colormap,
-        symbol=curves.get("Block"),
+        symbol=_curves.get("Block"),
         template=template,
     )
 
