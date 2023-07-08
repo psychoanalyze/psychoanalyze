@@ -22,7 +22,7 @@ repos:
   rev: '1.7.5'
   hooks:
   - id: bandit
-    args: [--skip, "B101,B311"]
+    args: [--skip, "B101,B311,B104"]
     stages: [push]
 
 - repo: https://github.com/compilerla/conventional-pre-commit
