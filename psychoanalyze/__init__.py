@@ -1,4 +1,4 @@
-"""Project architecture of `psychoanalyze`.
+"""Top-level module of the `psychoanalyze` package.
 
 Most submodules of `psychoanalyze` are organized according to the granularity
 of various levels in the hierarchy of the data. These submodules are as follows:
