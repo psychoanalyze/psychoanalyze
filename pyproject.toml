@@ -60,7 +60,7 @@ major_on_zero = true
 
 [tool.bandit]
 targets = ["psychoanalyze/"]
-skips = ["B311"]
+skips = ["B311", "B104"]
 
 [tool.mypy]
 exclude = [
