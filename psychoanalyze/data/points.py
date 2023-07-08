@@ -1,4 +1,9 @@
-"""Utilities for points-level data."""
+"""Utilities for points-level data.
+
+**Points** correspond to the aggregate measures of method-of-constant-stimuli
+experiments at each stimulus level measured. For example, a block that samples 8
+stimulus intensity levels would have 8 corresponding points.
+"""
 from pathlib import Path
 
 import cmdstanpy as stan

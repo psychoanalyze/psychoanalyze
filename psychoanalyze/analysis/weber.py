@@ -1,4 +1,8 @@
-"""Test functions related to Weber's Law analysis."""
+"""Test functions related to Weber's Law analysis.
+
+Contains functions assessing how discriminability of two stimuli
+relates to the baseline intensities of the stimuli according to Weber's Law.
+"""
 from pathlib import Path
 
 import pandas as pd

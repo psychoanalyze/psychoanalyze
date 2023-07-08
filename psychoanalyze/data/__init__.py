@@ -1,4 +1,8 @@
-"""Generic data tools for psychophysics data."""
+"""Data objects and methods.
+
+The **data** module contains general-purpose data transformation and analysis
+functions that do not fit easily into one of its submodules.
+"""
 from itertools import accumulate
 from pathlib import Path
 

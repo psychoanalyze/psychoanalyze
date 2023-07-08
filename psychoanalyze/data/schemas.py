@@ -1,4 +1,7 @@
-"""Pandera schemas for psychoanalyze dataframes."""
+"""Pandera schemas for psychoanalyze dataframes.
+
+Contains data table schemas of the hierarchical entities described above.
+"""
 from pandera import Column, DataFrameModel, DataFrameSchema, Index, MultiIndex
 from pandera.typing import Series
 

@@ -1,4 +1,7 @@
-"""Helper functions for common plot formats in psychophysics."""
+"""Helper functions for common plot formats in psychophysics.
+
+Contains functions assisting with the plotting of all of the above modules
+"""
 import pandas as pd
 import plotly.express as px
 from pandera.typing import DataFrame

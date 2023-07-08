@@ -1,4 +1,8 @@
-"""Functions relating to strength-duration analysis."""
+"""Strength-duration analysis.
+
+Contains functions assessing the relationship
+between the amplitude and the time course of the stimulus.
+"""
 import pandas as pd
 
 

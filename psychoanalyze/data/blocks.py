@@ -1,4 +1,9 @@
-"""Block-level data."""
+"""Block-level data.
+
+**Blocks** are perhaps the most analytically significant objects in the hierarchy.
+They represent a specific set of experimental conditions and generally correspond
+to a single fit of the psychometric function.
+"""
 from pathlib import Path
 
 import numpy as np

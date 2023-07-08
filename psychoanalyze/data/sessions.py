@@ -1,4 +1,8 @@
-"""Utilities for session-level data."""
+"""Utilities for session-level data.
+
+**Sessions** represent a single day of experiments performed by a subject. It may
+contain several blocks.
+"""
 from pathlib import Path
 
 import pandas as pd
