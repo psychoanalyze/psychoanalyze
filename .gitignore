@@ -154,3 +154,5 @@ dashboard/.profiler
 node_modules
 
 .vscode-server
+
+.user.yml
