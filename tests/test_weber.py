@@ -18,7 +18,7 @@ from pathlib import Path
 import pandas as pd
 
 from psychoanalyze.analysis import weber
-from psychoanalyze.data import schemas
+from psychoanalyze.data import types
 
 
 def test_aggregate() -> None:
@@ -42,7 +42,7 @@ def test_aggregate() -> None:
 def test_load(tmp_path: Path) -> None:
     """Given weber_curves.csv, loads dataframe."""
     pd.DataFrame(
-        {level_name: [] for level_name in schemas.block_index_levels}
+        {level_name: [] for level_name in types.block_index_levels}
         | {
             "Reference Charge (nC)": [],
             "location_CI_5": [],

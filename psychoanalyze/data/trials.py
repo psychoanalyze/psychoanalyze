@@ -24,7 +24,7 @@ from pandera import DataFrameModel, SeriesSchema
 from pandera.typing import Index
 from sklearn.linear_model import LogisticRegression
 
-from psychoanalyze.data import schemas
+from psychoanalyze.data import types
 
 schema = SeriesSchema(bool, name="Test Trials")
 
@@ -64,10 +64,10 @@ def generate(n: int, options: list[float], outcomes: list[float]) -> pd.DataFram
 
 def load(data_path: Path = Path("data")) -> pd.DataFrame:
     """Load trials data from csv."""
-    return schemas.trials.validate(
+    return types.trials.validate(
         pd.read_csv(
             data_path / "trials.csv",
-            index_col=schemas.points_index_levels,
+            index_col=types.points_index_levels,
             parse_dates=["Date"],
         ),
     )
@@ -80,13 +80,13 @@ def from_store(store_data: str) -> pd.DataFrame:
     index = pd.MultiIndex.from_tuples(df_dict["index"])
     trials = pd.DataFrame({"Result": df_dict["data"][0]}, index=index)
     trials.index.names = index_names
-    return schemas.trials.validate(trials)
+    return types.trials.validate(trials)
 
 
 def to_store(trials: pd.DataFrame) -> str:
     """Convert data to a JSON-formatted string for dcc.Store."""
     data_dict = trials.to_dict(orient="split")
-    data_dict["index_names"] = schemas.points_index_levels
+    data_dict["index_names"] = types.points_index_levels
     return json.dumps(data_dict)
 
 

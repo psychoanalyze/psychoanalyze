@@ -12,10 +12,16 @@
 # You should have received a copy of the GNU General Public License along with Foobar.
 # If not, see <https://www.gnu.org/licenses/>.
 
-"""Data objects and methods.
+"""Data modules and general-purpose data transformation utilities.
 
-The **data** module contains general-purpose data transformation and analysis
-functions that do not fit easily into one of its submodules.
+Submodules:
+
+- [`psychoanalyze.data.blocks`][psychoanalyze.data.blocks]
+- [`psychoanalyze.data.points`][psychoanalyze.data.points]
+- [`psychoanalyze.data.trials`][psychoanalyze.data.trials]
+- [`psychoanalyze.data.sessions`][psychoanalyze.data.sessions]
+- [`psychoanalyze.data.subjects`][psychoanalyze.data.subjects]
+- [`psychoanalyze.data.types`][psychoanalyze.data.types]
 """
 from itertools import accumulate
 from pathlib import Path

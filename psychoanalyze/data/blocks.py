@@ -31,7 +31,7 @@ from scipy.stats import logistic
 from sklearn.linear_model import LogisticRegression
 
 from psychoanalyze import data
-from psychoanalyze.data import points, schemas, sessions, stimulus, subjects, trials
+from psychoanalyze.data import points, sessions, stimulus, subjects, trials, types
 from psychoanalyze.plot import template
 
 dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
@@ -98,7 +98,7 @@ def dimensions(_points: pd.DataFrame, dims: list[str]) -> pd.Series:
 def fits(_points: pd.DataFrame) -> pd.DataFrame:
     """Apply fits to multiple blocks."""
     if len(_points):
-        return _points.groupby(schemas.block_index_levels).apply(points.fit)
+        return _points.groupby(types.block_index_levels).apply(points.fit)
     return pd.DataFrame(
         {"Threshold": [], "Fixed Magnitude": [], "Dimension": []},
         index=pd.MultiIndex.from_frame(
