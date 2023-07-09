@@ -23,9 +23,9 @@ experiment_params = dbc.Card(
         html.H4("Experimental Design", className="mb-4"),
         dbc.Row(
             [
-                dbc.Label("trials per level", html_for="n-trials-per-level", width=6),
+                dbc.Label("n trials", html_for="n-trials", width=6),
                 dbc.Col(
-                    dbc.Input(id="n-trials-per-level", type="number", value=10),
+                    dbc.Input(id="n-trials", type="number", value=70),
                     width=6,
                 ),
             ],

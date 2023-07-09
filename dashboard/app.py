@@ -33,13 +33,13 @@ server = app.server
 
 @callback(
     Output("plot", "figure"),
-    Input("n-trials-per-level", "value"),
+    Input("n-trials", "value"),
     Input("n-levels", "value"),
     Input("x_0", "value"),
     Input("model-k", "value"),
 )
 def update_data(
-    n_trials_per_level: int,
+    n_trials: int,
     n_levels: int,
     intercept: float,
     slope: float,
@@ -47,7 +47,7 @@ def update_data(
     """Update generated data according to user parameter inputs."""
     x = list(np.linspace(-4, 4, n_levels))
     points = pa_points.generate(
-        n_trials = n_trials_per_level * n_levels,
+        n_trials = n_trials,
         options = x,
         threshold = intercept,
         slope = slope,
