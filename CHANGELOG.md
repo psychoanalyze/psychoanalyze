@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.9 (2023-07-09)
+
+### Fix
+
+* Guess rate & lapse rate ([`2a94512`](https://github.com/psychoanalyze/psychoanalyze/commit/2a94512417d70e521231ccae0c9293cf1cbcdd9b))
+
 ## v0.4.8 (2023-07-09)
 
 ### Fix
