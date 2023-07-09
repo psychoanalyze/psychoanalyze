@@ -77,6 +77,7 @@ def update_data(  # noqa: PLR0913
                 y=logistic["Hit Rate"],
                 mode="lines",
                 name="model",
+                marker_color="blue",
             ),
         ),
         points.reset_index().sort_values(by="Intensity").to_dict("records"),
