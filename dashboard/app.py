@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>.
 
 import dash_bootstrap_components as dbc
 import numpy as np
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from dash import Dash, Input, Output, callback
@@ -71,9 +72,11 @@ def update_data(  # noqa: PLR0913
         options=x,
         params=params,
     )
-    points["logit(Hit Rate)"] = logit(points["Hit Rate"])
-    logistic = pa_blocks.logistic(params).reset_index()
-    logistic["logit(Hit Rate)"] = logit(logistic["Hit Rate"])
+    logistic = pa_blocks.logistic(params)
+    logit_logistic = pd.Series(
+        logit(logistic), index=logistic.index, name="logit(Hit Rate)",
+    ).reset_index()
+    logistic = logistic.reset_index()
     if form == "log":
         fig = px.scatter(
             points.reset_index(),
@@ -83,8 +86,8 @@ def update_data(  # noqa: PLR0913
             template="plotly_white",
         ).add_trace(
             go.Scatter(
-                x=logistic["Intensity"],
-                y=logistic["logit(Hit Rate)"],
+                x=logit_logistic["Intensity"],
+                y=logit_logistic["logit(Hit Rate)"],
                 mode="lines",
                 name="model",
                 marker_color="blue",

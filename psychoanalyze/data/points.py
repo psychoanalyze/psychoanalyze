@@ -141,7 +141,12 @@ def generate(
     )
     points = pd.concat([n, _hits], axis=1)
     _hit_rate = hit_rate(points)
-    return pd.concat([points, _hit_rate], axis=1)
+    logit_hit_rate = pd.Series(
+        logit(_hit_rate),
+        name="logit(Hit Rate)",
+        index=n.index,
+    )
+    return pd.concat([points, _hit_rate, logit_hit_rate], axis=1)
 
 
 def generate_point(n: int, p: float) -> int:
