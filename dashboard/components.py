@@ -96,18 +96,18 @@ psi_params = dbc.Card(
         ),
         dbc.Row(
             [
-                dbc.Label("Guess Rate ", html_for="gamma", width=6),
+                dbc.Label("Guess Rate ", html_for="guess-rate", width=6),
                 dbc.Col(
-                    dbc.Input(id="gamma", type="number", value=0.0, step=0.1),
+                    dbc.Input(id="guess-rate", type="number", value=0.0, step=0.1),
                     width=6,
                 ),
             ],
         ),
         dbc.Row(
             [
-                dbc.Label("Lapse Rate", html_for="lambda", width=6),
+                dbc.Label("Lapse Rate", html_for="lapse-rate", width=6),
                 dbc.Col(
-                    dbc.Input(id="lambda", type="number", value=0.0, step=0.1),
+                    dbc.Input(id="lapse-rate", type="number", value=0.0, step=0.1),
                     width=6,
                 ),
             ],

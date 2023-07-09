@@ -134,12 +134,16 @@ def hits(
     n: pd.Series,
     threshold: float = 0.0,
     scale: float = 1.0,
+    guess_rate: float = 0.0,
+    lapse_rate: float = 0.0,
 ) -> pd.Series:
     """Sample list of n hits from a list of intensity values."""
+    p = logistic.cdf(n.index.to_numpy(), threshold, scale)
+    psi = guess_rate + (1.0 - guess_rate - lapse_rate) * p
     return pd.Series(
         np.random.default_rng().binomial(
             n,
-            logistic.cdf(n.index.to_numpy(), threshold, scale),
+            psi,
             len(n),
         ),
         index=n.index,
@@ -147,15 +151,17 @@ def hits(
     )
 
 
-def generate(
+def generate(  # noqa: PLR0913
     n_trials: int,
     options: list[float],
     threshold: float = 0.0,
     slope: float = 1.0,
+    guess_rate: float = 0.0,
+    lapse_rate: float = 0.0,
 ) -> pd.DataFrame:
     """Generate points-level data."""
     n = generate_n(n_trials, options)
-    _hits = hits(n, threshold, slope)
+    _hits = hits(n, threshold, slope, guess_rate, lapse_rate)
     points = pd.concat([n, _hits], axis=1)
     _hit_rate = hit_rate(points)
     return pd.concat([points, _hit_rate], axis=1)

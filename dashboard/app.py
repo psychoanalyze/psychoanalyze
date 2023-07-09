@@ -37,6 +37,8 @@ server = app.server
     Input("n-levels", "value"),
     Input("x_0", "value"),
     Input("model-k", "value"),
+    Input("guess-rate", "value"),
+    Input("lapse-rate", "value"),
     Input("min-x", "value"),
     Input("max-x", "value"),
 )
@@ -45,6 +47,8 @@ def update_data(  # noqa: PLR0913
     n_levels: int,
     intercept: float,
     slope: float,
+    guess_rate: float,
+    lapse_rate: float,
     min_x: float,
     max_x: float,
 ) -> go.Figure:
@@ -55,6 +59,8 @@ def update_data(  # noqa: PLR0913
         options = x,
         threshold = intercept,
         slope = slope,
+        guess_rate = guess_rate,
+        lapse_rate = lapse_rate,
     )
     return pa_points.plot(points)
 
