@@ -148,6 +148,15 @@ points_table = dash_table.DataTable(
                                         scheme=dash_table.Format.Scheme.fixed,
                                     ),
                                 },
+                                {
+                                    "name": "logit(Hit Rate)",
+                                    "id": "logit(Hit Rate)",
+                                    "type": "numeric",
+                                    "format": dash_table.Format.Format(
+                                        precision=2,
+                                        scheme=dash_table.Format.Scheme.fixed,
+                                    ),
+                                },
                             ],
                             style_data={"color": "black"},
                             style_header={"color": "black"},

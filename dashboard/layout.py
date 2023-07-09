@@ -119,11 +119,12 @@ plot_tabs = dbc.Col(
                         ),
                         dbc.RadioItems(
                             options=[
-                                {"label": "Log Scale", "value": "log"},
-                                {"label": "Linear Scale", "value": "linear"},
+                                {"label": "logit(Hit Rate)", "value": "log"},
+                                {"label": "Hit Rate", "value": "linear"},
                             ],
                             value="linear",
                             inline=True,
+                            id="logit",
                         ),
                     ],
                     width=7,

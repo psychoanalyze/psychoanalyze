@@ -18,8 +18,10 @@ If not, see <https://www.gnu.org/licenses/>.
 
 import dash_bootstrap_components as dbc
 import numpy as np
+import plotly.express as px
 import plotly.graph_objects as go
 from dash import Dash, Input, Output, callback
+from scipy.special import logit
 
 from dashboard.layout import layout
 from psychoanalyze.data import blocks as pa_blocks
@@ -43,6 +45,7 @@ server = app.server
     Input("lapse-rate", "value"),
     Input("min-x", "value"),
     Input("max-x", "value"),
+    Input("logit", "value"),
 )
 def update_data(  # noqa: PLR0913
     n_trials: int,
@@ -53,6 +56,7 @@ def update_data(  # noqa: PLR0913
     lapse_rate: float,
     min_x: float,
     max_x: float,
+    form: str,
 ) -> go.Figure:
     """Update generated data according to user parameter inputs."""
     x = list(np.linspace(min_x, max_x, n_levels))
@@ -67,9 +71,27 @@ def update_data(  # noqa: PLR0913
         options=x,
         params=params,
     )
+    points["logit(Hit Rate)"] = logit(points["Hit Rate"])
     logistic = pa_blocks.logistic(params).reset_index()
-    return (
-        pa_points.plot(points).add_trace(
+    logistic["logit(Hit Rate)"] = logit(logistic["Hit Rate"])
+    if form == "log":
+        fig = px.scatter(
+            points.reset_index(),
+            x="Intensity",
+            y="logit(Hit Rate)",
+            size="n",
+            template="plotly_white",
+        ).add_trace(
+            go.Scatter(
+                x=logistic["Intensity"],
+                y=logistic["logit(Hit Rate)"],
+                mode="lines",
+                name="model",
+                marker_color="blue",
+            ),
+        )
+    else:
+        fig = pa_points.plot(points).add_trace(
             go.Scatter(
                 x=logistic["Intensity"],
                 y=logistic["Hit Rate"],
@@ -77,9 +99,8 @@ def update_data(  # noqa: PLR0913
                 name="model",
                 marker_color="blue",
             ),
-        ),
-        points.reset_index().sort_values(by="Intensity").to_dict("records"),
-    )
+        )
+    return fig, points.reset_index().sort_values(by="Intensity").to_dict("records")
 
 
 if __name__ == "__main__":
