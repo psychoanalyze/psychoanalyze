@@ -498,27 +498,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#tests.test_data.test_nonstandard_logistic_mean" class="md-nav__link">
-    test_nonstandard_logistic_mean()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_data.test_nonstandard_logistic_slope" class="md-nav__link">
-    test_nonstandard_logistic_slope()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_data.test_params" class="md-nav__link">
-    test_params()
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -889,27 +868,6 @@
           <li class="md-nav__item">
   <a href="#tests.test_data.subjects" class="md-nav__link">
     subjects()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_data.test_nonstandard_logistic_mean" class="md-nav__link">
-    test_nonstandard_logistic_mean()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_data.test_nonstandard_logistic_slope" class="md-nav__link">
-    test_nonstandard_logistic_slope()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_data.test_params" class="md-nav__link">
-    test_params()
   </a>
   
 </li>
@@ -2043,103 +2001,6 @@ for accepted contributions.</li>
 <a id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="k">def</span> <span class="nf">subjects</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <a id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;List of subject names.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-26" name="__codelineno-0-26"></a>    <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">]</span>
-</code></pre></div></td></tr></table></div>
-      </details>
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-
-<h4 id="tests.test_data.test_nonstandard_logistic_mean" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">test_nonstandard_logistic_mean</span><span class="p">()</span></code>
-
-<a href="#tests.test_data.test_nonstandard_logistic_mean" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Tests the y bounds of a nonstandard logistic.</p>
-
-      <details class="quote">
-        <summary>Source code in <code>tests/test_data.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-29">29</a></span>
-<span class="normal"><a href="#__codelineno-0-30">30</a></span>
-<span class="normal"><a href="#__codelineno-0-31">31</a></span>
-<span class="normal"><a href="#__codelineno-0-32">32</a></span>
-<span class="normal"><a href="#__codelineno-0-33">33</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-29" name="__codelineno-0-29"></a><span class="k">def</span> <span class="nf">test_nonstandard_logistic_mean</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-30" name="__codelineno-0-30"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests the y bounds of a nonstandard logistic.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-31" name="__codelineno-0-31"></a>    <span class="n">s</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">logistic</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32"></a>    <span class="k">assert</span> <span class="nb">min</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
-<a id="__codelineno-0-33" name="__codelineno-0-33"></a>    <span class="k">assert</span> <span class="nb">max</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span>
-</code></pre></div></td></tr></table></div>
-      </details>
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-
-<h4 id="tests.test_data.test_nonstandard_logistic_slope" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">test_nonstandard_logistic_slope</span><span class="p">()</span></code>
-
-<a href="#tests.test_data.test_nonstandard_logistic_slope" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Tests slope value for nonstandard logistic parameters.</p>
-
-      <details class="quote">
-        <summary>Source code in <code>tests/test_data.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-36">36</a></span>
-<span class="normal"><a href="#__codelineno-0-37">37</a></span>
-<span class="normal"><a href="#__codelineno-0-38">38</a></span>
-<span class="normal"><a href="#__codelineno-0-39">39</a></span>
-<span class="normal"><a href="#__codelineno-0-40">40</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="k">def</span> <span class="nf">test_nonstandard_logistic_slope</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests slope value for nonstandard logistic parameters.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-38" name="__codelineno-0-38"></a>    <span class="n">s_control</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">logistic</span><span class="p">()</span>
-<a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="n">s</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">logistic</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<a id="__codelineno-0-40" name="__codelineno-0-40"></a>    <span class="k">assert</span> <span class="nb">max</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">max</span><span class="p">(</span><span class="n">s_control</span><span class="p">)</span>
-</code></pre></div></td></tr></table></div>
-      </details>
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-
-<h4 id="tests.test_data.test_params" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">test_params</span><span class="p">()</span></code>
-
-<a href="#tests.test_data.test_params" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Test that params are in the right format.</p>
-
-      <details class="quote">
-        <summary>Source code in <code>tests/test_data.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-43">43</a></span>
-<span class="normal"><a href="#__codelineno-0-44">44</a></span>
-<span class="normal"><a href="#__codelineno-0-45">45</a></span>
-<span class="normal"><a href="#__codelineno-0-46">46</a></span>
-<span class="normal"><a href="#__codelineno-0-47">47</a></span>
-<span class="normal"><a href="#__codelineno-0-48">48</a></span>
-<span class="normal"><a href="#__codelineno-0-49">49</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="k">def</span> <span class="nf">test_params</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that params are in the right format.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-45" name="__codelineno-0-45"></a>    <span class="n">x</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">([])</span>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a>    <span class="n">fits</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;5%&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;50%&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;95%&quot;</span><span class="p">:</span> <span class="p">[]})</span>
-<a id="__codelineno-0-47" name="__codelineno-0-47"></a>    <span class="n">reshaped</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">blocks</span><span class="o">.</span><span class="n">reshape_fit_results</span><span class="p">(</span><span class="n">fits</span><span class="o">=</span><span class="n">fits</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;p&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-48" name="__codelineno-0-48"></a>    <span class="n">dt</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">reshaped</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-<a id="__codelineno-0-49" name="__codelineno-0-49"></a>    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">reshaped</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="p">{</span><span class="s2">&quot;err+&quot;</span><span class="p">,</span> <span class="s2">&quot;err-&quot;</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">}</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
