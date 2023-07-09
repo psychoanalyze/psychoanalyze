@@ -26,22 +26,19 @@ def subjects() -> list[str]:
     return ["A", "B"]
 
 
-def test_nonstandard_logistic_mean() -> None:
-    """Tests the y bounds of a nonstandard logistic."""
-    s = data.logistic(threshold=1)
+def test_nonstandard_logistic_mean():
+    s = data.blocks.logistic(threshold=1)
     assert min(s) > 0
     assert max(s) < 1
 
 
 def test_nonstandard_logistic_slope() -> None:
-    """Tests slope value for nonstandard logistic parameters."""
-    s_control = data.logistic()
-    s = data.logistic(scale=2)
+    s_control = data.blocks.logistic()
+    s = data.blocks.logistic(scale=2)
     assert max(s) < max(s_control)
 
 
-def test_params() -> None:
-    """Test that params are in the right format."""
+def test_params():
     x = pd.Index([])
     fits = pd.DataFrame({"5%": [], "50%": [], "95%": []})
     reshaped = data.blocks.reshape_fit_results(fits=fits, x=x, y="p")

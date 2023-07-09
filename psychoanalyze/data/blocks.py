@@ -26,7 +26,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from pandera.typing import DataFrame
 from scipy.special import expit, logit
-from scipy.stats import logistic
+from scipy.stats import logistic as scipy_logistic
 from sklearn.linear_model import LogisticRegression
 
 from psychoanalyze import data
@@ -57,7 +57,7 @@ def generate(n_trials_per_level: int = 100) -> pd.DataFrame:
     """Generate block-level data."""
     index = pd.Index(range(-3, 4), name="x")
     n = [n_trials_per_level] * len(index)
-    p = logistic.cdf(index)
+    p = scipy_logistic.cdf(index)
     return pd.DataFrame(
         {"n": n, "Hits": np.random.default_rng().binomial(n, p)},
         index=index,
@@ -275,3 +275,18 @@ def reshape_fit_results(fits: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame
     param_fits = param_fits.rename(columns={"50%": y})
     param_fits.index = x
     return param_fits
+
+def logistic(
+    threshold: float = 0.0,
+    scale: float = 1.0,
+    gamma: float = 0.0,
+    lambda_: float = 0.0,
+) -> pd.Series:
+    """Generate logistic curves from parameters."""
+    x = np.linspace(scipy_logistic.ppf(0.01), scipy_logistic.ppf(0.99), 100)
+    index = pd.Index(x, name="x")
+    return pd.Series(
+        gamma + (1 - gamma - lambda_) * scipy_logistic.cdf(x, threshold, scale),
+        index=index,
+        name="Hit Rate",
+    )

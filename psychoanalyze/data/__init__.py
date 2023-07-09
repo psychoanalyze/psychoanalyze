@@ -14,6 +14,10 @@
 
 """Data modules and general-purpose data transformation utilities.
 
+Functions:
+
+- [`psychoanalyze.data.load`][psychoanalyze.data.load]
+
 Submodules:
 
 - [`psychoanalyze.data.blocks`][psychoanalyze.data.blocks]
@@ -25,27 +29,9 @@ Submodules:
 """
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
-from scipy.stats import logistic as scipy_logistic
 
 from psychoanalyze.data import blocks, points, sessions, subjects
-
-
-def logistic(
-    threshold: float = 0.0,
-    scale: float = 1.0,
-    gamma: float = 0.0,
-    lambda_: float = 0.0,
-) -> pd.Series:
-    """Generate logistic curves from parameters."""
-    x = np.linspace(scipy_logistic.ppf(0.01), scipy_logistic.ppf(0.99), 100)
-    index = pd.Index(x, name="x")
-    return pd.Series(
-        gamma + (1 - gamma - lambda_) * scipy_logistic.cdf(x, threshold, scale),
-        index=index,
-        name="Hit Rate",
-    )
 
 
 def load(
