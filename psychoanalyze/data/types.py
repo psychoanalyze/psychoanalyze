@@ -89,7 +89,6 @@ psi_animation = DataFrameSchema(
 
 
 class PsiAnimation(DataFrameModel):
-
     """Pandera type for psychometric function animation dataset."""
 
     trial_id: Series[int]
@@ -98,8 +97,29 @@ class PsiAnimation(DataFrameModel):
 
 
 class PsiAnimationFrame(DataFrameModel):
-
     """Pandera type for a single psychometric function animation frame."""
 
     intensity: Series[float]
     hit_rate: Series[float]
+
+
+class Blocks(DataFrameModel):
+    """Blocks type for Pandera."""
+
+    slope: float
+    threshold: float
+
+
+class Points(DataFrameModel):
+    """Pandera data type."""
+
+    n: int
+    Hits: int
+    block_id: int
+
+
+class Trials(DataFrameModel):
+    """Trials data type for pandera + mypy type checking."""
+
+    result: int
+    intensity: Index[float]

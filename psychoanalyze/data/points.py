@@ -23,7 +23,6 @@ from pathlib import Path
 import cmdstanpy as stan
 import numpy as np
 import pandas as pd
-import pandera as pr
 import plotly.express as px
 from dash import dash_table
 from plotly import graph_objects as go
@@ -32,14 +31,6 @@ from scipy.stats import logistic
 from psychoanalyze.data import trials
 
 index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
-
-
-class Points(pr.DataFrameModel):
-    """Pandera data type."""
-
-    n: int
-    Hits: int
-    block_id: int
 
 
 def from_trials(_trials: pd.DataFrame) -> pd.Series:

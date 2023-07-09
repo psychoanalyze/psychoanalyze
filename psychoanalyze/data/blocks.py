@@ -24,7 +24,6 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from pandera import DataFrameModel
 from pandera.typing import DataFrame
 from scipy.special import expit, logit
 from scipy.stats import logistic
@@ -43,14 +42,6 @@ from psychoanalyze.plot import template
 
 dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
 index_levels = dims
-
-
-class Blocks(DataFrameModel):
-
-    """Blocks type for Pandera."""
-
-    slope: float
-    threshold: float
 
 
 def add_posterior(data: pd.Series, posterior: pd.Series) -> pd.DataFrame:
@@ -240,7 +231,7 @@ def generate_trials(n_trials: int, model_params: dict[str, float]) -> pd.DataFra
     return trials.moc_sample(n_trials, model_params)
 
 
-def from_points(points: DataFrame[points.Points]) -> pd.DataFrame:
+def from_points(points: DataFrame[types.Points]) -> pd.DataFrame:
     """Aggregate block measures from points data."""
     return points.groupby("BlockID")[["n"]].sum()
 

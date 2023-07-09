@@ -20,22 +20,12 @@ from typing import TypedDict
 
 import numpy as np
 import pandas as pd
-from pandera import DataFrameModel, SeriesSchema
-from pandera.typing import Index
+from pandera import SeriesSchema
 from sklearn.linear_model import LogisticRegression
 
 from psychoanalyze.data import types
 
 schema = SeriesSchema(bool, name="Test Trials")
-
-
-class Trials(DataFrameModel):
-
-    """Trials data type for pandera + mypy type checking."""
-
-    result: int
-    intensity: Index[float]
-
 
 data_path = Path("data/trials.csv")
 
