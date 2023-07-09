@@ -85,5 +85,5 @@ ignore_missing_imports = true
 
 [tool.ruff]
 fix = true
-select = ["ALL"]
+select = ["ALL", "CPY001"]
 ignore = ["S101", "S311", "D211", "D213"]
