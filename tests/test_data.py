@@ -27,14 +27,35 @@ def subjects() -> list[str]:
 
 
 def test_nonstandard_logistic_mean():
-    s = data.blocks.logistic(threshold=1)
+    s = data.blocks.logistic(
+        {
+            "Threshold": 1.0,
+            "Slope": 1.0,
+            "Guess Rate": 0.0,
+            "Lapse Rate": 0.0,
+        },
+    )
     assert min(s) > 0
     assert max(s) < 1
 
 
 def test_nonstandard_logistic_slope() -> None:
-    s_control = data.blocks.logistic()
-    s = data.blocks.logistic(scale=2)
+    s_control = data.blocks.logistic(
+        {
+            "Threshold": 0.0,
+            "Slope": 1.0,
+            "Guess Rate": 0.0,
+            "Lapse Rate": 0.0,
+        },
+    )
+    s = data.blocks.logistic(
+        {
+            "Threshold": 0.0,
+            "Slope": 2.0,
+            "Guess Rate": 0.0,
+            "Lapse Rate": 0.0,
+        },
+    )
     assert max(s) < max(s_control)
 
 

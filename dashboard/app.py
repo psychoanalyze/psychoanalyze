@@ -56,20 +56,18 @@ def update_data(  # noqa: PLR0913
 ) -> go.Figure:
     """Update generated data according to user parameter inputs."""
     x = list(np.linspace(min_x, max_x, n_levels))
+    params = {
+        "Threshold": intercept,
+        "Slope": slope,
+        "Guess Rate": guess_rate,
+        "Lapse Rate": lapse_rate,
+    }
     points = pa_points.generate(
         n_trials=n_trials,
         options=x,
-        threshold=intercept,
-        slope=slope,
-        guess_rate=guess_rate,
-        lapse_rate=lapse_rate,
+        params=params,
     )
-    logistic = pa_blocks.logistic(
-        intercept,
-        slope,
-        guess_rate,
-        lapse_rate,
-    ).reset_index()
+    logistic = pa_blocks.logistic(params).reset_index()
     return (
         pa_points.plot(points).add_trace(
             go.Scatter(
@@ -85,4 +83,4 @@ def update_data(  # noqa: PLR0913
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=False)  # noqa: S104
+    app.run(debug=False)

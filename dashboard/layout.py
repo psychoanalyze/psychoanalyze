@@ -117,6 +117,14 @@ plot_tabs = dbc.Col(
                         dcc.Graph(
                             id="plot",
                         ),
+                        dbc.RadioItems(
+                            options=[
+                                {"label": "Log Scale", "value": "log"},
+                                {"label": "Linear Scale", "value": "linear"},
+                            ],
+                            value="linear",
+                            inline=True,
+                        ),
                     ],
                     width=7,
                 ),

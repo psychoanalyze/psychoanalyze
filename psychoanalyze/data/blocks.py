@@ -242,21 +242,19 @@ def reshape_fit_results(fits: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame
     return param_fits
 
 
-def logistic(
-    threshold: float = 0.0,
-    scale: float = 1.0,
-    gamma: float = 0.0,
-    lambda_: float = 0.0,
-) -> pd.Series:
+def logistic(params: dict[str, float]) -> pd.Series:
     """Generate logistic function from parameters."""
     x = np.linspace(
-        scipy_logistic.ppf(0.01) + threshold,
-        scipy_logistic.ppf(0.99) + threshold,
+        scipy_logistic.ppf(0.01) + params["Threshold"],
+        scipy_logistic.ppf(0.99) + params["Threshold"],
         100,
     )
+    y = params["Guess Rate"] + (
+        1 - params["Guess Rate"] - params["Lapse Rate"]
+    ) * scipy_logistic.cdf(x, params["Threshold"], params["Slope"])
     index = pd.Index(x, name="Intensity")
     return pd.Series(
-        gamma + (1 - gamma - lambda_) * scipy_logistic.cdf(x, threshold, scale),
+        y,
         index=index,
         name="Hit Rate",
     )

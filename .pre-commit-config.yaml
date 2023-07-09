@@ -30,7 +30,7 @@ repos:
   hooks:
   - id: conventional-pre-commit
     stages: [commit-msg]
-    args: [feat, fix, ci, docs, test, dash, dev, deps, style]
+    args: [feat, fix, ci, docs, test, dash, dev, deps, style, refactor]
 
 - repo: local
   hooks:

@@ -84,15 +84,11 @@ def model() -> stan.CmdStanModel:
 
 def fit(
     points: pd.DataFrame,
-    save_to: Path | None = None,
-    block: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     """Fit psychometric curve to points."""
-    points = points[["x", "Hits", "n"]]
     if len(points):
-        data = points
-        _fit = trials.fit(data)
-        _fit = pd.DataFrame(
+        _fit = trials.fit(points[["x", "Hits", "n"]])
+        return pd.DataFrame(
             {
                 "Threshold": [_fit["Fit"][0]],
                 "width": [_fit["Fit"][1]],
@@ -101,23 +97,7 @@ def fit(
                 "err+": [None],
                 "err-": [None],
             },
-            index=pd.MultiIndex.from_tuples(
-                [block],
-                names=[
-                    "Monkey",
-                    "Date",
-                    "Amp2",
-                    "Width2",
-                    "Freq2",
-                    "Dur2",
-                    "Active Channels",
-                    "Return Channels",
-                ],
-            ),
         )
-        if save_to:
-            _fit.to_csv(save_to)
-        return _fit
     return pd.DataFrame(
         {
             "Threshold": [],
@@ -132,14 +112,11 @@ def fit(
 
 def hits(
     n: pd.Series,
-    threshold: float = 0.0,
-    scale: float = 1.0,
-    guess_rate: float = 0.0,
-    lapse_rate: float = 0.0,
+    params: dict[str, float],
 ) -> pd.Series:
     """Sample list of n hits from a list of intensity values."""
-    p = logistic.cdf(n.index.to_numpy(), threshold, scale)
-    psi = guess_rate + (1.0 - guess_rate - lapse_rate) * p
+    p = logistic.cdf(n.index.to_numpy(), params["Threshold"], params["Slope"])
+    psi = params["Guess Rate"] + (1.0 - params["Guess Rate"] - params["Lapse Rate"]) * p
     return pd.Series(
         np.random.default_rng().binomial(
             n,
@@ -151,17 +128,17 @@ def hits(
     )
 
 
-def generate(  # noqa: PLR0913
+def generate(
     n_trials: int,
     options: list[float],
-    threshold: float = 0.0,
-    slope: float = 1.0,
-    guess_rate: float = 0.0,
-    lapse_rate: float = 0.0,
+    params: dict[str, float],
 ) -> pd.DataFrame:
     """Generate points-level data."""
     n = generate_n(n_trials, options)
-    _hits = hits(n, threshold, slope, guess_rate, lapse_rate)
+    _hits = hits(
+        n,
+        params,
+    )
     points = pd.concat([n, _hits], axis=1)
     _hit_rate = hit_rate(points)
     return pd.concat([points, _hit_rate], axis=1)
