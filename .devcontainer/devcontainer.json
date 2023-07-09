@@ -1,7 +1,6 @@
 {
   "name": "PsychoAnalyzeDev",
-  "dockerComposeFile": "docker-compose.yml",
-  "service": "devcontainer",
+  "image": "mcr.microsoft.com/devcontainers/python:0-3.11",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "features": {
     "ghcr.io/devcontainers-contrib/features/poetry:1": {},
@@ -32,7 +31,8 @@
         "innoverio.vscode-dbt-power-user",
         "ms-python.black-formatter",
         "bungcip.better-toml",
-        "ms-azuretools.vscode-docker"
+        "ms-azuretools.vscode-docker",
+        "ivan-bocharov.stan-vscode"
       ]
     }
   }
