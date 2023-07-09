@@ -248,9 +248,13 @@ def logistic(
     gamma: float = 0.0,
     lambda_: float = 0.0,
 ) -> pd.Series:
-    """Generate logistic curves from parameters."""
-    x = np.linspace(scipy_logistic.ppf(0.01), scipy_logistic.ppf(0.99), 100)
-    index = pd.Index(x, name="x")
+    """Generate logistic function from parameters."""
+    x = np.linspace(
+        scipy_logistic.ppf(0.01) + threshold,
+        scipy_logistic.ppf(0.99) + threshold,
+        100,
+    )
+    index = pd.Index(x, name="Intensity")
     return pd.Series(
         gamma + (1 - gamma - lambda_) * scipy_logistic.cdf(x, threshold, scale),
         index=index,

@@ -22,6 +22,7 @@ import plotly.graph_objects as go
 from dash import Dash, Input, Output, callback
 
 from dashboard.layout import layout
+from psychoanalyze.data import blocks as pa_blocks
 from psychoanalyze.data import points as pa_points
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO, dbc.icons.BOOTSTRAP])
@@ -63,10 +64,24 @@ def update_data(  # noqa: PLR0913
         guess_rate=guess_rate,
         lapse_rate=lapse_rate,
     )
+    logistic = pa_blocks.logistic(
+        intercept,
+        slope,
+        guess_rate,
+        lapse_rate,
+    ).reset_index()
     return (
-        pa_points.plot(points),
+        pa_points.plot(points).add_trace(
+            go.Scatter(
+                x=logistic["Intensity"],
+                y=logistic["Hit Rate"],
+                mode="lines",
+                name="model",
+            ),
+        ),
         points.reset_index().sort_values(by="Intensity").to_dict("records"),
     )
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=False)  # noqa: S104

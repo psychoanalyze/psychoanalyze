@@ -174,4 +174,5 @@ layout = dbc.Container(
             ],
         ),
     ],
+    style={"border-radius": "5px"},
 )
