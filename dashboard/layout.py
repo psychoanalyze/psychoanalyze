@@ -19,43 +19,7 @@ If not, see <https://www.gnu.org/licenses/>.
 import dash_bootstrap_components as dbc
 from dash import dash_table, dcc, html
 
-from dashboard.components import experiment_params
-
-psi_params = html.Div(
-    [
-        html.H4("Psychometric Function"),
-        dcc.Dropdown(
-            id="f",
-            options=[{"label": "Logistic (expit)", "value": "expit"}],
-            value="expit",
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText("intercept"),
-                dbc.Input(id="x_0", type="number", value=50.0, step=0.1),
-            ],
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText("slope"),
-                dbc.Input(id="model-k", type="number", value=1, step=0.1),
-            ],
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText("guess rate"),
-                dbc.Input(id="gamma", type="number", value=0.0, step=0.1),
-            ],
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText("lapse rate"),
-                dbc.Input(id="lambda", type="number", value=0.0, step=0.1),
-            ],
-            class_name="mb-3",
-        ),
-    ],
-)
+from dashboard.components import experiment_params, psi_params
 
 component_column = dbc.Col(
     [
