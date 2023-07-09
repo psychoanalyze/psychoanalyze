@@ -22,7 +22,7 @@ import plotly.graph_objects as go
 from dash import Dash, Input, Output, callback
 
 from dashboard.layout import layout
-from psychoanalyze.data import points
+from psychoanalyze.data import points as pa_points
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO, dbc.icons.BOOTSTRAP])
 
@@ -46,13 +46,13 @@ def update_data(
 ) -> go.Figure:
     """Update generated data according to user parameter inputs."""
     x = list(np.linspace(-4, 4, n_levels))
-    _points = points.generate_series(
-        x=x,
-        n=[n_trials_per_level] * n_levels,
-        threshold=intercept,
-        scale=slope,
+    points = pa_points.generate(
+        n_trials = n_trials_per_level * n_levels,
+        options = x,
+        threshold = intercept,
+        slope = slope,
     )
-    return points.plot(_points.to_frame())
+    return pa_points.plot(points)
 
 
 if __name__ == "__main__":

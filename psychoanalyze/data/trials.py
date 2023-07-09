@@ -35,20 +35,23 @@ codes = {0: "Miss", 1: "Hit"}
 Trial = TypedDict("Trial", {"Result": bool, "Stimulus Magnitude": float})
 
 
-def generate(n: int, options: list[float], outcomes: list[float]) -> pd.DataFrame:
+def generate_n(n_trials: int, options: list[float]) -> pd.Series:
+    """Generate n trials (no outcomes)."""
+    return pd.Series(
+        [random.choice(options) for _ in range(n_trials)],
+        name="Intensity",
+    )
+
+
+def generate(
+    n: pd.Series,
+    outcomes: list[int],
+) -> pd.Series:
     """Generate n trials with outcomes."""
-    return pd.DataFrame(
-        {
-            "result": pd.Series(
-                [random.choice(outcomes) for _ in range(n)],
-                dtype=int,
-            ),
-        },
-        index=pd.Index(
-            [random.choice(options) for _ in range(n)],
-            name="intensity",
-            dtype=float,
-        ),
+    return pd.Series(
+        [random.choice(outcomes) for _ in range(n)],
+        name="Result",
+        index=n,
     )
 
 

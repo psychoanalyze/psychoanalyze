@@ -130,22 +130,35 @@ def fit(
     )
 
 
-def generate_series(
-    x: list[float],
-    n: list[int],
+def hits(
+    n: pd.Series,
     threshold: float = 0.0,
     scale: float = 1.0,
 ) -> pd.Series:
-    """Generate points-level data."""
+    """Sample list of n hits from a list of intensity values."""
     return pd.Series(
         np.random.default_rng().binomial(
             n,
-            logistic.cdf(x, threshold, scale),
-            len(x),
-        ) / len(x),
-        index=pd.Index(x, name="Intensity"),
-        name="Hit Rate",
+            logistic.cdf(n.index.to_numpy(), threshold, scale),
+            len(n),
+        ),
+        index=n.index,
+        name="Hits",
     )
+
+
+def generate(
+    n_trials: int,
+    options: list[float],
+    threshold: float = 0.0,
+    slope: float = 1.0,
+) -> pd.DataFrame:
+    """Generate points-level data."""
+    n = generate_n(n_trials, options)
+    _hits = hits(n, threshold, slope)
+    points = pd.concat([n, _hits], axis=1)
+    _hit_rate = hit_rate(points)
+    return pd.concat([points, _hit_rate], axis=1)
 
 
 def generate_point(n: int, p: float) -> int:
@@ -197,9 +210,14 @@ def combine_plots(fig1: go.Figure, fig2: go.Figure) -> go.Figure:
     return go.Figure(data=fig1.data + fig2.data)
 
 
-def n(trials: pd.DataFrame) -> pd.DataFrame:
+def n(trials: pd.Series) -> pd.Series:
     """Count trials at each point."""
-    return trials.groupby(level="Block").count()
+    return pd.Series(trials.value_counts(), name="n")
+
+
+def generate_n(n_trials: int, options: list[float]) -> pd.Series:
+    """Simulate how many trials were performed per intensity level."""
+    return n(trials.generate_n(n_trials, options))
 
 
 def to_block(points: pd.DataFrame) -> pd.DataFrame:
@@ -226,9 +244,9 @@ def plot(points: pd.DataFrame) -> go.Figure:
         points.reset_index(),
         x="Intensity",
         y="Hit Rate",
+        size="n",
         template="plotly_white",
     )
-
 
 
 def hit_rate(df: pd.DataFrame) -> pd.Series:
