@@ -44,20 +44,20 @@ dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
 index_levels = dims
 
 
-def generate(n_trials_per_level: int = 100) -> pd.DataFrame:
+def generate(
+    n_trials_per_level: int,
+    x_min: float,
+    x_max: float,
+    n_levels: int,
+) -> pd.DataFrame:
     """Generate block-level data."""
-    index = pd.Index(range(-3, 4), name="x")
+    index = pd.Index(np.linspace(x_min, x_max, n_levels), name="x")
     n = [n_trials_per_level] * len(index)
     p = scipy_logistic.cdf(index)
     return pd.DataFrame(
         {"n": n, "Hits": np.random.default_rng().binomial(n, p)},
         index=index,
     )
-
-
-def xrange_index(x_min: float, x_max: float, n_levels: int) -> pd.Index:
-    """Generate x range values from min and max."""
-    return pd.Index(np.linspace(x_min, x_max, n_levels), name="x")
 
 
 def transform(hit_rate: float, y: str) -> float:
@@ -261,6 +261,7 @@ def reshape_fit_results(fits: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame
     param_fits = param_fits.rename(columns={"50%": y})
     param_fits.index = x
     return param_fits
+
 
 def logistic(
     threshold: float = 0.0,
