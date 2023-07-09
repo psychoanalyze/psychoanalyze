@@ -1,10 +1,16 @@
 site_name: PsychoAnalyze
 site_url: https://psychoanalyze.io
 theme:
-    name: material
+  name: material
 plugins:
- - search
- - mkdocstrings:
+- search
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          show_root_heading: true
+          show_submodules: true
+          members_order: source
 repo_url: https://github.com/psychoanalyze/psychoanalyze
 edit_uri: edit/main/docs/
 markdown_extensions:
@@ -16,6 +22,8 @@ markdown_extensions:
   - pymdownx.tabbed:
       alternate_style: true
   - tables
+  - toc:
+      permalink: true
 extra_javascript:
  - https://cdn.plot.ly/plotly-2.12.1.min.js
  - docs/require.js

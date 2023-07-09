@@ -85,11 +85,6 @@ def generate_animation_curves() -> pd.DataFrame:
     return all_data
 
 
-def dimension_filter(blocks: pd.DataFrame, dim: str) -> pd.DataFrame:
-    """Filter block data by dimension."""
-    return blocks[blocks["Dimension"] == dim]
-
-
 def load(
     data_dir: Path = Path("data"),
 ) -> dict[str, pd.DataFrame]:

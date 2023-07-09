@@ -8,7 +8,6 @@ from pandera.typing import DataFrame
 from plotly import graph_objects as go
 
 from psychoanalyze import data
-from psychoanalyze.data import dimension_filter
 from psychoanalyze.data.schemas import PsiAnimation
 
 axis_settings = {
@@ -193,7 +192,7 @@ def strength_duration(
     x = labels_given_dim["x"]
     y = labels_given_dim["y"]
     if blocks is not None:
-        sd_df = dimension_filter(blocks, dim=dim)
+        sd_df = blocks[blocks["Dimension"] == dim]
     else:
         sd_df = pd.DataFrame({x: x_data, y: y_data})
     return px.scatter(
