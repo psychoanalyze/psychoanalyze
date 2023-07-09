@@ -51,36 +51,6 @@ labels = {
 }
 
 
-def strength_duration(
-    blocks: pd.DataFrame,
-    dim: str,
-    x_data: list[float],
-    y_data: list[float],
-) -> go.Figure:
-    """Plot strength-duration curve given detection data."""
-
-    def _get_labels_given_dim(
-        labels: dict[str, dict[str, str]],
-        dim: str,
-    ) -> dict[str, str]:
-        """Get appropriate axis labels for different choices of modulated dimension."""
-        return {"x": labels[dim]["x"], "y": labels[dim]["y"]}
-
-    labels_given_dim = _get_labels_given_dim(labels=labels, dim=dim)
-    x = labels_given_dim["x"]
-    y = labels_given_dim["y"]
-    if blocks is not None:
-        sd_df = blocks[blocks["Dimension"] == dim]
-    else:
-        sd_df = pd.DataFrame({x: x_data, y: y_data})
-    return px.scatter(
-        sd_df,
-        x=x,
-        y=y,
-        template=template,
-    )
-
-
 def counts(sessions: pd.DataFrame, dim: str) -> go.Figure:
     """Plot how many sessions are in the dataset."""
     if dim is not None:
