@@ -97,16 +97,6 @@ def fits(_points: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def empty() -> pd.Series:
-    """Return empty block Series."""
-    return pd.Series(
-        [],
-        name="Hit Rate",
-        index=pd.Index([], name="Amplitude (µA)"),
-        dtype=float,
-    )
-
-
 def plot_fits(blocks: pd.DataFrame) -> go.Figure:
     """Plot fits."""
     x = np.linspace(-3, 3, 100)
@@ -114,21 +104,15 @@ def plot_fits(blocks: pd.DataFrame) -> go.Figure:
     return px.line(blocks.reset_index(), x=x, y=y)
 
 
-def load_cached(data_path: Path) -> pd.DataFrame:
+def load(data_path: Path) -> pd.DataFrame:
     """Load block data from csv."""
+    full_path = data_path / "blocks.csv"
     channel_config = ["Active Channels", "Return Channels"]
-    blocks = pd.read_csv(data_path / "blocks.csv", parse_dates=["Date"]).set_index(
+    blocks = pd.read_csv(full_path / "blocks.csv", parse_dates=["Date"]).set_index(
         sessions.dims + stimulus.ref_dims + channel_config,
     )
-    blocks["Block"] = days(blocks, subjects.load(data_path))
+    blocks["Block"] = days(blocks, subjects.load(full_path))
     return blocks
-
-
-def load(
-    data_path: Path = Path("data"),
-) -> pd.DataFrame:
-    """Load blocks data from csv."""
-    return load_cached(data_path / "blocks.csv")
 
 
 def days(blocks: pd.DataFrame, intervention_dates: pd.DataFrame) -> pd.Series:
