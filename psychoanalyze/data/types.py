@@ -16,8 +16,7 @@
 
 Contains data table schemas of the hierarchical entities described above.
 """
-from pandera import Column, DataFrameModel, DataFrameSchema, Index, MultiIndex
-from pandera.typing import Series
+from pandera import Column, DataFrameModel, DataFrameSchema, Index, MultiIndex, typing
 
 session_dims = ["Monkey", "Date"]
 block_stim_dims = ["Amp2", "Width2", "Freq2", "Dur2"]
@@ -91,16 +90,16 @@ psi_animation = DataFrameSchema(
 class PsiAnimation(DataFrameModel):
     """Pandera type for psychometric function animation dataset."""
 
-    trial_id: Series[int]
-    intensity: Series[float]
-    hit_rate: Series[float]
+    trial_id: typing.Series[int]
+    intensity: typing.Series[float]
+    hit_rate: typing.Series[float]
 
 
 class PsiAnimationFrame(DataFrameModel):
     """Pandera type for a single psychometric function animation frame."""
 
-    intensity: Series[float]
-    hit_rate: Series[float]
+    intensity: typing.Series[float]
+    hit_rate: typing.Series[float]
 
 
 class Blocks(DataFrameModel):
@@ -122,4 +121,4 @@ class Trials(DataFrameModel):
     """Trials data type for pandera + mypy type checking."""
 
     result: int
-    intensity: Index[float]
+    intensity: typing.Index[float]
