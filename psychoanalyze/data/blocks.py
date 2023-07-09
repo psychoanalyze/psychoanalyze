@@ -238,7 +238,7 @@ def from_points(points: DataFrame[points.Points]) -> pd.DataFrame:
     return points.groupby("BlockID")[["n"]].sum()
 
 
-def plot_thresholds(blocks: DataFrame) -> go.Figure:
+def plot_thresholds(blocks: pd.DataFrame) -> go.Figure:
     """Plot longitudinal threshold data.
 
     Args:

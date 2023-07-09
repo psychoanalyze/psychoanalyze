@@ -16,10 +16,9 @@
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from pandera.typing import DataFrame, Series
 
 
-def bayes(simulated: DataFrame, estimated: Series) -> go.Figure:
+def plot(simulated: pd.DataFrame, estimated: pd.Series) -> go.Figure:
     """Plot Psychometric curve to emphasize Bayesian posteriors."""
     combined = pd.concat(
         [simulated.reset_index(), estimated.reset_index()],

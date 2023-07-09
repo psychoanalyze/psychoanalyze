@@ -47,13 +47,3 @@ labels = {
         "y": "Threshold Pulse Width (μs)",
     },
 }
-
-
-def combine_figs(fig1: go.Figure, fig2: go.Figure) -> go.Figure:
-    """Combine two plotly scatter plots."""
-    return go.Figure(
-        data=fig1.data + fig2.data,
-        layout_xaxis_title_text="Stimulus Magnitude",
-        layout_yaxis_title_text="Hit Rate",
-        layout_template=template,
-    )

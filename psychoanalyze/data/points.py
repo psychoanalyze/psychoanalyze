@@ -27,7 +27,7 @@ import pandera as pr
 import plotly.express as px
 from dash import dash_table
 from plotly import graph_objects as go
-from scipy.stats import binom
+from scipy.stats import logistic
 
 from psychoanalyze.data import trials
 
@@ -35,7 +35,6 @@ index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
 
 
 class Points(pr.DataFrameModel):
-
     """Pandera data type."""
 
     n: int
@@ -139,10 +138,19 @@ def fit(
     )
 
 
-def generate_series(x: list[float], n: list[int], p: list[float]) -> pd.Series:
+def generate_series(
+    x: list[float],
+    n: list[int],
+    threshold: float = 0.0,
+    scale: float = 1.0,
+) -> pd.Series:
     """Generate points-level data."""
     return pd.Series(
-        [binom.rvs(n[i], p[i]) for i in range(len(x))],
+        np.random.default_rng().binomial(
+            n,
+            logistic.cdf(x, threshold, scale),
+            len(x),
+        ),
         index=pd.Index(x, name="Intensity"),
         name="Hit Rate",
     )

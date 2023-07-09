@@ -66,3 +66,41 @@ def test_strength_duration_pw(s_d_columns: set, s_d_empty_df: pd.DataFrame) -> N
         "Fixed Amplitude (μA)",
         "Threshold Pulse Width (μs)",
     }
+
+
+def test_plot():
+    fig = strength_duration.plot(
+        dim="Amp",
+        blocks=pd.DataFrame(
+            {
+                "Dimension": [],
+                "Fixed Amplitude (μA)": [],
+                "Threshold Pulse Width (μs)": [],
+                "Fixed Pulse Width (μs)": [],
+                "Threshold Amplitude (μA)": [],
+            },
+        ),
+        x_data=[],
+        y_data=[],
+    )
+    assert fig.layout.xaxis.title.text == "Fixed Pulse Width (μs)"
+    assert fig.layout.yaxis.title.text == "Threshold Amplitude (μA)"
+
+
+def test_plot_with_data():
+    """Test strenght-duration plot with data."""
+    x_data = [1.0]
+    y_data = [1.0]
+    fig = strength_duration.plot(
+        dim="Width",
+        blocks=pd.DataFrame(
+            {
+                "Dimension": [],
+                "Fixed Amplitude (μA)": [],
+                "Threshold Pulse Width (μs)": [],
+            },
+        ),
+        x_data=x_data,
+        y_data=y_data,
+    )
+    assert len(fig.data) == 1

@@ -26,29 +26,11 @@ Submodules:
 from itertools import accumulate
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
-from numpy import linspace
-from numpy.random import default_rng
 from scipy.stats import logistic as scipy_logistic
 
 from psychoanalyze.data import blocks, points, sessions, subjects
-
-
-def generate_outcomes(
-    n_trials_per_stim_level: int,
-    index: pd.Index,
-    threshold: float,
-    scale: float,
-) -> pd.Series:
-    """Generate outcomes."""
-    random_number_generator = default_rng()
-    return pd.Series(
-        random_number_generator.binomial(
-            n_trials_per_stim_level,
-            scipy_logistic.cdf(index.get_level_values("x"), threshold, scale),
-            len(index),
-        ),
-    )
 
 
 def logistic(
@@ -58,7 +40,7 @@ def logistic(
     lambda_: float = 0.0,
 ) -> pd.Series:
     """Generate logistic curves from parameters."""
-    x = linspace(scipy_logistic.ppf(0.01), scipy_logistic.ppf(0.99), 100)
+    x = np.linspace(scipy_logistic.ppf(0.01), scipy_logistic.ppf(0.99), 100)
     index = pd.Index(x, name="x")
     return pd.Series(
         gamma + (1 - gamma - lambda_) * scipy_logistic.cdf(x, threshold, scale),

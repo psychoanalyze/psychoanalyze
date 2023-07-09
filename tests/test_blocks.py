@@ -12,16 +12,24 @@
 # You should have received a copy of the GNU General Public License along with Foobar.
 # If not, see <https://www.gnu.org/licenses/>.
 
-"""Empirical Distribution Functions (eCDF)."""
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
+
+from psychoanalyze.data import blocks
 
 
-def plot(blocks: pd.DataFrame, param: str) -> go.Figure:
-    """Plot empirical cumulative distrubtion function (eCDF) of fitted params."""
-    return px.ecdf(
-        blocks.reset_index(),
-        x=param,
-        color=blocks.get("Monkey"),
-    ).update_layout(xaxis_title=param)
+def test_thresholds() -> None:
+    """Tests threshold plot."""
+    data = pd.DataFrame(
+        {
+            "Subject": ["A", "B"],
+            "5%": [1, 2],
+            "50%": [1, 2],
+            "95%": [1, 2],
+            "Block": [1, 2],
+        },
+    )
+    fig = blocks.plot_thresholds(data)
+    subjects = {trace["legendgroup"] for trace in fig.data}
+    assert subjects == {"A", "B"}
+    assert fig.layout.xaxis.title.text == "Block"
+    assert fig.layout.yaxis.title.text == "50%"
