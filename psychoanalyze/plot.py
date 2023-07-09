@@ -13,8 +13,6 @@
 # If not, see <https://www.gnu.org/licenses/>.
 
 """Visualize psychophysical data and metrics."""
-import pandas as pd
-import plotly.express as px
 from plotly import graph_objects as go
 
 axis_settings = {
@@ -49,28 +47,6 @@ labels = {
         "y": "Threshold Pulse Width (μs)",
     },
 }
-
-
-def counts(sessions: pd.DataFrame, dim: str) -> go.Figure:
-    """Plot how many sessions are in the dataset."""
-    if dim is not None:
-        sessions["Dimension"] = "Amp"
-        sessions = sessions[sessions["Dimension"] == dim]
-    return px.histogram(
-        sessions,
-        x="Monkey",
-        color="Monkey",
-        template=template,
-    ).update_layout(yaxis_title_text="# of Sessions")
-
-
-def ecdf(blocks: pd.DataFrame, param: str) -> go.Figure:
-    """Plot empirical cumulative distrubtion function (eCDF) of fitted params."""
-    return px.ecdf(
-        blocks.reset_index(),
-        x=param,
-        color=blocks.get("Monkey"),
-    ).update_layout(xaxis_title=param)
 
 
 def combine_figs(fig1: go.Figure, fig2: go.Figure) -> go.Figure:

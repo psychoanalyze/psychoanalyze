@@ -12,24 +12,16 @@
 # You should have received a copy of the GNU General Public License along with Foobar.
 # If not, see <https://www.gnu.org/licenses/>.
 
-"""Bayesian analysis of psychophysical data."""
-import pandas as pd
+"""Empirical Distribution Functions (eCDF)."""
 import plotly.express as px
 import plotly.graph_objects as go
-from pandera.typing import DataFrame, Series
+from pandera.typing import DataFrame
 
 
-def bayes(simulated: DataFrame, estimated: Series) -> go.Figure:
-    """Plot Psychometric curve to emphasize Bayesian posteriors."""
-    combined = pd.concat(
-        [simulated.reset_index(), estimated.reset_index()],
-        keys=["Simulated", "Estimated"],
-        names=["Type"],
-    )
-    return px.scatter(
-        combined.reset_index(),
-        x="x",
-        y="Hit Rate",
-        color="Type",
-        template="plotly_white",
-    )
+def ecdf(blocks: DataFrame, param: str) -> go.Figure:
+    """Plot empirical cumulative distrubtion function (eCDF) of fitted params."""
+    return px.ecdf(
+        blocks.reset_index(),
+        x=param,
+        color=blocks.get("Monkey"),
+    ).update_layout(xaxis_title=param)
