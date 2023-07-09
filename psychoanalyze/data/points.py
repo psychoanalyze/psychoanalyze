@@ -227,3 +227,9 @@ def plot(points: pd.DataFrame) -> go.Figure:
         y="Hit Rate",
         template="plotly_white",
     )
+
+
+
+def hit_rate(df: pd.DataFrame) -> pd.Series:
+    """Calculate hit rate from hits and number of trials."""
+    return pd.Series(df["Hits"] / df["n"], name="Hit Rate")

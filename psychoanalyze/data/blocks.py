@@ -12,7 +12,7 @@
 # You should have received a copy of the GNU General Public License along with Foobar.
 # If not, see <https://www.gnu.org/licenses/>.
 
-"""Block-level data.
+"""Block-level data utilities.
 
 **Blocks** are the most analytically significant objects in the PsychoAnalyze
 data hierarchy. They represent a specific set of experimental conditions and generally
@@ -44,15 +44,6 @@ dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
 index_levels = dims
 
 
-def add_posterior(data: pd.Series, posterior: pd.Series) -> pd.DataFrame:
-    """Combine observed and simulated data."""
-    return pd.concat(
-        [data, posterior],
-        keys=["Observed", "Posterior"],
-        names=["Type"],
-    ).reset_index()
-
-
 def generate(n_trials_per_level: int = 100) -> pd.DataFrame:
     """Generate block-level data."""
     index = pd.Index(range(-3, 4), name="x")
@@ -62,11 +53,6 @@ def generate(n_trials_per_level: int = 100) -> pd.DataFrame:
         {"n": n, "Hits": np.random.default_rng().binomial(n, p)},
         index=index,
     )
-
-
-def hit_rate(df: pd.DataFrame) -> pd.Series:
-    """Calculate hit rate from hits and number of trials."""
-    return df["Hits"] / df["n"]
 
 
 def xrange_index(x_min: float, x_max: float, n_levels: int) -> pd.Index:
