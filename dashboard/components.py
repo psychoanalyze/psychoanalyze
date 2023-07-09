@@ -21,6 +21,12 @@ from dash import dcc, html
 experiment_params = dbc.Card(
     [
         html.H4("Experimental Design", className="mb-4"),
+        dcc.Dropdown(
+            id="exp-type",
+            options=[{"label": "Method of Constant Stimuli", "value": "moc"}],
+            value="moc",
+            className="mb-3",
+        ),
         dbc.Row(
             [
                 dbc.Label("n trials", html_for="n-trials", width=6),
@@ -46,7 +52,7 @@ experiment_params = dbc.Card(
 
 psi_params = dbc.Card(
     [
-        html.H4("Psychometric Function", className="mb-4"),
+        html.H4("Psychometric Model", className="mb-4"),
         dcc.Dropdown(
             id="f",
             options=[{"label": "Logistic (expit)", "value": "expit"}],
