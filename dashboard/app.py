@@ -35,16 +35,25 @@ server = app.server
     Output("plot", "figure"),
     Input("n-trials-per-level", "value"),
     Input("n-levels", "value"),
+    Input("x_0", "value"),
+    Input("model-k", "value"),
 )
-def update_data(n_trials_per_level: int, n_levels: int) -> go.Figure:
+def update_data(
+    n_trials_per_level: int,
+    n_levels: int,
+    intercept: float,
+    slope: float,
+) -> go.Figure:
     """Update generated data according to user parameter inputs."""
     x = list(np.linspace(-4, 4, n_levels))
     _points = points.generate_series(
         x=x,
         n=[n_trials_per_level] * n_levels,
+        threshold=intercept,
+        scale=slope,
     )
     return points.plot(_points.to_frame())
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=False)  # noqa: S104
+    app.run(debug=True)
