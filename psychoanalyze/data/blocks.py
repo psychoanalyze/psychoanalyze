@@ -25,7 +25,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from pandera.typing import DataFrame
-from scipy.special import expit, logit
+from scipy.special import expit
 from scipy.stats import logistic as scipy_logistic
 from sklearn.linear_model import LogisticRegression
 
@@ -58,11 +58,6 @@ def generate(
         {"n": n, "Hits": np.random.default_rng().binomial(n, p)},
         index=index,
     )
-
-
-def transform(hit_rate: float, y: str) -> float:
-    """Logit transform hit rate."""
-    return logit(hit_rate) if y == "alpha" else hit_rate
 
 
 def prep_psych_curve(curves_data: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame:

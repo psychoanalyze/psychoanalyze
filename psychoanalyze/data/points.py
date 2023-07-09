@@ -26,6 +26,7 @@ import pandas as pd
 import plotly.express as px
 from dash import dash_table
 from plotly import graph_objects as go
+from scipy.special import logit
 from scipy.stats import logistic
 
 from psychoanalyze.data import trials
@@ -233,3 +234,8 @@ def plot(points: pd.DataFrame) -> go.Figure:
 def hit_rate(df: pd.DataFrame) -> pd.Series:
     """Calculate hit rate from hits and number of trials."""
     return pd.Series(df["Hits"] / df["n"], name="Hit Rate")
+
+
+def transform(hit_rate: float, y: str) -> float:
+    """Logit transform hit rate."""
+    return logit(hit_rate) if y == "alpha" else hit_rate
