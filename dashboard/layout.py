@@ -17,9 +17,9 @@ If not, see <https://www.gnu.org/licenses/>.
 """
 
 import dash_bootstrap_components as dbc
-from dash import dash_table, dcc, html
+from dash import dcc, html
 
-from dashboard.components import experiment_params, psi_params
+from dashboard.components import experiment_params, points_table, psi_params
 
 component_column = dbc.Col(
     [
@@ -121,43 +121,7 @@ plot_tabs = dbc.Col(
                     width=7,
                 ),
                 dbc.Col(
-                    [
-                        dash_table.DataTable(
-                            id="table",
-                            columns=[
-                                {
-                                    "name": "Subject",
-                                    "id": "Subject",
-                                },
-                                {
-                                    "name": "Block",
-                                    "id": "Block",
-                                },
-                                {
-                                    "name": "Slope",
-                                    "id": "slope",
-                                    "type": "numeric",
-                                    "format": dash_table.Format.Format(
-                                        precision=2,
-                                        scheme=dash_table.Format.Scheme.fixed,
-                                    ),
-                                },
-                                {
-                                    "name": "Threshold",
-                                    "id": "Threshold",
-                                    "type": "numeric",
-                                    "format": dash_table.Format.Format(
-                                        precision=2,
-                                        scheme=dash_table.Format.Scheme.fixed,
-                                    ),
-                                },
-                            ],
-                            row_selectable="multi",
-                            style_data={"color": "black"},
-                            style_header={"color": "black"},
-                            page_size=15,
-                        ),
-                    ],
+                    points_table,
                     width=4,
                 ),
             ],

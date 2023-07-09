@@ -33,6 +33,7 @@ server = app.server
 
 @callback(
     Output("plot", "figure"),
+    Output("table", "data"),
     Input("n-trials", "value"),
     Input("n-levels", "value"),
     Input("x_0", "value"),
@@ -55,15 +56,17 @@ def update_data(  # noqa: PLR0913
     """Update generated data according to user parameter inputs."""
     x = list(np.linspace(min_x, max_x, n_levels))
     points = pa_points.generate(
-        n_trials = n_trials,
-        options = x,
-        threshold = intercept,
-        slope = slope,
-        guess_rate = guess_rate,
-        lapse_rate = lapse_rate,
+        n_trials=n_trials,
+        options=x,
+        threshold=intercept,
+        slope=slope,
+        guess_rate=guess_rate,
+        lapse_rate=lapse_rate,
     )
-    return pa_points.plot(points)
-
+    return (
+        pa_points.plot(points),
+        points.reset_index().sort_values(by="Intensity").to_dict("records"),
+    )
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=False)  # noqa: S104

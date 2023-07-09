@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License along with Foo
 If not, see <https://www.gnu.org/licenses/>.
 """
 import dash_bootstrap_components as dbc
-from dash import dcc, html
+from dash import dash_table, dcc, html
 
 experiment_params = dbc.Card(
     [
@@ -115,3 +115,41 @@ psi_params = dbc.Card(
     ],
     body=True,
 )
+
+
+points_table = dash_table.DataTable(
+                            id="table",
+                            columns=[
+                                {
+                                    "name": "Intensity",
+                                    "id": "Intensity",
+                                    "type": "numeric",
+                                    "format": dash_table.Format.Format(
+                                        precision=2,
+                                        scheme=dash_table.Format.Scheme.fixed,
+                                    ),
+                                },
+                                {
+                                    "name": "Hits",
+                                    "id": "Hits",
+                                    "type": "numeric",
+                                },
+                                {
+                                    "name": "n",
+                                    "id": "n",
+                                    "type": "numeric",
+                                },
+                                {
+                                    "name": "Hit Rate",
+                                    "id": "Hit Rate",
+                                    "type": "numeric",
+                                    "format": dash_table.Format.Format(
+                                        precision=2,
+                                        scheme=dash_table.Format.Scheme.fixed,
+                                    ),
+                                },
+                            ],
+                            style_data={"color": "black"},
+                            style_header={"color": "black"},
+                            page_size=15,
+                        )
