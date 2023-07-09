@@ -25,7 +25,7 @@ transformation functions, often corresponding to a level in the data hierarchy.
 
 Modules:
 
-- [`plot`][psychoanalyze.plot]: Various plotting functions.
+- [`plot`][psychoanalyze.plot]: Global plot settings and generic plot utilities.
 - [`sigmoids`][psychoanalyze.sigmoids]: Implementations of psychometric sigmoid
 functions.
 """

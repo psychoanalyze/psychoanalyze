@@ -12,7 +12,7 @@
 # You should have received a copy of the GNU General Public License along with Foobar.
 # If not, see <https://www.gnu.org/licenses/>.
 
-"""Visualize psychophysical data and metrics."""
+"""Global plot settings and generic plot utilities."""
 from plotly import graph_objects as go
 
 axis_settings = {
