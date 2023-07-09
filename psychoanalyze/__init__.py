@@ -14,8 +14,18 @@
 
 """Top-level package for `psychoanalyze`.
 
+Subpackages:
+
+- [`data`][psychoanalyze.data]: Submodules in [`psychoanalyze.data`][psychoanalyze.data]
+contain data manipulation and transformation functions that relate to a level in the
+data hierarchy.
+- [`analysis`][psychoanalyze.analysis]: Submodules in
+[`psychoanalyze.analysis`][psychoanalyze.analysis] contain data manipulation and
+transformation functions, often corresponding to a level in the data hierarchy.
+
 Modules:
 
-- `data`: Submodules in `psychoanalyze.data` contain data manipulation
-and transformation functions that relate to a level in the data hierarchy.
+- [`plot`][psychoanalyze.plot]: Various plotting functions.
+- [`sigmoids`][psychoanalyze.sigmoids]: Implementations of psychometric sigmoid
+functions.
 """

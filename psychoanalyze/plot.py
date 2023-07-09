@@ -12,10 +12,7 @@
 # You should have received a copy of the GNU General Public License along with Foobar.
 # If not, see <https://www.gnu.org/licenses/>.
 
-"""Helper functions for common plot formats in psychophysics.
-
-Contains functions assisting with the plotting of all of the above modules
-"""
+"""Visualize psychophysical data and metrics."""
 import pandas as pd
 import plotly.express as px
 from pandera.typing import DataFrame
