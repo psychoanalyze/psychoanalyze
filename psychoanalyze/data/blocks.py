@@ -14,9 +14,9 @@
 
 """Block-level data.
 
-**Blocks** are perhaps the most analytically significant objects in the hierarchy.
-They represent a specific set of experimental conditions and generally correspond
-to a single fit of the psychometric function.
+**Blocks** are the most analytically significant objects in the PsychoAnalyze
+data hierarchy. They represent a specific set of experimental conditions and generally
+correspond to a single fit of the psychometric function.
 """
 from pathlib import Path
 
@@ -31,7 +31,14 @@ from scipy.stats import logistic
 from sklearn.linear_model import LogisticRegression
 
 from psychoanalyze import data
-from psychoanalyze.data import points, sessions, stimulus, subjects, trials, types
+from psychoanalyze.data import (
+    points,
+    sessions,
+    stimulus,
+    subjects,
+    trials,
+    types,
+)
 from psychoanalyze.plot import template
 
 dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
@@ -85,7 +92,7 @@ def prep_psych_curve(curves_data: pd.DataFrame, x: pd.Index, y: str) -> pd.DataF
     """Transform & fit curve data."""
     curves_data.index = x
     fits = points.fit(curves_data)
-    return data.reshape_fit_results(fits, x, y)
+    return reshape_fit_results(fits, x, y)
 
 
 def dimensions(_points: pd.DataFrame, dims: list[str]) -> pd.Series:
@@ -248,7 +255,7 @@ def plot_thresholds(blocks: pd.DataFrame) -> go.Figure:
         A plotly Graph Object.
     """
     return px.scatter(
-        data.transform_errors(blocks),
+        data.blocks.transform_errors(blocks),
         x="Block",
         y="50%",
         error_y="err+",
@@ -257,3 +264,23 @@ def plot_thresholds(blocks: pd.DataFrame) -> go.Figure:
         color_discrete_map={"U": "#e41a1c", "Y": "#377eb8", "Z": "#4daf4a"},
         template=template,
     )
+
+
+def transform_errors(fit: pd.DataFrame) -> pd.DataFrame:
+    """Transform errors from absolute to relative."""
+    fit["err+"] = fit["95%"] - fit["50%"]
+    fit["err-"] = fit["50%"] - fit["5%"]
+    return fit.drop(columns=["95%", "5%"])
+
+
+def reshape_fit_results(fits: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame:
+    """Reshape fit params for plotting."""
+    rows = [f"{y}[{i}]" for i in range(1, len(x) + 1)]
+    param_fits = fits.loc[
+        rows,  # row eg 'p[1]:p[8]'
+        ["5%", "50%", "95%"],  # col
+    ]
+    param_fits = transform_errors(param_fits)
+    param_fits = param_fits.rename(columns={"50%": y})
+    param_fits.index = x
+    return param_fits

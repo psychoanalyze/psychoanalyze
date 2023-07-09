@@ -44,11 +44,6 @@ def test_params() -> None:
     """Test that params are in the right format."""
     x = pd.Index([])
     fits = pd.DataFrame({"5%": [], "50%": [], "95%": []})
-    reshaped = data.reshape_fit_results(fits=fits, x=x, y="p")
+    reshaped = data.blocks.reshape_fit_results(fits=fits, x=x, y="p")
     dt.validate(reshaped.index, x)
     assert set(reshaped.columns) <= {"err+", "err-", "p"}
-
-
-def test_generate() -> None:
-    """Test generation of complete data set."""
-    assert set(data.generate().columns) == {"Intensity", "Hit Rate"}

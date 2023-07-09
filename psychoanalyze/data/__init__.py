@@ -23,7 +23,6 @@ Submodules:
 - [`psychoanalyze.data.subjects`][psychoanalyze.data.subjects]
 - [`psychoanalyze.data.types`][psychoanalyze.data.types]
 """
-from itertools import accumulate
 from pathlib import Path
 
 import numpy as np
@@ -49,44 +48,6 @@ def logistic(
     )
 
 
-def transform_errors(fit: pd.DataFrame) -> pd.DataFrame:
-    """Transform errors from absolute to relative."""
-    fit["err+"] = fit["95%"] - fit["50%"]
-    fit["err-"] = fit["50%"] - fit["5%"]
-    return fit.drop(columns=["95%", "5%"])
-
-
-def reshape_fit_results(fits: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame:
-    """Reshape fit params for plotting."""
-    rows = [f"{y}[{i}]" for i in range(1, len(x) + 1)]
-    param_fits = fits.loc[
-        rows,  # row eg 'p[1]:p[8]'
-        ["5%", "50%", "95%"],  # col
-    ]
-    param_fits = transform_errors(param_fits)
-    param_fits = param_fits.rename(columns={"50%": y})
-    param_fits.index = x
-    return param_fits
-
-
-def generate_animation_curves() -> pd.DataFrame:
-    """Generate animation data for curves."""
-    n_blocks = 10
-    n_trials_per_level_per_block = 10
-    all_data = pd.concat(
-        list(
-            accumulate(
-                [
-                    blocks.generate(n_trials_per_level_per_block)
-                    for _ in range(n_blocks)
-                ],
-            ),
-        ),
-    )
-    all_data["Hit Rate"] = blocks.hit_rate
-    return all_data
-
-
 def load(
     data_dir: Path = Path("data"),
 ) -> dict[str, pd.DataFrame]:
@@ -97,13 +58,3 @@ def load(
         "Blocks": blocks.load(data_dir),
         "Points": points.load(data_dir).to_frame(),
     }
-
-
-def generate() -> pd.DataFrame:
-    """Generate data."""
-    return pd.DataFrame(
-        {
-            "Intensity": [0.0],
-            "Hit Rate": [0.5],
-        },
-    )
