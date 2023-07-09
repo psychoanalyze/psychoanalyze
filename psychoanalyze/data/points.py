@@ -142,7 +142,7 @@ def generate_series(
             n,
             logistic.cdf(x, threshold, scale),
             len(x),
-        ),
+        ) / len(x),
         index=pd.Index(x, name="Intensity"),
         name="Hit Rate",
     )

@@ -18,9 +18,9 @@ If not, see <https://www.gnu.org/licenses/>.
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 
-experiment_params = html.Div(
+experiment_params = dbc.Card(
     [
-        html.H4("Experimental Design"),
+        html.H4("Experimental Design", className="mb-4"),
         dbc.Row(
             [
                 dbc.Label("trials per level", html_for="n-trials-per-level", width=6),
@@ -38,26 +38,27 @@ experiment_params = html.Div(
                     width=6,
                 ),
             ],
-            className="mb-3",
         ),
     ],
+    body=True,
+    className="mb-3",
 )
 
-psi_params = html.Div(
+psi_params = dbc.Card(
     [
-        html.H4("Psychometric Function"),
+        html.H4("Psychometric Function", className="mb-4"),
         dcc.Dropdown(
             id="f",
             options=[{"label": "Logistic (expit)", "value": "expit"}],
             value="expit",
             className="mb-3",
         ),
-        dcc.Markdown("""$f(x) = \\frac{1}{1 + exp(-k(x-x_0))}$""", mathjax=True),
+        dcc.Markdown("""$f(x) = \\frac{1}{1 + e^{-k(x-x_0)}}$""", mathjax=True),
         dbc.Row(
             [
                 dbc.Label("Intercept", html_for="x_0", width=6),
                 dbc.Col(
-                    dbc.Input(id="x_0", type="number", value=50.0, step=0.1),
+                    dbc.Input(id="x_0", type="number", value=0.0, step=0.1),
                     width=6,
                 ),
             ],
@@ -90,4 +91,5 @@ psi_params = html.Div(
             ],
         ),
     ],
+    body=True,
 )
