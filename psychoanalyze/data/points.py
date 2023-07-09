@@ -221,5 +221,10 @@ def psi(
 
 
 def plot(points: pd.DataFrame) -> go.Figure:
-    """Plot points data."""
-    return px.scatter(points.reset_index(), x="Intensity", y="Hit Rate")
+    """Plot the psychometric function."""
+    return px.scatter(
+        points.reset_index(),
+        x="Intensity",
+        y="Hit Rate",
+        template="plotly_white",
+    )

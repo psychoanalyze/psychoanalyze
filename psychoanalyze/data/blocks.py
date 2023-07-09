@@ -32,6 +32,7 @@ from sklearn.linear_model import LogisticRegression
 
 from psychoanalyze import data
 from psychoanalyze.data import points, schemas, sessions, stimulus, subjects, trials
+from psychoanalyze.plot import template
 
 dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
 index_levels = dims
@@ -235,3 +236,24 @@ def generate_trials(n_trials: int, model_params: dict[str, float]) -> pd.DataFra
 def from_points(points: DataFrame[points.Points]) -> pd.DataFrame:
     """Aggregate block measures from points data."""
     return points.groupby("BlockID")[["n"]].sum()
+
+
+def plot_thresholds(blocks: DataFrame) -> go.Figure:
+    """Plot longitudinal threshold data.
+
+    Args:
+        blocks: Block-level DataFrame.
+
+    Returns:
+        A plotly Graph Object.
+    """
+    return px.scatter(
+        data.transform_errors(blocks),
+        x="Block",
+        y="50%",
+        error_y="err+",
+        error_y_minus="err-",
+        color="Subject",
+        color_discrete_map={"U": "#e41a1c", "Y": "#377eb8", "Z": "#4daf4a"},
+        template=template,
+    )

@@ -87,3 +87,6 @@ ignore_missing_imports = true
 fix = true
 select = ["ALL", "CPY001"]
 ignore = ["S101", "S311", "D211", "D213"]
+
+[tool.ruff.pydocstyle]
+convention = "google"
