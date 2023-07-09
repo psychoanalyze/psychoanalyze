@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.8 (2023-07-09)
+
+### Fix
+
+* Get intercept and slope params to work ([`c05211d`](https://github.com/psychoanalyze/psychoanalyze/commit/c05211d89e607e3212582fa6771789fb8f0fb867))
+
 ## v0.4.7 (2023-07-09)
 
 ### Fix
