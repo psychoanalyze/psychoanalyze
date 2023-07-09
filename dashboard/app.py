@@ -25,7 +25,7 @@ server = app.server
 def update_data(n_trials_per_level: int, n_levels: int) -> go.Figure:
     """Update generated data according to user parameter inputs."""
     x = list(np.linspace(-4, 4, n_levels))
-    _points = points.generate(
+    _points = points.generate_series(
         x=x,
         n=[n_trials_per_level] * n_levels,
         p=expit(x),

@@ -68,7 +68,7 @@ def test_generate() -> None:
     x = list(np.linspace(-3, 3, 7))
     n = [10] * 7
     p = expit(x)
-    _points = points.generate(x, n, p)
+    _points = points.generate_series(x, n, p)
     assert all(_points.index.to_numpy() == x)
     assert _points.name == "Hit Rate"
     assert _points.index.name == "Intensity"

@@ -45,13 +45,6 @@ def test_normalize() -> None:
     }
 
 
-def test_generate_block() -> None:
-    """Test that generating block data results in the right schema."""
-    block = trials.generate_block()
-    assert set(block.columns) == {"Hits", "n"}
-    assert block.index.name == "x"
-
-
 def test_labels() -> None:
     """Given trial result integers, translates to labels."""
     assert trials.labels([0, 1]) == ["Miss", "Hit"]

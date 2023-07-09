@@ -125,13 +125,18 @@ def fit(
     )
 
 
-def generate(x: list[float], n: list[int], p: list[float]) -> pd.Series:
+def generate_series(x: list[float], n: list[int], p: list[float]) -> pd.Series:
     """Generate points-level data."""
     return pd.Series(
         [binom.rvs(n[i], p[i]) for i in range(len(x))],
         index=pd.Index(x, name="Intensity"),
         name="Hit Rate",
     )
+
+
+def generate_point(n: int, p: float) -> int:
+    """Sample n hits from n trials and probability p from binomial dist."""
+    return np.random.default_rng().binomial(n, p)
 
 
 def datatable(data: pd.DataFrame) -> dash_table.DataTable:

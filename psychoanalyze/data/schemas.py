@@ -23,6 +23,21 @@ points = DataFrameSchema(
     },
 )
 
+trials_schema = DataFrameSchema(
+    columns={"Intensity": Column(float), "Outcome": Column(str, required=False)},
+    index=Index(int, name="TrialID"),
+)
+
+
+points_schema = DataFrameSchema(
+    columns={
+        "Intensity": Column(float),
+        "n": Column(int),
+        "Hits": Column(int),
+        "Hit Rate": Column(float, required=False),
+    },
+)
+
 blocks = DataFrameSchema(
     columns={"Threshold": Column(dtype=float), "width": Column(dtype=float)},
     index=MultiIndex(

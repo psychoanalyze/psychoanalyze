@@ -31,21 +31,6 @@ codes = {0: "Miss", 1: "Hit"}
 Trial = TypedDict("Trial", {"Result": bool, "Stimulus Magnitude": float})
 
 
-def generate_hits(n: int, p: float) -> int:
-    """Sample n hits from n trials and probability p from binomial dist."""
-    return np.random.default_rng().binomial(n, p)
-
-
-def generate_block(dim: str = "x") -> pd.DataFrame:
-    """Generate a block of trial data."""
-    hits = pd.Series(
-        [generate_hits(100, p) for p in [0.1, 0.2, 0.5, 0.8, 0.9]],
-        name="Hits",
-    )
-    x = [0, 1, 2, 3, 4]
-    return pd.DataFrame({"Hits": hits, "n": [100] * 5}, index=pd.Index(x, name=dim))
-
-
 def generate(n: int, options: list[float], outcomes: list[float]) -> pd.DataFrame:
     """Generate n trials with outcomes."""
     return pd.DataFrame(
