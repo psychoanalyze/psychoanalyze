@@ -37,15 +37,19 @@ server = app.server
     Input("n-levels", "value"),
     Input("x_0", "value"),
     Input("model-k", "value"),
+    Input("min-x", "value"),
+    Input("max-x", "value"),
 )
-def update_data(
+def update_data(  # noqa: PLR0913
     n_trials: int,
     n_levels: int,
     intercept: float,
     slope: float,
+    min_x: float,
+    max_x: float,
 ) -> go.Figure:
     """Update generated data according to user parameter inputs."""
-    x = list(np.linspace(-4, 4, n_levels))
+    x = list(np.linspace(min_x, max_x, n_levels))
     points = pa_points.generate(
         n_trials = n_trials,
         options = x,

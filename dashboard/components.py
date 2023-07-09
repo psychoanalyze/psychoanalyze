@@ -35,6 +35,7 @@ experiment_params = dbc.Card(
                     width=6,
                 ),
             ],
+            className="mb-1",
         ),
         dbc.Row(
             [
@@ -43,6 +44,21 @@ experiment_params = dbc.Card(
                     dbc.Input(id="n-levels", type="number", value=7),
                     width=6,
                 ),
+            ],
+            className="mb-1",
+        ),
+        dbc.Row(
+            [
+                dbc.Label("min(x)", html_for="min-x", width=3),
+                dbc.Col(
+                    dbc.Input(id="min-x", type="number", value=46),
+                    width=3,
+                ),
+                dbc.Col(
+                    dbc.Input(id="max-x", type="number", value=54),
+                    width=3,
+                ),
+                dbc.Label("max(x)", html_for="max-x", width=3),
             ],
         ),
     ],
@@ -64,7 +80,7 @@ psi_params = dbc.Card(
             [
                 dbc.Label("Intercept", html_for="x_0", width=6),
                 dbc.Col(
-                    dbc.Input(id="x_0", type="number", value=0.0, step=0.1),
+                    dbc.Input(id="x_0", type="number", value=50.0, step=0.1),
                     width=6,
                 ),
             ],
