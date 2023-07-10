@@ -1,5 +1,5 @@
 {
-  "name": "PsychoAnalyzeDev",
+  "name": "PsychoAnalyze",
   "image": "mcr.microsoft.com/devcontainers/python:0-3.11",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "features": {
