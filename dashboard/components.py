@@ -93,36 +93,55 @@ psi_params = dbc.Card(
         ),
         dbc.Row(
             [
-                dbc.Label("Intercept", html_for="x_0", width=6),
+                dbc.Label("Intercept", width=6),
                 dbc.Col(
-                    dbc.Input(id="x_0", type="number", value=0.0),
+                    dbc.Input(
+                        id={"type": "param", "id": 0},
+                        type="number",
+                        value=0.0,
+                    ),
                     width=6,
                 ),
             ],
         ),
         dbc.Row(
             [
-                dbc.Label("Slope", html_for="model-k", width=6),
+                dbc.Label("Slope", width=6),
                 dbc.Col(
-                    dbc.Input(id="model-k", type="number", value=1.0, step=0.1),
+                    dbc.Input(
+                        id={"type": "param", "id": 1},
+                        type="number",
+                        value=1.0,
+                        step=0.1,
+                    ),
                     width=6,
                 ),
             ],
         ),
         dbc.Row(
             [
-                dbc.Label("Guess Rate ", html_for="guess-rate", width=6),
+                dbc.Label("Guess Rate ", width=6),
                 dbc.Col(
-                    dbc.Input(id="guess-rate", type="number", value=0.0, step=0.1),
+                    dbc.Input(
+                        id={"type": "param", "id": 2},
+                        type="number",
+                        value=0.0,
+                        step=0.1,
+                    ),
                     width=6,
                 ),
             ],
         ),
         dbc.Row(
             [
-                dbc.Label("Lapse Rate", html_for="lapse-rate", width=6),
+                dbc.Label("Lapse Rate", width=6),
                 dbc.Col(
-                    dbc.Input(id="lapse-rate", type="number", value=0.0, step=0.1),
+                    dbc.Input(
+                        id={"type": "param", "id": 3},
+                        type="number",
+                        value=0.0,
+                        step=0.1,
+                    ),
                     width=6,
                 ),
             ],

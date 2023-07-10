@@ -155,6 +155,24 @@ plot_tabs = dbc.Col(
                                         scheme=dash_table.Format.Scheme.fixed,
                                     ),
                                 },
+                                {
+                                    "name": "Guess Rate",
+                                    "id": "Guess Rate",
+                                    "type": "numeric",
+                                    "format": dash_table.Format.Format(
+                                        precision=2,
+                                        scheme=dash_table.Format.Scheme.fixed,
+                                    ),
+                                },
+                                {
+                                    "name": "Lapse Rate",
+                                    "id": "Lapse Rate",
+                                    "type": "numeric",
+                                    "format": dash_table.Format.Format(
+                                        precision=2,
+                                        scheme=dash_table.Format.Scheme.fixed,
+                                    ),
+                                },
                             ],
                             style_data={"color": "black"},
                             style_header={"color": "black"},
@@ -169,6 +187,9 @@ plot_tabs = dbc.Col(
 
 layout = dbc.Container(
     [
+        html.Div(id="div"),
+        dcc.Store(id="points-store"),
+        dcc.Store(id="blocks-store"),
         dbc.NavbarSimple(
             [
                 dbc.NavItem(

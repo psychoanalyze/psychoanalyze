@@ -28,7 +28,13 @@
             "tests"
         ],
         "python.testing.unittestEnabled": false,
-        "python.testing.pytestEnabled": true
+        "python.testing.pytestEnabled": true,
+        "mypy-type-checker.path": [
+          ".venv/bin/mypy"
+        ],
+        "mypy-type-checker.interpreter": [
+          ".venv/bin/python"
+        ]
       },
       "extensions": [
         "ms-python.python",
@@ -39,7 +45,8 @@
         "bungcip.better-toml",
         "ms-azuretools.vscode-docker",
         "ivan-bocharov.stan-vscode",
-        "ms-toolsai.jupyter"
+        "ms-toolsai.jupyter",
+        "ms-python.mypy-type-checker"
       ]
     }
   }

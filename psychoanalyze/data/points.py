@@ -40,10 +40,11 @@ index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
 def from_trials(trials: pd.DataFrame) -> pd.DataFrame:
     """Aggregate point-level measures from trial data."""
     points = (
-        trials.groupby("Intensity")[["Result"]]
-        .agg(["count", "sum"])["Result"]
-        .rename(columns={"count": "n", "sum": "Hits"})
+        trials.groupby("Intensity")
+        .agg(["count", "sum"])
     )
+    points.columns = points.columns.droplevel()
+    points = points.rename(columns={"count": "n", "sum": "Hits"})
     points["Hit Rate"] = points["Hits"] / points["n"]
     points["logit(Hit Rate)"] = logit(points["Hit Rate"])
     return points
