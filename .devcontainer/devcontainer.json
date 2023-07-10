@@ -22,8 +22,7 @@
           "*.sql": "jinja-sql"
         },
         "editor.formatOnSave": true,
-        "editor.defaultFormatter": "ms-python.black-formatter",
-        "python.formatting.provider": "none",
+        "python.formatting.provider": "black",
         "python.testing.pytestArgs": [
             "tests"
         ],
@@ -41,13 +40,14 @@
         "ms-python.vscode-pylance",
         "charliermarsh.ruff",
         "innoverio.vscode-dbt-power-user",
-        "ms-python.black-formatter",
         "bungcip.better-toml",
         "ms-azuretools.vscode-docker",
         "ivan-bocharov.stan-vscode",
         "ms-toolsai.jupyter",
         "ms-python.mypy-type-checker",
-        "GitHub.copilot"
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "eamodio.gitlens"
       ]
     }
   }
