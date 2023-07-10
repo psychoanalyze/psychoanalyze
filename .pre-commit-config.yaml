@@ -32,6 +32,12 @@ repos:
     stages: [commit-msg]
     args: [feat, fix, ci, docs, test, dash, dev, deps, style, refactor]
 
+- repo: https://github.com/psf/black
+  rev: 23.3.0
+  hooks:
+  - id: black
+
+
 - repo: local
   hooks:
   - id: pytest
