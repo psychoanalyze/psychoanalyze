@@ -69,6 +69,7 @@ def update_data(  # noqa: PLR0913
         "Lapse Rate": lapse_rate,
     }
     trials = pa_trials.generate(n_trials, x, params).reset_index()
+    fits = pa_trials.fit(trials)
     points = pa_points.from_trials(trials)
     points["Hit Rate"] = points["Hits"] / points["n"]
     points["logit(Hit Rate)"] = logit(points["Hit Rate"])
@@ -80,8 +81,8 @@ def update_data(  # noqa: PLR0913
     return (
         fig,
         points.reset_index().sort_values(by="Intensity").to_dict("records"),
-        None,
-        None,
+        fits.coef_[0],
+        fits.intercept_,
     )
 
 
