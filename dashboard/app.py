@@ -61,22 +61,38 @@ def update_data(  # noqa: PLR0913
     form: str,
 ) -> go.Figure:
     """Update generated data according to user parameter inputs."""
-    x = list(np.linspace(min_x, max_x, n_levels))
     params = {
         "Threshold": intercept,
         "Slope": slope,
         "Guess Rate": guess_rate,
         "Lapse Rate": lapse_rate,
     }
-    trials = pa_trials.generate(n_trials, x, params).reset_index()
+    trials = pa_trials.generate(
+        n_trials,
+        options=list(np.linspace(min_x, max_x, n_levels)),
+        params=params,
+    ).reset_index()
     fits = pa_trials.fit(trials)
+    fit_params = {
+        "Threshold": -fits.intercept_[0],
+        "Slope": fits.coef_[0][0],
+        "Guess Rate": 0.0,
+        "Lapse Rate": 0.0,
+    }
     points = pa_points.from_trials(trials)
     points["Hit Rate"] = points["Hits"] / points["n"]
     points["logit(Hit Rate)"] = logit(points["Hit Rate"])
     logistic = pa_blocks.logistic(params).reset_index()
+    fit_logistic = pa_blocks.logistic(fit_params).reset_index()
     y = "logit(Hit Rate)" if form == "log" else "Hit Rate"
-    fig = pa_points.plot(points.reset_index(), y).add_trace(
-        pa_points.plot_logistic(logistic, y),
+    fig = (
+        pa_points.plot(points.reset_index(), y)
+        .add_trace(
+            pa_points.plot_logistic(logistic, y, name="model", color="blue"),
+        )
+        .add_trace(
+            pa_points.plot_logistic(fit_logistic, y, name="predicted", color="red"),
+        )
     )
     return (
         fig,

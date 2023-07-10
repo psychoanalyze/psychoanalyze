@@ -247,12 +247,12 @@ def transform(hit_rate: float, y: str) -> float:
     return logit(hit_rate) if y == "alpha" else hit_rate
 
 
-def plot_logistic(logistic: pd.DataFrame, y: str) -> go.Scatter:
+def plot_logistic(logistic: pd.DataFrame, y: str, name: str, color: str) -> go.Scatter:
     """Plot a smooth logistic function."""
     return go.Scatter(
         x=logistic["Intensity"],
         y=logistic[y],
         mode="lines",
-        name="model",
-        marker_color="blue",
+        name=name,
+        marker_color=color,
     )

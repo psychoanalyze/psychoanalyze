@@ -80,7 +80,7 @@ psi_params = dbc.Card(
             [
                 dbc.Label("Intercept", html_for="x_0", width=6),
                 dbc.Col(
-                    dbc.Input(id="x_0", type="number", value=50.0, step=0.1),
+                    dbc.Input(id="x_0", type="number", value=50.0),
                     width=6,
                 ),
             ],
