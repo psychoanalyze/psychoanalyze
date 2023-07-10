@@ -20,7 +20,6 @@ import dash_bootstrap_components as dbc
 import numpy as np
 import plotly.graph_objects as go
 from dash import Dash, Input, Output, callback
-from scipy.special import logit
 
 from dashboard.layout import layout
 from psychoanalyze.data import blocks as pa_blocks
@@ -71,7 +70,7 @@ def update_data(  # noqa: PLR0913
         n_trials,
         options=list(np.linspace(min_x, max_x, n_levels)),
         params=params,
-    ).reset_index()
+    )
     fits = pa_trials.fit(trials)
     fit_params = {
         "Threshold": -fits.intercept_[0],
@@ -80,8 +79,6 @@ def update_data(  # noqa: PLR0913
         "Lapse Rate": 0.0,
     }
     points = pa_points.from_trials(trials)
-    points["Hit Rate"] = points["Hits"] / points["n"]
-    points["logit(Hit Rate)"] = logit(points["Hit Rate"])
     logistic = pa_blocks.logistic(params).reset_index()
     fit_logistic = pa_blocks.logistic(fit_params).reset_index()
     y = "logit(Hit Rate)" if form == "log" else "Hit Rate"

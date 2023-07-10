@@ -16,7 +16,14 @@
 
 Contains data table schemas of the hierarchical entities described above.
 """
-from pandera import Column, DataFrameModel, DataFrameSchema, Index, MultiIndex, typing
+from pandera import (
+    Column,
+    DataFrameModel,
+    DataFrameSchema,
+    Index,
+    MultiIndex,
+    typing,
+)
 
 session_dims = ["Monkey", "Date"]
 block_stim_dims = ["Amp2", "Width2", "Freq2", "Dur2"]
@@ -31,25 +38,20 @@ points_index_levels = block_index_levels + point_dims
 points = DataFrameSchema(
     {
         "n": Column(int),
-        "Intensity": Column(float),
         "Hits": Column(int),
+        "Hit Rate": Column(float),
+        "logit(Hit Rate)": Column(float),
     },
+    index=Index(float, name="Intensity", unique=True),
 )
 
-trials_schema = DataFrameSchema(
-    columns={"Intensity": Column(float), "Outcome": Column(str, required=False)},
-    index=Index(int, name="TrialID"),
-)
-
-
-points_schema = DataFrameSchema(
+trials = DataFrameSchema(
     columns={
         "Intensity": Column(float),
-        "n": Column(int),
-        "Hits": Column(int),
-        "Hit Rate": Column(float, required=False),
+        "Result": Column(int),
     },
 )
+
 
 blocks = DataFrameSchema(
     columns={"Threshold": Column(dtype=float), "width": Column(dtype=float)},
@@ -63,20 +65,6 @@ blocks = DataFrameSchema(
     ),
 )
 
-
-trials = DataFrameSchema(
-    {"Result": Column(int, coerce=True)},
-    index=MultiIndex(
-        [
-            Index(str, name="Monkey"),
-            Index("datetime64", name="Date", coerce=True),
-        ]
-        + [Index(float, name=dim) for dim in block_stim_dims]
-        + [Index(int, name=dim) for dim in block_channel_dims]
-        + [Index(float, name=dim) for dim in point_dims],
-    ),
-    coerce=True,
-)
 
 psi_animation = DataFrameSchema(
     {

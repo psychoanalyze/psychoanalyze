@@ -25,28 +25,35 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 from dash import dash_table
+from pandera import check_io, check_output
 from plotly import graph_objects as go
 from scipy.special import logit
 from scipy.stats import logistic
 
-from psychoanalyze.data import trials
+from psychoanalyze.data import trials as pa_trials
+from psychoanalyze.data import types
 
 index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
 
 
-def from_trials(_trials: pd.DataFrame) -> pd.Series:
+@check_io(trials=types.trials, out=types.points)
+def from_trials(trials: pd.DataFrame) -> pd.DataFrame:
     """Aggregate point-level measures from trial data."""
-    return (
-        _trials.groupby("Intensity")[["Result"]]
+    points = (
+        trials.groupby("Intensity")[["Result"]]
         .agg(["count", "sum"])
         .rename(columns={"count": "n", "sum": "Hits"})
     )["Result"]
+    points["Hit Rate"] = points["Hits"] / points["n"]
+    points["logit(Hit Rate)"] = logit(points["Hit Rate"])
+    return points
 
 
-def load(data_path: Path) -> pd.Series:
+@check_output(types.points)
+def load(data_path: Path) -> pd.DataFrame:
     """Load points data from csv."""
-    _trials = trials.load(data_path)
-    return from_trials(_trials)
+    trials = pa_trials.load(data_path)
+    return from_trials(trials)
 
 
 def dimension(points: pd.DataFrame) -> str:
@@ -87,7 +94,7 @@ def fit(
 ) -> pd.DataFrame:
     """Fit psychometric curve to points."""
     if len(points):
-        _fit = trials.fit(points[["x", "Hits", "n"]])
+        _fit = pa_trials.fit(points[["x", "Hits", "n"]])
         return pd.DataFrame(
             {
                 "Threshold": [_fit["Fit"][0]],
@@ -189,8 +196,8 @@ def datatable(data: pd.DataFrame) -> dash_table.DataTable:
 
 def from_store(store_data: str) -> pd.DataFrame:
     """Get points-level measures from trials-level data store."""
-    _trials = trials.from_store(store_data)
-    return from_trials(_trials).to_frame()
+    trials = pa_trials.from_store(store_data)
+    return from_trials(trials)
 
 
 def combine_plots(fig1: go.Figure, fig2: go.Figure) -> go.Figure:
@@ -205,7 +212,7 @@ def n(trials: pd.Series) -> pd.Series:
 
 def generate_n(n_trials: int, options: list[float]) -> pd.Series:
     """Simulate how many trials were performed per intensity level."""
-    return n(trials.generate_trial_index(n_trials, options))
+    return n(pa_trials.generate_trial_index(n_trials, options))
 
 
 def to_block(points: pd.DataFrame) -> pd.DataFrame:

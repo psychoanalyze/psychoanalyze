@@ -42,5 +42,5 @@ def load(
         "Sessions": sessions.load(data_dir),
         "Subjects": subjects.load(data_dir),
         "Blocks": blocks.load(data_dir),
-        "Points": points.load(data_dir).to_frame(),
+        "Points": points.load(data_dir),
     }

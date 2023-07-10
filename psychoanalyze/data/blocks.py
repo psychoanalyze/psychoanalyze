@@ -29,7 +29,6 @@ from scipy.special import expit, logit
 from scipy.stats import logistic as scipy_logistic
 from sklearn.linear_model import LogisticRegression
 
-from psychoanalyze import data
 from psychoanalyze.data import (
     points,
     sessions,
@@ -211,7 +210,7 @@ def plot_thresholds(blocks: pd.DataFrame) -> go.Figure:
         A plotly Graph Object.
     """
     return px.scatter(
-        data.blocks.transform_errors(blocks),
+        transform_errors(blocks),
         x="Block",
         y="50%",
         error_y="err+",

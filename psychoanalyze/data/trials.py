@@ -20,7 +20,7 @@ from typing import TypedDict
 
 import numpy as np
 import pandas as pd
-from pandera import SeriesSchema
+from pandera import SeriesSchema, check_output
 from sklearn.linear_model import LogisticRegression
 
 from psychoanalyze.data import types
@@ -43,18 +43,20 @@ def generate_trial_index(n_trials: int, options: list[float]) -> pd.Series:
     )
 
 
+@check_output(types.trials)
 def generate(
     n_trials: int,
     options: list[float],
     params: dict[str, float],
-) -> pd.Series:
+) -> pd.DataFrame:
     """Generate n trials with outcomes."""
     x = generate_trial_index(n_trials, options)
     p = {option: psi(option, params) for option in options}
-    return pd.Series(
-        [int(random.random() <= p[x_val]) for x_val in x],
-        name="Result",
-        index=x,
+    return pd.DataFrame(
+        {
+            "Result": [int(random.random() <= p[x_val]) for x_val in x],
+            "Intensity": x,
+        },
     )
 
 

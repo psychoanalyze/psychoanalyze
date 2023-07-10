@@ -51,11 +51,11 @@ experiment_params = dbc.Card(
             [
                 dbc.Label("min(x)", html_for="min-x", width=3),
                 dbc.Col(
-                    dbc.Input(id="min-x", type="number", value=46),
+                    dbc.Input(id="min-x", type="number", value=-4),
                     width=3,
                 ),
                 dbc.Col(
-                    dbc.Input(id="max-x", type="number", value=54),
+                    dbc.Input(id="max-x", type="number", value=4),
                     width=3,
                 ),
                 dbc.Label("max(x)", html_for="max-x", width=3),
@@ -80,7 +80,7 @@ psi_params = dbc.Card(
             [
                 dbc.Label("Intercept", html_for="x_0", width=6),
                 dbc.Col(
-                    dbc.Input(id="x_0", type="number", value=50.0),
+                    dbc.Input(id="x_0", type="number", value=0.0),
                     width=6,
                 ),
             ],
