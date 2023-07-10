@@ -37,6 +37,7 @@ def from_blocks(blocks: pd.DataFrame, dim: str) -> pd.DataFrame:
     blocks[xlabel] = blocks["Fixed Magnitude"]
     return blocks.drop(columns=["Threshold", "Fixed Magnitude"])
 
+
 def plot(
     blocks: pd.DataFrame,
     dim: str,

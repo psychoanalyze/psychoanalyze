@@ -142,7 +142,7 @@ def moc_sample(n_trials: int, model_params: dict[str, float]) -> pd.DataFrame:
     intensities = [float(random.choice(intensity_choices)) for _ in range(n_trials)]
     intensity_index = pd.Index(intensities, name="Intensity")
     results = [
-        int(random.random() <= psi( intensity, model_params))
+        int(random.random() <= psi(intensity, model_params))
         for intensity in intensities
     ]
     return pd.DataFrame(

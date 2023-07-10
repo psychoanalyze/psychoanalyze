@@ -258,6 +258,8 @@ def logistic(params: dict[str, float]) -> pd.DataFrame:
         name="Hit Rate",
     )
     logit_hit_rate = pd.Series(
-        logit(logistic_points), index=logistic_points.index, name="logit(Hit Rate)",
+        logit(logistic_points),
+        index=logistic_points.index,
+        name="logit(Hit Rate)",
     )
     return pd.concat([logistic_points, logit_hit_rate], axis=1)

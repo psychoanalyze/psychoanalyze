@@ -25,7 +25,7 @@ def test_from_trials_sums_n_per_intensity_level():
     trials = pd.DataFrame(
         {
             "Result": [0, 0],
-            "Intensity": [0.0,1.0],
+            "Intensity": [0.0, 1.0],
         },
     )
     points = pa_points.from_trials(trials)
@@ -74,12 +74,16 @@ def test_plot():
 
 def test_generate():
     x = list(np.linspace(-3, 3, 7))
-    points = pa_points.generate(n_trials=70, options=x, params={
-        "Threshold": 0.0,
-        "Slope": 1.0,
-        "Guess Rate": 0.0,
-        "Lapse Rate": 0.0,
-    })
+    points = pa_points.generate(
+        n_trials=70,
+        options=x,
+        params={
+            "Threshold": 0.0,
+            "Slope": 1.0,
+            "Guess Rate": 0.0,
+            "Lapse Rate": 0.0,
+        },
+    )
     assert set(points.index) == set(x)
     assert set(points.columns) >= {"Hits", "n", "Hit Rate"}
     assert points.index.name == "Intensity"
