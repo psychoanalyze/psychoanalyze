@@ -38,7 +38,8 @@
         "ms-python.black-formatter",
         "bungcip.better-toml",
         "ms-azuretools.vscode-docker",
-        "ivan-bocharov.stan-vscode"
+        "ivan-bocharov.stan-vscode",
+        "ms-toolsai.jupyter"
       ]
     }
   }
