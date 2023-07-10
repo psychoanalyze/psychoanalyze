@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.10 (2023-07-10)
+
+### Fix
+
+* Use trials as data source ([`efe7238`](https://github.com/psychoanalyze/psychoanalyze/commit/efe72382254533663d56786d70df762a975528ba))
+
 ## v0.4.9 (2023-07-09)
 
 ### Fix
