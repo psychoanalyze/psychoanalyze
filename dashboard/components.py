@@ -60,6 +60,15 @@ experiment_params = dbc.Card(
                 ),
                 dbc.Label("max(x)", html_for="max-x", width=3),
             ],
+            className="mb-1",
+        ),
+        dbc.Row(
+            [
+                dbc.Label("n blocks", html_for="n-blocks", width=6),
+                dbc.Col(
+                    dbc.Input(id="n-blocks", type="number", value=2),
+                ),
+            ],
         ),
     ],
     body=True,
@@ -118,47 +127,47 @@ psi_params = dbc.Card(
 
 
 points_table = dash_table.DataTable(
-                            id="table",
-                            columns=[
-                                {
-                                    "name": "Intensity",
-                                    "id": "Intensity",
-                                    "type": "numeric",
-                                    "format": dash_table.Format.Format(
-                                        precision=2,
-                                        scheme=dash_table.Format.Scheme.fixed,
-                                    ),
-                                },
-                                {
-                                    "name": "Hits",
-                                    "id": "Hits",
-                                    "type": "numeric",
-                                },
-                                {
-                                    "name": "n",
-                                    "id": "n",
-                                    "type": "numeric",
-                                },
-                                {
-                                    "name": "Hit Rate",
-                                    "id": "Hit Rate",
-                                    "type": "numeric",
-                                    "format": dash_table.Format.Format(
-                                        precision=2,
-                                        scheme=dash_table.Format.Scheme.fixed,
-                                    ),
-                                },
-                                {
-                                    "name": "logit(Hit Rate)",
-                                    "id": "logit(Hit Rate)",
-                                    "type": "numeric",
-                                    "format": dash_table.Format.Format(
-                                        precision=2,
-                                        scheme=dash_table.Format.Scheme.fixed,
-                                    ),
-                                },
-                            ],
-                            style_data={"color": "black"},
-                            style_header={"color": "black"},
-                            page_size=15,
-                        )
+    id="table",
+    columns=[
+        {
+            "name": "Intensity",
+            "id": "Intensity",
+            "type": "numeric",
+            "format": dash_table.Format.Format(
+                precision=2,
+                scheme=dash_table.Format.Scheme.fixed,
+            ),
+        },
+        {
+            "name": "Hits",
+            "id": "Hits",
+            "type": "numeric",
+        },
+        {
+            "name": "n",
+            "id": "n",
+            "type": "numeric",
+        },
+        {
+            "name": "Hit Rate",
+            "id": "Hit Rate",
+            "type": "numeric",
+            "format": dash_table.Format.Format(
+                precision=2,
+                scheme=dash_table.Format.Scheme.fixed,
+            ),
+        },
+        {
+            "name": "logit(Hit Rate)",
+            "id": "logit(Hit Rate)",
+            "type": "numeric",
+            "format": dash_table.Format.Format(
+                precision=2,
+                scheme=dash_table.Format.Scheme.fixed,
+            ),
+        },
+    ],
+    style_data={"color": "black"},
+    style_header={"color": "black"},
+    page_size=15,
+)

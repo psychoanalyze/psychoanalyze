@@ -41,9 +41,9 @@ def from_trials(trials: pd.DataFrame) -> pd.DataFrame:
     """Aggregate point-level measures from trial data."""
     points = (
         trials.groupby("Intensity")[["Result"]]
-        .agg(["count", "sum"])
+        .agg(["count", "sum"])["Result"]
         .rename(columns={"count": "n", "sum": "Hits"})
-    )["Result"]
+    )
     points["Hit Rate"] = points["Hits"] / points["n"]
     points["logit(Hit Rate)"] = logit(points["Hit Rate"])
     return points
@@ -86,23 +86,16 @@ def model() -> stan.CmdStanModel:
     return stan.CmdStanModel(stan_file="models/binomial_regression.stan")
 
 
-# def fit(ready_for_fit: pd.DataFrame) -> pd.DataFrame:
-
-
 def fit(
     points: pd.DataFrame,
 ) -> pd.DataFrame:
     """Fit psychometric curve to points."""
     if len(points):
-        _fit = pa_trials.fit(points[["x", "Hits", "n"]])
+        fit = pa_trials.fit(points[["x", "Hits", "n"]])
         return pd.DataFrame(
             {
-                "Threshold": [_fit["Fit"][0]],
-                "width": [_fit["Fit"][1]],
-                "gamma": [_fit["Fit"][2]],
-                "lambda": [_fit["Fit"][3]],
-                "err+": [None],
-                "err-": [None],
+                "Threshold": [fit["Threshold"]],
+                "Slope": [fit["Slope"]],
             },
         )
     return pd.DataFrame(
@@ -137,7 +130,7 @@ def hits(
 
 def generate(
     n_trials: int,
-    options: list[float],
+    options: pd.Index,
     params: dict[str, float],
 ) -> pd.DataFrame:
     """Generate points-level data."""
@@ -210,7 +203,7 @@ def n(trials: pd.Series) -> pd.Series:
     return pd.Series(trials.value_counts(), name="n")
 
 
-def generate_n(n_trials: int, options: list[float]) -> pd.Series:
+def generate_n(n_trials: int, options: pd.Index) -> pd.Series:
     """Simulate how many trials were performed per intensity level."""
     return n(pa_trials.generate_trial_index(n_trials, options))
 
@@ -256,6 +249,7 @@ def transform(hit_rate: float, y: str) -> float:
 
 def plot_logistic(logistic: pd.DataFrame, y: str, name: str, color: str) -> go.Scatter:
     """Plot a smooth logistic function."""
+    logistic = logistic.reset_index()
     return go.Scatter(
         x=logistic["Intensity"],
         y=logistic[y],

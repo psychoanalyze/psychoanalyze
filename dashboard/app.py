@@ -70,31 +70,29 @@ def update_data(  # noqa: PLR0913
         options=pa_points.generate_index(n_levels, min_x, max_x),
         params=params,
     )
+    model = pa_blocks.logistic(params)
     fits = pa_trials.fit(trials)
-    fit_params = {
-        "Threshold": -fits.intercept_[0],
-        "Slope": fits.coef_[0][0],
+    fit_params = fits | {
         "Guess Rate": 0.0,
         "Lapse Rate": 0.0,
     }
     points = pa_points.from_trials(trials)
-    logistic = pa_blocks.logistic(params).reset_index()
-    fit_logistic = pa_blocks.logistic(fit_params).reset_index()
+    fit = pa_blocks.logistic(fit_params)
     y = "logit(Hit Rate)" if form == "log" else "Hit Rate"
     fig = (
         pa_points.plot(points.reset_index(), y)
         .add_trace(
-            pa_points.plot_logistic(logistic, y, name="model", color="blue"),
+            pa_points.plot_logistic(model, y, name="model", color="blue"),
         )
         .add_trace(
-            pa_points.plot_logistic(fit_logistic, y, name="predicted", color="red"),
+            pa_points.plot_logistic(fit, y, name="predicted", color="red"),
         )
     )
     return (
         fig,
         points.reset_index().sort_values(by="Intensity").to_dict("records"),
-        fits.coef_[0],
-        fits.intercept_,
+        fits["Slope"],
+        fits["Threshold"],
     )
 
 

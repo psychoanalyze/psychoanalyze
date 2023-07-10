@@ -35,7 +35,7 @@ codes = {0: "Miss", 1: "Hit"}
 Trial = TypedDict("Trial", {"Result": bool, "Stimulus Magnitude": float})
 
 
-def generate_trial_index(n_trials: int, options: list[float]) -> pd.Series:
+def generate_trial_index(n_trials: int, options: pd.Index) -> pd.Series:
     """Generate n trials (no outcomes)."""
     return pd.Series(
         [random.choice(options) for _ in range(n_trials)],
@@ -46,7 +46,7 @@ def generate_trial_index(n_trials: int, options: list[float]) -> pd.Series:
 @check_output(types.trials)
 def generate(
     n_trials: int,
-    options: list[float],
+    options: pd.Index,
     params: dict[str, float],
 ) -> pd.DataFrame:
     """Generate n trials with outcomes."""
@@ -151,6 +151,7 @@ def moc_sample(n_trials: int, model_params: dict[str, float]) -> pd.DataFrame:
     )
 
 
-def fit(trials: pd.DataFrame) -> pd.DataFrame:
+def fit(trials: pd.DataFrame) -> dict[str, float]:
     """Fit trial data using logistic regression."""
-    return LogisticRegression().fit(trials[["Intensity"]], trials["Result"])
+    fits = LogisticRegression().fit(trials[["Intensity"]], trials["Result"])
+    return {"Threshold": -fits.intercept_[0], "Slope": fits.coef_[0][0]}
