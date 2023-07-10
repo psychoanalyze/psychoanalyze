@@ -72,6 +72,7 @@ empirical_data_components = html.Div(
                 dbc.Col(upload_component),
                 dbc.Col(dataset_component),
             ],
+            style={"align-items": "center"},
         ),
     ],
 )
@@ -118,9 +119,7 @@ plot_tabs = dbc.Col(
             [
                 dbc.Col(
                     [
-                        dcc.Graph(
-                            id="plot",
-                        ),
+                        dcc.Graph(id="plot"),
                         dbc.RadioItems(
                             options=[
                                 {"label": "logit(Hit Rate)", "value": "log"},
@@ -186,6 +185,7 @@ layout = dbc.Container(
             ),
             brand_href="/",
             class_name="mb-3",
+            style={"border-radius": "0 0 7px 7px"},
         ),
         dbc.Row(
             [
@@ -194,5 +194,4 @@ layout = dbc.Container(
             ],
         ),
     ],
-    style={"border-radius": "5px"},
 )

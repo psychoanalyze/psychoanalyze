@@ -19,10 +19,18 @@ from dash import dash_table, dcc, html
 
 experiment_params = dbc.Card(
     [
-        html.H4("Experimental Design", className="mb-4"),
+        html.H4("Experimental Design", className="card-title"),
         dcc.Dropdown(
             id="exp-type",
-            options=[{"label": "Method of Constant Stimuli", "value": "moc"}],
+            options=[
+                {
+                    "label": html.Span(
+                        "Method of Constant Stimuli",
+                        style={"color": "black"},
+                    ),
+                    "value": "moc",
+                },
+            ],
             value="moc",
             className="mb-3",
         ),
@@ -42,35 +50,6 @@ experiment_params = dbc.Card(
         ),
         dbc.Row(
             [
-                dbc.Label("n levels", html_for="n-levels", width=6),
-                dbc.Col(
-                    dbc.Input(
-                        id={"type": "experiment-param", "name": "n-levels"},
-                        type="number",
-                        value=7,
-                    ),
-                    width=6,
-                ),
-            ],
-            className="mb-1",
-        ),
-        dbc.Row(
-            [
-                dbc.Label("min(x)", html_for="min-x", width=3),
-                dbc.Col(
-                    dbc.Input(id="min-x", type="number", value=-4),
-                    width=3,
-                ),
-                dbc.Col(
-                    dbc.Input(id="max-x", type="number", value=4),
-                    width=3,
-                ),
-                dbc.Label("max(x)", html_for="max-x", width=3),
-            ],
-            className="mb-1",
-        ),
-        dbc.Row(
-            [
                 dbc.Label("n blocks", html_for="n-blocks", width=6),
                 dbc.Col(
                     dbc.Input(
@@ -80,10 +59,44 @@ experiment_params = dbc.Card(
                     ),
                 ),
             ],
+            className="mb-1",
+        ),
+        dbc.Row(
+            [
+                dbc.Label("n levels", html_for="n-levels", width=6),
+                dbc.Col(
+                    dbc.Input(
+                        id={"type": "experiment-param", "name": "n-levels"},
+                        type="number",
+                        value=7,
+                        style={"border-radius": 3},
+                    ),
+                    width=6,
+                ),
+            ],
+            className="mb-1",
+        ),
+        dbc.Row(
+            [
+                dbc.Label("Intensity Range", width=6),
+                dbc.Col(
+                    dbc.Input(
+                        id="min-x",
+                        type="number",
+                        value=-4,
+                        style={"border-radius": 3},
+                    ),
+                    width=3,
+                ),
+                dbc.Col(
+                    dbc.Input(id="max-x", type="number", value=4),
+                    width=3,
+                ),
+            ],
         ),
     ],
     body=True,
-    className="mb-3",
+    style={"border-radius": 7},
 )
 
 psi_params = dbc.Card(
@@ -160,6 +173,7 @@ psi_params = dbc.Card(
         ),
     ],
     body=True,
+    style={"border-radius": 7},
 )
 
 
