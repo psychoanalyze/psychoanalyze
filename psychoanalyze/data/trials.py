@@ -35,7 +35,7 @@ codes = {0: "Miss", 1: "Hit"}
 Trial = TypedDict("Trial", {"Result": bool, "Stimulus Magnitude": float})
 
 
-def generate_n(n_trials: int, options: list[float]) -> pd.Series:
+def generate_trial_index(n_trials: int, options: list[float]) -> pd.Series:
     """Generate n trials (no outcomes)."""
     return pd.Series(
         [random.choice(options) for _ in range(n_trials)],
@@ -44,14 +44,17 @@ def generate_n(n_trials: int, options: list[float]) -> pd.Series:
 
 
 def generate(
-    n: pd.Series,
-    outcomes: list[int],
+    n_trials: int,
+    options: list[float],
+    params: dict[str, float],
 ) -> pd.Series:
     """Generate n trials with outcomes."""
+    x = generate_trial_index(n_trials, options)
+    p = {option: psi(option, params) for option in options}
     return pd.Series(
-        [random.choice(outcomes) for _ in range(n)],
+        [int(random.random() <= p[x_val]) for x_val in x],
         name="Result",
-        index=n,
+        index=x,
     )
 
 
@@ -120,8 +123,12 @@ def labels(results: list[int]) -> list[str]:
     return [codes[result] for result in results]
 
 
-def psi(gamma: float, lambda_: float, k: float, intensity: float, x_0: float) -> float:
+def psi(intensity: float, params: dict[str, float]) -> float:
     """Calculate the value of the psychometric function for a given intensity."""
+    gamma = params["Guess Rate"]
+    lambda_ = params["Lapse Rate"]
+    k = params["Slope"]
+    x_0 = params["Threshold"]
     return gamma + (1 - gamma - lambda_) * (1 / (1 + np.exp(-k * (intensity - x_0))))
 
 
@@ -129,13 +136,11 @@ def moc_sample(n_trials: int, model_params: dict[str, float]) -> pd.DataFrame:
     """Sample results from a method-of-constant-stimuli experiment."""
     x_0 = model_params["x_0"]
     k = model_params["k"]
-    gamma = model_params["gamma"]
-    lambda_ = model_params["lambda"]
     intensity_choices = np.linspace(x_0 - 4 / k, x_0 + 4 / k, 7)
     intensities = [float(random.choice(intensity_choices)) for _ in range(n_trials)]
     intensity_index = pd.Index(intensities, name="Intensity")
     results = [
-        int(random.random() <= psi(gamma, lambda_, k, intensity, x_0))
+        int(random.random() <= psi( intensity, model_params))
         for intensity in intensities
     ]
     return pd.DataFrame(

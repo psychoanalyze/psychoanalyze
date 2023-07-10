@@ -130,7 +130,12 @@ plot_tabs = dbc.Col(
                     width=7,
                 ),
                 dbc.Col(
-                    points_table,
+                    [
+                        points_table,
+                        html.P("Fit: "),
+                        html.P(id="x_0_fit"),
+                        html.P(id="k_fit"),
+                    ],
                     width=4,
                 ),
             ],

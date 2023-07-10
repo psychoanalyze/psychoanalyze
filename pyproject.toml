@@ -35,14 +35,14 @@ black = "^23.3.0"
 mkdocs = "^1.4.3"
 mkdocs-material = "^9.1.18"
 mkdocstrings = {extras = ["python"], version = "^0.22.0"}
+ipykernel = "^6.24.0"
+ipywidgets = "^8.0.7"
 
 [tool.poetry.scripts]
 psychoanalyze = "psychoanalyze.__main__:main"
 
 
 [tool.poetry.group.dev.dependencies]
-ipython = "^8.14.0"
-ipykernel = "^6.23.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

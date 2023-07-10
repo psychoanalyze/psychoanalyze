@@ -20,10 +20,12 @@ import dash_bootstrap_components as dbc
 import numpy as np
 import plotly.graph_objects as go
 from dash import Dash, Input, Output, callback
+from scipy.special import logit
 
 from dashboard.layout import layout
 from psychoanalyze.data import blocks as pa_blocks
 from psychoanalyze.data import points as pa_points
+from psychoanalyze.data import trials as pa_trials
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO, dbc.icons.BOOTSTRAP])
 
@@ -35,6 +37,8 @@ server = app.server
 @callback(
     Output("plot", "figure"),
     Output("table", "data"),
+    Output("x_0_fit", "children"),
+    Output("k_fit", "children"),
     Input("n-trials", "value"),
     Input("n-levels", "value"),
     Input("x_0", "value"),
@@ -64,16 +68,21 @@ def update_data(  # noqa: PLR0913
         "Guess Rate": guess_rate,
         "Lapse Rate": lapse_rate,
     }
-    points = pa_points.generate(
-        n_trials=n_trials,
-        options=x,
-        params=params,
-    )
-    logistic = pa_blocks.logistic(params)
-    logistic = logistic.reset_index()
+    trials = pa_trials.generate(n_trials, x, params).reset_index()
+    points = pa_points.from_trials(trials)
+    points["Hit Rate"] = points["Hits"] / points["n"]
+    points["logit(Hit Rate)"] = logit(points["Hit Rate"])
+    logistic = pa_blocks.logistic(params).reset_index()
     y = "logit(Hit Rate)" if form == "log" else "Hit Rate"
-    fig = pa_points.plot(points, y).add_trace(pa_points.plot_logistic(logistic, y))
-    return fig, points.reset_index().sort_values(by="Intensity").to_dict("records")
+    fig = pa_points.plot(points.reset_index(), y).add_trace(
+        pa_points.plot_logistic(logistic, y),
+    )
+    return (
+        fig,
+        points.reset_index().sort_values(by="Intensity").to_dict("records"),
+        None,
+        None,
+    )
 
 
 if __name__ == "__main__":

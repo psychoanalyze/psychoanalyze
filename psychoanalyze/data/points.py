@@ -205,7 +205,7 @@ def n(trials: pd.Series) -> pd.Series:
 
 def generate_n(n_trials: int, options: list[float]) -> pd.Series:
     """Simulate how many trials were performed per intensity level."""
-    return n(trials.generate_n(n_trials, options))
+    return n(trials.generate_trial_index(n_trials, options))
 
 
 def to_block(points: pd.DataFrame) -> pd.DataFrame:
