@@ -62,9 +62,7 @@ targets = ["psychoanalyze/"]
 skips = ["B311", "B104"]
 
 [tool.mypy]
-exclude = [
-    'target'
-]
+exclude = ['target']
 
 [[tool.mypy.overrides]]
 module = [

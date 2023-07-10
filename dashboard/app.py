@@ -18,11 +18,9 @@ If not, see <https://www.gnu.org/licenses/>.
 
 import dash_bootstrap_components as dbc
 import numpy as np
-import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from dash import Dash, Input, Output, callback
-from scipy.special import logit
 
 from dashboard.layout import layout
 from psychoanalyze.data import blocks as pa_blocks
@@ -73,9 +71,6 @@ def update_data(  # noqa: PLR0913
         params=params,
     )
     logistic = pa_blocks.logistic(params)
-    logit_logistic = pd.Series(
-        logit(logistic), index=logistic.index, name="logit(Hit Rate)",
-    ).reset_index()
     logistic = logistic.reset_index()
     if form == "log":
         fig = px.scatter(
@@ -86,8 +81,8 @@ def update_data(  # noqa: PLR0913
             template="plotly_white",
         ).add_trace(
             go.Scatter(
-                x=logit_logistic["Intensity"],
-                y=logit_logistic["logit(Hit Rate)"],
+                x=logistic["Intensity"],
+                y=logistic["logit(Hit Rate)"],
                 mode="lines",
                 name="model",
                 marker_color="blue",

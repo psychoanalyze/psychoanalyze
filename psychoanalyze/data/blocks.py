@@ -25,7 +25,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from pandera.typing import DataFrame
-from scipy.special import expit
+from scipy.special import expit, logit
 from scipy.stats import logistic as scipy_logistic
 from sklearn.linear_model import LogisticRegression
 
@@ -242,7 +242,7 @@ def reshape_fit_results(fits: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame
     return param_fits
 
 
-def logistic(params: dict[str, float]) -> pd.Series:
+def logistic(params: dict[str, float]) -> pd.DataFrame:
     """Generate logistic function from parameters."""
     x = np.linspace(
         scipy_logistic.ppf(0.01) + params["Threshold"],
@@ -253,8 +253,12 @@ def logistic(params: dict[str, float]) -> pd.Series:
         1 - params["Guess Rate"] - params["Lapse Rate"]
     ) * scipy_logistic.cdf(x, params["Threshold"], params["Slope"])
     index = pd.Index(x, name="Intensity")
-    return pd.Series(
+    logistic_points = pd.Series(
         y,
         index=index,
         name="Hit Rate",
     )
+    logit_hit_rate = pd.Series(
+        logit(logistic_points), index=logistic_points.index, name="logit(Hit Rate)",
+    )
+    return pd.concat([logistic_points, logit_hit_rate], axis=1)
