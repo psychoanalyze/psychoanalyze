@@ -16,7 +16,7 @@
 
 
 import dash_bootstrap_components as dbc
-from dash import dcc, html
+from dash import dash_table, dcc, html
 
 from dashboard.components import experiment_params, points_table, psi_params
 
@@ -131,9 +131,32 @@ plot_tabs = dbc.Col(
                 dbc.Col(
                     [
                         points_table,
-                        html.P("Fit: "),
-                        html.P(id="x_0_fit"),
-                        html.P(id="k_fit"),
+                        html.Br(),
+                        dash_table.DataTable(
+                            id="blocks-table",
+                            columns=[
+                                {
+                                    "name": "Threshold",
+                                    "id": "Threshold",
+                                    "type": "numeric",
+                                    "format": dash_table.Format.Format(
+                                        precision=2,
+                                        scheme=dash_table.Format.Scheme.fixed,
+                                    ),
+                                },
+                                {
+                                    "name": "Slope",
+                                    "id": "Slope",
+                                    "type": "numeric",
+                                    "format": dash_table.Format.Format(
+                                        precision=2,
+                                        scheme=dash_table.Format.Scheme.fixed,
+                                    ),
+                                },
+                            ],
+                            style_data={"color": "black"},
+                            style_header={"color": "black"},
+                        ),
                     ],
                     width=4,
                 ),

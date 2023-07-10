@@ -36,8 +36,7 @@ server = app.server
 @callback(
     Output("plot", "figure"),
     Output("table", "data"),
-    Output("x_0_fit", "children"),
-    Output("k_fit", "children"),
+    Output("blocks-table", "data"),
     Input("n-trials", "value"),
     Input("n-levels", "value"),
     Input("x_0", "value"),
@@ -92,8 +91,7 @@ def update_data(  # noqa: PLR0913
     return (
         fig,
         points.reset_index().sort_values(by="Intensity").to_dict("records"),
-        fits["Slope"],
-        fits["Threshold"],
+        [fits],
     )
 
 
