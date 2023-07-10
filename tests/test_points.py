@@ -67,7 +67,7 @@ def test_plot():
         {"Hit Rate": [], "n": []},
         index=pd.Index([], name="Intensity"),
     )
-    fig = pa_points.plot(points)
+    fig = pa_points.plot(points, y="Hit Rate")
     assert fig.layout.yaxis.title.text == "Hit Rate"
     assert fig.layout.xaxis.title.text == "Intensity"
 

@@ -226,12 +226,12 @@ def psi(
     )
 
 
-def plot(points: pd.DataFrame) -> go.Figure:
+def plot(points: pd.DataFrame, y: str) -> go.Figure:
     """Plot the psychometric function."""
     return px.scatter(
         points.reset_index(),
         x="Intensity",
-        y="Hit Rate",
+        y=y,
         size="n",
         template="plotly_white",
     )
@@ -245,3 +245,14 @@ def hit_rate(df: pd.DataFrame) -> pd.Series:
 def transform(hit_rate: float, y: str) -> float:
     """Logit transform hit rate."""
     return logit(hit_rate) if y == "alpha" else hit_rate
+
+
+def plot_logistic(logistic: pd.DataFrame, y: str) -> go.Scatter:
+    """Plot a smooth logistic function."""
+    return go.Scatter(
+        x=logistic["Intensity"],
+        y=logistic[y],
+        mode="lines",
+        name="model",
+        marker_color="blue",
+    )
