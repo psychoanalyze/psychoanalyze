@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>.
 """
 
 import dash_bootstrap_components as dbc
-import numpy as np
 import plotly.graph_objects as go
 from dash import Dash, Input, Output, callback
 
@@ -68,7 +67,7 @@ def update_data(  # noqa: PLR0913
     }
     trials = pa_trials.generate(
         n_trials,
-        options=list(np.linspace(min_x, max_x, n_levels)),
+        options=pa_points.generate_index(n_levels, min_x, max_x),
         params=params,
     )
     fits = pa_trials.fit(trials)
