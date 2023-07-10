@@ -27,6 +27,7 @@ from psychoanalyze.data import trials as pa_trials
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO, dbc.icons.BOOTSTRAP])
 
+app.title = "PsychoAnalyze"
 app.layout = layout
 
 server = app.server
