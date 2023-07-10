@@ -83,7 +83,14 @@ psi_params = dbc.Card(
             value="expit",
             className="mb-3",
         ),
-        dcc.Markdown("""$f(x) = \\frac{1}{1 + e^{-k(x-x_0)}}$""", mathjax=True),
+        dcc.Markdown(
+            """
+            $$
+            f(x) = \\frac{1}{1 + e^{-k(x-x_0)}}
+            $$
+            """,
+            mathjax=True,
+        ),
         dbc.Row(
             [
                 dbc.Label("Intercept", html_for="x_0", width=6),

@@ -134,6 +134,8 @@ plot_tabs = dbc.Col(
                         html.Br(),
                         dash_table.DataTable(
                             id="blocks-table",
+                            row_selectable="single",
+                            selected_rows=[0],
                             columns=[
                                 {
                                     "name": "Threshold",
