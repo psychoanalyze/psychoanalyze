@@ -16,9 +16,14 @@
 
 
 import dash_bootstrap_components as dbc
-from dash import dash_table, dcc, html
+from dash import dcc, html
 
-from dashboard.components import experiment_params, points_table, psi_params
+from dashboard.components import (
+    blocks_table,
+    experiment_params,
+    points_table,
+    psi_params,
+)
 
 component_column = dbc.Col(
     [
@@ -132,51 +137,7 @@ plot_tabs = dbc.Col(
                     [
                         points_table,
                         html.Br(),
-                        dash_table.DataTable(
-                            id="blocks-table",
-                            row_selectable="single",
-                            selected_rows=[0],
-                            columns=[
-                                {
-                                    "name": "Threshold",
-                                    "id": "Threshold",
-                                    "type": "numeric",
-                                    "format": dash_table.Format.Format(
-                                        precision=2,
-                                        scheme=dash_table.Format.Scheme.fixed,
-                                    ),
-                                },
-                                {
-                                    "name": "Slope",
-                                    "id": "Slope",
-                                    "type": "numeric",
-                                    "format": dash_table.Format.Format(
-                                        precision=2,
-                                        scheme=dash_table.Format.Scheme.fixed,
-                                    ),
-                                },
-                                {
-                                    "name": "Guess Rate",
-                                    "id": "Guess Rate",
-                                    "type": "numeric",
-                                    "format": dash_table.Format.Format(
-                                        precision=2,
-                                        scheme=dash_table.Format.Scheme.fixed,
-                                    ),
-                                },
-                                {
-                                    "name": "Lapse Rate",
-                                    "id": "Lapse Rate",
-                                    "type": "numeric",
-                                    "format": dash_table.Format.Format(
-                                        precision=2,
-                                        scheme=dash_table.Format.Scheme.fixed,
-                                    ),
-                                },
-                            ],
-                            style_data={"color": "black"},
-                            style_header={"color": "black"},
-                        ),
+                        blocks_table,
                     ],
                     width=4,
                 ),

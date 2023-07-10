@@ -28,9 +28,13 @@ experiment_params = dbc.Card(
         ),
         dbc.Row(
             [
-                dbc.Label("n trials", html_for="n-trials", width=6),
+                dbc.Label("n trials", width=6),
                 dbc.Col(
-                    dbc.Input(id="n-trials", type="number", value=70),
+                    dbc.Input(
+                        id={"type": "experiment-param", "name": "n-trials"},
+                        type="number",
+                        value=70,
+                    ),
                     width=6,
                 ),
             ],
@@ -40,7 +44,11 @@ experiment_params = dbc.Card(
             [
                 dbc.Label("n levels", html_for="n-levels", width=6),
                 dbc.Col(
-                    dbc.Input(id="n-levels", type="number", value=7),
+                    dbc.Input(
+                        id={"type": "experiment-param", "name": "n-levels"},
+                        type="number",
+                        value=7,
+                    ),
                     width=6,
                 ),
             ],
@@ -65,7 +73,11 @@ experiment_params = dbc.Card(
             [
                 dbc.Label("n blocks", html_for="n-blocks", width=6),
                 dbc.Col(
-                    dbc.Input(id="n-blocks", type="number", value=2),
+                    dbc.Input(
+                        id={"type": "experiment-param", "name": "n-blocks"},
+                        type="number",
+                        value=2,
+                    ),
                 ),
             ],
         ),
@@ -195,4 +207,50 @@ points_table = dash_table.DataTable(
     style_data={"color": "black"},
     style_header={"color": "black"},
     page_size=15,
+)
+
+blocks_table = dash_table.DataTable(
+    id="blocks-table",
+    row_selectable="single",
+    selected_rows=[0],
+    columns=[
+        {
+            "name": "Threshold",
+            "id": "Threshold",
+            "type": "numeric",
+            "format": dash_table.Format.Format(
+                precision=2,
+                scheme=dash_table.Format.Scheme.fixed,
+            ),
+        },
+        {
+            "name": "Slope",
+            "id": "Slope",
+            "type": "numeric",
+            "format": dash_table.Format.Format(
+                precision=2,
+                scheme=dash_table.Format.Scheme.fixed,
+            ),
+        },
+        {
+            "name": "Guess Rate",
+            "id": "Guess Rate",
+            "type": "numeric",
+            "format": dash_table.Format.Format(
+                precision=2,
+                scheme=dash_table.Format.Scheme.fixed,
+            ),
+        },
+        {
+            "name": "Lapse Rate",
+            "id": "Lapse Rate",
+            "type": "numeric",
+            "format": dash_table.Format.Format(
+                precision=2,
+                scheme=dash_table.Format.Scheme.fixed,
+            ),
+        },
+    ],
+    style_data={"color": "black"},
+    style_header={"color": "black"},
 )

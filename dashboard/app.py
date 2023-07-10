@@ -22,7 +22,7 @@ from typing import Any
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.graph_objects as go
-from dash import ALL, Dash, Input, Output, callback, dash_table
+from dash import ALL, Dash, Input, Output, State, callback, dash_table
 
 from dashboard.layout import layout
 from psychoanalyze.data import blocks as pa_blocks
@@ -33,57 +33,58 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO, dbc.icons.BOOTS
 
 app.title = "PsychoAnalyze"
 app.layout = layout
-
 server = app.server
+
 
 @callback(
     Output("points-store", "data"),
     Output("blocks-table", "data"),
-    Input("n-trials", "value"),
-    Input("n-levels", "value"),
+    Input({"type": "experiment-param", "name": ALL}, "value"),
+    State({"type": "experiment-param", "name": ALL}, "id"),
     Input({"type": "param", "id": ALL}, "value"),
     Input("min-x", "value"),
     Input("max-x", "value"),
 )
 def update_data(
-    n_trials: int,
-    n_levels: int,
+    experiment_param_values: list[int],
+    dash_ids: list[dict[str, str]],
     params: list[float],
     min_x: float,
     max_x: float,
 ) -> tuple[list[Any], list[dict[str, float]]]:
     """Update generated data according to user parameter inputs."""
+    experiment_params = {
+        dash_id["name"]: experiment_param_values[i]
+        for i, dash_id in enumerate(dash_ids)
+    }
     _params = {
         "Threshold": params[0],
         "Slope": params[1],
         "Guess Rate": params[2],
         "Lapse Rate": params[3],
     }
-    x = pa_points.generate_index(n_levels, min_x, max_x)
-    trials1 = pa_trials.generate(
-        n_trials,
-        options=x,
-        params=_params,
-    )
-    trials2 = pa_trials.generate(
-        n_trials,
-        options=x,
-        params=_params,
-    )
-    fits1 = pa_trials.fit(trials1)
-    fits2 = pa_trials.fit(trials2)
-    fit_params1 = fits1 | {
-        "Guess Rate": 0.0,
-        "Lapse Rate": 0.0,
-    }
-    fit_params2 = fits2 | {
-        "Guess Rate": 0.0,
-        "Lapse Rate": 0.0,
-    }
-    fit_params = [fit_params1, fit_params2]
-    points1 = pa_points.from_trials(trials1).reset_index()
-    points2 = pa_points.from_trials(trials2).reset_index()
-    all_points = [points1.to_dict("records"), points2.to_dict("records")]
+    x = pa_points.generate_index(experiment_params["n-levels"], min_x, max_x)
+    trials = [
+        pa_trials.generate(
+            experiment_params["n-trials"],
+            options=x,
+            params=_params,
+        )
+        for _ in range(experiment_params["n-blocks"])
+    ]
+    fits = [pa_trials.fit(trial_block) for trial_block in trials]
+    fit_params = [
+        fit
+        | {
+            "Guess Rate": 0.0,
+            "Lapse Rate": 0.0,
+        }
+        for fit in fits
+    ]
+    points = [
+        pa_points.from_trials(trial_block).reset_index() for trial_block in trials
+    ]
+    all_points = [points_block.to_dict("records") for points_block in points]
     return all_points, fit_params
 
 
