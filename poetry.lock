@@ -903,17 +903,6 @@ async = ["asgiref (>=3.2)"]
 dotenv = ["python-dotenv"]
 
 [[package]]
-name = "flask-talisman"
-version = "1.0.0"
-description = "HTTP security headers for Flask."
-optional = false
-python-versions = "*"
-files = [
-    {file = "flask-talisman-1.0.0.tar.gz", hash = "sha256:205d3de7c5ecfad667c84123f5fbe580b1f68cd9a1b058d7353cc0348e15b1bf"},
-    {file = "flask_talisman-1.0.0-py2.py3-none-any.whl", hash = "sha256:be2767b6b2bc11b36bf9a0e09ffa10622fbe0d971fd7057a843f82cd795a854b"},
-]
-
-[[package]]
 name = "fonttools"
 version = "4.40.0"
 description = "Tools to manipulate font files"
@@ -3923,4 +3912,4 @@ test = ["hypothesis", "packaging", "pytest", "pytest-cov"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.4"
-content-hash = "5e3febe81b45815683c1b93fa7aad96585bcde59654f5418b1ffd5d0ca492c1f"
+content-hash = "6efa1fd6831871f8eaa1de50a6d8b08f4e8044a6586a53447a6691422f3ee667"

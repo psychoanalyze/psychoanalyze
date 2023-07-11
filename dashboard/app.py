@@ -23,7 +23,6 @@ import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.graph_objects as go
 from dash import ALL, Dash, Input, Output, State, callback, dash_table
-from flask_talisman import Talisman
 
 from dashboard.layout import layout
 from psychoanalyze.data import blocks as pa_blocks
@@ -31,7 +30,6 @@ from psychoanalyze.data import points as pa_points
 from psychoanalyze.data import trials as pa_trials
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO, dbc.icons.BOOTSTRAP])
-Talisman(app)
 app.title = "PsychoAnalyze"
 app.layout = layout
 server = app.server
