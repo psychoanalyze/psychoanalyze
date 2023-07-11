@@ -163,20 +163,6 @@ plot_tabs = dbc.Col(
                                                     "name": "pdf",
                                                 },
                                             ),
-                                            dbc.DropdownMenuItem(
-                                                "EPS",
-                                                id={
-                                                    "type": "img-export",
-                                                    "name": "eps",
-                                                },
-                                            ),
-                                            dbc.DropdownMenuItem(
-                                                "HTML",
-                                                id={
-                                                    "type": "img-export",
-                                                    "name": "html",
-                                                },
-                                            ),
                                         ],
                                         label="Download figure as... ",
                                         id="figure-download",
