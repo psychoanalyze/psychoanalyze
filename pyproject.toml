@@ -37,6 +37,7 @@ mkdocs-material = "^9.1.18"
 mkdocstrings = {extras = ["python"], version = "^0.22.0"}
 ipykernel = "^6.24.0"
 ipywidgets = "^8.0.7"
+kaleido = "0.2.1"
 
 [tool.poetry.scripts]
 psychoanalyze = "psychoanalyze.__main__:main"
