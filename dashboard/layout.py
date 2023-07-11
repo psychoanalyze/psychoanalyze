@@ -38,9 +38,7 @@ component_column = dbc.Col(
 )
 
 upload_component = dcc.Upload(
-    """Upload your own data -
-                        drag and drop, or click to open file browser
-                        """,
+    "Upload data - drag-and-drop OR click to open upload tool",
     id="upload-data",
     style={
         "width": "100%",
@@ -174,7 +172,10 @@ plot_tabs = dbc.Col(
                                         children=[
                                             dbc.DropdownMenuItem(
                                                 "Parquet",
-                                                id="parquet",
+                                                id={
+                                                    "type": "data-export",
+                                                    "name": "parquet",
+                                                },
                                             ),
                                             dbc.DropdownMenuItem(
                                                 "CSV",
@@ -188,13 +189,6 @@ plot_tabs = dbc.Col(
                                                 id={
                                                     "type": "data-export",
                                                     "name": "json",
-                                                },
-                                            ),
-                                            dbc.DropdownMenuItem(
-                                                "Excel",
-                                                id={
-                                                    "type": "data-export",
-                                                    "name": "xlsx",
                                                 },
                                             ),
                                             dbc.DropdownMenuItem(

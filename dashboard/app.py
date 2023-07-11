@@ -18,9 +18,11 @@ Contains callbacks.
 # PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
 import base64
+from pathlib import Path
 from typing import Any
 
 import dash_bootstrap_components as dbc
+import duckdb
 import pandas as pd
 import plotly.graph_objects as go
 from dash import (
@@ -187,7 +189,26 @@ def export_data(
     data: go.Figure,
 ) -> dict[str, str | bool | bytes]:
     """Export image."""
-    return dcc.send_data_frame(pd.DataFrame.from_records(data).to_csv, "data.csv")
+    format_suffix = callback_context.triggered_id["name"]
+    _data = pd.DataFrame.from_records(data)
+    if format_suffix == "csv":
+        download = dcc.send_data_frame(_data.to_csv, "data.csv")
+    elif format_suffix == "json":
+        download = dcc.send_data_frame(_data.to_json, "data.json")
+    elif format_suffix == "parquet":
+        download = dcc.send_data_frame(_data.to_parquet, "data.parquet")
+    elif format_suffix == "duckdb":
+        connection = duckdb.connect("psychoanalyze.duckdb")
+        connection.sql("CREATE TABLE points AS SELECT * FROM _data")
+        connection.close()
+        with Path("psychoanalyze.duckdb").open("rb") as f:
+            download = {
+                "base64": True,
+                "content": base64.b64encode(f.read()).decode("utf-8"),
+                "filename": f"psychoanalyze.{format_suffix}",
+            }
+
+    return download
 
 
 if __name__ == "__main__":
