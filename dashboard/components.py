@@ -19,7 +19,7 @@ from dash import dash_table, dcc, html
 
 experiment_params = dbc.Card(
     [
-        html.H4("Experimental Design", className="card-title"),
+        html.H4("Experimental Design", className="card-title mb-3"),
         dcc.Dropdown(
             id="exp-type",
             options=[
@@ -36,46 +36,35 @@ experiment_params = dbc.Card(
         ),
         dbc.Row(
             [
-                dbc.Label("n trials", width=6),
                 dbc.Col(
                     dbc.Input(
                         id={"type": "experiment-param", "name": "n-trials"},
                         type="number",
                         value=70,
+                        style={"border-radius": 3},
                     ),
-                    width=6,
+                    width=4,
                 ),
+                dbc.Label("trials per block", width=6),
             ],
             className="mb-1",
         ),
         dbc.Row(
             [
-                dbc.Label("n blocks", html_for="n-blocks", width=6),
                 dbc.Col(
                     dbc.Input(
                         id={"type": "experiment-param", "name": "n-blocks"},
                         type="number",
                         value=2,
-                    ),
-                ),
-            ],
-            className="mb-1",
-        ),
-        dbc.Row(
-            [
-                dbc.Label("n levels", html_for="n-levels", width=6),
-                dbc.Col(
-                    dbc.Input(
-                        id={"type": "experiment-param", "name": "n-levels"},
-                        type="number",
-                        value=7,
                         style={"border-radius": 3},
                     ),
-                    width=6,
+                    width=4,
                 ),
+                dbc.Label("blocks", width=6),
             ],
             className="mb-1",
         ),
+        html.H5("Sampling strategy", className="mt-4 mb-2"),
         dbc.Row(
             [
                 dbc.Label("Intensity Range", width=6),
@@ -89,19 +78,40 @@ experiment_params = dbc.Card(
                     width=3,
                 ),
                 dbc.Col(
-                    dbc.Input(id="max-x", type="number", value=4),
+                    dbc.Input(
+                        id="max-x",
+                        type="number",
+                        value=4,
+                        style={"border-radius": 3},
+                    ),
                     width=3,
                 ),
             ],
         ),
+        dbc.Row(
+            [
+                dbc.Col(
+                    dbc.Input(
+                        id={"type": "experiment-param", "name": "n-levels"},
+                        type="number",
+                        value=7,
+                        style={"border-radius": 3},
+                    ),
+                    width=4,
+                ),
+                dbc.Label("intensity levels", html_for="n-levels", width=6),
+            ],
+            className="mb-1",
+        ),
     ],
     body=True,
+    className="mb-4",
     style={"border-radius": 7},
 )
 
 psi_params = dbc.Card(
     [
-        html.H4("Psychometric Model", className="mb-4"),
+        html.H4("Psychometric Model", className="card-title mb-3"),
         dcc.Dropdown(
             id="f",
             options=[{"label": "Logistic (expit)", "value": "expit"}],
@@ -118,58 +128,69 @@ psi_params = dbc.Card(
         ),
         dbc.Row(
             [
-                dbc.Label("Intercept", width=6),
+                dbc.Label("Intercept", width=6, style={"text-align": "right"}),
                 dbc.Col(
                     dbc.Input(
                         id={"type": "param", "id": 0},
                         type="number",
                         value=0.0,
+                        style={"border-radius": 3},
+                        className="mb-1",
                     ),
                     width=6,
                 ),
             ],
+            style={"justify-content": "center"},
         ),
         dbc.Row(
             [
-                dbc.Label("Slope", width=6),
+                dbc.Label("Slope", width=6, style={"text-align": "right"}),
                 dbc.Col(
                     dbc.Input(
                         id={"type": "param", "id": 1},
                         type="number",
                         value=1.0,
                         step=0.1,
+                        style={"border-radius": 3},
+                        className="mb-1",
                     ),
                     width=6,
                 ),
             ],
+            style={"justify-content": "center"},
         ),
         dbc.Row(
             [
-                dbc.Label("Guess Rate ", width=6),
+                dbc.Label("Guess Rate ", width=6, style={"text-align": "right"}),
                 dbc.Col(
                     dbc.Input(
                         id={"type": "param", "id": 2},
                         type="number",
                         value=0.0,
                         step=0.1,
+                        style={"border-radius": 3},
+                        className="mb-1",
                     ),
                     width=6,
                 ),
             ],
+            style={"justify-content": "center"},
         ),
         dbc.Row(
             [
-                dbc.Label("Lapse Rate", width=6),
+                dbc.Label("Lapse Rate", width=6, style={"text-align": "right"}),
                 dbc.Col(
                     dbc.Input(
                         id={"type": "param", "id": 3},
                         type="number",
                         value=0.0,
                         step=0.1,
+                        style={"border-radius": 3},
                     ),
                     width=6,
                 ),
             ],
+            style={"justify-content": "center"},
         ),
     ],
     body=True,

@@ -65,16 +65,13 @@ dataset_component = dcc.Dropdown(
     id="dataset",
 )
 
-empirical_data_components = html.Div(
+empirical_data_components = dbc.Row(
     [
-        dbc.Row(
-            [
-                dbc.Col(upload_component),
-                dbc.Col(dataset_component),
-            ],
-            style={"align-items": "center"},
-        ),
+        dbc.Col(upload_component),
+        dbc.Col(dataset_component),
     ],
+    style={"align-items": "center"},
+    className="mb-3",
 )
 
 psi_tab = dbc.Tab(
@@ -103,22 +100,19 @@ plot_tabs = dbc.Col(
     [
         empirical_data_components,
         dbc.Row(
-            dbc.Tabs(
-                [
-                    psi_tab,
-                    ecdf_tab,
-                    time_series_tab,
-                    sd_tab,
-                ],
-                active_tab="psi-tab",
-                id="plot-tabs",
-            ),
-            class_name="my-4",
-        ),
-        dbc.Row(
             [
                 dbc.Col(
                     [
+                        dbc.Tabs(
+                            [
+                                psi_tab,
+                                ecdf_tab,
+                                time_series_tab,
+                                sd_tab,
+                            ],
+                            active_tab="psi-tab",
+                            id="plot-tabs",
+                        ),
                         dcc.Graph(id="plot"),
                         dbc.RadioItems(
                             options=[
@@ -134,11 +128,11 @@ plot_tabs = dbc.Col(
                 ),
                 dbc.Col(
                     [
+                        html.H4("Blocks", className="mt-2"),
+                        html.Div(blocks_table, className="mb-3"),
+                        html.H4("Points"),
                         points_table,
-                        html.Br(),
-                        blocks_table,
                     ],
-                    width=4,
                 ),
             ],
         ),
@@ -186,6 +180,7 @@ layout = dbc.Container(
             brand_href="/",
             class_name="mb-3",
             style={"border-radius": "0 0 7px 7px"},
+            fluid=True,
         ),
         dbc.Row(
             [
