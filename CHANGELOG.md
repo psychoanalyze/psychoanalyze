@@ -2,6 +2,17 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.11 (2023-07-11)
+
+### Fix
+
+* Https via flask-talisman ([`21727bb`](https://github.com/psychoanalyze/psychoanalyze/commit/21727bb671a1787d6aa04d8b454a375bfaade995))
+
+### Documentation
+
+* Remove colab badge ([`f467052`](https://github.com/psychoanalyze/psychoanalyze/commit/f4670520c29fe0ad9b47c14e28971a55607e7357))
+* Correct typo in license statement ([`d83bfa8`](https://github.com/psychoanalyze/psychoanalyze/commit/d83bfa8dfdce4b0fcc4bc5d5e56167c64e7ab9d0))
+
 ## v0.4.10 (2023-07-10)
 
 ### Fix
