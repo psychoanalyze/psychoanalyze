@@ -32,6 +32,7 @@ from dash import (
     callback,
     callback_context,
     dash_table,
+    dcc,
 )
 
 from dashboard.layout import layout
@@ -173,6 +174,20 @@ def export_image(
         ).decode("utf-8"),
         "filename": f"fig.{format_suffix}",
     }
+
+
+@callback(
+    Output("data-download", "data"),
+    Input({"type": "data-export", "name": ALL}, "n_clicks"),
+    State("table", "data"),
+    prevent_initial_call=True,
+)
+def export_data(
+    export_clicked: int,  # noqa: ARG001
+    data: go.Figure,
+) -> dict[str, str | bool | bytes]:
+    """Export image."""
+    return dcc.send_data_frame(pd.DataFrame.from_records(data).to_csv, "data.csv")
 
 
 if __name__ == "__main__":
