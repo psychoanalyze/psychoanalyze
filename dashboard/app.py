@@ -17,19 +17,36 @@ Contains callbacks.
 # You should have received a copy of the GNU General Public License along with
 # PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
+import base64
 from typing import Any
 
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.graph_objects as go
-from dash import ALL, Dash, Input, Output, State, callback, dash_table
+from dash import (
+    ALL,
+    Dash,
+    Input,
+    Output,
+    State,
+    callback,
+    callback_context,
+    dash_table,
+)
 
 from dashboard.layout import layout
 from psychoanalyze.data import blocks as pa_blocks
 from psychoanalyze.data import points as pa_points
 from psychoanalyze.data import trials as pa_trials
 
-app = Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO, dbc.icons.BOOTSTRAP])
+app = Dash(
+    __name__,
+    external_stylesheets=[
+        dbc.themes.SUPERHERO,
+        dbc.icons.BOOTSTRAP,
+        "https://fonts.googleapis.com/css2?family=Comfortaa:wght@500&family=Glegoo:wght@700&display=swap",
+    ],
+)
 app.title = "PsychoAnalyze"
 app.layout = layout
 server = app.server
@@ -127,12 +144,35 @@ def update_downstream(
         ],
     )
     return pa_points.plot(points_df, y).add_trace(
-        pa_points.plot_logistic(model, y, name="model", color="blue"),
+        pa_points.plot_logistic(model, y, name="model", color="#636EFA"),
     ).add_trace(
-        pa_points.plot_logistic(fit, y, name="predicted", color="red"),
+        pa_points.plot_logistic(fit, y, name="predicted", color="#EF553B"),
     ), points_df.to_dict(
         "records",
     )
+
+
+@callback(
+    Output("img-download", "data"),
+    Input({"type": "img-export", "name": ALL}, "n_clicks"),
+    State("plot", "figure"),
+    prevent_initial_call=True,
+)
+def export_image(
+    export_clicked: int,  # noqa: ARG001
+    fig: go.Figure,
+) -> dict[str, str | bool | bytes]:
+    """Export image."""
+    format_suffix = callback_context.triggered_id["name"]
+    return {
+        "base64": True,
+        "content": base64.b64encode(
+            go.Figure(fig)
+            .update_layout(showlegend=False)
+            .to_image(format=format_suffix, width=500, height=500),
+        ).decode("utf-8"),
+        "filename": f"fig.{format_suffix}",
+    }
 
 
 if __name__ == "__main__":

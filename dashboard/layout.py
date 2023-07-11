@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License along with
 # PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
-
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 
@@ -24,6 +23,10 @@ from dashboard.components import (
     points_table,
     psi_params,
 )
+
+font_family = "Comfortaa, Times, serif"
+subtitle = "Interactive data simulation & analysis for psychophysics."
+
 
 component_column = dbc.Col(
     [
@@ -133,7 +136,98 @@ plot_tabs = dbc.Col(
                         html.H4("Blocks", className="mt-2"),
                         html.Div(blocks_table, className="mb-3"),
                         html.H4("Points"),
-                        points_table,
+                        html.Div(points_table, className="mb-3"),
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    dbc.DropdownMenu(
+                                        children=[
+                                            dbc.DropdownMenuItem(
+                                                "SVG",
+                                                id={
+                                                    "type": "img-export",
+                                                    "name": "svg",
+                                                },
+                                            ),
+                                            dbc.DropdownMenuItem(
+                                                "PNG",
+                                                id={
+                                                    "type": "img-export",
+                                                    "name": "png",
+                                                },
+                                            ),
+                                            dbc.DropdownMenuItem(
+                                                "PDF",
+                                                id={
+                                                    "type": "img-export",
+                                                    "name": "pdf",
+                                                },
+                                            ),
+                                            dbc.DropdownMenuItem(
+                                                "EPS",
+                                                id={
+                                                    "type": "img-export",
+                                                    "name": "eps",
+                                                },
+                                            ),
+                                            dbc.DropdownMenuItem(
+                                                "HTML",
+                                                id={
+                                                    "type": "img-export",
+                                                    "name": "html",
+                                                },
+                                            ),
+                                        ],
+                                        label="Download figure as... ",
+                                        id="figure-download",
+                                        toggle_style={"border-radius": 5},
+                                    ),
+                                ),
+                                dbc.Col(
+                                    dbc.DropdownMenu(
+                                        children=[
+                                            dbc.DropdownMenuItem(
+                                                "Parquet",
+                                                id="parquet",
+                                            ),
+                                            dbc.DropdownMenuItem(
+                                                "CSV",
+                                                id={
+                                                    "type": "data-export",
+                                                    "name": "csv",
+                                                },
+                                            ),
+                                            dbc.DropdownMenuItem(
+                                                "JSON",
+                                                id={
+                                                    "type": "data-export",
+                                                    "name": "json",
+                                                },
+                                            ),
+                                            dbc.DropdownMenuItem(
+                                                "Excel",
+                                                id={
+                                                    "type": "data-export",
+                                                    "name": "xlsx",
+                                                },
+                                            ),
+                                            dbc.DropdownMenuItem(
+                                                "DuckDB",
+                                                id={
+                                                    "type": "data-export",
+                                                    "name": "duckdb",
+                                                },
+                                            ),
+                                        ],
+                                        label="Download data as... ",
+                                        id="data-export",
+                                        toggle_style={"border-radius": 5},
+                                    ),
+                                ),
+                            ],
+                        ),
+                        dcc.Download(id="img-download"),
+                        dcc.Download(id="data-download"),
                     ],
                 ),
             ],
@@ -143,7 +237,6 @@ plot_tabs = dbc.Col(
 
 layout = dbc.Container(
     [
-        html.Div(id="div"),
         dcc.Store(id="points-store"),
         dcc.Store(id="blocks-store"),
         dbc.NavbarSimple(
@@ -171,12 +264,30 @@ layout = dbc.Container(
             ],
             brand=dbc.Col(
                 [
-                    dbc.Row(html.H1("PsychoAnalyze")),
                     dbc.Row(
-                        html.P(
-                            "Interactive data simulation & analysis for psychophysics.",
-                        ),
+                        [
+                            dbc.Col(
+                                html.Img(
+                                    src="assets/PsychoAnalyze_100x100.png",
+                                ),
+                                width="auto",
+                            ),
+                            dbc.Col(
+                                [
+                                    html.H1(
+                                        "PsychoAnalyze",
+                                        style={"font-family": font_family},
+                                    ),
+                                    html.P(subtitle),
+                                ],
+                                align="end",
+                            ),
+                        ],
+                        align="center",
+                        justify="start",
+                        className="ms-4",
                     ),
+                    dbc.Row(),
                 ],
             ),
             brand_href="/",
