@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.12 (2023-07-11)
+
+### Fix
+
+* Undo Talisman usage ([`1d4efe8`](https://github.com/psychoanalyze/psychoanalyze/commit/1d4efe86315b8a05316862a9804115a09e3ffb99))
+
 ## v0.4.11 (2023-07-11)
 
 ### Fix
