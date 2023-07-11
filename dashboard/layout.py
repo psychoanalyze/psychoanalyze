@@ -113,7 +113,9 @@ plot_tabs = dbc.Col(
                             active_tab="psi-tab",
                             id="plot-tabs",
                         ),
-                        dcc.Graph(id="plot"),
+                        dcc.Graph(id="plot", className="mb-3"),
+                        html.H5("Plot Options"),
+                        html.H6("Y Axis"),
                         dbc.RadioItems(
                             options=[
                                 {"label": "logit(Hit Rate)", "value": "log"},
