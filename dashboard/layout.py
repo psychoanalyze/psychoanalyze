@@ -71,7 +71,7 @@ empirical_data_components = dbc.Row(
         dbc.Col(upload_component),
         dbc.Col(dataset_component),
     ],
-    style={"align-items": "center"},
+    align="center",
     className="mb-3",
 )
 
@@ -117,14 +117,21 @@ plot_tabs = dbc.Col(
                         dcc.Graph(id="plot", className="mb-3"),
                         html.H5("Plot Options"),
                         html.H6("Y Axis"),
-                        dbc.RadioItems(
-                            options=[
-                                {"label": "logit(Hit Rate)", "value": "log"},
-                                {"label": "Hit Rate", "value": "linear"},
-                            ],
-                            value="linear",
-                            inline=True,
-                            id="logit",
+                        html.Div(
+                            dbc.RadioItems(
+                                options=[
+                                    {"label": "logit(Hit Rate)", "value": "log"},
+                                    {"label": "Hit Rate", "value": "linear"},
+                                ],
+                                value="linear",
+                                inline=True,
+                                id="logit",
+                                className="btn-group",
+                                inputClassName="btn-check",
+                                labelClassName="btn btn-outline-primary",
+                                labelCheckedClassName="active",
+                            ),
+                            className="radio-group",
                         ),
                     ],
                     width=7,
