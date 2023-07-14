@@ -37,48 +37,9 @@ component_column = dbc.Col(
     width=3,
 )
 
-upload_component = dcc.Upload(
-    "Upload data - drag-and-drop OR click to open upload tool",
-    id="upload-data",
-    style={
-        "width": "100%",
-        "height": "60px",
-        "lineHeight": "60px",
-        "borderWidth": "1px",
-        "borderStyle": "dashed",
-        "borderRadius": "5px",
-        "textAlign": "center",
-    },
-    multiple=True,
-)
-
-dataset_component = dcc.Dropdown(
-    options=[
-        {
-            "label": html.Span(
-                ["Schlichenmeyer et al. 2022"],
-                style={"color": "black"},
-            ),
-            "value": "schlich2022",
-        },
-    ],
-    placeholder="Select an open dataset...",
-    id="dataset",
-)
-
-empirical_data_components = dbc.Row(
-    [
-        dbc.Col(upload_component),
-        dbc.Col(dataset_component),
-    ],
-    align="center",
-    className="mb-3",
-)
-
 
 plot_tabs = dbc.Col(
     [
-        empirical_data_components,
         dbc.Row(
             [
                 dbc.Col(
