@@ -148,7 +148,9 @@ psi_params = dbc.Card(
         ),
         dbc.Row(
             [
-                dbc.Label("Intercept", width=6, style={"text-align": "right"}),
+                dbc.Col(
+                    dcc.Markdown("$x_0$", mathjax=True, style={"text-align": "right"}),
+                ),
                 dbc.Col(
                     dbc.Input(
                         id={"type": "param", "id": 0},
@@ -157,14 +159,10 @@ psi_params = dbc.Card(
                         style={"border-radius": 3},
                         className="mb-1",
                     ),
-                    width=6,
                 ),
-            ],
-            style={"justify-content": "center"},
-        ),
-        dbc.Row(
-            [
-                dbc.Label("Slope", width=6, style={"text-align": "right"}),
+                dbc.Col(
+                    dcc.Markdown("$k$", mathjax=True, style={"text-align": "right"}),
+                ),
                 dbc.Col(
                     dbc.Input(
                         id={"type": "param", "id": 1},
@@ -174,14 +172,18 @@ psi_params = dbc.Card(
                         style={"border-radius": 3},
                         className="mb-1",
                     ),
-                    width=6,
                 ),
             ],
-            style={"justify-content": "center"},
         ),
         dbc.Row(
             [
-                dbc.Label("Guess Rate ", width=6, style={"text-align": "right"}),
+                dbc.Col(
+                    dcc.Markdown(
+                        "$\\gamma$",
+                        mathjax=True,
+                        style={"text-align": "right"},
+                    ),
+                ),
                 dbc.Col(
                     dbc.Input(
                         id={"type": "param", "id": 2},
@@ -191,14 +193,14 @@ psi_params = dbc.Card(
                         style={"border-radius": 3},
                         className="mb-1",
                     ),
-                    width=6,
                 ),
-            ],
-            style={"justify-content": "center"},
-        ),
-        dbc.Row(
-            [
-                dbc.Label("Lapse Rate", width=6, style={"text-align": "right"}),
+                dbc.Col(
+                    dcc.Markdown(
+                        "$\\lambda$",
+                        mathjax=True,
+                        style={"text-align": "right"},
+                    ),
+                ),
                 dbc.Col(
                     dbc.Input(
                         id={"type": "param", "id": 3},
@@ -207,10 +209,8 @@ psi_params = dbc.Card(
                         step=0.1,
                         style={"border-radius": 3},
                     ),
-                    width=6,
                 ),
             ],
-            style={"justify-content": "center"},
         ),
     ],
     body=True,
