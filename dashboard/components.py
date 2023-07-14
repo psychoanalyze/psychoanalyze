@@ -123,6 +123,15 @@ experiment_params = dbc.Card(
 psi_params = dbc.Card(
     [
         html.H4("Psychometric Model", className="card-title mb-3"),
+        dcc.Markdown(
+            """
+            $$
+            \\psi(x) = \\gamma + (1 - \\gamma - \\lambda)F(x)
+            $$
+
+            """,
+            mathjax=True,
+        ),
         dcc.Dropdown(
             id="f",
             options=[{"label": "Logistic (expit)", "value": "expit"}],
@@ -132,7 +141,7 @@ psi_params = dbc.Card(
         dcc.Markdown(
             """
             $$
-            f(x) = \\frac{1}{1 + e^{-k(x-x_0)}}
+            F(x) = \\frac{1}{1 + e^{-k(x-x_0)}}
             $$
             """,
             mathjax=True,
