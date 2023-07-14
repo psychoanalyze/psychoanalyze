@@ -28,7 +28,7 @@ font_family = "Comfortaa, Times, serif"
 subtitle = "Interactive data simulation & analysis for psychophysics."
 
 
-component_column = dbc.Col(
+input_col = dbc.Col(
     [
         html.H3("Simulation Parameters"),
         experiment_params,
@@ -37,121 +37,114 @@ component_column = dbc.Col(
     width=3,
 )
 
-
-plot_tabs = dbc.Col(
+plot_col = dbc.Col(
     [
+        dcc.Graph(id="plot", className="mb-3"),
+        html.H5("Plot Options"),
+        html.H6("Y Axis"),
+        html.Div(
+            dbc.RadioItems(
+                options=[
+                    {"label": "logit(Hit Rate)", "value": "log"},
+                    {"label": "Hit Rate", "value": "linear"},
+                ],
+                value="linear",
+                inline=True,
+                id="logit",
+                className="btn-group",
+                inputClassName="btn-check",
+                labelClassName="btn btn-outline-primary",
+                labelCheckedClassName="active",
+            ),
+            className="radio-group",
+        ),
+    ],
+    width=5,
+)
+
+data_col = dbc.Col(
+    [
+        html.H4("Blocks", className="mt-2"),
+        html.Div(blocks_table, className="mb-3"),
+        html.H4("Points"),
+        html.Div(points_table, className="mb-3"),
         dbc.Row(
             [
                 dbc.Col(
-                    [
-                        dcc.Graph(id="plot", className="mb-3"),
-                        html.H5("Plot Options"),
-                        html.H6("Y Axis"),
-                        html.Div(
-                            dbc.RadioItems(
-                                options=[
-                                    {"label": "logit(Hit Rate)", "value": "log"},
-                                    {"label": "Hit Rate", "value": "linear"},
-                                ],
-                                value="linear",
-                                inline=True,
-                                id="logit",
-                                className="btn-group",
-                                inputClassName="btn-check",
-                                labelClassName="btn btn-outline-primary",
-                                labelCheckedClassName="active",
+                    dbc.DropdownMenu(
+                        children=[
+                            dbc.DropdownMenuItem(
+                                "SVG",
+                                id={
+                                    "type": "img-export",
+                                    "name": "svg",
+                                },
                             ),
-                            className="radio-group",
-                        ),
-                    ],
-                    width=7,
+                            dbc.DropdownMenuItem(
+                                "PNG",
+                                id={
+                                    "type": "img-export",
+                                    "name": "png",
+                                },
+                            ),
+                            dbc.DropdownMenuItem(
+                                "PDF",
+                                id={
+                                    "type": "img-export",
+                                    "name": "pdf",
+                                },
+                            ),
+                        ],
+                        label="Download plot as... ",
+                        id="figure-download",
+                        toggle_style={"border-radius": 5},
+                    ),
                 ),
                 dbc.Col(
-                    [
-                        html.H4("Blocks", className="mt-2"),
-                        html.Div(blocks_table, className="mb-3"),
-                        html.H4("Points"),
-                        html.Div(points_table, className="mb-3"),
-                        dbc.Row(
-                            [
-                                dbc.Col(
-                                    dbc.DropdownMenu(
-                                        children=[
-                                            dbc.DropdownMenuItem(
-                                                "SVG",
-                                                id={
-                                                    "type": "img-export",
-                                                    "name": "svg",
-                                                },
-                                            ),
-                                            dbc.DropdownMenuItem(
-                                                "PNG",
-                                                id={
-                                                    "type": "img-export",
-                                                    "name": "png",
-                                                },
-                                            ),
-                                            dbc.DropdownMenuItem(
-                                                "PDF",
-                                                id={
-                                                    "type": "img-export",
-                                                    "name": "pdf",
-                                                },
-                                            ),
-                                        ],
-                                        label="Download figure as... ",
-                                        id="figure-download",
-                                        toggle_style={"border-radius": 5},
-                                    ),
-                                ),
-                                dbc.Col(
-                                    dbc.DropdownMenu(
-                                        children=[
-                                            dbc.DropdownMenuItem(
-                                                "Parquet",
-                                                id={
-                                                    "type": "data-export",
-                                                    "name": "parquet",
-                                                },
-                                            ),
-                                            dbc.DropdownMenuItem(
-                                                "CSV",
-                                                id={
-                                                    "type": "data-export",
-                                                    "name": "csv",
-                                                },
-                                            ),
-                                            dbc.DropdownMenuItem(
-                                                "JSON",
-                                                id={
-                                                    "type": "data-export",
-                                                    "name": "json",
-                                                },
-                                            ),
-                                            dbc.DropdownMenuItem(
-                                                "DuckDB",
-                                                id={
-                                                    "type": "data-export",
-                                                    "name": "duckdb",
-                                                },
-                                            ),
-                                        ],
-                                        label="Download data as... ",
-                                        id="data-export",
-                                        toggle_style={"border-radius": 5},
-                                    ),
-                                ),
-                            ],
-                        ),
-                        dcc.Download(id="img-download"),
-                        dcc.Download(id="data-download"),
-                    ],
+                    dbc.DropdownMenu(
+                        children=[
+                            dbc.DropdownMenuItem(
+                                "Parquet",
+                                id={
+                                    "type": "data-export",
+                                    "name": "parquet",
+                                },
+                            ),
+                            dbc.DropdownMenuItem(
+                                "CSV",
+                                id={
+                                    "type": "data-export",
+                                    "name": "csv",
+                                },
+                            ),
+                            dbc.DropdownMenuItem(
+                                "JSON",
+                                id={
+                                    "type": "data-export",
+                                    "name": "json",
+                                },
+                            ),
+                            dbc.DropdownMenuItem(
+                                "DuckDB",
+                                id={
+                                    "type": "data-export",
+                                    "name": "duckdb",
+                                },
+                            ),
+                        ],
+                        label="Download data as... ",
+                        id="data-export",
+                        toggle_style={"border-radius": 5},
+                    ),
                 ),
             ],
-            className="mt-4",
         ),
+        dcc.Download(id="img-download"),
+        dcc.Download(id="data-download"),
     ],
+    width=4,
 )
+
 
 layout = dbc.Container(
     [
@@ -209,14 +202,14 @@ layout = dbc.Container(
                 ],
             ),
             brand_href="/",
-            class_name="mb-3",
+            class_name="mb-5",
             style={"border-radius": "0 0 7px 7px"},
-            fluid=True,
         ),
         dbc.Row(
             [
-                component_column,
-                plot_tabs,
+                input_col,
+                plot_col,
+                data_col,
             ],
         ),
     ],
