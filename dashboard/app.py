@@ -207,12 +207,38 @@ def export_data(
 
 @callback(
     Output({"type": "x", "name": ALL}, "disabled"),
+    Output({"type": "x", "name": ALL}, "value"),
     Input("fix-range", "value"),
+    Input({"type": "param", "id": 0}, "value"),
+    State({"type": "x", "name": ALL}, "value"),
     prevent_initial_call=True,
 )
-def disable_range(fix_range: list[str]) -> tuple[bool, bool]:
+def disable_range(
+    fix_range: list[str],
+    intercept: float,
+    x_range: list[float],
+) -> tuple[tuple[bool, bool], tuple[float, float]]:
     """Disable range inputs if range is fixed."""
-    return "fix-range" in fix_range, "fix-range" in fix_range
+    if "fix-range" in fix_range:
+        output = (
+            True,
+            True,
+        ), (
+            intercept - 4,
+            intercept + 4,
+        )
+    else:
+        output = (
+            (
+                "fix-range" in fix_range,
+                "fix-range" in fix_range,
+            ),
+            (
+                x_range[0],
+                x_range[1],
+            ),
+        )
+    return output
 
 
 if __name__ == "__main__":

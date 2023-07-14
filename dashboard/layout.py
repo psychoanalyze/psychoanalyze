@@ -148,6 +148,7 @@ plot_tabs = dbc.Col(
                     ],
                 ),
             ],
+            className="mt-4",
         ),
     ],
 )
