@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.5.0 (2023-07-14)
+
+### Feature
+
+* Fix x range to model ([`93c5c4e`](https://github.com/psychoanalyze/psychoanalyze/commit/93c5c4eac826037b84ef08aced0c6b8eda653c89))
+
 ## v0.4.12 (2023-07-11)
 
 ### Fix
