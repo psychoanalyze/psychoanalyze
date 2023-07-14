@@ -75,27 +75,6 @@ empirical_data_components = dbc.Row(
     className="mb-3",
 )
 
-psi_tab = dbc.Tab(
-    tab_id="psi-tab",
-    label="Psychometric Function",
-    activeTabClassName="fw-bold fst-italic",
-)
-
-ecdf_tab = dbc.Tab(
-    label="eCDF",
-    tab_id="ecdf-tab",
-)
-
-time_series_tab = dbc.Tab(
-    tab_id="time-series-tab",
-    label="Time Series",
-    activeTabClassName="fw-bold fst-italic",
-)
-
-sd_tab = dbc.Tab(
-    label="Strength-Duration",
-    tab_id="sd-tab",
-)
 
 plot_tabs = dbc.Col(
     [
@@ -104,16 +83,6 @@ plot_tabs = dbc.Col(
             [
                 dbc.Col(
                     [
-                        dbc.Tabs(
-                            [
-                                psi_tab,
-                                ecdf_tab,
-                                time_series_tab,
-                                sd_tab,
-                            ],
-                            active_tab="psi-tab",
-                            id="plot-tabs",
-                        ),
                         dcc.Graph(id="plot", className="mb-3"),
                         html.H5("Plot Options"),
                         html.H6("Y Axis"),
