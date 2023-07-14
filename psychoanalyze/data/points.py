@@ -257,6 +257,8 @@ def plot_logistic(logistic: pd.DataFrame, y: str, name: str, color: str) -> go.S
     )
 
 
-def generate_index(n_levels: int, min_x: float, max_x: float) -> pd.Index:
+def generate_index(n_levels: int, x_range: list[float]) -> pd.Index:
     """Generate evenly-spaced values along the modulated stimulus dimension."""
+    min_x = x_range[0]
+    max_x = x_range[1]
     return pd.Index(np.linspace(min_x, max_x, n_levels), name="Intensity")

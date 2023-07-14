@@ -61,15 +61,13 @@ server = app.server
     Input({"type": "experiment-param", "name": ALL}, "value"),
     State({"type": "experiment-param", "name": ALL}, "id"),
     Input({"type": "param", "id": ALL}, "value"),
-    Input("min-x", "value"),
-    Input("max-x", "value"),
+    Input({"type": "x", "name": ALL}, "value"),
 )
 def update_data(
     experiment_param_values: list[int],
     dash_ids: list[dict[str, str]],
     params: list[float],
-    min_x: float,
-    max_x: float,
+    x_range: list[float],
 ) -> tuple[list[Any], list[dict[str, float]]]:
     """Update generated data according to user parameter inputs."""
     experiment_params = {
@@ -78,7 +76,7 @@ def update_data(
     }
     param_names = ["Threshold", "Slope", "Guess Rate", "Lapse Rate"]
     _params = dict(zip(param_names, params, strict=True))
-    x = pa_points.generate_index(experiment_params["n-levels"], min_x, max_x)
+    x = pa_points.generate_index(experiment_params["n-levels"], x_range)
     trials = [
         pa_trials.generate(
             experiment_params["n-trials"],
@@ -205,6 +203,16 @@ def export_data(
             }
 
     return download
+
+
+@callback(
+    Output({"type": "x", "name": ALL}, "disabled"),
+    Input("fix-range", "value"),
+    prevent_initial_call=True,
+)
+def disable_range(fix_range: list[str]) -> tuple[bool, bool]:
+    """Disable range inputs if range is fixed."""
+    return "fix-range" in fix_range, "fix-range" in fix_range
 
 
 if __name__ == "__main__":

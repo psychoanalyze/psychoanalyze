@@ -67,29 +67,6 @@ experiment_params = dbc.Card(
         html.H5("Sampling strategy", className="mt-4 mb-2"),
         dbc.Row(
             [
-                dbc.Label("Intensity Range", width=6),
-                dbc.Col(
-                    dbc.Input(
-                        id="min-x",
-                        type="number",
-                        value=-4,
-                        style={"border-radius": 3},
-                    ),
-                    width=3,
-                ),
-                dbc.Col(
-                    dbc.Input(
-                        id="max-x",
-                        type="number",
-                        value=4,
-                        style={"border-radius": 3},
-                    ),
-                    width=3,
-                ),
-            ],
-        ),
-        dbc.Row(
-            [
                 dbc.Col(
                     dbc.Input(
                         id={"type": "experiment-param", "name": "n-levels"},
@@ -102,6 +79,40 @@ experiment_params = dbc.Card(
                 dbc.Label("intensity levels", html_for="n-levels", width=6),
             ],
             className="mb-1",
+        ),
+        dbc.Row(
+            [
+                dbc.Label("Intensity Range", width=6),
+                dbc.Col(
+                    [
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    dbc.Input(
+                                        id={"type": "x", "name": "min"},
+                                        type="number",
+                                        value=-4,
+                                        style={"border-radius": 3},
+                                    ),
+                                ),
+                                dbc.Col(
+                                    dbc.Input(
+                                        id={"type": "x", "name": "max"},
+                                        type="number",
+                                        value=4,
+                                        style={"border-radius": 3},
+                                    ),
+                                ),
+                            ],
+                            className="mb-2",
+                        ),
+                        dbc.Checklist(
+                            options=[{"label": "Fix to model", "value": "fix-range"}],
+                            id="fix-range",
+                        ),
+                    ],
+                ),
+            ],
         ),
     ],
     body=True,
