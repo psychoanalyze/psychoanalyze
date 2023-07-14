@@ -76,12 +76,8 @@ def update_data(
         dash_id["name"]: experiment_param_values[i]
         for i, dash_id in enumerate(dash_ids)
     }
-    _params = {
-        "Threshold": params[0],
-        "Slope": params[1],
-        "Guess Rate": params[2],
-        "Lapse Rate": params[3],
-    }
+    param_names = ["Threshold", "Slope", "Guess Rate", "Lapse Rate"]
+    _params = dict(zip(param_names, params, strict=True))
     x = pa_points.generate_index(experiment_params["n-levels"], min_x, max_x)
     trials = [
         pa_trials.generate(
