@@ -72,6 +72,7 @@ server = app.server
     Input("n-levels", "value"),
     Input("n-trials", "value"),
     Input("n-blocks", "value"),
+    Input("tabs", "active_tab"),
     prevent_initial_call=True,
 )
 def update_x_range(
@@ -79,6 +80,7 @@ def update_x_range(
     n_levels: int,
     n_trials: int,
     n_blocks: int,
+    active_tab: str,
 ) -> tuple[str, str, list[dict[Hashable, Any]], list[dict[Hashable, Any]]]:
     """Update x range based on threshold and slope."""
     params = dict(zip(["x_0", "k", "gamma", "lambda"], param, strict=True))
@@ -122,7 +124,7 @@ def update_x_range(
         f"{min_:0.2f}",
         f"{max_:0.2f}",
         final_points.to_dict("records"),
-        all_blocks,
+        [] if active_tab == "upload" else all_blocks,
     )
 
 
@@ -132,27 +134,29 @@ def update_x_range(
     Input({"type": "param", "name": ALL}, "value"),
     Input("points-table", "data"),
     Input("blocks-table", "data"),
+    Input("tabs", "active_tab"),
 )
 def update_fig_model(
     form: str,
     param: list[float],
     data: list[dict[str, float]],
     fits: list[dict[str, float]],
+    active_tab: str,
 ) -> tuple[go.Figure, dash_table.DataTable]:
     """Update plot and tables based on data store and selected view."""
-    params = dict(zip(["x_0", "k", "gamma", "lambda"], param, strict=True))
-    model = params["gamma"] + (
-        1 - params["gamma"] - params["lambda"]
-    ) * pa_blocks.logistic(params)
-    fit_params = fits[0]
-    fit_psi = fit_params["gamma"] + (
-        1 - fit_params["gamma"] - fit_params["lambda"]
-    ) * pa_blocks.logistic(fit_params)
-    y = model["logit(Hit Rate)"] if form == "log" else model["Hit Rate"]
-    y_fit = fit_psi["logit(Hit Rate)"] if form == "log" else fit_psi["Hit Rate"]
-    if data is None:
-        fig = px.line(y, y=y.name, template="plotly_white")
+    if data is None or active_tab == "upload":
+        fig = px.scatter(template="plotly_white")
     else:
+        params = dict(zip(["x_0", "k", "gamma", "lambda"], param, strict=True))
+        model = params["gamma"] + (
+            1 - params["gamma"] - params["lambda"]
+        ) * pa_blocks.logistic(params)
+        fit_params = fits[0]
+        fit_psi = fit_params["gamma"] + (
+            1 - fit_params["gamma"] - fit_params["lambda"]
+        ) * pa_blocks.logistic(fit_params)
+        y = model["logit(Hit Rate)"] if form == "log" else model["Hit Rate"]
+        y_fit = fit_psi["logit(Hit Rate)"] if form == "log" else fit_psi["Hit Rate"]
         fig = (
             px.scatter(
                 pd.DataFrame.from_records(data),

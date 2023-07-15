@@ -249,11 +249,11 @@ layout = dbc.Container(
         dbc.Tabs(
             [
                 dbc.Tab(label="Simulate", tab_id="simulate"),
-                dbc.Tab(label="Upload", tab_id="Upload"),
+                dbc.Tab(label="Upload", tab_id="upload"),
                 dbc.Tab(label="Examples", tab_id="examples"),
             ],
             id="tabs",
-            active_tab="simulate",
+            active_tab="upload",
         ),
         dcc.Upload(
             """
