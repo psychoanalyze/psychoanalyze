@@ -197,10 +197,7 @@ stimulus_params = dbc.Container(
                     [
                         dbc.FormText("n levels"),
                         dbc.Input(
-                            id={
-                                "type": "experiment-param",
-                                "name": "n-levels",
-                            },
+                            id="n-levels",
                             type="number",
                             value=7,
                         ),
@@ -251,8 +248,8 @@ simulation_params = dbc.Row(
         ),
         dbc.Col(
             dbc.Button(
-                "Regenerate",
-                id="regenerate",
+                "Resimulate",
+                id="resimulate",
                 style={"border-radius": 3},
             ),
             width="auto",

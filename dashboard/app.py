@@ -67,14 +67,13 @@ def update_x_range(
     x_0: float,
     k: float,
     n_levels: int,
-) -> tuple[str, str, dict[str, list[float]]]:
+) -> tuple[str, str, list[dict[str, float]]]:
     """Update x range based on threshold and slope."""
-    min_ = f"{logistic.ppf(0.01, loc=x_0, scale=k):.2f}"
-    max_ = f"{logistic.ppf(0.99, loc=x_0, scale=k):.2f}"
+    min_, max_ = logistic.ppf([0.01, 0.99], loc=x_0, scale=k)
     return (
-        min_,
-        max_,
-        {"Intensity": np.linspace(min_, max_, n_levels)},
+        f"{min_:0.2f}",
+        f"{max_:0.2f}",
+        [{"Intensity": x} for x in np.linspace(min_, max_, n_levels)],
     )
 
 
