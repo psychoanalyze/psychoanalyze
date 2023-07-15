@@ -245,18 +245,6 @@ def transform(hit_rate: float, y: str) -> float:
     return logit(hit_rate) if y == "alpha" else hit_rate
 
 
-def plot_logistic(logistic: pd.DataFrame, y: str, name: str, color: str) -> go.Scatter:
-    """Plot a smooth logistic function."""
-    logistic = logistic.reset_index()
-    return go.Scatter(
-        x=logistic["Intensity"],
-        y=logistic[y],
-        mode="lines",
-        name=name,
-        marker_color=color,
-    )
-
-
 def generate_index(n_levels: int, x_range: list[float]) -> pd.Index:
     """Generate evenly-spaced values along the modulated stimulus dimension."""
     min_x = x_range[0]

@@ -18,10 +18,11 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 
 from dashboard.components import (
-    blocks_table,
-    experiment_params,
+    link_function,
+    model_params,
     points_table,
-    psi_params,
+    simulation_params,
+    stimulus_params,
 )
 
 font_family = "Comfortaa, Times, serif"
@@ -30,9 +31,24 @@ subtitle = "Interactive data simulation & analysis for psychophysics."
 
 input_col = dbc.Col(
     [
-        html.H3("Simulation Parameters"),
-        experiment_params,
-        psi_params,
+        html.H4("Model"),
+        dcc.Markdown(
+            """
+            $$
+            \\psi(x) = \\gamma + (1 - \\gamma - \\lambda)F(x)
+            $$
+
+            """,
+            mathjax=True,
+        ),
+        html.H4("Link Function"),
+        link_function,
+        html.H4("Model Parameters"),
+        model_params,
+        html.H4("Stimulus"),
+        stimulus_params,
+        html.H4("Simulate"),
+        dbc.Container(simulation_params),
     ],
     width=3,
 )
@@ -41,33 +57,39 @@ plot_col = dbc.Col(
     [
         dcc.Graph(id="plot", className="mb-3"),
         html.H5("Plot Options"),
-        html.H6("Y Axis"),
-        html.Div(
-            dbc.RadioItems(
-                options=[
-                    {"label": "logit(Hit Rate)", "value": "log"},
-                    {"label": "Hit Rate", "value": "linear"},
-                ],
-                value="linear",
-                inline=True,
-                id="logit",
-                className="btn-group",
-                inputClassName="btn-check",
-                labelClassName="btn btn-outline-primary",
-                labelCheckedClassName="active",
-            ),
-            className="radio-group",
+        dbc.Container(
+            [
+                dbc.FormText("Y Transform"),
+                html.Div(
+                    dbc.RadioItems(
+                        options=[
+                            {"label": "Hit Rate", "value": "linear"},
+                            {
+                                "label": "logit(Hit Rate)",
+                                "value": "log",
+                            },
+                        ],
+                        value="linear",
+                        inline=True,
+                        id="logit",
+                        className="btn-group",
+                        inputClassName="btn-check",
+                        labelClassName="btn btn-outline-primary",
+                        labelCheckedClassName="active",
+                    ),
+                    className="radio-group",
+                ),
+            ],
         ),
     ],
     width=5,
+    className="mt-5",
 )
 
 data_col = dbc.Col(
     [
-        html.H4("Blocks", className="mt-2"),
-        html.Div(blocks_table, className="mb-3"),
-        html.H4("Points"),
-        html.Div(points_table, className="mb-3"),
+        html.H4("Points", className="mt-3"),
+        dbc.Container(points_table, className="mb-3"),
         dbc.Row(
             [
                 dbc.Col(
@@ -95,10 +117,11 @@ data_col = dbc.Col(
                                 },
                             ),
                         ],
-                        label="Download plot as... ",
+                        label="Download plot",
                         id="figure-download",
                         toggle_style={"border-radius": 5},
                     ),
+                    width="auto",
                 ),
                 dbc.Col(
                     dbc.DropdownMenu(
@@ -132,17 +155,18 @@ data_col = dbc.Col(
                                 },
                             ),
                         ],
-                        label="Download data as... ",
+                        label="Download data",
                         id="data-export",
                         toggle_style={"border-radius": 5},
                     ),
+                    width="auto",
                 ),
             ],
+            justify="around",
         ),
         dcc.Download(id="img-download"),
         dcc.Download(id="data-download"),
     ],
-    width=4,
 )
 
 
@@ -202,7 +226,7 @@ layout = dbc.Container(
                 ],
             ),
             brand_href="/",
-            class_name="mb-5",
+            class_name="mb-2",
             style={"border-radius": "0 0 7px 7px"},
         ),
         dbc.Row(

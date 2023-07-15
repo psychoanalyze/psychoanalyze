@@ -134,15 +134,6 @@ def n_trials(trials: pd.DataFrame) -> pd.Series:
     ].count()
 
 
-def experiment_type(blocks: pd.DataFrame) -> pd.Series:
-    """Determine experimental type (detection/discrimination) from data."""
-    ref_stim = blocks.reset_index()[["Amp2", "Width2", "Freq2", "Dur2"]]
-    ref_charge = ref_stim["Amp2"] * ref_stim["Width2"]
-    blocks.loc[ref_charge == 0, "Experiment Type"] = "Detection"
-    blocks.loc[ref_charge != 0, "Experiment Type"] = "Discrimination"
-    return blocks["Experiment Type"]
-
-
 def is_valid(block: pd.DataFrame) -> bool:
     """Determine if curve data is valid."""
     return any(block["Hit Rate"] > 0.5) & any(block["Hit Rate"] < 0.5)  # noqa: PLR2004
@@ -244,13 +235,12 @@ def reshape_fit_results(fits: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame
 def logistic(params: dict[str, float]) -> pd.DataFrame:
     """Generate logistic function from parameters."""
     x = np.linspace(
-        scipy_logistic.ppf(0.01) + params["Threshold"],
-        scipy_logistic.ppf(0.99) + params["Threshold"],
+        scipy_logistic.ppf(0.01, loc=params["x_0"], scale=params["k"]),
+        scipy_logistic.ppf(0.99, loc=params["x_0"], scale=params["k"]),
         100,
     )
-    y = params["Guess Rate"] + (
-        1 - params["Guess Rate"] - params["Lapse Rate"]
-    ) * scipy_logistic.cdf(x, params["Threshold"], params["Slope"])
+    # ) * scipy_logistic.cdf(x, params["Threshold"], params["Slope"])
+    y = scipy_logistic.cdf(x, params["x_0"], params["k"])
     index = pd.Index(x, name="Intensity")
     logistic_points = pd.Series(
         y,

@@ -15,243 +15,259 @@
 #  PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
 import dash_bootstrap_components as dbc
-from dash import dash_table, dcc, html
+from dash import dash_table, dcc
 
-experiment_params = dbc.Card(
+model_params = dbc.Container(
     [
-        html.H4("Experimental Design", className="card-title mb-3"),
-        dcc.Dropdown(
-            id="exp-type",
-            options=[
-                {
-                    "label": html.Span(
-                        "Method of Constant Stimuli",
-                        style={"color": "black"},
+        dbc.Row(
+            [
+                dbc.Col(
+                    dcc.Markdown("$x_0$", mathjax=True),
+                    width=2,
+                    style={"text-align": "center"},
+                    align="center",
+                ),
+                dbc.Col(
+                    dbc.InputGroup(
+                        [
+                            dbc.InputGroupText(
+                                dbc.Checkbox(id="x_0-free", value=True),
+                            ),
+                            dbc.Input(
+                                id="x_0",
+                                type="number",
+                                value=0.0,
+                            ),
+                        ],
+                        size="sm",
+                        class_name="p-0",
                     ),
-                    "value": "moc",
-                },
+                    width=4,
+                    style={"text-align": "center"},
+                    align="center",
+                ),
+                dbc.Col(
+                    dcc.Markdown("$k$", mathjax=True),
+                    width=2,
+                    align="center",
+                    style={"text-align": "center"},
+                ),
+                dbc.Col(
+                    dbc.InputGroup(
+                        [
+                            dbc.InputGroupText(
+                                dbc.Checkbox(
+                                    value=True,
+                                    id="k-free",
+                                ),
+                            ),
+                            dbc.Input(
+                                id="k",
+                                type="number",
+                                value=1.0,
+                                step=0.5,
+                            ),
+                        ],
+                        size="sm",
+                        class_name="p-0",
+                    ),
+                    width=4,
+                    align="center",
+                    style={"text-align": "center"},
+                ),
             ],
-            value="moc",
-            className="mb-3",
+            class_name="g-0 mb-0",
         ),
         dbc.Row(
             [
                 dbc.Col(
-                    dbc.Input(
-                        id={"type": "experiment-param", "name": "n-trials"},
-                        type="number",
-                        value=70,
-                        style={"border-radius": 3},
+                    dcc.Markdown("$\\gamma$", mathjax=True),
+                    width=2,
+                    align="center",
+                    style={"text-align": "center"},
+                ),
+                dbc.Col(
+                    dbc.InputGroup(
+                        [
+                            dbc.InputGroupText(
+                                dbc.Checkbox(id="gamma-free", value=True),
+                            ),
+                            dbc.Input(
+                                id="gamma",
+                                type="number",
+                                value=0.0,
+                            ),
+                        ],
+                        size="sm",
+                        class_name="p-0",
                     ),
                     width=4,
+                    align="center",
+                    style={"text-align": "center"},
                 ),
-                dbc.Label("trials per block", width=6),
+                dbc.Col(
+                    dcc.Markdown("$\\lambda$", mathjax=True),
+                    width=2,
+                    align="center",
+                    style={"text-align": "center"},
+                ),
+                dbc.Col(
+                    dbc.InputGroup(
+                        [
+                            dbc.InputGroupText(
+                                dbc.Checkbox(
+                                    value=True,
+                                    id="lambda-free",
+                                ),
+                            ),
+                            dbc.Input(
+                                id="lambda",
+                                type="number",
+                                value=1.0,
+                                step=0.5,
+                            ),
+                        ],
+                        size="sm",
+                        class_name="p-0",
+                    ),
+                    width=4,
+                    align="center",
+                    style={"text-align": "center"},
+                ),
             ],
-            className="mb-1",
+            class_name="g-0",
         ),
+        dbc.FormText("Uncheck boxes to fix parameters."),
+    ],
+    className="mb-2",
+)
+
+link_function = dbc.Container(
+    [
         dbc.Row(
             [
                 dbc.Col(
-                    dbc.Input(
-                        id={"type": "experiment-param", "name": "n-blocks"},
-                        type="number",
-                        value=2,
-                        style={"border-radius": 3},
+                    dcc.Dropdown(
+                        id="f",
+                        options=[{"label": "Logistic (expit)", "value": "expit"}],
+                        value="expit",
+                        className="mb-1",
                     ),
-                    width=4,
                 ),
-                dbc.Label("blocks", width=6),
-            ],
-            className="mb-1",
-        ),
-        html.H5("Sampling strategy", className="mt-4 mb-2"),
-        dbc.Row(
-            [
                 dbc.Col(
-                    dbc.Input(
-                        id={"type": "experiment-param", "name": "n-levels"},
-                        type="number",
-                        value=7,
+                    dbc.Button(
+                        "Show Eqn",
                         style={"border-radius": 3},
+                        id="show-eqn",
+                        outline=True,
                     ),
-                    width=4,
+                    width="auto",
                 ),
-                dbc.Label("intensity levels", html_for="n-levels", width=6),
             ],
-            className="mb-1",
         ),
+        dbc.Collapse(
+            dcc.Markdown(
+                """
+                    $$
+                    F(x) = \\frac{1}{1 + e^{-k(x-x_0)}}
+                    $$""",
+                mathjax=True,
+            ),
+            is_open=False,
+        ),
+    ],
+    className="mb-2",
+)
+
+stimulus_params = dbc.Container(
+    [
         dbc.Row(
             [
-                dbc.Label("Intensity Range", width=6),
                 dbc.Col(
                     [
-                        dbc.Row(
-                            [
-                                dbc.Col(
-                                    dbc.Input(
-                                        id={"type": "x", "name": "min"},
-                                        type="number",
-                                        value=-4,
-                                        style={"border-radius": 3},
-                                    ),
-                                ),
-                                dbc.Col(
-                                    dbc.Input(
-                                        id={"type": "x", "name": "max"},
-                                        type="number",
-                                        value=4,
-                                        style={"border-radius": 3},
-                                    ),
-                                ),
-                            ],
-                            className="mb-2",
+                        dbc.FormText("min"),
+                        dbc.Input(
+                            id="x-min",
+                            type="number",
+                            disabled=True,
                         ),
-                        dbc.Checklist(
-                            options=[{"label": "Fix to model", "value": "fix-range"}],
-                            id="fix-range",
+                    ],
+                ),
+                dbc.Col(
+                    [
+                        dbc.FormText("n levels"),
+                        dbc.Input(
+                            id={
+                                "type": "experiment-param",
+                                "name": "n-levels",
+                            },
+                            type="number",
+                            value=7,
+                        ),
+                    ],
+                ),
+                dbc.Col(
+                    [
+                        dbc.FormText("max"),
+                        dbc.Input(
+                            id="x-max",
+                            type="number",
+                            disabled=True,
                         ),
                     ],
                 ),
             ],
+            className="mb-1 g-0",
+        ),
+        dbc.Checklist(
+            options=[
+                {
+                    "label": "Select range from model",
+                    "value": "fix-range",
+                },
+            ],
+            id="fix-range",
+            switch=True,
+            value=["fix-range"],
         ),
     ],
-    body=True,
-    className="mb-4",
-    style={"border-radius": 7},
+    class_name="mb-3",
 )
 
-psi_params = dbc.Card(
-    [
-        html.H4("Psychometric Model", className="card-title mb-3"),
-        dcc.Markdown(
-            """
-            $$
-            \\psi(x) = \\gamma + (1 - \\gamma - \\lambda)F(x)
-            $$
 
-            """,
-            mathjax=True,
-        ),
-        dcc.Dropdown(
-            id="f",
-            options=[{"label": "Logistic (expit)", "value": "expit"}],
-            value="expit",
-            className="mb-3",
-        ),
-        dcc.Markdown(
-            """
-            $$
-            F(x) = \\frac{1}{1 + e^{-k(x-x_0)}}
-            $$
-            """,
-            mathjax=True,
-        ),
-        dbc.Row(
-            [
-                dbc.Col(
-                    dcc.Markdown("$x_0$", mathjax=True, style={"text-align": "right"}),
-                ),
-                dbc.Col(
+simulation_params = dbc.Row(
+    [
+        dbc.Col(
+            dbc.InputGroup(
+                [
                     dbc.Input(
-                        id={"type": "param", "id": 0},
+                        id={"type": "experiment-param", "name": "n-trials"},
                         type="number",
-                        value=0.0,
-                        style={"border-radius": 3},
-                        className="mb-1",
+                        value=70,
                     ),
-                ),
-                dbc.Col(
-                    dcc.Markdown("$k$", mathjax=True, style={"text-align": "right"}),
-                ),
-                dbc.Col(
-                    dbc.Input(
-                        id={"type": "param", "id": 1},
-                        type="number",
-                        value=1.0,
-                        step=0.1,
-                        style={"border-radius": 3},
-                        className="mb-1",
-                    ),
-                ),
-            ],
+                    dbc.InputGroupText("trials"),
+                ],
+            ),
         ),
-        dbc.Row(
-            [
-                dbc.Col(
-                    dcc.Markdown(
-                        "$\\gamma$",
-                        mathjax=True,
-                        style={"text-align": "right"},
-                    ),
-                ),
-                dbc.Col(
-                    dbc.Input(
-                        id={"type": "param", "id": 2},
-                        type="number",
-                        value=0.0,
-                        step=0.1,
-                        style={"border-radius": 3},
-                        className="mb-1",
-                    ),
-                ),
-                dbc.Col(
-                    dcc.Markdown(
-                        "$\\lambda$",
-                        mathjax=True,
-                        style={"text-align": "right"},
-                    ),
-                ),
-                dbc.Col(
-                    dbc.Input(
-                        id={"type": "param", "id": 3},
-                        type="number",
-                        value=0.0,
-                        step=0.1,
-                        style={"border-radius": 3},
-                    ),
-                ),
-            ],
+        dbc.Col(
+            dbc.Button(
+                "Regenerate",
+                id="regenerate",
+                style={"border-radius": 3},
+            ),
+            width="auto",
         ),
     ],
-    body=True,
-    style={"border-radius": 7},
+    className="mb-3",
 )
 
 
 points_table = dash_table.DataTable(
-    id="table",
+    id="points-table",
     columns=[
         {
             "name": "Intensity",
             "id": "Intensity",
-            "type": "numeric",
-            "format": dash_table.Format.Format(
-                precision=2,
-                scheme=dash_table.Format.Scheme.fixed,
-            ),
-        },
-        {
-            "name": "Hits",
-            "id": "Hits",
-            "type": "numeric",
-        },
-        {
-            "name": "n",
-            "id": "n",
-            "type": "numeric",
-        },
-        {
-            "name": "Hit Rate",
-            "id": "Hit Rate",
-            "type": "numeric",
-            "format": dash_table.Format.Format(
-                precision=2,
-                scheme=dash_table.Format.Scheme.fixed,
-            ),
-        },
-        {
-            "name": "logit(Hit Rate)",
-            "id": "logit(Hit Rate)",
             "type": "numeric",
             "format": dash_table.Format.Format(
                 precision=2,

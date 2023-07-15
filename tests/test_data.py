@@ -29,8 +29,8 @@ def subjects() -> list[str]:
 def test_nonstandard_logistic_mean():
     points = data.blocks.logistic(
         {
-            "Threshold": 1.0,
-            "Slope": 1.0,
+            "x_0": 1.0,
+            "k": 1.0,
             "Guess Rate": 0.0,
             "Lapse Rate": 0.0,
         },
@@ -42,16 +42,16 @@ def test_nonstandard_logistic_mean():
 def test_nonstandard_logistic_slope():
     points_control = data.blocks.logistic(
         {
-            "Threshold": 0.0,
-            "Slope": 1.0,
+            "x_0": 0.0,
+            "k": 1.0,
             "Guess Rate": 0.0,
             "Lapse Rate": 0.0,
         },
     )
     points = data.blocks.logistic(
         {
-            "Threshold": 0.0,
-            "Slope": 2.0,
+            "x_0": 0.0,
+            "k": 2.0,
             "Guess Rate": 0.0,
             "Lapse Rate": 0.0,
         },

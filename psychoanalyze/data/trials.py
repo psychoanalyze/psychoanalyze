@@ -51,10 +51,9 @@ def generate(
 ) -> pd.DataFrame:
     """Generate n trials with outcomes."""
     x = generate_trial_index(n_trials, options)
-    p = {option: psi(option, params) for option in options}
     return pd.DataFrame(
         {
-            "Result": [int(random.random() <= p[x_val]) for x_val in x],
+            "Result": [int(random.random() <= psi(x_val, params)) for x_val in x],
             "Intensity": x,
         },
     )
