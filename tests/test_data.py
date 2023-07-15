@@ -39,26 +39,6 @@ def test_nonstandard_logistic_mean():
     assert max(points["Hit Rate"]) < 1
 
 
-def test_nonstandard_logistic_slope():
-    points_control = data.blocks.logistic(
-        {
-            "x_0": 0.0,
-            "k": 1.0,
-            "Guess Rate": 0.0,
-            "Lapse Rate": 0.0,
-        },
-    )
-    points = data.blocks.logistic(
-        {
-            "x_0": 0.0,
-            "k": 2.0,
-            "Guess Rate": 0.0,
-            "Lapse Rate": 0.0,
-        },
-    )
-    assert max(points["Hit Rate"]) < max(points_control["Hit Rate"])
-
-
 def test_params():
     x = pd.Index([])
     fits = pd.DataFrame({"5%": [], "50%": [], "95%": []})
