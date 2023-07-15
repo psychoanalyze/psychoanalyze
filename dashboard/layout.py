@@ -18,6 +18,7 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 
 from dashboard.components import (
+    blocks_table,
     link_function,
     model_params,
     points_table,
@@ -55,6 +56,7 @@ input_col = dbc.Col(
         dbc.Container(simulation_params),
     ],
     width=3,
+    class_name="mt-4",
 )
 
 plot_col = dbc.Col(
@@ -100,7 +102,9 @@ plot_col = dbc.Col(
 
 data_col = dbc.Col(
     [
-        html.H4("Points", className="mt-3"),
+        html.H4("Blocks", className="mt-3 mb-2"),
+        dbc.Container(blocks_table, className="mb-3"),
+        html.H4("Points", className="mb-2"),
         dbc.Container(points_table, className="mb-3"),
         dbc.Row(
             [

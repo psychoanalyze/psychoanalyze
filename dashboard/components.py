@@ -163,9 +163,14 @@ model_params = dbc.Container(
                                 "label": "Non Standard",
                                 "value": "non-standard",
                             },
+                            {
+                                "label": "2AFC",
+                                "value": "2AFC",
+                            },
                         ],
                     ),
                     width=7,
+                    class_name="mt-2",
                 ),
             ],
             justify="center",
@@ -344,8 +349,8 @@ blocks_table = dash_table.DataTable(
     selected_rows=[0],
     columns=[
         {
-            "name": "Threshold",
-            "id": "Threshold",
+            "name": "x_0",
+            "id": "x_0",
             "type": "numeric",
             "format": dash_table.Format.Format(
                 precision=2,
@@ -353,8 +358,8 @@ blocks_table = dash_table.DataTable(
             ),
         },
         {
-            "name": "Slope",
-            "id": "Slope",
+            "name": "k",
+            "id": "k",
             "type": "numeric",
             "format": dash_table.Format.Format(
                 precision=2,
@@ -362,8 +367,8 @@ blocks_table = dash_table.DataTable(
             ),
         },
         {
-            "name": "Guess Rate",
-            "id": "Guess Rate",
+            "name": "gamma",
+            "id": "gamma",
             "type": "numeric",
             "format": dash_table.Format.Format(
                 precision=2,
@@ -371,8 +376,8 @@ blocks_table = dash_table.DataTable(
             ),
         },
         {
-            "name": "Lapse Rate",
-            "id": "Lapse Rate",
+            "name": "lambda",
+            "id": "lambda",
             "type": "numeric",
             "format": dash_table.Format.Format(
                 precision=2,

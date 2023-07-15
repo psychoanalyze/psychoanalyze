@@ -28,6 +28,7 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import statsmodels.api as sm
 from dash import (
     ALL,
     MATCH,
@@ -42,6 +43,7 @@ from dash import (
 )
 from dash_bootstrap_components import icons, themes
 from scipy.stats import logistic
+from statsmodels.discrete.discrete_model import Logit
 
 from dashboard.layout import layout
 from psychoanalyze.data import blocks as pa_blocks
@@ -64,6 +66,7 @@ server = app.server
     Output("x-min", "value"),
     Output("x-max", "value"),
     Output("points-table", "data"),
+    Output("blocks-table", "data"),
     Input({"type": "param", "name": ALL}, "value"),
     Input("n-levels", "value"),
     Input("n-trials", "value"),
@@ -72,7 +75,7 @@ def update_x_range(
     param: list[float],
     n_levels: int,
     n_trials: int,
-) -> tuple[str, str, list[dict[Hashable, Any]]]:
+) -> tuple[str, str, list[dict[Hashable, Any]], list[dict[Hashable, Any]]]:
     """Update x range based on threshold and slope."""
     params = dict(zip(["x_0", "k", "gamma", "lambda"], param, strict=True))
     min_, max_ = logistic.ppf([0.01, 0.99], loc=params["x_0"], scale=params["k"])
@@ -82,18 +85,29 @@ def update_x_range(
         [random.choice(ix) for _ in range(n_trials)],
         name="Intensity",
     )
-    counts = execution_plan.value_counts().rename("n trials").sort_index()
-    hits = pd.Series(
-        np.random.default_rng().binomial(counts, p),
-        index=counts.index,
-        name="Hits",
+    results = pd.Series(
+        [int(random.random() < p.loc[x]) for x in execution_plan],
+        name="Result",
     )
+    fit = Logit(
+        results,
+        sm.add_constant(execution_plan.to_frame()),
+    ).fit()
+    fit_params = fit.params
+    blocks = [
+        fit_params.rename({"const": "x_0", "Intensity": "k"}).to_dict()
+        | {"gamma": 0.0, "lambda": 0.0},
+    ]
+    counts = execution_plan.value_counts().rename("n trials").sort_index()
+    hits = results.groupby(execution_plan).sum().rename("Hits")
     hit_rate = pd.Series(hits / counts, name="Hit Rate")
     points = pd.concat([counts, p, hits, hit_rate], axis=1).reset_index()
+
     return (
         f"{min_:0.2f}",
         f"{max_:0.2f}",
         points.to_dict("records"),
+        blocks,
     )
 
 
@@ -102,35 +116,55 @@ def update_x_range(
     Input("logit", "value"),
     Input({"type": "param", "name": ALL}, "value"),
     Input("points-table", "data"),
+    Input("blocks-table", "data"),
 )
 def update_fig_model(
     form: str,
     param: list[float],
-    data: list[dict[Hashable, Any]],
+    data: list[dict[str, float]],
+    fits: list[dict[str, float]],
 ) -> tuple[go.Figure, dash_table.DataTable]:
     """Update plot and tables based on data store and selected view."""
     params = dict(zip(["x_0", "k", "gamma", "lambda"], param, strict=True))
     model = params["gamma"] + (
         1 - params["gamma"] - params["lambda"]
     ) * pa_blocks.logistic(params)
+    fit_params = fits[0]
+    fit_psi = fit_params["gamma"] + (
+        1 - fit_params["gamma"] - fit_params["lambda"]
+    ) * pa_blocks.logistic(fit_params)
     y = model["logit(Hit Rate)"] if form == "log" else model["Hit Rate"]
+    y_fit = fit_psi["logit(Hit Rate)"] if form == "log" else fit_psi["Hit Rate"]
     if data is None:
         fig = px.line(y, y=y.name, template="plotly_white")
     else:
-        fig = px.scatter(
-            pd.DataFrame.from_records(data),
-            x="Intensity",
-            y="Hit Rate",
-            size="n trials",
-            template="plotly_white",
-        ).add_trace(
-            go.Scatter(
-                x=model.index,
-                y=y,
-                name="Model",
-                mode="lines",
-                line_color="#636EFA",
-            ),
+        fig = (
+            px.scatter(
+                pd.DataFrame.from_records(data),
+                x="Intensity",
+                y="Hit Rate",
+                size="n trials",
+                template="plotly_white",
+            )
+            .add_trace(
+                go.Scatter(
+                    x=model.index,
+                    y=y,
+                    name="Model",
+                    mode="lines",
+                    line_color="#636EFA",
+                ),
+            )
+            .add_trace(
+                go.Scatter(
+                    x=fit_psi.index,
+                    y=y_fit,
+                    name="Predicted",
+                    mode="lines",
+                    line_dash="dash",
+                    line_color="#636EFA",
+                ),
+            )
         )
     return fig
 
@@ -212,6 +246,42 @@ def toggle_eqn(n_clicks: int) -> tuple[bool, str]:
 def toggle_param(free: bool) -> bool:  # noqa: FBT001
     """Toggle parameter."""
     return not free
+
+
+@callback(
+    Output({"type": "param", "name": ALL}, "value"),
+    Input("preset", "value"),
+    State({"type": "param", "name": ALL}, "value"),
+)
+def set_params_to_preset(
+    preset: str,
+    param: list[float],
+) -> list[float]:
+    """Set parameters to preset values."""
+    presets = {
+        "standard": [0.0, 1.0, 0.0, 0.0],
+        "non-standard": [10, 2, 0.2, 0.1],
+        "2AFC": [0, 1, 0.5, 0.0],
+    }
+    return presets.get(preset, param)
+
+
+@callback(
+    Output({"type": "free", "name": ALL}, "value"),
+    Input("preset", "value"),
+    State({"type": "free", "name": ALL}, "value"),
+)
+def set_fixed_params_to_preset(
+    preset: str,
+    param: list[bool],
+) -> list[bool]:
+    """Set parameters to preset values."""
+    presets = {
+        "standard": [True] * 4,
+        "non-standard": [True] * 4,
+        "2AFC": [True, True, False, True],
+    }
+    return presets.get(preset, param)
 
 
 if __name__ == "__main__":

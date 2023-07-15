@@ -73,7 +73,8 @@ module = [
     'dash_daq',
     'datatest',
     'bambi',
-    'hypothesis'
+    'hypothesis',
+    'statsmodels.*',
 ]
 ignore_missing_imports = true
 
