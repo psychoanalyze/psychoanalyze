@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.1 (2023-07-15)
+
+### Fix
+
+* Logit(hit rate) ([`49d53fa`](https://github.com/psychoanalyze/psychoanalyze/commit/49d53faebb871ac5e9317f5ce56c6171c0f046cd))
+
 ## v0.6.0 (2023-07-15)
 
 ### Feature
