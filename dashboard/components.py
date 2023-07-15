@@ -156,9 +156,10 @@ link_function = dbc.Container(
                 ),
                 dbc.Col(
                     dbc.Button(
-                        "Show Eqn",
+                        "Show Eqn ▾ ",
                         style={"border-radius": 3},
                         id="show-eqn",
+                        class_name="btn btn-outline-info",
                         outline=True,
                     ),
                     width="auto",
@@ -174,6 +175,7 @@ link_function = dbc.Container(
                 mathjax=True,
             ),
             is_open=False,
+            id="F-eqn",
         ),
     ],
     className="mb-2",

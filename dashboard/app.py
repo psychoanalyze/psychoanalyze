@@ -153,5 +153,15 @@ def export_data(
     return download
 
 
+@callback(
+    Output("F-eqn", "is_open"),
+    Output("show-eqn", "children"),
+    Input("show-eqn", "n_clicks"),
+)
+def toggle_eqn(n_clicks: int) -> tuple[bool, str]:
+    """Toggle equation."""
+    return (n_clicks % 2 == 1, "Hide Eqn ▴ ") if n_clicks else (False, "Show Eqn ▾ ")
+
+
 if __name__ == "__main__":
     app.run(debug=True)
