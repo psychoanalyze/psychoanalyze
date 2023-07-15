@@ -65,15 +65,14 @@ server = app.server
 
 
 @callback(
-    Output("x-min", "value"),
-    Output("x-max", "value"),
+    Output("x-min", "value", allow_duplicate=True),
+    Output("x-max", "value", allow_duplicate=True),
     Output("points-store", "data", allow_duplicate=True),
     Output("blocks-table", "data"),
     Input({"type": "param", "name": ALL}, "value"),
     Input("n-levels", "value"),
     Input("n-trials", "value"),
     Input("n-blocks", "value"),
-    Input("tabs", "active_tab"),
     prevent_initial_call=True,
 )
 def update_x_range(
@@ -81,7 +80,6 @@ def update_x_range(
     n_levels: int,
     n_trials: int,
     n_blocks: int,
-    active_tab: str,
 ) -> tuple[str, str, list[dict[Hashable, Any]], list[dict[Hashable, Any]]]:
     """Update x range based on threshold and slope."""
     params = dict(zip(["x_0", "k", "gamma", "lambda"], param, strict=True))
@@ -125,7 +123,7 @@ def update_x_range(
         f"{min_:0.2f}",
         f"{max_:0.2f}",
         final_points.to_dict("records"),
-        [] if active_tab == "upload" else all_blocks,
+        all_blocks,
     )
 
 
@@ -135,17 +133,16 @@ def update_x_range(
     Input({"type": "param", "name": ALL}, "value"),
     Input("points-table", "data"),
     Input("blocks-table", "data"),
-    Input("tabs", "active_tab"),
+    prevent_initial_call=True,
 )
 def update_fig_model(
     form: str,
     param: list[float],
     data: list[dict[str, float]],
     fits: list[dict[str, float]],
-    active_tab: str,
 ) -> tuple[go.Figure, dash_table.DataTable]:
     """Update plot and tables based on data store and selected view."""
-    if data is None or active_tab == "upload":
+    if not data:
         fig = px.scatter(pd.DataFrame({"Intensity": []}), template="plotly_white")
     else:
         params = dict(zip(["x_0", "k", "gamma", "lambda"], param, strict=True))
@@ -305,9 +302,10 @@ def set_fixed_params_to_preset(
 
 
 @callback(
-    Output("points-table", "data"),
+    Output("points-table", "data", allow_duplicate=True),
     Input("blocks-table", "derived_virtual_selected_rows"),
     State("points-store", "data"),
+    prevent_initial_call=True,
 )
 def filter_points(
     selected_rows: list[int],
@@ -343,6 +341,34 @@ def upload_data(contents: str, filename: str) -> list[dict[Hashable, Any]]:
 def toggle_upload(active_tab: str) -> bool:
     """Toggle upload."""
     return active_tab == "upload"
+
+
+@callback(
+    Output("x-min", "value"),
+    Output("x-max", "value"),
+    Output("n-levels", "value"),
+    Output("fix-range", "value"),
+    Output("fix-range", "disabled"),
+    Input("upload", "contents"),
+    prevent_initial_call=True,
+)
+def update_points_table(
+    contents: str,
+) -> tuple[float, float, int, bool, bool]:
+    """Update points table."""
+    if contents is None:
+        return []
+    content_type, content_string = contents.split(",")
+    decoded = io.StringIO(base64.b64decode(content_string).decode("utf-8"))
+    trials = pd.read_csv(decoded)
+    points = pa_points.from_trials(trials).reset_index()
+    return (
+        points["Intensity"].min(),
+        points["Intensity"].max(),
+        points["Intensity"].nunique(),
+        False,
+        True,
+    )
 
 
 if __name__ == "__main__":

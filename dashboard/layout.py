@@ -27,7 +27,7 @@ from dashboard.components import (
 )
 
 font_family = "Comfortaa, Times, serif"
-subtitle = "Interactive data simulation & analysis for psychophysics."
+subtitle = "Interactive data simulation & automated analysis for psychophysics."
 
 
 input_col = dbc.Col(

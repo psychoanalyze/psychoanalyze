@@ -153,7 +153,7 @@ model_params = dbc.Container(
                 dbc.Col(
                     dcc.Dropdown(
                         id="preset",
-                        placeholder="Select a Preset",
+                        placeholder="Preset examples...",
                         options=[
                             {
                                 "label": "Standard",
@@ -254,16 +254,10 @@ stimulus_params = dbc.Container(
             ],
             className="mb-1 g-0",
         ),
-        dbc.Checklist(
-            options=[
-                {
-                    "label": "Pin range to ±4σ",  # noqa: RUF001
-                    "value": "fix-range",
-                },
-            ],
+        dbc.Checkbox(
+            label="Pin range to ±4σ",  # noqa: RUF001
             id="fix-range",
-            switch=True,
-            value=["fix-range"],
+            value=True,
         ),
     ],
     class_name="mb-3",
@@ -299,6 +293,11 @@ simulation_params = dbc.Col(
 points_table = dash_table.DataTable(
     id="points-table",
     columns=[
+        {
+            "name": "Block",
+            "id": "Block",
+            "type": "numeric",
+        },
         {
             "name": "Intensity",
             "id": "Intensity",
