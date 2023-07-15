@@ -53,7 +53,7 @@ input_col = dbc.Col(
         html.H4("Stimulus"),
         stimulus_params,
         html.H4("Simulate"),
-        dbc.Container(simulation_params),
+        dbc.Container(dbc.Row(simulation_params, justify="center")),
     ],
     width=3,
     class_name="mt-4",

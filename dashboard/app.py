@@ -65,49 +65,59 @@ server = app.server
 @callback(
     Output("x-min", "value"),
     Output("x-max", "value"),
-    Output("points-table", "data"),
+    Output("points-store", "data"),
     Output("blocks-table", "data"),
     Input({"type": "param", "name": ALL}, "value"),
     Input("n-levels", "value"),
     Input("n-trials", "value"),
+    Input("n-blocks", "value"),
+    prevent_initial_call=True,
 )
 def update_x_range(
     param: list[float],
     n_levels: int,
     n_trials: int,
+    n_blocks: int,
 ) -> tuple[str, str, list[dict[Hashable, Any]], list[dict[Hashable, Any]]]:
     """Update x range based on threshold and slope."""
     params = dict(zip(["x_0", "k", "gamma", "lambda"], param, strict=True))
     min_, max_ = logistic.ppf([0.01, 0.99], loc=params["x_0"], scale=params["k"])
     ix = pd.Index(np.linspace(min_, max_, n_levels), name="Intensity")
     p = pa_points.psi(ix, params)
-    execution_plan = pd.Series(
-        [random.choice(ix) for _ in range(n_trials)],
-        name="Intensity",
-    )
-    results = pd.Series(
-        [int(random.random() < p.loc[x]) for x in execution_plan],
-        name="Result",
-    )
-    fit = Logit(
-        results,
-        sm.add_constant(execution_plan.to_frame()),
-    ).fit()
-    fit_params = fit.params
-    blocks = [
-        fit_params.rename({"const": "x_0", "Intensity": "k"}).to_dict()
-        | {"gamma": 0.0, "lambda": 0.0},
-    ]
-    counts = execution_plan.value_counts().rename("n trials").sort_index()
-    hits = results.groupby(execution_plan).sum().rename("Hits")
-    hit_rate = pd.Series(hits / counts, name="Hit Rate")
-    points = pd.concat([counts, p, hits, hit_rate], axis=1).reset_index()
-
+    all_points = {}
+    all_blocks = []
+    for i in range(n_blocks):
+        execution_plan = pd.Series(
+            [random.choice(ix) for _ in range(n_trials)],
+            name="Intensity",
+        )
+        results = pd.Series(
+            [int(random.random() < p.loc[x]) for x in execution_plan],
+            name="Result",
+        )
+        fit = Logit(
+            results,
+            sm.add_constant(execution_plan.to_frame()),
+        ).fit(disp=False)
+        fit_params = fit.params
+        block = fit_params.rename({"const": "x_0", "Intensity": "k"}).to_dict() | {
+            "gamma": 0.0,
+            "lambda": 0.0,
+            "Block": i,
+        }
+        counts = execution_plan.value_counts().rename("n trials").sort_index()
+        hits = results.groupby(execution_plan).sum().rename("Hits")
+        hit_rate = pd.Series(hits / counts, name="Hit Rate")
+        points = pd.concat([counts, p, hits, hit_rate], axis=1).reset_index()
+        points["Block"] = i
+        all_points[i] = points
+        all_blocks.append(block)
+    final_points = pd.concat(all_points, names=["Block"])
     return (
         f"{min_:0.2f}",
         f"{max_:0.2f}",
-        points.to_dict("records"),
-        blocks,
+        final_points.to_dict("records"),
+        all_blocks,
     )
 
 
@@ -282,6 +292,22 @@ def set_fixed_params_to_preset(
         "2AFC": [True, True, False, True],
     }
     return presets.get(preset, param)
+
+
+@callback(
+    Output("points-table", "data"),
+    Input("blocks-table", "derived_virtual_selected_rows"),
+    State("points-store", "data"),
+)
+def filter_points(
+    selected_rows: list[int],
+    points: list[dict[Hashable, Any]],
+) -> list[dict[Hashable, Any]]:
+    """Filter points table."""
+    if not selected_rows:
+        return []
+    points_df = pd.DataFrame.from_records(points)
+    return points_df[points_df["Block"].isin(selected_rows)].to_dict("records")
 
 
 if __name__ == "__main__":

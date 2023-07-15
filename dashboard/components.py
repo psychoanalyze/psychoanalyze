@@ -270,32 +270,31 @@ stimulus_params = dbc.Container(
 )
 
 
-simulation_params = dbc.Row(
+simulation_params = dbc.Col(
     [
-        dbc.Col(
-            dbc.InputGroup(
-                [
-                    dbc.Input(
-                        id="n-trials",
-                        type="number",
-                        value=70,
-                    ),
-                    dbc.InputGroupText("trials"),
-                ],
-            ),
+        dbc.InputGroup(
+            [
+                dbc.Input(
+                    id="n-trials",
+                    type="number",
+                    value=70,
+                ),
+                dbc.InputGroupText("trials per block"),
+            ],
         ),
-        dbc.Col(
-            dbc.Button(
-                "Resimulate",
-                id="resimulate",
-                style={"border-radius": 3},
-            ),
-            width="auto",
+        dbc.InputGroup(
+            [
+                dbc.Input(
+                    id="n-blocks",
+                    type="number",
+                    value=5,
+                ),
+                dbc.InputGroupText("blocks"),
+            ],
         ),
     ],
-    className="mb-3",
+    width="9",
 )
-
 
 points_table = dash_table.DataTable(
     id="points-table",
@@ -348,6 +347,11 @@ blocks_table = dash_table.DataTable(
     row_selectable="single",
     selected_rows=[0],
     columns=[
+        {
+            "name": "Block",
+            "id": "Block",
+            "type": "numeric",
+        },
         {
             "name": "x_0",
             "id": "x_0",
