@@ -42,6 +42,7 @@ from dash import (
     dcc,
 )
 from dash_bootstrap_components import icons, themes
+from scipy.special import logit
 from scipy.stats import logistic
 from statsmodels.discrete.discrete_model import Logit
 
@@ -108,7 +109,11 @@ def update_x_range(
         counts = execution_plan.value_counts().rename("n trials").sort_index()
         hits = results.groupby(execution_plan).sum().rename("Hits")
         hit_rate = pd.Series(hits / counts, name="Hit Rate")
-        points = pd.concat([counts, p, hits, hit_rate], axis=1).reset_index()
+        logit_hit_rate = pd.Series(logit(hit_rate), name="logit(Hit Rate)")
+        points = pd.concat(
+            [counts, p, hits, hit_rate, logit_hit_rate],
+            axis=1,
+        ).reset_index()
         points["Block"] = i
         all_points[i] = points
         all_blocks.append(block)
@@ -152,7 +157,7 @@ def update_fig_model(
             px.scatter(
                 pd.DataFrame.from_records(data),
                 x="Intensity",
-                y="Hit Rate",
+                y=y.name,
                 size="n trials",
                 template="plotly_white",
             )

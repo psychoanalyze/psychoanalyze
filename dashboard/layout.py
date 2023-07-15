@@ -57,6 +57,7 @@ input_col = dbc.Col(
     ],
     width=3,
     class_name="mt-4",
+    id="input-col",
 )
 
 plot_col = dbc.Col(
@@ -244,6 +245,32 @@ layout = dbc.Container(
             brand_href="/",
             class_name="mb-2",
             style={"border-radius": "0 0 7px 7px"},
+        ),
+        dbc.Tabs(
+            [
+                dbc.Tab(label="Simulate", tab_id="simulate"),
+                dbc.Tab(label="Upload", tab_id="Upload"),
+                dbc.Tab(label="Examples", tab_id="examples"),
+            ],
+            id="tabs",
+            active_tab="simulate",
+        ),
+        dcc.Upload(
+            """
+            Drag-and-Drop or Click to Upload.
+            Upload a tabular data file with columns "Block", "Intensity", and "Result".
+            """,
+            id="upload",
+            style={
+                "width": "100%",
+                "height": "60px",
+                "lineHeight": "60px",
+                "borderWidth": "1px",
+                "borderStyle": "dashed",
+                "borderRadius": "5px",
+                "textAlign": "center",
+                "margin": "10px",
+            },
         ),
         dbc.Row(
             [
