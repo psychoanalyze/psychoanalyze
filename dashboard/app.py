@@ -20,7 +20,6 @@ Contains callbacks.
 import base64
 from pathlib import Path
 
-import dash_bootstrap_components as dbc
 import duckdb
 import numpy as np
 import pandas as pd
@@ -37,6 +36,7 @@ from dash import (
     dash_table,
     dcc,
 )
+from dash_bootstrap_components import icons, themes
 from scipy.stats import logistic
 
 from dashboard.layout import layout
@@ -45,8 +45,8 @@ from psychoanalyze.data import blocks as pa_blocks
 app = Dash(
     __name__,
     external_stylesheets=[
-        dbc.themes.SUPERHERO,
-        dbc.icons.BOOTSTRAP,
+        themes.SUPERHERO,
+        icons.BOOTSTRAP,
         "https://fonts.googleapis.com/css2?family=Comfortaa:wght@500&family=Glegoo:wght@700&display=swap",
     ],
 )
@@ -70,10 +70,12 @@ def update_x_range(
 ) -> tuple[str, str, list[dict[str, float]]]:
     """Update x range based on threshold and slope."""
     min_, max_ = logistic.ppf([0.01, 0.99], loc=x_0, scale=k)
+    x = pd.Index(np.linspace(min_, max_, n_levels), name="Intensity")
+
     return (
         f"{min_:0.2f}",
         f"{max_:0.2f}",
-        [{"Intensity": x} for x in np.linspace(min_, max_, n_levels)],
+        [{"Intensity": x_i} for x_i in x.to_numpy()],
     )
 
 
@@ -152,4 +154,4 @@ def export_data(
 
 
 if __name__ == "__main__":
-    app.run(debug=True, use_reloader=False)
+    app.run(debug=True)

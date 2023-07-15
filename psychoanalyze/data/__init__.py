@@ -14,10 +14,6 @@
 
 """Data modules and general-purpose data transformation utilities.
 
-Functions:
-
-- [`psychoanalyze.data.load`][psychoanalyze.data.load]
-
 Submodules:
 
 - [`psychoanalyze.data.blocks`][psychoanalyze.data.blocks]
@@ -27,20 +23,3 @@ Submodules:
 - [`psychoanalyze.data.subjects`][psychoanalyze.data.subjects]
 - [`psychoanalyze.data.types`][psychoanalyze.data.types]
 """
-from pathlib import Path
-
-import pandas as pd
-
-from psychoanalyze.data import blocks, points, sessions, subjects
-
-
-def load(
-    data_dir: Path = Path("data"),
-) -> dict[str, pd.DataFrame]:
-    """Load all tables into dict."""
-    return {
-        "Sessions": sessions.load(data_dir),
-        "Subjects": subjects.load(data_dir),
-        "Blocks": blocks.load(data_dir),
-        "Points": points.load(data_dir),
-    }

@@ -9,15 +9,11 @@
     "ghcr.io/devcontainers/features/node:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
-  "remoteEnv": {
-    "PYTHONDONTWRITEBYTECODE": "true"
-  },
   "remoteUser": "vscode",
   "onCreateCommand": "poetry install && pre-commit install",
   "customizations": {
     "vscode": {
       "settings": {
-        "editor.defaultFormatter": "ms-python.python",
         "python.defaultInterpreterPath": ".venv/bin/python",
         "files.associations": {
           "*.psyexp": "xml",

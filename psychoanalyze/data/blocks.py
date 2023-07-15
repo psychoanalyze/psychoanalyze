@@ -24,7 +24,6 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from pandera.typing import DataFrame
 from scipy.special import expit, logit
 from scipy.stats import logistic as scipy_logistic
 from sklearn.linear_model import LogisticRegression
@@ -186,7 +185,7 @@ def generate_trials(n_trials: int, model_params: dict[str, float]) -> pd.DataFra
     return trials.moc_sample(n_trials, model_params)
 
 
-def from_points(points: DataFrame[types.Points]) -> pd.DataFrame:
+def from_points(points: pd.DataFrame) -> pd.DataFrame:
     """Aggregate block measures from points data."""
     return points.groupby("BlockID")[["n"]].sum()
 
