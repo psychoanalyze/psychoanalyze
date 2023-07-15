@@ -212,15 +212,16 @@ def to_block(points: pd.DataFrame) -> pd.DataFrame:
 
 
 def psi(
-    x: np.ndarray,
-    threshold: float,
-    width: float,
-    gamma: float,
-    lambda_: float,
-) -> float:
+    x: pd.Index,
+    params: dict[str, float],
+) -> pd.Series:
     """Calculate psi for an array of intensity levels x."""
-    return gamma + (1 - gamma - lambda_) / (
-        1 + np.exp(-gamma * (x - threshold) / width) ** lambda_
+    return pd.Series(
+        params["gamma"]
+        + (1 - params["gamma"] - params["lambda"])
+        / (1 + np.exp(-params["k"] * (x - params["x_0"]))),
+        index=x,
+        name="p(x)",
     )
 
 

@@ -31,19 +31,23 @@ subtitle = "Interactive data simulation & analysis for psychophysics."
 
 input_col = dbc.Col(
     [
-        html.H4("Model"),
-        dcc.Markdown(
-            """
-            $$
-            \\psi(x) = \\gamma + (1 - \\gamma - \\lambda)F(x)
-            $$
-
-            """,
-            mathjax=True,
-        ),
         html.H4("Link Function"),
         link_function,
-        html.H4("Model Parameters"),
+        dbc.Row(
+            [
+                dbc.Col(html.H4("Model Parameters")),
+                dbc.Col(
+                    html.I(className="bi bi-info-circle", id="fixed-param-info"),
+                    width="auto",
+                ),
+            ],
+            justify="start",
+            align="center",
+        ),
+        dbc.Tooltip(
+            "Checked: free parameter\nUnchecked: fixed parameter",
+            target="fixed-param-info",
+        ),
         model_params,
         html.H4("Stimulus"),
         stimulus_params,
@@ -55,6 +59,15 @@ input_col = dbc.Col(
 
 plot_col = dbc.Col(
     [
+        dcc.Markdown(
+            """
+            $$
+            \\psi(x) = \\gamma + (1 - \\gamma - \\lambda)F(x)
+            $$
+
+            """,
+            mathjax=True,
+        ),
         dcc.Graph(id="plot", className="mb-3"),
         html.H5("Plot Options"),
         dbc.Container(
@@ -83,7 +96,6 @@ plot_col = dbc.Col(
         ),
     ],
     width=5,
-    className="mt-5",
 )
 
 data_col = dbc.Col(

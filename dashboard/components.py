@@ -31,10 +31,13 @@ model_params = dbc.Container(
                     dbc.InputGroup(
                         [
                             dbc.InputGroupText(
-                                dbc.Checkbox(id="x_0-free", value=True),
+                                dbc.Checkbox(
+                                    id={"type": "free", "name": "x_0"},
+                                    value=True,
+                                ),
                             ),
                             dbc.Input(
-                                id="x_0",
+                                id={"type": "param", "name": "x_0"},
                                 type="number",
                                 value=0.0,
                             ),
@@ -58,11 +61,11 @@ model_params = dbc.Container(
                             dbc.InputGroupText(
                                 dbc.Checkbox(
                                     value=True,
-                                    id="k-free",
+                                    id={"type": "free", "name": "k"},
                                 ),
                             ),
                             dbc.Input(
-                                id="k",
+                                id={"type": "param", "name": "k"},
                                 type="number",
                                 value=1.0,
                                 step=0.5,
@@ -90,12 +93,18 @@ model_params = dbc.Container(
                     dbc.InputGroup(
                         [
                             dbc.InputGroupText(
-                                dbc.Checkbox(id="gamma-free", value=True),
+                                dbc.Checkbox(
+                                    id={"type": "free", "name": "gamma"},
+                                    value=True,
+                                ),
                             ),
                             dbc.Input(
-                                id="gamma",
+                                id={"type": "param", "name": "gamma"},
                                 type="number",
                                 value=0.0,
+                                step=0.1,
+                                min=0.0,
+                                max=1.0,
                             ),
                         ],
                         size="sm",
@@ -117,14 +126,16 @@ model_params = dbc.Container(
                             dbc.InputGroupText(
                                 dbc.Checkbox(
                                     value=True,
-                                    id="lambda-free",
+                                    id={"type": "free", "name": "lambda"},
                                 ),
                             ),
                             dbc.Input(
-                                id="lambda",
+                                id={"type": "param", "name": "lambda"},
                                 type="number",
-                                value=1.0,
-                                step=0.5,
+                                value=0.0,
+                                step=0.1,
+                                min=0.0,
+                                max=1.0,
                             ),
                         ],
                         size="sm",
@@ -137,7 +148,28 @@ model_params = dbc.Container(
             ],
             class_name="g-0",
         ),
-        dbc.FormText("Uncheck boxes to fix parameters."),
+        dbc.Row(
+            [
+                dbc.Col(
+                    dcc.Dropdown(
+                        id="preset",
+                        placeholder="Select a Preset",
+                        options=[
+                            {
+                                "label": "Standard",
+                                "value": "standard",
+                            },
+                            {
+                                "label": "Non Standard",
+                                "value": "non-standard",
+                            },
+                        ],
+                    ),
+                    width=7,
+                ),
+            ],
+            justify="center",
+        ),
     ],
     className="mb-2",
 )
@@ -149,20 +181,19 @@ link_function = dbc.Container(
                 dbc.Col(
                     dcc.Dropdown(
                         id="f",
-                        options=[{"label": "Logistic (expit)", "value": "expit"}],
+                        options=[{"label": "Logistic", "value": "expit"}],
                         value="expit",
                         className="mb-1",
                     ),
                 ),
                 dbc.Col(
                     dbc.Button(
-                        "Show Eqn ▾ ",
                         style={"border-radius": 3},
                         id="show-eqn",
                         class_name="btn btn-outline-info",
                         outline=True,
                     ),
-                    width="auto",
+                    width=6,
                 ),
             ],
         ),
@@ -174,7 +205,7 @@ link_function = dbc.Container(
                     $$""",
                 mathjax=True,
             ),
-            is_open=False,
+            is_open=True,
             id="F-eqn",
         ),
     ],
@@ -221,7 +252,7 @@ stimulus_params = dbc.Container(
         dbc.Checklist(
             options=[
                 {
-                    "label": "Select range from model",
+                    "label": "Pin range to ±4σ",  # noqa: RUF001
                     "value": "fix-range",
                 },
             ],
@@ -240,7 +271,7 @@ simulation_params = dbc.Row(
             dbc.InputGroup(
                 [
                     dbc.Input(
-                        id={"type": "experiment-param", "name": "n-trials"},
+                        id="n-trials",
                         type="number",
                         value=70,
                     ),
@@ -267,6 +298,34 @@ points_table = dash_table.DataTable(
         {
             "name": "Intensity",
             "id": "Intensity",
+            "type": "numeric",
+            "format": dash_table.Format.Format(
+                precision=2,
+                scheme=dash_table.Format.Scheme.fixed,
+            ),
+        },
+        {
+            "name": "n trials",
+            "id": "n trials",
+            "type": "numeric",
+        },
+        {
+            "name": "p(x)",
+            "id": "p(x)",
+            "type": "numeric",
+            "format": dash_table.Format.Format(
+                precision=2,
+                scheme=dash_table.Format.Scheme.fixed,
+            ),
+        },
+        {
+            "name": "Hits",
+            "id": "Hits",
+            "type": "numeric",
+        },
+        {
+            "name": "Hit Rate",
+            "id": "Hit Rate",
             "type": "numeric",
             "format": dash_table.Format.Format(
                 precision=2,

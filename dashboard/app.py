@@ -18,7 +18,10 @@ Contains callbacks.
 # PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
 import base64
+import random
+from collections.abc import Hashable
 from pathlib import Path
+from typing import Any
 
 import duckdb
 import numpy as np
@@ -27,6 +30,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from dash import (
     ALL,
+    MATCH,
     Dash,
     Input,
     Output,
@@ -41,6 +45,7 @@ from scipy.stats import logistic
 
 from dashboard.layout import layout
 from psychoanalyze.data import blocks as pa_blocks
+from psychoanalyze.data import points as pa_points
 
 app = Dash(
     __name__,
@@ -59,42 +64,75 @@ server = app.server
     Output("x-min", "value"),
     Output("x-max", "value"),
     Output("points-table", "data"),
-    Input("x_0", "value"),
-    Input("k", "value"),
+    Input({"type": "param", "name": ALL}, "value"),
     Input("n-levels", "value"),
+    Input("n-trials", "value"),
 )
 def update_x_range(
-    x_0: float,
-    k: float,
+    param: list[float],
     n_levels: int,
-) -> tuple[str, str, list[dict[str, float]]]:
+    n_trials: int,
+) -> tuple[str, str, list[dict[Hashable, Any]]]:
     """Update x range based on threshold and slope."""
-    min_, max_ = logistic.ppf([0.01, 0.99], loc=x_0, scale=k)
-    x = pd.Index(np.linspace(min_, max_, n_levels), name="Intensity")
-
+    params = dict(zip(["x_0", "k", "gamma", "lambda"], param, strict=True))
+    min_, max_ = logistic.ppf([0.01, 0.99], loc=params["x_0"], scale=params["k"])
+    ix = pd.Index(np.linspace(min_, max_, n_levels), name="Intensity")
+    p = pa_points.psi(ix, params)
+    execution_plan = pd.Series(
+        [random.choice(ix) for _ in range(n_trials)],
+        name="Intensity",
+    )
+    counts = execution_plan.value_counts().rename("n trials").sort_index()
+    hits = pd.Series(
+        np.random.default_rng().binomial(counts, p),
+        index=counts.index,
+        name="Hits",
+    )
+    hit_rate = pd.Series(hits / counts, name="Hit Rate")
+    points = pd.concat([counts, p, hits, hit_rate], axis=1).reset_index()
     return (
         f"{min_:0.2f}",
         f"{max_:0.2f}",
-        [{"Intensity": x_i} for x_i in x.to_numpy()],
+        points.to_dict("records"),
     )
 
 
 @callback(
     Output("plot", "figure"),
     Input("logit", "value"),
-    Input("k", "value"),
-    Input("x_0", "value"),
+    Input({"type": "param", "name": ALL}, "value"),
+    Input("points-table", "data"),
 )
 def update_fig_model(
     form: str,
-    k: float,
-    x_0: float,
+    param: list[float],
+    data: list[dict[Hashable, Any]],
 ) -> tuple[go.Figure, dash_table.DataTable]:
     """Update plot and tables based on data store and selected view."""
-    params = {"k": k, "x_0": x_0}
-    model = pa_blocks.logistic(params)
+    params = dict(zip(["x_0", "k", "gamma", "lambda"], param, strict=True))
+    model = params["gamma"] + (
+        1 - params["gamma"] - params["lambda"]
+    ) * pa_blocks.logistic(params)
     y = model["logit(Hit Rate)"] if form == "log" else model["Hit Rate"]
-    return px.line(y, y=y.name, template="plotly_white")
+    if data is None:
+        fig = px.line(y, y=y.name, template="plotly_white")
+    else:
+        fig = px.scatter(
+            pd.DataFrame.from_records(data),
+            x="Intensity",
+            y="Hit Rate",
+            size="n trials",
+            template="plotly_white",
+        ).add_trace(
+            go.Scatter(
+                x=model.index,
+                y=y,
+                name="Model",
+                mode="lines",
+                line_color="#636EFA",
+            ),
+        )
+    return fig
 
 
 @callback(
@@ -160,7 +198,20 @@ def export_data(
 )
 def toggle_eqn(n_clicks: int) -> tuple[bool, str]:
     """Toggle equation."""
-    return (n_clicks % 2 == 1, "Hide Eqn ▴ ") if n_clicks else (False, "Show Eqn ▾ ")
+    if n_clicks:
+        n_clicks_is_even = n_clicks % 2 == 0
+        label = "Hide Eqn ▴ " if n_clicks_is_even else "Show Eqn ▾ "
+        return n_clicks_is_even, label
+    return True, "Hide Eqn ▴ "
+
+
+@callback(
+    Output({"type": "param", "name": MATCH}, "disabled"),
+    Input({"type": "free", "name": MATCH}, "value"),
+)
+def toggle_param(free: bool) -> bool:  # noqa: FBT001
+    """Toggle parameter."""
+    return not free
 
 
 if __name__ == "__main__":
