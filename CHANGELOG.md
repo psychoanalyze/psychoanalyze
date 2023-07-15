@@ -2,6 +2,23 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.0 (2023-07-15)
+
+### Feature
+
+* Feature-complete panel for basic psychometric curve fitting ([`aaf9e6a`](https://github.com/psychoanalyze/psychoanalyze/commit/aaf9e6aac66d89cabc6a5225f8ad0b7266f2faef))
+* Feature-complete panel for basic psychometric curve fitting ([`8c61af8`](https://github.com/psychoanalyze/psychoanalyze/commit/8c61af83d06a96da1ee30674677f1596641b34cf))
+
+### Fix
+
+* Predicted trace ([`3232471`](https://github.com/psychoanalyze/psychoanalyze/commit/3232471e03b2b1ff811f64cae1e4bbd83633da30))
+* Show eqn toggle ([`e3871e5`](https://github.com/psychoanalyze/psychoanalyze/commit/e3871e55dd07dee2b93454e40cd92f28e652ea57))
+* Add intensities to points table ([`bc0f05c`](https://github.com/psychoanalyze/psychoanalyze/commit/bc0f05c22cb4df85404fab21d15781bb03a74c41))
+
+### Performance
+
+* Imports ([`90e3fb2`](https://github.com/psychoanalyze/psychoanalyze/commit/90e3fb203043133f5dd3f98863d43695f16be52d))
+
 ## v0.5.0 (2023-07-14)
 
 ### Feature
