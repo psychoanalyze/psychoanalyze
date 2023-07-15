@@ -253,7 +253,7 @@ layout = dbc.Container(
                 dbc.Tab(label="Examples", tab_id="examples"),
             ],
             id="tabs",
-            active_tab="upload",
+            active_tab="simulate",
         ),
         dcc.Upload(
             """
