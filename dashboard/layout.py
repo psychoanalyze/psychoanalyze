@@ -255,22 +255,25 @@ layout = dbc.Container(
             id="tabs",
             active_tab="simulate",
         ),
-        dcc.Upload(
-            """
+        dbc.Collapse(
+            dcc.Upload(
+                """
             Drag-and-Drop or Click to Upload.
             Upload a tabular data file with columns "Block", "Intensity", and "Result".
             """,
-            id="upload",
-            style={
-                "width": "100%",
-                "height": "60px",
-                "lineHeight": "60px",
-                "borderWidth": "1px",
-                "borderStyle": "dashed",
-                "borderRadius": "5px",
-                "textAlign": "center",
-                "margin": "10px",
-            },
+                id="upload",
+                style={
+                    "width": "60%",
+                    "height": "60px",
+                    "lineHeight": "60px",
+                    "borderWidth": "1px",
+                    "borderStyle": "dashed",
+                    "borderRadius": "5px",
+                    "textAlign": "center",
+                    "margin": "10px",
+                },
+            ),
+            id="upload-collapse",
         ),
         dbc.Row(
             [

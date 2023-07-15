@@ -18,6 +18,7 @@ Contains callbacks.
 # PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
 import base64
+import io
 import random
 from collections.abc import Hashable
 from pathlib import Path
@@ -66,7 +67,7 @@ server = app.server
 @callback(
     Output("x-min", "value"),
     Output("x-max", "value"),
-    Output("points-store", "data"),
+    Output("points-store", "data", allow_duplicate=True),
     Output("blocks-table", "data"),
     Input({"type": "param", "name": ALL}, "value"),
     Input("n-levels", "value"),
@@ -145,7 +146,7 @@ def update_fig_model(
 ) -> tuple[go.Figure, dash_table.DataTable]:
     """Update plot and tables based on data store and selected view."""
     if data is None or active_tab == "upload":
-        fig = px.scatter(template="plotly_white")
+        fig = px.scatter(pd.DataFrame({"Intensity": []}), template="plotly_white")
     else:
         params = dict(zip(["x_0", "k", "gamma", "lambda"], param, strict=True))
         model = params["gamma"] + (
@@ -317,6 +318,31 @@ def filter_points(
         return []
     points_df = pd.DataFrame.from_records(points)
     return points_df[points_df["Block"].isin(selected_rows)].to_dict("records")
+
+
+@callback(
+    Output("points-store", "data"),
+    Input("upload", "contents"),
+    State("upload", "filename"),
+)
+def upload_data(contents: str, filename: str) -> list[dict[Hashable, Any]]:
+    """Upload data."""
+    if contents is None:
+        return []
+    content_type, content_string = contents.split(",")
+    decoded = io.StringIO(base64.b64decode(content_string).decode("utf-8"))
+    if "csv" in filename:
+        points = pd.read_csv(decoded)
+    return points.to_dict("records")
+
+
+@callback(
+    Output("upload-collapse", "is_open"),
+    Input("tabs", "active_tab"),
+)
+def toggle_upload(active_tab: str) -> bool:
+    """Toggle upload."""
+    return active_tab == "upload"
 
 
 if __name__ == "__main__":
