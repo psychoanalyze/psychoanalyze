@@ -37,18 +37,20 @@ points_index_levels = block_index_levels + point_dims
 
 points = DataFrameSchema(
     {
-        "n": Column(int),
+        "n trials": Column(int),
         "Hits": Column(int),
         "Hit Rate": Column(float),
         "logit(Hit Rate)": Column(float),
+        "Block": Column(int, required=False),
+        "Intensity": Column(float),
     },
-    index=Index(float, name="Intensity", unique=True),
 )
 
 trials = DataFrameSchema(
     columns={
         "Intensity": Column(float),
         "Result": Column(int),
+        "Block": Column(int),
     },
 )
 

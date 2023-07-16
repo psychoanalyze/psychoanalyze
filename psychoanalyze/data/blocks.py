@@ -34,7 +34,6 @@ from psychoanalyze.data import (
     stimulus,
     subjects,
     trials,
-    types,
 )
 from psychoanalyze.plot import template
 
@@ -58,41 +57,11 @@ def generate(
     )
 
 
-def prep_psych_curve(curves_data: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame:
-    """Transform & fit curve data."""
-    curves_data.index = x
-    fits = points.fit(curves_data)
-    return reshape_fit_results(fits, x, y)
-
-
 def dimensions(_points: pd.DataFrame, dims: list[str]) -> pd.Series:
     """Calculate dimensions for multiple blocks."""
     return _points.groupby(
         [dim for dim in list(_points.index.names) if dim not in dims],
     ).apply(points.dimension)
-
-
-def fits(_points: pd.DataFrame) -> pd.DataFrame:
-    """Apply fits to multiple blocks."""
-    if len(_points):
-        return _points.groupby(types.block_index_levels).apply(points.fit)
-    return pd.DataFrame(
-        {"Threshold": [], "Fixed Magnitude": [], "Dimension": []},
-        index=pd.MultiIndex.from_frame(
-            pd.DataFrame(
-                {
-                    "Subject": [],
-                    "Date": [],
-                    "Amp2": [],
-                    "Width2": [],
-                    "Freq2": [],
-                    "Dur2": [],
-                    "Active Channels": [],
-                    "Return Channels": [],
-                },
-            ),
-        ),
-    )
 
 
 def plot_fits(blocks: pd.DataFrame) -> go.Figure:

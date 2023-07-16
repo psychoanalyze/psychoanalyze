@@ -183,6 +183,20 @@ data_col = dbc.Col(
         ),
         dcc.Download(id="img-download"),
         dcc.Download(id="data-download"),
+        dcc.Upload(
+            "Upload data",
+            id="upload",
+            style={
+                "width": "100%",
+                "height": "60px",
+                "lineHeight": "60px",
+                "borderWidth": "1px",
+                "borderStyle": "dashed",
+                "borderRadius": "5px",
+                "textAlign": "center",
+                "margin": "10px",
+            },
+        ),
     ],
 )
 
@@ -191,6 +205,7 @@ layout = dbc.Container(
     [
         dcc.Store(id="points-store"),
         dcc.Store(id="blocks-store"),
+        dcc.Store(id="trials-store"),
         dbc.NavbarSimple(
             [
                 dbc.NavItem(
@@ -246,33 +261,7 @@ layout = dbc.Container(
             class_name="mb-2",
             style={"border-radius": "0 0 7px 7px"},
         ),
-        dbc.Tabs(
-            [
-                dbc.Tab(label="Simulate", tab_id="simulate"),
-                dbc.Tab(label="Upload", tab_id="upload"),
-                dbc.Tab(label="Examples", tab_id="examples"),
-            ],
-            id="tabs",
-            active_tab="simulate",
-        ),
         dbc.Collapse(
-            dcc.Upload(
-                """
-            Drag-and-Drop or Click to Upload.
-            Upload a tabular data file with columns "Block", "Intensity", and "Result".
-            """,
-                id="upload",
-                style={
-                    "width": "60%",
-                    "height": "60px",
-                    "lineHeight": "60px",
-                    "borderWidth": "1px",
-                    "borderStyle": "dashed",
-                    "borderRadius": "5px",
-                    "textAlign": "center",
-                    "margin": "10px",
-                },
-            ),
             id="upload-collapse",
         ),
         dbc.Row(

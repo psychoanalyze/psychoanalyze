@@ -225,9 +225,10 @@ stimulus_params = dbc.Container(
                     [
                         dbc.FormText("min"),
                         dbc.Input(
-                            id="x-min",
+                            id={"type": "x-param", "name": "x-min"},
                             type="number",
                             disabled=True,
+                            value=-4.5,
                         ),
                     ],
                 ),
@@ -235,7 +236,7 @@ stimulus_params = dbc.Container(
                     [
                         dbc.FormText("n levels"),
                         dbc.Input(
-                            id="n-levels",
+                            id={"type": "n-param", "name": "n-levels"},
                             type="number",
                             value=7,
                         ),
@@ -245,9 +246,10 @@ stimulus_params = dbc.Container(
                     [
                         dbc.FormText("max"),
                         dbc.Input(
-                            id="x-max",
+                            id={"type": "x-param", "name": "x-max"},
                             type="number",
                             disabled=True,
+                            value=4.5,
                         ),
                     ],
                 ),
@@ -269,7 +271,7 @@ simulation_params = dbc.Col(
         dbc.InputGroup(
             [
                 dbc.Input(
-                    id="n-trials",
+                    id={"type": "n-param", "name": "n-trials"},
                     type="number",
                     value=70,
                 ),
@@ -279,7 +281,7 @@ simulation_params = dbc.Col(
         dbc.InputGroup(
             [
                 dbc.Input(
-                    id="n-blocks",
+                    id={"type": "n-param", "name": "n-blocks"},
                     type="number",
                     value=5,
                 ),
@@ -343,7 +345,7 @@ points_table = dash_table.DataTable(
 
 blocks_table = dash_table.DataTable(
     id="blocks-table",
-    row_selectable="single",
+    row_selectable="multi",
     selected_rows=[0],
     columns=[
         {

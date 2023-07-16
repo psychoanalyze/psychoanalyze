@@ -36,6 +36,7 @@ ipykernel = "^6.24.0"
 ipywidgets = "^8.0.7"
 kaleido = "0.2.1"
 pyarrow = "^12.0.1"
+types-pytz = "^2023.3.0.0"
 
 [tool.poetry.scripts]
 psychoanalyze = "psychoanalyze.__main__:main"
@@ -75,6 +76,7 @@ module = [
     'bambi',
     'hypothesis',
     'statsmodels.*',
+    'pytz'
 ]
 ignore_missing_imports = true
 

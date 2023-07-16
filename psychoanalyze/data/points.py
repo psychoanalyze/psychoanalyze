@@ -39,12 +39,11 @@ index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
 @check_io(trials=types.trials, out=types.points)
 def from_trials(trials: pd.DataFrame) -> pd.DataFrame:
     """Aggregate point-level measures from trial data."""
-    points = trials.groupby("Intensity").agg(["count", "sum"])
-    points.columns = points.columns.droplevel()
-    points = points.rename(columns={"count": "n", "sum": "Hits"})
-    points["Hit Rate"] = points["Hits"] / points["n"]
+    points = trials.groupby(["Block", "Intensity"])["Result"].agg(["count", "sum"])
+    points = points.rename(columns={"count": "n trials", "sum": "Hits"})
+    points["Hit Rate"] = points["Hits"] / points["n trials"]
     points["logit(Hit Rate)"] = logit(points["Hit Rate"])
-    return points
+    return points.reset_index()
 
 
 @check_output(types.points)
@@ -82,30 +81,6 @@ def prep_fit(points: pd.DataFrame, dimension: str = "Amp1") -> dict:
 def model() -> stan.CmdStanModel:
     """Instantiate Stan binomial regression model."""
     return stan.CmdStanModel(stan_file="models/binomial_regression.stan")
-
-
-def fit(
-    points: pd.DataFrame,
-) -> pd.DataFrame:
-    """Fit psychometric curve to points."""
-    if len(points):
-        fit = pa_trials.fit(points[["x", "Hits", "n"]])
-        return pd.DataFrame(
-            {
-                "Threshold": [fit["Threshold"]],
-                "Slope": [fit["Slope"]],
-            },
-        )
-    return pd.DataFrame(
-        {
-            "Threshold": [],
-            "width": [],
-            "lambda": [],
-            "gamma": [],
-            "err+": [],
-            "err-": [],
-        },
-    )
 
 
 def hits(

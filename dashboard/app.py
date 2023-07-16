@@ -20,7 +20,9 @@ Contains callbacks.
 import base64
 import io
 import random
+import zipfile
 from collections.abc import Hashable
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -29,6 +31,7 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import pytz
 import statsmodels.api as sm
 from dash import (
     ALL,
@@ -39,12 +42,9 @@ from dash import (
     State,
     callback,
     callback_context,
-    dash_table,
     dcc,
 )
 from dash_bootstrap_components import icons, themes
-from scipy.special import logit
-from scipy.stats import logistic
 from statsmodels.discrete.discrete_model import Logit
 
 from dashboard.layout import layout
@@ -63,68 +63,59 @@ app.title = "PsychoAnalyze"
 app.layout = layout
 server = app.server
 
+Records = list[dict[Hashable, Any]]
+
 
 @callback(
-    Output("x-min", "value", allow_duplicate=True),
-    Output("x-max", "value", allow_duplicate=True),
-    Output("points-store", "data", allow_duplicate=True),
-    Output("blocks-table", "data"),
-    Input({"type": "param", "name": ALL}, "value"),
-    Input("n-levels", "value"),
-    Input("n-trials", "value"),
-    Input("n-blocks", "value"),
-    prevent_initial_call=True,
+    Output("points-store", "data"),
+    Input("trials-store", "data"),
 )
-def update_x_range(
-    param: list[float],
-    n_levels: int,
-    n_trials: int,
-    n_blocks: int,
-) -> tuple[str, str, list[dict[Hashable, Any]], list[dict[Hashable, Any]]]:
-    """Update x range based on threshold and slope."""
-    params = dict(zip(["x_0", "k", "gamma", "lambda"], param, strict=True))
-    min_, max_ = logistic.ppf([0.01, 0.99], loc=params["x_0"], scale=params["k"])
-    ix = pd.Index(np.linspace(min_, max_, n_levels), name="Intensity")
-    p = pa_points.psi(ix, params)
-    all_points = {}
-    all_blocks = []
-    for i in range(n_blocks):
-        execution_plan = pd.Series(
-            [random.choice(ix) for _ in range(n_trials)],
-            name="Intensity",
-        )
-        results = pd.Series(
-            [int(random.random() < p.loc[x]) for x in execution_plan],
-            name="Result",
-        )
-        fit = Logit(
-            results,
-            sm.add_constant(execution_plan.to_frame()),
-        ).fit(disp=False)
-        fit_params = fit.params
-        block = fit_params.rename({"const": "x_0", "Intensity": "k"}).to_dict() | {
-            "gamma": 0.0,
-            "lambda": 0.0,
-            "Block": i,
-        }
-        counts = execution_plan.value_counts().rename("n trials").sort_index()
-        hits = results.groupby(execution_plan).sum().rename("Hits")
-        hit_rate = pd.Series(hits / counts, name="Hit Rate")
-        logit_hit_rate = pd.Series(logit(hit_rate), name="logit(Hit Rate)")
-        points = pd.concat(
-            [counts, p, hits, hit_rate, logit_hit_rate],
-            axis=1,
-        ).reset_index()
-        points["Block"] = i
-        all_points[i] = points
-        all_blocks.append(block)
-    final_points = pd.concat(all_points, names=["Block"])
+def update_points_table(trials: Records) -> Records:
+    """Update points table."""
+    trials_df = pd.DataFrame.from_records(trials)
+    return pa_points.from_trials(trials_df).to_dict("records")
+
+
+@callback(
+    Output("points-table", "data"),
+    Input("blocks-table", "derived_virtual_selected_rows"),
+    Input("points-store", "data"),
+)
+def filter_points(
+    selected_rows: list[int],
+    points: Records,
+) -> Records:
+    """Filter points table."""
+    points_df = pd.DataFrame.from_records(points)
     return (
-        f"{min_:0.2f}",
-        f"{max_:0.2f}",
-        final_points.to_dict("records"),
-        all_blocks,
+        points_df[points_df["Block"].isin(selected_rows)].to_dict("records")
+        if selected_rows
+        else points_df.to_dict("records")
     )
+
+
+@callback(
+    Output("blocks-table", "data"),
+    Input("trials-store", "data"),
+)
+def update_blocks_table(trials: Records) -> Records:
+    """Update blocks table."""
+    trials_df = pd.DataFrame.from_records(trials)
+
+    def fit(trials_df: pd.DataFrame) -> Records:
+        return (
+            Logit(
+                trials_df["Result"],
+                sm.add_constant(trials_df[["Intensity"]]),
+            )
+            .fit(disp=False)
+            .params.rename({"const": "x_0", "Intensity": "k"})
+        )
+
+    blocks = trials_df.groupby("Block").apply(fit).reset_index()
+    blocks["gamma"] = 0.0
+    blocks["lambda"] = 0.0
+    return blocks.to_dict("records")
 
 
 @callback(
@@ -133,14 +124,13 @@ def update_x_range(
     Input({"type": "param", "name": ALL}, "value"),
     Input("points-table", "data"),
     Input("blocks-table", "data"),
-    prevent_initial_call=True,
 )
-def update_fig_model(
+def update_fig(
     form: str,
     param: list[float],
     data: list[dict[str, float]],
     fits: list[dict[str, float]],
-) -> tuple[go.Figure, dash_table.DataTable]:
+) -> go.Figure:
     """Update plot and tables based on data store and selected view."""
     if not data:
         fig = px.scatter(pd.DataFrame({"Intensity": []}), template="plotly_white")
@@ -213,21 +203,62 @@ def export_image(
     Output("data-download", "data"),
     Input({"type": "data-export", "name": ALL}, "n_clicks"),
     State("points-table", "data"),
+    State("blocks-table", "data"),
+    State("trials-store", "data"),
     prevent_initial_call=True,
 )
 def export_data(
     export_clicked: int,  # noqa: ARG001
-    data: go.Figure,
-) -> dict[str, str | bool | bytes]:
+    points: Records,
+    blocks: Records,
+    trials: Records,
+) -> dict[str, Any | None]:
     """Export image."""
     format_suffix = callback_context.triggered_id["name"]
-    _data = pd.DataFrame.from_records(data)
+    points_df = pd.DataFrame.from_records(points)
+    blocks_df = pd.DataFrame.from_records(blocks)
+    trials_df = pd.DataFrame.from_records(trials)
     if format_suffix == "csv":
-        download = dcc.send_data_frame(_data.to_csv, "data.csv")
+        zip_buffer = io.BytesIO()
+
+        with zipfile.ZipFile(
+            zip_buffer,
+            mode="a",
+            compression=zipfile.ZIP_DEFLATED,
+            allowZip64=False,
+        ) as zip_file:
+
+            def write_file(df: pd.DataFrame, name: str) -> None:
+                buffer = io.StringIO()
+                df.to_csv(buffer, index=False)
+                zip_file.writestr(name, buffer.getvalue())
+
+            data = {
+                "points": points_df,
+                "blocks": blocks_df,
+                "trials": trials_df,
+            }
+            for level, points_df in data.items():
+                write_file(points_df, f"{level}.csv")
+
+        zip_buffer.seek(0)
+        zip_bytes = zip_buffer.read()
+
+        base64_bytes = base64.b64encode(zip_bytes)
+        base64_string = base64_bytes.decode("utf-8")
+        timestamp = datetime.now(tz=pytz.timezone("America/Chicago")).strftime(
+            "%Y-%m-%d_%H%M",
+        )
+        download = {
+            "base64": True,
+            "content": base64_string,
+            "filename": f"{timestamp}_psychoanalyze.zip",
+        }
+
     elif format_suffix == "json":
-        download = dcc.send_data_frame(_data.to_json, "data.json")
+        download = dcc.send_data_frame(points_df.to_json, "data.json")
     elif format_suffix == "parquet":
-        download = dcc.send_data_frame(_data.to_parquet, "data.parquet")
+        download = dcc.send_data_frame(points_df.to_parquet, "data.parquet")
     elif format_suffix == "duckdb":
         connection = duckdb.connect("psychoanalyze.duckdb")
         connection.sql("CREATE TABLE points AS SELECT * FROM _data")
@@ -302,74 +333,77 @@ def set_fixed_params_to_preset(
 
 
 @callback(
-    Output("points-table", "data", allow_duplicate=True),
-    Input("blocks-table", "derived_virtual_selected_rows"),
-    State("points-store", "data"),
-    prevent_initial_call=True,
-)
-def filter_points(
-    selected_rows: list[int],
-    points: list[dict[Hashable, Any]],
-) -> list[dict[Hashable, Any]]:
-    """Filter points table."""
-    if not selected_rows:
-        return []
-    points_df = pd.DataFrame.from_records(points)
-    return points_df[points_df["Block"].isin(selected_rows)].to_dict("records")
-
-
-@callback(
-    Output("points-store", "data"),
+    Output("trials-store", "data"),
     Input("upload", "contents"),
     State("upload", "filename"),
+    Input({"type": "n-param", "name": ALL}, "value"),
+    Input({"type": "x-param", "name": ALL}, "value"),
+    Input({"type": "param", "name": ALL}, "value"),
 )
-def upload_data(contents: str, filename: str) -> list[dict[Hashable, Any]]:
-    """Upload data."""
-    if contents is None:
-        return []
-    content_type, content_string = contents.split(",")
-    decoded = io.StringIO(base64.b64decode(content_string).decode("utf-8"))
-    if "csv" in filename:
-        points = pd.read_csv(decoded)
-    return points.to_dict("records")
-
-
-@callback(
-    Output("upload-collapse", "is_open"),
-    Input("tabs", "active_tab"),
-)
-def toggle_upload(active_tab: str) -> bool:
-    """Toggle upload."""
-    return active_tab == "upload"
-
-
-@callback(
-    Output("x-min", "value"),
-    Output("x-max", "value"),
-    Output("n-levels", "value"),
-    Output("fix-range", "value"),
-    Output("fix-range", "disabled"),
-    Input("upload", "contents"),
-    prevent_initial_call=True,
-)
-def update_points_table(
+def update_data(
     contents: str,
-) -> tuple[float, float, int, bool, bool]:
+    filename: str,
+    n_param: list[int],
+    x_param: list[float],
+    param: list[float],
+) -> Records:
     """Update points table."""
-    if contents is None:
-        return []
-    content_type, content_string = contents.split(",")
-    decoded = io.StringIO(base64.b64decode(content_string).decode("utf-8"))
-    trials = pd.read_csv(decoded)
-    points = pa_points.from_trials(trials).reset_index()
-    return (
-        points["Intensity"].min(),
-        points["Intensity"].max(),
-        points["Intensity"].nunique(),
-        False,
-        True,
-    )
+    n_param_values = [
+        "n_levels",
+        "n_trials",
+        "n_blocks",
+    ]
+    x_param_values = [
+        "min",
+        "max",
+    ]
+    x_params = dict(zip(x_param_values, x_param, strict=True))
+    n_params = dict(zip(n_param_values, n_param, strict=True))
+    if callback_context.triggered_id == "upload":
+        _, content_string = contents.split(",")
+        decoded = base64.b64decode(content_string)
+        if "zip" in filename:
+            with zipfile.ZipFile(io.BytesIO(decoded)) as z:
+                trials = pd.read_csv(z.open("trials.csv"))
+        else:
+            trials = pd.read_csv(io.StringIO(decoded.decode("utf-8")))
+    else:
+        points_ix = pd.Index(
+            np.linspace(x_params["min"], x_params["max"], n_params["n_levels"]),
+            name="Intensity",
+        )
+        params = dict(zip(["x_0", "k", "gamma", "lambda"], param, strict=True))
+        p = pa_points.psi(points_ix, params)
+        all_trials = {}
+        for i in range(n_params["n_blocks"]):
+            execution_plan = pd.Index(
+                [random.choice(points_ix) for _ in range(n_params["n_trials"])],
+                name="Intensity",
+            )
+            trials_i = pd.Series(
+                [int(random.random() < p.loc[x]) for x in execution_plan],
+                name="Result",
+                index=execution_plan,
+            )
+            all_trials[i] = trials_i
+        trials = pd.concat(all_trials, names=["Block"]).reset_index()
+    return trials.to_dict("records")
 
+
+# False,
+# True,
+# ,
+
+
+# @callback(
+# def update_data(
+#     param: list[float],
+# ) -> tuple[str, str, Records]:
+#     """Update x range based on threshold and slope."""
+
+#         ).fit(disp=False)
+#         ).reset_index()
+#     return (
 
 if __name__ == "__main__":
     app.run(debug=True)
