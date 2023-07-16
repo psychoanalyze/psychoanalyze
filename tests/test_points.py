@@ -26,6 +26,7 @@ def test_from_trials_sums_n_per_intensity_level():
         {
             "Result": [0, 0],
             "Intensity": [0.0, 1.0],
+            "Block": [0, 0],
         },
     )
     points = pa_points.from_trials(trials)
