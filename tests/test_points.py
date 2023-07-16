@@ -69,7 +69,7 @@ def test_both_dimensions():
 
 def test_plot():
     points = pd.DataFrame(
-        {"Hit Rate": [], "n": []},
+        {"Hit Rate": [], "n": [], "Block": []},
         index=pd.Index([], name="Intensity"),
     )
     fig = pa_points.plot(points, y="Hit Rate")
