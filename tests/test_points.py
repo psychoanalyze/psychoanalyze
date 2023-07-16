@@ -31,8 +31,12 @@ def test_from_trials_sums_n_per_intensity_level():
     )
     points = pa_points.from_trials(trials)
     assert all(
-        points["n"]
-        == pd.Series([1, 1], index=pd.Index([0.0, 1.0], name="Intensity"), name="n"),
+        points["n trials"]
+        == pd.Series(
+            [1, 1],
+            index=pd.Index([0.0, 1.0], name="Intensity"),
+            name="n trials",
+        ),
     )
 
 
