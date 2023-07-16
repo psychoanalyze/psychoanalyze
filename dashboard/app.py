@@ -282,9 +282,9 @@ def toggle_eqn(n_clicks: int) -> tuple[bool, str]:
     """Toggle equation."""
     if n_clicks:
         n_clicks_is_even = n_clicks % 2 == 0
-        label = "Hide Eqn ▴ " if n_clicks_is_even else "Show Eqn ▾ "
+        label = "Hide F(x) ▴ " if n_clicks_is_even else "Show F(x) ▾ "
         return n_clicks_is_even, label
-    return True, "Hide Eqn ▴ "
+    return True, "Hide F(x) ▴ "
 
 
 @callback(
