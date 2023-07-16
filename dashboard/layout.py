@@ -32,6 +32,20 @@ subtitle = "Interactive data simulation & analysis for psychophysics."
 
 input_col = dbc.Col(
     [
+        dcc.Upload(
+            "Upload data",
+            id="upload",
+            style={
+                "width": "100%",
+                "height": "60px",
+                "lineHeight": "60px",
+                "borderWidth": "1px",
+                "borderStyle": "dashed",
+                "borderRadius": "5px",
+                "textAlign": "center",
+                "margin": "10px",
+            },
+        ),
         html.H4("Link Function"),
         link_function,
         dbc.Row(
@@ -184,20 +198,6 @@ data_col = dbc.Col(
         ),
         dcc.Download(id="img-download"),
         dcc.Download(id="data-download"),
-        dcc.Upload(
-            "Upload data",
-            id="upload",
-            style={
-                "width": "100%",
-                "height": "60px",
-                "lineHeight": "60px",
-                "borderWidth": "1px",
-                "borderStyle": "dashed",
-                "borderRadius": "5px",
-                "textAlign": "center",
-                "margin": "10px",
-            },
-        ),
     ],
 )
 
