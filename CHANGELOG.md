@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.2 (2023-07-16)
+
+### Fix
+
+* Upload data processing ([`da078d9`](https://github.com/psychoanalyze/psychoanalyze/commit/da078d99547e26befdb312df76f12ace613087ce))
+
 ## v0.6.1 (2023-07-15)
 
 ### Fix
