@@ -340,13 +340,13 @@ points_table = dash_table.DataTable(
     ],
     style_data={"color": "black"},
     style_header={"color": "black"},
-    page_size=15,
+    page_action="native",
 )
 
 blocks_table = dash_table.DataTable(
     id="blocks-table",
     row_selectable="multi",
-    selected_rows=[0],
+    selected_rows=[0, 2],
     columns=[
         {
             "name": "Block",

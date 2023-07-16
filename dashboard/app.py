@@ -162,7 +162,8 @@ def update_fig(
                     y=y,
                     name="Model",
                     mode="lines",
-                    line_color="#636EFA",
+                    line_width=1,
+                    line_color="black",
                 ),
             )
             .add_trace(
@@ -419,6 +420,16 @@ def update_data(
 #         ).fit(disp=False)
 #         ).reset_index()
 #     return (
+
+
+@callback(
+    Output("points-table", "page_size"),
+    Input({"type": "n-param", "name": "n-levels"}, "value"),
+)
+def update_page_size(n_levels: int) -> int:
+    """Update page size."""
+    return n_levels
+
 
 if __name__ == "__main__":
     app.run(debug=True)
