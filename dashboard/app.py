@@ -145,12 +145,15 @@ def update_fig(
         ) * pa_blocks.logistic(fit_params)
         y = model["logit(Hit Rate)"] if form == "log" else model["Hit Rate"]
         y_fit = fit_psi["logit(Hit Rate)"] if form == "log" else fit_psi["Hit Rate"]
+        points = pd.DataFrame.from_records(data)
+        points["Block"] = points["Block"].astype("category")
         fig = (
             px.scatter(
-                pd.DataFrame.from_records(data),
+                points,
                 x="Intensity",
                 y=y.name,
                 size="n trials",
+                color="Block",
                 template="plotly_white",
             )
             .add_trace(

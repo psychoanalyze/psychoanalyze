@@ -207,6 +207,7 @@ def plot(points: pd.DataFrame, y: str) -> go.Figure:
         x="Intensity",
         y=y,
         size="n",
+        color="Block",
         template="plotly_white",
     )
 
