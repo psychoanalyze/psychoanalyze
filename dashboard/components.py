@@ -210,7 +210,7 @@ link_function = dbc.Container(
                     $$""",
                 mathjax=True,
             ),
-            is_open=True,
+            is_open=False,
             id="F-eqn",
         ),
     ],

@@ -27,7 +27,7 @@ from dashboard.components import (
 )
 
 font_family = "Comfortaa, Times, serif"
-subtitle = "Interactive data simulation & automated analysis for psychophysics."
+subtitle = "Interactive data simulation & analysis for psychophysics."
 
 
 input_col = dbc.Col(
@@ -70,6 +70,7 @@ plot_col = dbc.Col(
 
             """,
             mathjax=True,
+            id="plot-equation",
         ),
         dcc.Graph(id="plot", className="mb-3"),
         html.H5("Plot Options"),

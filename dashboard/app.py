@@ -276,15 +276,27 @@ def export_data(
 @callback(
     Output("F-eqn", "is_open"),
     Output("show-eqn", "children"),
+    Output("plot-equation", "children"),
     Input("show-eqn", "n_clicks"),
 )
-def toggle_eqn(n_clicks: int) -> tuple[bool, str]:
+def toggle_eqn(n_clicks: int) -> tuple[bool, str, str]:
     """Toggle equation."""
+    equation_abstracted = """
+    $$
+    \\psi(x) = \\gamma + (1 - \\gamma - \\lambda)F(x)
+    $$
+    """
     if n_clicks:
         n_clicks_is_even = n_clicks % 2 == 0
-        label = "Hide F(x) ▴ " if n_clicks_is_even else "Show F(x) ▾ "
-        return n_clicks_is_even, label
-    return True, "Hide F(x) ▴ "
+        label = "Show F(x) ▾ " if n_clicks_is_even else "Hide F(x) ▴ "
+        equation_expanded = """
+        $$
+        \\psi(x) = \\frac{\\gamma + (1 - \\gamma - \\lambda)}{1 + e^{-k(x - x_0)}}
+        $$
+        """
+        equation = equation_abstracted if n_clicks_is_even else equation_expanded
+        return not n_clicks_is_even, label, equation
+    return False, "Show F(x) ▾ ", equation_abstracted
 
 
 @callback(
