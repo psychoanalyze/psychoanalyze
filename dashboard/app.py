@@ -136,7 +136,9 @@ def update_fig(
 ) -> go.Figure:
     """Update plot and tables based on data store and selected view."""
     params = pd.Series(param, index=["x_0", "k", "gamma", "lambda"])
-    blocks = [blocks[i] for i in selected_rows]
+    blocks = [blocks[i] for i in selected_rows] + [
+        {"Block": "Model"} | params.to_dict(),
+    ]
     x = pd.Index(
         np.linspace(
             scipy_logistic.ppf(

@@ -153,7 +153,7 @@ model_params = dbc.Container(
                 dbc.Col(
                     dcc.Dropdown(
                         id="preset",
-                        placeholder="Preset examples...",
+                        placeholder="Preset examples",
                         options=[
                             {
                                 "label": "Standard",
