@@ -68,6 +68,61 @@ Records = list[dict[Hashable, Any]]
 
 
 @callback(
+    Output("trials-store", "data"),
+    Output({"type": "x-param", "name": "min"}, "value"),
+    Output({"type": "x-param", "name": "max"}, "value"),
+    Input("upload", "contents"),
+    State("upload", "filename"),
+    Input({"type": "n-param", "name": ALL}, "value"),
+    Input({"type": "param", "name": ALL}, "value"),
+)
+def update_data(
+    contents: str,
+    filename: str,
+    n_param: list[int],
+    param: list[float],
+) -> tuple[Records, float, float]:
+    """Update points table."""
+    n_param_values = [
+        "n_levels",
+        "n_trials",
+        "n_blocks",
+    ]
+    n_params = pd.Series(n_param, index=n_param_values)
+    if callback_context.triggered_id == "upload":
+        _, content_string = contents.split(",")
+        decoded = base64.b64decode(content_string)
+        if "zip" in filename:
+            with zipfile.ZipFile(io.BytesIO(decoded)) as z:
+                trials = pd.read_csv(z.open("trials.csv"))
+        else:
+            trials = pd.read_csv(io.StringIO(decoded.decode("utf-8")))
+    else:
+        params = dict(zip(["x_0", "k", "gamma", "lambda"], param, strict=True))
+        x_min = params["x_0"] - 4.0 * params["k"]
+        x_max = params["x_0"] + 4.0 * params["k"]
+        points_ix = pd.Index(
+            np.linspace(x_min, x_max, n_params["n_levels"]),
+            name="Intensity",
+        )
+        p = pa_points.psi(points_ix, params)
+        all_trials = {}
+        for i in range(n_params["n_blocks"]):
+            execution_plan = pd.Index(
+                [random.choice(points_ix) for _ in range(n_params["n_trials"])],
+                name="Intensity",
+            )
+            trials_i = pd.Series(
+                [int(random.random() < p.loc[x]) for x in execution_plan],
+                name="Result",
+                index=execution_plan,
+            )
+            all_trials[i] = trials_i
+        trials = pd.concat(all_trials, names=["Block"]).reset_index()
+    return trials.to_dict("records"), x_min, x_max
+
+
+@callback(
     Output("points-store", "data"),
     Input("trials-store", "data"),
 )
@@ -75,24 +130,6 @@ def update_points_table(trials: Records) -> Records:
     """Update points table."""
     trials_df = pd.DataFrame.from_records(trials)
     return pa_points.from_trials(trials_df).to_dict("records")
-
-
-@callback(
-    Output("points-table", "data"),
-    Input("blocks-table", "derived_virtual_selected_rows"),
-    Input("points-store", "data"),
-)
-def filter_points(
-    selected_rows: list[int],
-    points: Records,
-) -> Records:
-    """Filter points table."""
-    points_df = pd.DataFrame.from_records(points)
-    return (
-        points_df[points_df["Block"].isin(selected_rows)].to_dict("records")
-        if selected_rows
-        else points_df.to_dict("records")
-    )
 
 
 @callback(
@@ -116,7 +153,26 @@ def update_blocks_table(trials: Records) -> Records:
     blocks = trials_df.groupby("Block").apply(fit).reset_index()
     blocks["gamma"] = 0.0
     blocks["lambda"] = 0.0
+    blocks["x_0"] = -blocks["x_0"]
     return blocks.to_dict("records")
+
+
+@callback(
+    Output("points-table", "data"),
+    Input("blocks-table", "derived_virtual_selected_rows"),
+    Input("points-store", "data"),
+)
+def filter_points(
+    selected_rows: list[int],
+    points: Records,
+) -> Records:
+    """Filter points table."""
+    points_df = pd.DataFrame.from_records(points)
+    return (
+        points_df[points_df["Block"].isin(selected_rows)].to_dict("records")
+        if selected_rows
+        else points_df.to_dict("records")
+    )
 
 
 @callback(
@@ -305,6 +361,7 @@ def toggle_eqn(n_clicks: int) -> tuple[bool, str, str]:
 @callback(
     Output({"type": "param", "name": MATCH}, "disabled"),
     Input({"type": "free", "name": MATCH}, "value"),
+    prevent_initial_call=True,
 )
 def toggle_param(free: bool) -> bool:  # noqa: FBT001
     """Toggle parameter."""
@@ -315,6 +372,7 @@ def toggle_param(free: bool) -> bool:  # noqa: FBT001
     Output({"type": "param", "name": ALL}, "value"),
     Input("preset", "value"),
     State({"type": "param", "name": ALL}, "value"),
+    prevent_initial_call=True,
 )
 def set_params_to_preset(
     preset: str,
@@ -333,6 +391,7 @@ def set_params_to_preset(
     Output({"type": "free", "name": ALL}, "value"),
     Input("preset", "value"),
     State({"type": "free", "name": ALL}, "value"),
+    prevent_initial_call=True,
 )
 def set_fixed_params_to_preset(
     preset: str,
@@ -345,64 +404,6 @@ def set_fixed_params_to_preset(
         "2AFC": [True, True, False, True],
     }
     return presets.get(preset, param)
-
-
-@callback(
-    Output("trials-store", "data"),
-    Input("upload", "contents"),
-    State("upload", "filename"),
-    Input({"type": "n-param", "name": ALL}, "value"),
-    Input({"type": "x-param", "name": ALL}, "value"),
-    Input({"type": "param", "name": ALL}, "value"),
-)
-def update_data(
-    contents: str,
-    filename: str,
-    n_param: list[int],
-    x_param: list[float],
-    param: list[float],
-) -> Records:
-    """Update points table."""
-    n_param_values = [
-        "n_levels",
-        "n_trials",
-        "n_blocks",
-    ]
-    x_param_values = [
-        "min",
-        "max",
-    ]
-    x_params = dict(zip(x_param_values, x_param, strict=True))
-    n_params = dict(zip(n_param_values, n_param, strict=True))
-    if callback_context.triggered_id == "upload":
-        _, content_string = contents.split(",")
-        decoded = base64.b64decode(content_string)
-        if "zip" in filename:
-            with zipfile.ZipFile(io.BytesIO(decoded)) as z:
-                trials = pd.read_csv(z.open("trials.csv"))
-        else:
-            trials = pd.read_csv(io.StringIO(decoded.decode("utf-8")))
-    else:
-        points_ix = pd.Index(
-            np.linspace(x_params["min"], x_params["max"], n_params["n_levels"]),
-            name="Intensity",
-        )
-        params = dict(zip(["x_0", "k", "gamma", "lambda"], param, strict=True))
-        p = pa_points.psi(points_ix, params)
-        all_trials = {}
-        for i in range(n_params["n_blocks"]):
-            execution_plan = pd.Index(
-                [random.choice(points_ix) for _ in range(n_params["n_trials"])],
-                name="Intensity",
-            )
-            trials_i = pd.Series(
-                [int(random.random() < p.loc[x]) for x in execution_plan],
-                name="Result",
-                index=execution_plan,
-            )
-            all_trials[i] = trials_i
-        trials = pd.concat(all_trials, names=["Block"]).reset_index()
-    return trials.to_dict("records")
 
 
 @callback(

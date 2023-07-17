@@ -225,10 +225,9 @@ stimulus_params = dbc.Container(
                     [
                         dbc.FormText("min"),
                         dbc.Input(
-                            id={"type": "x-param", "name": "x-min"},
+                            id={"type": "x-param", "name": "min"},
                             type="number",
                             disabled=True,
-                            value=-4.5,
                         ),
                     ],
                 ),
@@ -246,10 +245,9 @@ stimulus_params = dbc.Container(
                     [
                         dbc.FormText("max"),
                         dbc.Input(
-                            id={"type": "x-param", "name": "x-max"},
+                            id={"type": "x-param", "name": "max"},
                             type="number",
                             disabled=True,
-                            value=4.5,
                         ),
                     ],
                 ),
@@ -258,7 +256,7 @@ stimulus_params = dbc.Container(
         ),
         dbc.Checkbox(
             label="Pin range to ±4σ",  # noqa: RUF001
-            id="fix-range",
+            id="pin-range",
             value=True,
         ),
     ],
@@ -283,7 +281,7 @@ simulation_params = dbc.Col(
                 dbc.Input(
                     id={"type": "n-param", "name": "n-blocks"},
                     type="number",
-                    value=3,
+                    value=5,
                 ),
                 dbc.InputGroupText("blocks"),
             ],
