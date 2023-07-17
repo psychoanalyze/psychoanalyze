@@ -205,6 +205,6 @@ def logistic(params: pd.Series, x: pd.Index) -> pd.Series:
     y = scipy_logistic.cdf(
         x,
         loc=params["x_0"],
-        scale=params["k"],
+        scale=1 / params["k"],
     )
     return pd.Series(y, name="Hit Rate", index=x)

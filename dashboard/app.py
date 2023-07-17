@@ -99,8 +99,8 @@ def update_data(
             trials = pd.read_csv(io.StringIO(decoded.decode("utf-8")))
     else:
         params = dict(zip(["x_0", "k", "gamma", "lambda"], param, strict=True))
-        x_min = params["x_0"] - 4.0 * params["k"]
-        x_max = params["x_0"] + 4.0 * params["k"]
+        x_min = params["x_0"] - 4.0 / params["k"]
+        x_max = params["x_0"] + 4.0 / params["k"]
         points_ix = pd.Index(
             np.linspace(x_min, x_max, n_params["n_levels"]),
             name="Intensity",
@@ -129,6 +129,7 @@ def update_data(
 def update_points_table(trials: Records) -> Records:
     """Update points table."""
     trials_df = pd.DataFrame.from_records(trials)
+    trials_df["Intensity"] = trials_df["Intensity"].astype(float)
     return pa_points.from_trials(trials_df).to_dict("records")
 
 
@@ -200,12 +201,12 @@ def update_fig(
             scipy_logistic.ppf(
                 0.01,
                 loc=params["x_0"],
-                scale=params["k"],
+                scale=1 / params["k"],
             ),
             scipy_logistic.ppf(
                 0.99,
                 loc=params["x_0"],
-                scale=params["k"],
+                scale=1 / params["k"],
             ),
             100,
         ),
