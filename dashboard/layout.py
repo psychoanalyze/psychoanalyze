@@ -94,15 +94,15 @@ plot_col = dbc.Col(
                 html.Div(
                     dbc.RadioItems(
                         options=[
-                            {"label": "Hit Rate", "value": "linear"},
+                            {"label": "Hit Rate", "value": "Hit Rate"},
                             {
                                 "label": "logit(Hit Rate)",
-                                "value": "log",
+                                "value": "logit(Hit Rate)",
                             },
                         ],
-                        value="linear",
+                        value="Hit Rate",
                         inline=True,
-                        id="logit",
+                        id="y",
                         className="btn-group",
                         inputClassName="btn-check",
                         labelClassName="btn btn-outline-primary",

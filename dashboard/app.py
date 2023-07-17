@@ -45,6 +45,7 @@ from dash import (
     dcc,
 )
 from dash_bootstrap_components import icons, themes
+from scipy.stats import logistic as scipy_logistic
 from statsmodels.discrete.discrete_model import Logit
 
 from dashboard.layout import layout
@@ -120,64 +121,60 @@ def update_blocks_table(trials: Records) -> Records:
 
 @callback(
     Output("plot", "figure"),
-    Input("logit", "value"),
+    Input("y", "value"),
     Input({"type": "param", "name": ALL}, "value"),
     Input("points-table", "data"),
     Input("blocks-table", "data"),
+    Input("blocks-table", "derived_virtual_selected_rows"),
 )
 def update_fig(
-    form: str,
+    y: str,
     param: list[float],
-    data: list[dict[str, float]],
-    fits: list[dict[str, float]],
+    points: Records,
+    blocks: Records,
+    selected_rows: list[int],
 ) -> go.Figure:
     """Update plot and tables based on data store and selected view."""
-    if not data:
-        fig = px.scatter(pd.DataFrame({"Intensity": []}), template="plotly_white")
-    else:
-        params = dict(zip(["x_0", "k", "gamma", "lambda"], param, strict=True))
-        model = params["gamma"] + (
-            1 - params["gamma"] - params["lambda"]
-        ) * pa_blocks.logistic(params)
-        fit_params = fits[0]
-        fit_psi = fit_params["gamma"] + (
-            1 - fit_params["gamma"] - fit_params["lambda"]
-        ) * pa_blocks.logistic(fit_params)
-        y = model["logit(Hit Rate)"] if form == "log" else model["Hit Rate"]
-        y_fit = fit_psi["logit(Hit Rate)"] if form == "log" else fit_psi["Hit Rate"]
-        points = pd.DataFrame.from_records(data)
-        points["Block"] = points["Block"].astype("category")
-        fig = (
-            px.scatter(
-                points,
-                x="Intensity",
-                y=y.name,
-                size="n trials",
-                color="Block",
-                template="plotly_white",
-            )
-            .add_trace(
-                go.Scatter(
-                    x=model.index,
-                    y=y,
-                    name="Model",
-                    mode="lines",
-                    line_width=1,
-                    line_color="black",
-                ),
-            )
-            .add_trace(
-                go.Scatter(
-                    x=fit_psi.index,
-                    y=y_fit,
-                    name="Predicted",
-                    mode="lines",
-                    line_dash="dash",
-                    line_color="#636EFA",
-                ),
-            )
-        )
-    return fig
+    params = pd.Series(param, index=["x_0", "k", "gamma", "lambda"])
+    blocks = [blocks[i] for i in selected_rows]
+    x = pd.Index(
+        np.linspace(
+            scipy_logistic.ppf(
+                0.01,
+                loc=params["x_0"],
+                scale=params["k"],
+            ),
+            scipy_logistic.ppf(
+                0.99,
+                loc=params["x_0"],
+                scale=params["k"],
+            ),
+            100,
+        ),
+        name="Intensity",
+    )
+    fits = pd.concat(
+        {block["Block"]: pa_blocks.logistic(pd.Series(block), x) for block in blocks},
+        names=["Block"],
+    ).reset_index()
+    fits["Block"] = fits["Block"].astype(str)
+    points_df = pd.DataFrame.from_records(points)
+    points_df["Block"] = points_df["Block"].astype(str)
+    fits_fig = px.line(
+        fits,
+        x="Intensity",
+        y=y,
+        color="Block",
+    )
+    results_fig = px.scatter(
+        points_df,
+        x="Intensity",
+        y=y,
+        size="n trials",
+        color="Block",
+        template="plotly_white",
+    )
+    return results_fig.add_traces(fits_fig.data)
 
 
 @callback(
@@ -404,22 +401,6 @@ def update_data(
             all_trials[i] = trials_i
         trials = pd.concat(all_trials, names=["Block"]).reset_index()
     return trials.to_dict("records")
-
-
-# False,
-# True,
-# ,
-
-
-# @callback(
-# def update_data(
-#     param: list[float],
-# ) -> tuple[str, str, Records]:
-#     """Update x range based on threshold and slope."""
-
-#         ).fit(disp=False)
-#         ).reset_index()
-#     return (
 
 
 @callback(

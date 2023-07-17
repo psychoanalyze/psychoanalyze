@@ -283,7 +283,7 @@ simulation_params = dbc.Col(
                 dbc.Input(
                     id={"type": "n-param", "name": "n-blocks"},
                     type="number",
-                    value=5,
+                    value=3,
                 ),
                 dbc.InputGroupText("blocks"),
             ],

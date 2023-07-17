@@ -34,9 +34,10 @@ def test_nonstandard_logistic_mean():
             "Guess Rate": 0.0,
             "Lapse Rate": 0.0,
         },
+        pd.Index([0.0, 1.0, 2.0]),
     )
-    assert min(points["Hit Rate"]) > 0
-    assert max(points["Hit Rate"]) < 1
+    assert min(points) > 0
+    assert max(points) < 1
 
 
 def test_params():
