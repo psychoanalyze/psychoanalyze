@@ -27,7 +27,7 @@ import plotly.express as px
 from dash import dash_table
 from pandera import check_io, check_output
 from plotly import graph_objects as go
-from scipy.special import logit
+from scipy.special import expit, logit
 from scipy.stats import logistic
 
 from psychoanalyze.data import trials as pa_trials
@@ -194,7 +194,7 @@ def psi(
     return pd.Series(
         params["gamma"]
         + (1 - params["gamma"] - params["lambda"])
-        / (1 + np.exp(-params["k"] * (x - params["x_0"]))),
+        * expit(params["x_0"] + params["k"] * x),
         index=x,
         name="p(x)",
     )

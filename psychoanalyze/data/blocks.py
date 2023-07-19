@@ -116,37 +116,15 @@ def subject_counts(data: pd.DataFrame) -> pd.DataFrame:
     return summary
 
 
-def model_predictions(
-    intensity_choices: list[float],
-    k: float,
-    x_0: float = 0.0,
-) -> pd.Series:
-    """Calculate psi for array of x values. Possible duplicate."""
-    return pd.Series(
-        [1 / (1 + np.exp(-k * (x - x_0))) for x in intensity_choices],
-        index=intensity_choices,
-        name="Hit Rate",
+def fit(trials: pd.DataFrame) -> pd.Series:
+    """Fit logistic regression to trial data."""
+    fit = LogisticRegression().fit(
+        trials[["Intensity"]],
+        trials["Result"],
     )
-
-
-def make_predictions(fit: pd.Series, intensity_choices: list[float]) -> pd.Series:
-    """Get psi value for array of x values."""
-    return pd.Series(
-        fit.predict_proba(pd.DataFrame({"Intensity": intensity_choices}))[:, 1],
-        name="Hit Rate",
-        index=pd.Index(intensity_choices, name="Intensity"),
-    )
-
-
-def get_fit(trials: pd.DataFrame) -> pd.Series:
-    """Get parameter fits for given trial data."""
-    fit = LogisticRegression().fit(trials[["Intensity"]], trials["Result"])
-    return pd.Series(
-        {
-            "slope": fit.coef_[0][0],
-            "intercept": fit.intercept_[0],
-        },
-    )
+    intercept = fit.intercept_[0]
+    slope = fit.coef_[0][0]
+    return pd.Series({"intercept": intercept, "slope": slope})
 
 
 def generate_trials(n_trials: int, model_params: dict[str, float]) -> pd.DataFrame:
@@ -198,13 +176,3 @@ def reshape_fit_results(fits: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame
     param_fits = param_fits.rename(columns={"50%": y})
     param_fits.index = x
     return param_fits
-
-
-def logistic(params: pd.Series, x: pd.Index) -> pd.Series:
-    """Generate logistic function from parameters."""
-    y = scipy_logistic.cdf(
-        x,
-        loc=params["x_0"],
-        scale=1 / params["k"],
-    )
-    return pd.Series(y, name="Hit Rate", index=x)

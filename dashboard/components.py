@@ -68,7 +68,7 @@ model_params = dbc.Container(
                                 id={"type": "param", "name": "k"},
                                 type="number",
                                 value=1.0,
-                                step=0.5,
+                                step=0.1,
                             ),
                         ],
                         size="sm",
@@ -271,7 +271,7 @@ simulation_params = dbc.Col(
                 dbc.Input(
                     id={"type": "n-param", "name": "n-trials"},
                     type="number",
-                    value=70,
+                    value=100,
                 ),
                 dbc.InputGroupText("trials per block"),
             ],

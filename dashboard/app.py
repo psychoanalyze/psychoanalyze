@@ -32,7 +32,6 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import pytz
-import statsmodels.api as sm
 from dash import (
     ALL,
     MATCH,
@@ -45,8 +44,7 @@ from dash import (
     dcc,
 )
 from dash_bootstrap_components import icons, themes
-from scipy.stats import logistic as scipy_logistic
-from statsmodels.discrete.discrete_model import Logit
+from scipy.special import expit, logit
 
 from dashboard.layout import layout
 from psychoanalyze.data import blocks as pa_blocks
@@ -89,6 +87,11 @@ def update_data(
         "n_blocks",
     ]
     n_params = pd.Series(n_param, index=n_param_values)
+    params = pd.Series(param, index=["x_0", "k", "gamma", "lambda"])
+    params["intercept"] = -params["x_0"] / params["k"]
+    params["slope"] = 1 / params["k"]
+    min_x = (logit(0.01) - params["intercept"]) / params["slope"]
+    max_x = (logit(0.99) - params["intercept"]) / params["slope"]
     if callback_context.triggered_id == "upload":
         _, content_string = contents.split(",")
         decoded = base64.b64decode(content_string)
@@ -98,14 +101,10 @@ def update_data(
         else:
             trials = pd.read_csv(io.StringIO(decoded.decode("utf-8")))
     else:
-        params = dict(zip(["x_0", "k", "gamma", "lambda"], param, strict=True))
-        x_min = params["x_0"] - 4.0 / params["k"]
-        x_max = params["x_0"] + 4.0 / params["k"]
         points_ix = pd.Index(
-            np.linspace(x_min, x_max, n_params["n_levels"]),
+            np.linspace(min_x, max_x, n_params["n_levels"]),
             name="Intensity",
         )
-        p = pa_points.psi(points_ix, params)
         all_trials = {}
         for i in range(n_params["n_blocks"]):
             execution_plan = pd.Index(
@@ -113,13 +112,19 @@ def update_data(
                 name="Intensity",
             )
             trials_i = pd.Series(
-                [int(random.random() < p.loc[x]) for x in execution_plan],
+                [
+                    int(
+                        random.random()
+                        < expit(x * params["slope"] + params["intercept"]),
+                    )
+                    for x in execution_plan
+                ],
                 name="Result",
                 index=execution_plan,
             )
             all_trials[i] = trials_i
         trials = pd.concat(all_trials, names=["Block"]).reset_index()
-    return trials.to_dict("records"), x_min, x_max
+    return trials.to_dict("records"), min_x, max_x
 
 
 @callback(
@@ -130,7 +135,8 @@ def update_points_table(trials: Records) -> Records:
     """Update points table."""
     trials_df = pd.DataFrame.from_records(trials)
     trials_df["Intensity"] = trials_df["Intensity"].astype(float)
-    return pa_points.from_trials(trials_df).to_dict("records")
+    points = pa_points.from_trials(trials_df)
+    return points.to_dict("records")
 
 
 @callback(
@@ -141,20 +147,9 @@ def update_blocks_table(trials: Records) -> Records:
     """Update blocks table."""
     trials_df = pd.DataFrame.from_records(trials)
 
-    def fit(trials_df: pd.DataFrame) -> Records:
-        return (
-            Logit(
-                trials_df["Result"],
-                sm.add_constant(trials_df[["Intensity"]]),
-            )
-            .fit(disp=False)
-            .params.rename({"const": "x_0", "Intensity": "k"})
-        )
-
-    blocks = trials_df.groupby("Block").apply(fit).reset_index()
+    blocks = trials_df.groupby("Block").apply(pa_blocks.fit).reset_index()
     blocks["gamma"] = 0.0
     blocks["lambda"] = 0.0
-    blocks["x_0"] = -blocks["x_0"]
     return blocks.to_dict("records")
 
 
@@ -183,37 +178,38 @@ def filter_points(
     Input("points-table", "data"),
     Input("blocks-table", "data"),
     Input("blocks-table", "derived_virtual_selected_rows"),
+    State({"type": "x-param", "name": "min"}, "value"),
+    State({"type": "x-param", "name": "max"}, "value"),
 )
-def update_fig(
+def update_fig(  # noqa: PLR0913
     y: str,
     param: list[float],
     points: Records,
     blocks: Records,
     selected_rows: list[int],
+    min_x: float,
+    max_x: float,
 ) -> go.Figure:
     """Update plot and tables based on data store and selected view."""
     params = pd.Series(param, index=["x_0", "k", "gamma", "lambda"])
+    params["intercept"] = -params["x_0"] / params["k"]
+    params["slope"] = 1 / params["k"]
     blocks = [blocks[i] for i in selected_rows] + [
         {"Block": "Model"} | params.to_dict(),
     ]
     x = pd.Index(
-        np.linspace(
-            scipy_logistic.ppf(
-                0.01,
-                loc=params["x_0"],
-                scale=1 / params["k"],
-            ),
-            scipy_logistic.ppf(
-                0.99,
-                loc=params["x_0"],
-                scale=1 / params["k"],
-            ),
-            100,
-        ),
+        np.linspace(min_x, max_x, 100),
         name="Intensity",
     )
     fits = pd.concat(
-        {block["Block"]: pa_blocks.logistic(pd.Series(block), x) for block in blocks},
+        {
+            block["Block"]: pd.Series(
+                expit(x.to_numpy() * block["slope"] + block["intercept"]),
+                name="Hit Rate",
+                index=x,
+            )
+            for block in blocks
+        },
         names=["Block"],
     ).reset_index()
     fits["Block"] = fits["Block"].astype(str)
