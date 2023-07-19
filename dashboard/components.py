@@ -352,8 +352,8 @@ blocks_table = dash_table.DataTable(
             "type": "numeric",
         },
         {
-            "name": "x_0",
-            "id": "x_0",
+            "name": "intercept",
+            "id": "intercept",
             "type": "numeric",
             "format": dash_table.Format.Format(
                 precision=2,
@@ -361,8 +361,8 @@ blocks_table = dash_table.DataTable(
             ),
         },
         {
-            "name": "k",
-            "id": "k",
+            "name": "slope",
+            "id": "slope",
             "type": "numeric",
             "format": dash_table.Format.Format(
                 precision=2,
