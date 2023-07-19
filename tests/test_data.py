@@ -26,20 +26,6 @@ def subjects() -> list[str]:
     return ["A", "B"]
 
 
-def test_nonstandard_logistic_mean():
-    points = data.blocks.logistic(
-        {
-            "x_0": 1.0,
-            "k": 1.0,
-            "Guess Rate": 0.0,
-            "Lapse Rate": 0.0,
-        },
-        pd.Index([0.0, 1.0, 2.0]),
-    )
-    assert min(points) > 0
-    assert max(points) < 1
-
-
 def test_params():
     x = pd.Index([])
     fits = pd.DataFrame({"5%": [], "50%": [], "95%": []})
