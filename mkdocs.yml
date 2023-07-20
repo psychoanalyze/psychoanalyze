@@ -2,6 +2,8 @@ site_name: PsychoAnalyze
 site_url: https://psychoanalyze.io
 theme:
   name: material
+  logo: assets/logo_bgwhite.png
+  favicon: assets/logo_bgwhite.png
 plugins:
 - search
 - mkdocstrings:
@@ -29,5 +31,10 @@ extra_javascript:
  - docs/require.js
 watch:
  - psychoanalyze
- - dashboard
  - tests
+nav:
+ - 'index.md'
+ - 'dashboard.md'
+ - 'api.md'
+ - 'contributing.md'
+ - 'tests.md'

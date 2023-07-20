@@ -17,7 +17,7 @@
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 
-from dashboard.components import (
+from psychoanalyze.dashboard.components import (
     blocks_table,
     link_function,
     model_params,

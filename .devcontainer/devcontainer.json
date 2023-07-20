@@ -7,7 +7,10 @@
     "ghcr.io/devcontainers-contrib/features/pre-commit:1": {},
     "ghcr.io/eitsupi/devcontainer-features/duckdb-cli:1": {},
     "ghcr.io/devcontainers/features/node:1": {},
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers-contrib/features/mkdocs:2"	: {
+      "plugins": "mkdocs-material mkdocstrings-python"
+    }
   },
   "remoteUser": "vscode",
   "onCreateCommand": "poetry install && pre-commit install",

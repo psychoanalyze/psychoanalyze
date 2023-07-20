@@ -38,9 +38,6 @@ kaleido = "0.2.1"
 pyarrow = "^12.0.1"
 types-pytz = "^2023.3.0.0"
 python-semantic-release = "^8.0.2"
-mkdocs = "^1.4.3"
-mkdocstrings = {extras = ["python"], version = "^0.22.0"}
-mkdocs-material = "^9.1.19"
 
 [tool.poetry.scripts]
 psychoanalyze = "psychoanalyze.__main__:main"

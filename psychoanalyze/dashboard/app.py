@@ -46,7 +46,7 @@ from dash import (
 from dash_bootstrap_components import icons, themes
 from scipy.special import expit, logit
 
-from dashboard.layout import layout
+from psychoanalyze.dashboard.layout import layout
 from psychoanalyze.data import blocks as pa_blocks
 from psychoanalyze.data import points as pa_points
 
