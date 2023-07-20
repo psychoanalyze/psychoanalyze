@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "psychoanalyze"
-version = "0.6.2"
+version = "0.6.3"
 description = "A Pythonic analysis package for psychophysics data"
 authors = ["Ty Schlichenmeyer <t.schlic@wustl.edu>"]
 license = "GPL-3.0-or-later"
