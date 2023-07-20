@@ -360,24 +360,6 @@ blocks_table = dash_table.DataTable(
                 scheme=dash_table.Format.Scheme.fixed,
             ),
         },
-        {
-            "name": "gamma",
-            "id": "gamma",
-            "type": "numeric",
-            "format": dash_table.Format.Format(
-                precision=2,
-                scheme=dash_table.Format.Scheme.fixed,
-            ),
-        },
-        {
-            "name": "lambda",
-            "id": "lambda",
-            "type": "numeric",
-            "format": dash_table.Format.Format(
-                precision=2,
-                scheme=dash_table.Format.Scheme.fixed,
-            ),
-        },
     ],
     style_data={"color": "black"},
     style_header={"color": "black"},

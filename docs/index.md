@@ -8,9 +8,9 @@ Interactive data exploration for psychophysics.
     - Simulate data by adjusting model/simulation parameters
     - Upload your own dataset according to the specified schema.
     - Examine existing datasets using the dropdown menu
-- Use [psychoanalyze](https://pypi.org/project/psychoanalyze/) as a Python package to develop your own analysis scripts.
+- Use `psychoanalyze` [(PyPI)](https://pypi.org/project/psychoanalyze/) as a Python package to develop your own analysis scripts.
 
-## Installation
+## Python Installation
 
 === "Poetry"
 
