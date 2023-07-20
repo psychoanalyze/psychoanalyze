@@ -1,1 +1,1 @@
-web: gunicorn psychoanalyze.sdashboard.app:server
+web: gunicorn psychoanalyze.dashboard.app:server
