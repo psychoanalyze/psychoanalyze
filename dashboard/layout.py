@@ -88,31 +88,6 @@ plot_col = dbc.Col(
             id="plot-equation",
         ),
         dcc.Graph(id="plot", className="mb-3"),
-        html.H5("Plot Options"),
-        dbc.Container(
-            [
-                dbc.FormText("Y Transform"),
-                html.Div(
-                    dbc.RadioItems(
-                        options=[
-                            {"label": "Hit Rate", "value": "Hit Rate"},
-                            {
-                                "label": "logit(Hit Rate)",
-                                "value": "logit(Hit Rate)",
-                            },
-                        ],
-                        value="Hit Rate",
-                        inline=True,
-                        id="y",
-                        className="btn-group",
-                        inputClassName="btn-check",
-                        labelClassName="btn btn-outline-primary",
-                        labelCheckedClassName="active",
-                    ),
-                    className="radio-group",
-                ),
-            ],
-        ),
     ],
     width=5,
 )
