@@ -96,6 +96,14 @@ data_col = dbc.Col(
     [
         html.H4("Blocks", className="mt-3 mb-2"),
         dbc.Container(blocks_table, className="mb-3"),
+        dcc.Markdown(
+            """
+            $$
+            F(x) = \\frac{1}{1 + e^{-(\\beta_0 + \\beta_1 x)}}
+            $$
+            """,
+            mathjax=True,
+        ),
         html.H4("Points", className="mb-2"),
         dbc.Container(points_table, className="mb-3"),
         dbc.Row(

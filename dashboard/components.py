@@ -343,7 +343,7 @@ blocks_table = dash_table.DataTable(
             "type": "numeric",
         },
         {
-            "name": "intercept",
+            "name": "intercept β₀",
             "id": "intercept",
             "type": "numeric",
             "format": dash_table.Format.Format(
@@ -352,7 +352,7 @@ blocks_table = dash_table.DataTable(
             ),
         },
         {
-            "name": "slope",
+            "name": "slope β₁",
             "id": "slope",
             "type": "numeric",
             "format": dash_table.Format.Format(

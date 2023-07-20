@@ -173,7 +173,6 @@ def filter_points(
 
 @callback(
     Output("plot", "figure"),
-    Input("y", "value"),
     Input({"type": "param", "name": ALL}, "value"),
     Input("points-table", "data"),
     Input("blocks-table", "data"),
@@ -182,7 +181,6 @@ def filter_points(
     State({"type": "x-param", "name": "max"}, "value"),
 )
 def update_fig(  # noqa: PLR0913
-    y: str,
     param: list[float],
     points: Records,
     blocks: Records,
@@ -218,13 +216,13 @@ def update_fig(  # noqa: PLR0913
     fits_fig = px.line(
         fits,
         x="Intensity",
-        y=y,
+        y="Hit Rate",
         color="Block",
     )
     results_fig = px.scatter(
         points_df,
         x="Intensity",
-        y=y,
+        y="Hit Rate",
         size="n trials",
         color="Block",
         template="plotly_white",
