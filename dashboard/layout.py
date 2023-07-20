@@ -33,18 +33,19 @@ subtitle = "Interactive data simulation & analysis for psychophysics."
 input_col = dbc.Col(
     [
         dcc.Upload(
-            "Upload data",
+            [
+                html.P("Upload CSV/parquet with columns:", className="mb-0"),
+                html.P("Block, Intensity, Result."),
+                html.P("Your data stays in the browser.", className="mb-0"),
+            ],
             id="upload",
             style={
-                "width": "100%",
-                "height": "60px",
-                "lineHeight": "60px",
                 "borderWidth": "1px",
                 "borderStyle": "dashed",
                 "borderRadius": "5px",
                 "textAlign": "center",
-                "margin": "10px",
             },
+            className="mb-3 p-3",
         ),
         html.H4("Link Function"),
         link_function,

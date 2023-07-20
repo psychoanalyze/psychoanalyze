@@ -153,7 +153,7 @@ model_params = dbc.Container(
                 dbc.Col(
                     dcc.Dropdown(
                         id="preset",
-                        placeholder="Preset examples",
+                        placeholder="Presets",
                         options=[
                             {
                                 "label": "Standard",
@@ -162,10 +162,6 @@ model_params = dbc.Container(
                             {
                                 "label": "Non Standard",
                                 "value": "non-standard",
-                            },
-                            {
-                                "label": "2AFC",
-                                "value": "2AFC",
                             },
                         ],
                     ),
@@ -253,11 +249,6 @@ stimulus_params = dbc.Container(
                 ),
             ],
             className="mb-1 g-0",
-        ),
-        dbc.Checkbox(
-            label="Pin range to ±4σ",  # noqa: RUF001
-            id="pin-range",
-            value=True,
         ),
     ],
     class_name="mb-3",
