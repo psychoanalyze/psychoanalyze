@@ -1,0 +1,76 @@
+---
+title: PsychoAnalyze Tutorial
+author: "Ty C Schlichenmeyer"
+date: '20223-07-20'
+toc: true
+number-sections: true
+jupyter: python3
+---
+
+# PsychoAnalyze Python Tutorial / Demo
+
+## Ordinary Least Squares Logistic Regression on Trial Data
+
+### Data Schema
+
+The simplest psychophysical experiments consist of a series of trials measuring a binary-encoded response to an intensity-graded stimulus.
+
+Use the `trials` module to load data from a CSV or Parquet file into a Pandas DataFrame.dd
+
+```{python}
+from psychoanalyze.data import trials
+
+example_trials = trials.load("tutorial_trials.csv")
+example_trials
+```
+```{python}
+example_trials.info()
+```
+
+### Diving into Logistic Regression
+
+By designing the experiment such that the recorded response is binary, researchers may use logistic regression to model the relationship between the stimulus and the response; logistic regression is a generalized linear model that is appropriate for a series of binary (Bernoulli) trials.
+
+Let's examine the logistic function using built-in `psychoanalyze` utility functions.
+
+First, let's plot the standard logistic equation:
+
+```{python}
+from psychoanalyze.data.blocks import standard_logistic
+from psychoanalyze import plot
+import pandas as pd
+pd.options.plotting.backend = "plotly"
+
+plot.standard_logistic()
+```
+
+::: {.column-margin}
+$$
+f(x) = \frac{1}{1 + e^{-x}}
+$$
+:::
+
+::: {.callout-note}
+## Sanity check
+$f(0) = \frac{1}{1 + e^{-0}} = \frac{1}{1+1} = \frac{1}{2}$
+:::
+
+### Apply the logistic model to a Yes/No experiment
+
+Let's label some variables and perform some simple substitutions to examine a *non-standard* parameterization of the logistic function, where \mu is a *location* parameter and \sigma is a *scale* parameter:
+
+$$
+\psi(x) = \frac{1}{1 + e^{-\frac{x - \mu}{\sigma}}}
+$$
+
+Observe how the *x-axis* adjusts in response to the following adjustments:
+
+- To the *location* parameter, \mu
+```{python}
+plot.logistic(location=10, scale=1)
+```
+
+- To the *scale* parameter, \sigma
+```{python}
+plot.logistic(location=0, scale=10)
+```
