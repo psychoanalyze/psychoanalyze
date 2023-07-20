@@ -236,7 +236,7 @@ layout = dbc.Container(
                         [
                             dbc.Col(
                                 html.Img(
-                                    src="assets/PsychoAnalyze_100x100.png",
+                                    src="assets/logo_transparent_100x100.png",
                                 ),
                                 width="auto",
                             ),
