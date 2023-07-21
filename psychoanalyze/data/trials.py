@@ -59,13 +59,16 @@ def generate(
     )
 
 
-def load(data_path: Path = Path("data")) -> pd.DataFrame:
+def load(data_path: Path) -> pd.DataFrame:
     """Load trials data from csv."""
     return types.trials.validate(
         pd.read_csv(
-            data_path / "trials.csv",
-            index_col=types.points_index_levels,
-            parse_dates=["Date"],
+            data_path,
+            dtype={
+                "Result": int,
+                "Intensity": float,
+                "Block": int,
+            },
         ),
     )
 

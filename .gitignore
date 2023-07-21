@@ -140,7 +140,7 @@ docs/tables/*
 
 .jupyterlite.doit.db
 
-notebooks/*
+**/notebooks/*
 figures/*
 
 *.duckdb*
@@ -156,3 +156,9 @@ node_modules
 .vscode-server
 
 .user.yml
+
+/.luarc.json
+
+docs/notebooks/tutorial_files/**/*.js
+docs/notebooks/tutorial_files/**/*.css
+docs/notebooks/tutorial/*.html

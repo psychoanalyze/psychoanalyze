@@ -176,3 +176,19 @@ def reshape_fit_results(fits: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame
     param_fits = param_fits.rename(columns={"50%": y})
     param_fits.index = x
     return param_fits
+
+
+def standard_logistic() -> pd.Series:
+    """Generate points for a line trace of a standard logistic function."""
+    x = pd.Index(np.linspace(-3, 3, 100), name="x")
+    y = expit(x)
+    return pd.Series(y, index=x, name="f(x)")
+
+
+def logistic(location: float, scale: float) -> pd.Series:
+    """Generate points for a line trace of a logistic function."""
+    x_min = (location - 4) * scale
+    x_max = (location + 4) * scale
+    x = pd.Index(np.linspace(x_min, x_max, 100), name="Intensity")
+    y = expit((x - location) / scale)
+    return pd.Series(y, index=x, name="Ψ(x)")
