@@ -10,16 +10,6 @@ Psychophysics analysis in Python.
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/psychoanalyze/psychoanalyze/main?labpath=docs%2Fnotebooks%2Ftutorial.ipynb)
 
 
-## Installation
-poetry (preferred):
-```console
-poetry add psychoanalyze
-```
-pip:
-```console
-pip install psychoanalyze
-```
-
 ## Dashboard
 See what `psychoanalyze` can do by [viewing our dashboard](https://psychoanalyze.io/).
 
