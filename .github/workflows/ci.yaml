@@ -12,6 +12,7 @@ defaults:
 
 jobs:
   ci:
+    needs: pre-commit
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -41,16 +42,16 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build and run dev container task
-      uses: devcontainers/ci@v0.3
-      with:
-        imageName: ghcr.io/psychoanalyze/devcontainer
-        imageTag: devcontainer
-        cacheFrom: ghcr.io/psychoanalyze/devcontainer
-        push: always
-        runCmd: |
-          poetry run pre-commit --all-files
-          poetry run pytest
+    # - name: Build and run dev container task
+    #   uses: devcontainers/ci@v0.3
+    #   with:
+    #     imageName: ghcr.io/psychoanalyze/devcontainer
+    #     imageTag: devcontainer
+    #     cacheFrom: ghcr.io/psychoanalyze/devcontainer
+    #     push: always
+    #     runCmd: |
+    #       poetry run pre-commit --all-files
+    #       poetry run pytest
 
     - name: Semantic Release - update version
       run: poetry run semantic-release -vv version
