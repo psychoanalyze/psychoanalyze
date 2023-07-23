@@ -2,6 +2,25 @@
 
 
 
+## v0.7.1 (2023-07-23)
+
+### Chore
+
+* chore: Merge branch &#39;main&#39; of https://github.com/psychoanalyze/psychoanalyze ([`c803454`](https://github.com/psychoanalyze/psychoanalyze/commit/c803454a2552374f575a37ae7a46ff80d3419bde))
+
+* chore(release): release 0.7.0 ([`4c9b40f`](https://github.com/psychoanalyze/psychoanalyze/commit/4c9b40f5bf56ee9c5fb4b3ed6c80737b4788f280))
+
+### Ci
+
+* ci: revert to using local runner for semantic-release ([`86966af`](https://github.com/psychoanalyze/psychoanalyze/commit/86966afc11f12175d9d9c2f8cfe7aee5c3797771))
+
+* ci: fix missing steps block key ([`e7861ab`](https://github.com/psychoanalyze/psychoanalyze/commit/e7861ab95aed33f5439bc4bcf44d40eb13e71922))
+
+### Fix
+
+* fix: undo strict since release step is last ([`0287421`](https://github.com/psychoanalyze/psychoanalyze/commit/02874214881a94af6b412a01d54e650b1ff616d1))
+
+
 ## v0.7.0 (2023-07-23)
 
 ### Chore
