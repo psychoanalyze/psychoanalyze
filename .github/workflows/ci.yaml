@@ -9,7 +9,7 @@ defaults:
 
 jobs:
   ci:
-    if: github.event.status == 'success'
+    if: github.event.state == 'success'
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
