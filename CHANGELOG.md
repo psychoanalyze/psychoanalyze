@@ -40,6 +40,8 @@
 
 ### Fix
 
+* fix: re-release ([`582eeff`](https://github.com/psychoanalyze/psychoanalyze/commit/582eeffae5f7df07b5a2e97a7dbd07da94dfc9f5))
+
 * fix: poetry settings ([`a83a789`](https://github.com/psychoanalyze/psychoanalyze/commit/a83a789980141ef48e18825e070f3f08a0372cbb))
 
 * fix: maintenance &amp; notebooks ([`6757ad6`](https://github.com/psychoanalyze/psychoanalyze/commit/6757ad6cde640888aefa70c9713bf30a3144cf76))
