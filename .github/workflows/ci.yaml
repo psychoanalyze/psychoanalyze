@@ -2,8 +2,6 @@ name: ci
 
 on:
   check_run:
-    workflows: ["pre-commit"]
-    branches: [main]
     types:
       - completed
 
