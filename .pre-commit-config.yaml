@@ -50,3 +50,7 @@ repos:
     stages: [push]
     pass_filenames: false
     always_run: true
+
+ci:
+  autofix_commit_msg: ci(pre-commit)
+  autoupdate_commit_msg: ci(pre-commit)
