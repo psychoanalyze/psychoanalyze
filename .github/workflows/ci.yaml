@@ -22,6 +22,18 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Install Python Poetry
+      run: pipx install poetry
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+        cache: 'poetry'
+
+    - name: Install dependencies
+      run: poetry install
+
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
@@ -36,6 +48,9 @@ jobs:
         imageTag: devcontainer
         cacheFrom: ghcr.io/psychoanalyze/devcontainer
         push: always
+        runCmd: |
+          poetry run pre-commit
+          poetry run pytest
 
     - name: Semantic Release - update version
       run: poetry run semantic-release version
