@@ -1,10 +1,28 @@
 [tool.poetry]
 name = "psychoanalyze"
 version = "0.7.0"
-description = "A Pythonic analysis package for psychophysics data"
+description = "Interactive analysis and simulation of psychophysical data."
 authors = ["Ty Schlichenmeyer <t.schlic@wustl.edu>"]
 license = "GPL-3.0-or-later"
 readme = "README.md"
+packages = [ { include = "psychoanalyze" }]
+homepage = "https://psychoanalyze.io"
+repository = "https://github.com/psychoanalyze/psychoanalyze"
+documentation = "https://docs.psychoanalyze.io"
+keywords = ["psychophysics", "neuroscience", "psychology", "bayes"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Web Environment",
+    "Framework :: Dash",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+urls = { JupyterHub = "https://nb.psychoanalyze.io" }
 
 [tool.poetry.dependencies]
 python = "3.11.4"
@@ -50,7 +68,6 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.semantic_release]
 version_variable = [
-    "psychoanalyze/__init__.py:__version__",
     "pyproject.toml:version"
 ]
 branch = "main"
