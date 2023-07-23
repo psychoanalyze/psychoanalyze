@@ -1,21 +1,19 @@
 name: ci
 
 on:
-  status:
-
-defaults:
-  run:
-    shell: bash
+  pull_request:
+    branches:
+      - main
 
 jobs:
   ci:
-    if: github.event.state == 'success'
     runs-on: ubuntu-latest
+
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
-    steps:
 
+    steps:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
