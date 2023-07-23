@@ -8,6 +8,10 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    concurrency: release
+    permissions:
+      id-token: write
+      contents: write
 
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -49,15 +53,3 @@ jobs:
     #     runCmd: |
     #       poetry run pre-commit --all-files
     #       poetry run pytest
-
-    - name: Semantic Release - update version
-      run: poetry run semantic-release -vv version
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
-
-    - name: Semantic Release - publish
-      run: poetry run semantic-release -vv publish
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
