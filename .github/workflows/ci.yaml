@@ -1,10 +1,11 @@
 name: ci
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
+  check_run:
+    workflows: ["pre-commit"]
+    branches: [main]
+    types:
+      - completed
 
 defaults:
   run:
@@ -12,7 +13,7 @@ defaults:
 
 jobs:
   ci:
-    needs: pre-commit
+    if: github.event.check_run.conclusion == 'success'
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
