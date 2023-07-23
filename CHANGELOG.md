@@ -6,6 +6,8 @@
 
 ### Chore
 
+* chore(release): release 0.7.0 ([`6bda47c`](https://github.com/psychoanalyze/psychoanalyze/commit/6bda47c3278322920c9661ddb27b2a65ffa67266))
+
 * chore: remove conda config for faster binder image build ([`957f575`](https://github.com/psychoanalyze/psychoanalyze/commit/957f57544febe5458339eda5763f02780bae909c))
 
 * chore: update version ([`875c767`](https://github.com/psychoanalyze/psychoanalyze/commit/875c76757d4253438b9852fa61b9eb97c5680fc0))
