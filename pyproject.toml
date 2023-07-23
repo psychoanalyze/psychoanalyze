@@ -67,12 +67,28 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.semantic_release]
-version_variable = [
-    "pyproject.toml:version"
+version_toml = [
+    "pyproject.toml:tool.poetry.version"
 ]
 branch = "main"
 build_command = "poetry build"
-major_on_zero = true
+
+[tool.semantic_release.commit_parser_options]
+allowed_tags = [
+    "feat",
+    "fix",
+    "ci",
+    "docs",
+    "test",
+    "dash",
+    "dev",
+    "deps",
+    "style",
+    "refactor",
+    "perf",
+    "chore",
+    "notebook"
+]
 
 [tool.bandit]
 targets = ["psychoanalyze/"]

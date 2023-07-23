@@ -2,7 +2,74 @@
 
 
 
+## v0.7.0 (2023-07-23)
+
+### Chore
+
+* chore: remove conda config for faster binder image build ([`957f575`](https://github.com/psychoanalyze/psychoanalyze/commit/957f57544febe5458339eda5763f02780bae909c))
+
+* chore: update version ([`875c767`](https://github.com/psychoanalyze/psychoanalyze/commit/875c76757d4253438b9852fa61b9eb97c5680fc0))
+
+* chore: upgrade version ([`334839c`](https://github.com/psychoanalyze/psychoanalyze/commit/334839cfb85f0139400e3ad7023ce12795773058))
+
+### Dash
+
+* dash: procfile typo ([`7aad841`](https://github.com/psychoanalyze/psychoanalyze/commit/7aad8413c94f98ddd21d413e7da16e83b71445c8))
+
+* dash: update procfile ([`bcea14f`](https://github.com/psychoanalyze/psychoanalyze/commit/bcea14f54420ed10301ff381a3a0353185315cfe))
+
+* dash: add slope/intercept formulation ([`c64d83b`](https://github.com/psychoanalyze/psychoanalyze/commit/c64d83b70b6b4997ef99dffac9386a2b47feb674))
+
+* dash: cleanup ([`178da30`](https://github.com/psychoanalyze/psychoanalyze/commit/178da3052c2d2967db00a046f078e04ae2375e69))
+
+* dash: cleanup ([`ed0e9ce`](https://github.com/psychoanalyze/psychoanalyze/commit/ed0e9ce5e12afacc4223611459066dffc62a536f))
+
+### Deps
+
+* deps: docs dependencies ([`96d0b5d`](https://github.com/psychoanalyze/psychoanalyze/commit/96d0b5db4c3d2bd36503fd59fde014e6238e346a))
+
+### Documentation
+
+* docs: fix python version in pyproject classifiers ([`a9ae5bd`](https://github.com/psychoanalyze/psychoanalyze/commit/a9ae5bd4e87f2344137926ad459789adf73cbf03))
+
+* docs: take install instructions out of readme ([`73d17bf`](https://github.com/psychoanalyze/psychoanalyze/commit/73d17bf2f0dafe0121c36d8ec7a96357fcd4381c))
+
+### Feature
+
+* feat: reorganize proj architecture ([`3f0e885`](https://github.com/psychoanalyze/psychoanalyze/commit/3f0e8859a0e125eeeb9faa12071c21c0d1dfa351))
+
+### Fix
+
+* fix: poetry settings ([`a83a789`](https://github.com/psychoanalyze/psychoanalyze/commit/a83a789980141ef48e18825e070f3f08a0372cbb))
+
+* fix: maintenance &amp; notebooks ([`6757ad6`](https://github.com/psychoanalyze/psychoanalyze/commit/6757ad6cde640888aefa70c9713bf30a3144cf76))
+
+### Style
+
+* style: give favicon white bg ([`aab4a8b`](https://github.com/psychoanalyze/psychoanalyze/commit/aab4a8b2293be7f6fbd83ac06686fbc1faa7eca3))
+
+
 ## v0.6.3 (2023-07-19)
+
+### Dash
+
+* dash: rename columns to match slope + intercept formulation ([`e0da067`](https://github.com/psychoanalyze/psychoanalyze/commit/e0da0671202b2990323a73b62f88d92bc18ef536))
+
+* dash: fix xrange pin ([`d8afa7d`](https://github.com/psychoanalyze/psychoanalyze/commit/d8afa7da36b1e545129745430f46ccd4aefd116a))
+
+* dash: add model trace ([`b135d64`](https://github.com/psychoanalyze/psychoanalyze/commit/b135d6471504839192f73d0f2d39b6921b1cc09e))
+
+* dash: paginate points table ([`ce88a2e`](https://github.com/psychoanalyze/psychoanalyze/commit/ce88a2e9be73a282da68250eaccea391d062a03a))
+
+* dash: add color to block param ([`857907f`](https://github.com/psychoanalyze/psychoanalyze/commit/857907f03c3355f0861290bb504f0ca6f287f750))
+
+* dash: show/hide F(x) ([`1f208d0`](https://github.com/psychoanalyze/psychoanalyze/commit/1f208d00cbe6eb5589789aecb28cd98874414ea2))
+
+### Dev
+
+* dev: release ([`83b5700`](https://github.com/psychoanalyze/psychoanalyze/commit/83b57007a13e7e3b4ca5570d704ccb36c35baf61))
+
+* dev: run black first in pre-commit ([`d4bf4a3`](https://github.com/psychoanalyze/psychoanalyze/commit/d4bf4a324c1b23d7c0611f570f8b4fce93b54c6d))
 
 ### Fix
 
@@ -24,24 +91,18 @@
 
 * test: fix broken test ([`9e3d846`](https://github.com/psychoanalyze/psychoanalyze/commit/9e3d8461728525d496764308f1df880db6a651ca))
 
-### Unknown
-
-* dash: rename columns to match slope + intercept formulation ([`e0da067`](https://github.com/psychoanalyze/psychoanalyze/commit/e0da0671202b2990323a73b62f88d92bc18ef536))
-
-* dash: fix xrange pin ([`d8afa7d`](https://github.com/psychoanalyze/psychoanalyze/commit/d8afa7da36b1e545129745430f46ccd4aefd116a))
-
-* dev: run black first in pre-commit ([`d4bf4a3`](https://github.com/psychoanalyze/psychoanalyze/commit/d4bf4a324c1b23d7c0611f570f8b4fce93b54c6d))
-
-* dash: add model trace ([`b135d64`](https://github.com/psychoanalyze/psychoanalyze/commit/b135d6471504839192f73d0f2d39b6921b1cc09e))
-
-* dash: paginate points table ([`ce88a2e`](https://github.com/psychoanalyze/psychoanalyze/commit/ce88a2e9be73a282da68250eaccea391d062a03a))
-
-* dash: add color to block param ([`857907f`](https://github.com/psychoanalyze/psychoanalyze/commit/857907f03c3355f0861290bb504f0ca6f287f750))
-
-* dash: show/hide F(x) ([`1f208d0`](https://github.com/psychoanalyze/psychoanalyze/commit/1f208d00cbe6eb5589789aecb28cd98874414ea2))
-
 
 ## v0.6.2 (2023-07-16)
+
+### Dash
+
+* dash: cleaner upload toggle ([`0672ab9`](https://github.com/psychoanalyze/psychoanalyze/commit/0672ab992a7755f780f478e27f9704806db81e8b))
+
+* dash: toggle upload space ([`79526ad`](https://github.com/psychoanalyze/psychoanalyze/commit/79526adfcc015fefeed15c9a5513cc1d4ffa87bb))
+
+* dash: default tab simulate ([`238fdbe`](https://github.com/psychoanalyze/psychoanalyze/commit/238fdbe8a9cb1ff94cfa17b8a158bce60685632d))
+
+* dash: clear panels for upload tabl ([`5d6e59d`](https://github.com/psychoanalyze/psychoanalyze/commit/5d6e59da9dfbb2c66368d1f9d3a970097f9b9ad6))
 
 ### Fix
 
@@ -52,16 +113,6 @@
 * test: another broken test ([`d7aa616`](https://github.com/psychoanalyze/psychoanalyze/commit/d7aa61697c4c5b0ab45e9b3ac0e454a5e95c5a8d))
 
 * test: fix broken test ([`649f8b7`](https://github.com/psychoanalyze/psychoanalyze/commit/649f8b7902bb4ebc675ed4c80383c88fbba5cdf6))
-
-### Unknown
-
-* dash: cleaner upload toggle ([`0672ab9`](https://github.com/psychoanalyze/psychoanalyze/commit/0672ab992a7755f780f478e27f9704806db81e8b))
-
-* dash: toggle upload space ([`79526ad`](https://github.com/psychoanalyze/psychoanalyze/commit/79526adfcc015fefeed15c9a5513cc1d4ffa87bb))
-
-* dash: default tab simulate ([`238fdbe`](https://github.com/psychoanalyze/psychoanalyze/commit/238fdbe8a9cb1ff94cfa17b8a158bce60685632d))
-
-* dash: clear panels for upload tabl ([`5d6e59d`](https://github.com/psychoanalyze/psychoanalyze/commit/5d6e59da9dfbb2c66368d1f9d3a970097f9b9ad6))
 
 
 ## v0.6.1 (2023-07-15)
@@ -106,6 +157,28 @@
 
 ## v0.5.0 (2023-07-14)
 
+### Dash
+
+* dash: export data as duckdb, csv, json, parquet ([`4b7f30e`](https://github.com/psychoanalyze/psychoanalyze/commit/4b7f30e31c66820a4744691f9c50720bcc481532))
+
+* dash: download csv button ([`40b73ad`](https://github.com/psychoanalyze/psychoanalyze/commit/40b73ad00925dcf8964ef956d7b4fa4f0424775e))
+
+* dash: remove html and eps from export options ([`9405a20`](https://github.com/psychoanalyze/psychoanalyze/commit/9405a20a92d358f4766d512a7d84c1d05d7d1821))
+
+* dash: add label for plot options ([`43fff1d`](https://github.com/psychoanalyze/psychoanalyze/commit/43fff1d0e4dfee00faa1ec7e0e47d0f7e0ea103d))
+
+### Deps
+
+* deps: kaleido ([`c674f01`](https://github.com/psychoanalyze/psychoanalyze/commit/c674f018a39b43e44457a094458ebc7a6f704238))
+
+### Dev
+
+* dev: enable debug ([`61228df`](https://github.com/psychoanalyze/psychoanalyze/commit/61228df8a7446acc5f9b0d1954e73778bd5cf805))
+
+* dev: Merge branch &#39;main&#39; of https://github.com/psychoanalyze/psychoanalyze ([`c8a76ce`](https://github.com/psychoanalyze/psychoanalyze/commit/c8a76cef52b0fa51835685437e3b9cf60ac96a07))
+
+* dev: enable debug with reloader disabled ([`a556e7e`](https://github.com/psychoanalyze/psychoanalyze/commit/a556e7e4c4885be8366a754a23caf2bd716e3058))
+
 ### Feature
 
 * feat: fix x range to model ([`93c5c4e`](https://github.com/psychoanalyze/psychoanalyze/commit/93c5c4eac826037b84ef08aced0c6b8eda653c89))
@@ -128,31 +201,15 @@
 
 ### Unknown
 
-* dev: enable debug ([`61228df`](https://github.com/psychoanalyze/psychoanalyze/commit/61228df8a7446acc5f9b0d1954e73778bd5cf805))
-
 * Merge pull request #12 from psychoanalyze/pre-commit-ci-update-config
 
 [pre-commit.ci] pre-commit autoupdate ([`f71b080`](https://github.com/psychoanalyze/psychoanalyze/commit/f71b0809cdbf9ec18aee2b52ba7914578f12601e))
-
-* dash: export data as duckdb, csv, json, parquet ([`4b7f30e`](https://github.com/psychoanalyze/psychoanalyze/commit/4b7f30e31c66820a4744691f9c50720bcc481532))
-
-* dash: download csv button ([`40b73ad`](https://github.com/psychoanalyze/psychoanalyze/commit/40b73ad00925dcf8964ef956d7b4fa4f0424775e))
-
-* dash: remove html and eps from export options ([`9405a20`](https://github.com/psychoanalyze/psychoanalyze/commit/9405a20a92d358f4766d512a7d84c1d05d7d1821))
 
 * [pre-commit.ci] pre-commit autoupdate
 
 updates:
 - [github.com/astral-sh/ruff-pre-commit: v0.0.276 → v0.0.277](https://github.com/astral-sh/ruff-pre-commit/compare/v0.0.276...v0.0.277)
 - [github.com/psf/black: 23.3.0 → 23.7.0](https://github.com/psf/black/compare/23.3.0...23.7.0) ([`f5307c0`](https://github.com/psychoanalyze/psychoanalyze/commit/f5307c00bbb0eea4b59ec1e48e68f6a5c3aaa334))
-
-* deps: kaleido ([`c674f01`](https://github.com/psychoanalyze/psychoanalyze/commit/c674f018a39b43e44457a094458ebc7a6f704238))
-
-* dev: Merge branch &#39;main&#39; of https://github.com/psychoanalyze/psychoanalyze ([`c8a76ce`](https://github.com/psychoanalyze/psychoanalyze/commit/c8a76cef52b0fa51835685437e3b9cf60ac96a07))
-
-* dev: enable debug with reloader disabled ([`a556e7e`](https://github.com/psychoanalyze/psychoanalyze/commit/a556e7e4c4885be8366a754a23caf2bd716e3058))
-
-* dash: add label for plot options ([`43fff1d`](https://github.com/psychoanalyze/psychoanalyze/commit/43fff1d0e4dfee00faa1ec7e0e47d0f7e0ea103d))
 
 
 ## v0.4.12 (2023-07-11)
@@ -169,6 +226,34 @@ updates:
 * ci: run black on all files ([`aa6e04e`](https://github.com/psychoanalyze/psychoanalyze/commit/aa6e04eb7aa819e72abcb1200a2b241ad8e58b2c))
 
 * ci: add some pandera decorators for pipeline ([`83e239b`](https://github.com/psychoanalyze/psychoanalyze/commit/83e239b550f6c4350e9b8454fac0a106466881be))
+
+### Dash
+
+* dash: persist data cross different views ([`ca2d07c`](https://github.com/psychoanalyze/psychoanalyze/commit/ca2d07c665249f9dd6dfde67b23b584fece157d6))
+
+* dash: show fit params in table ([`ba46f93`](https://github.com/psychoanalyze/psychoanalyze/commit/ba46f939a0cd07706283f1e8b4d022c2c81e999c))
+
+* dash: update title ([`a5cb241`](https://github.com/psychoanalyze/psychoanalyze/commit/a5cb24171c60e2177d74e68b4e93d8a8b21c3625))
+
+* dash: give predicted trace own color/label ([`2705d6d`](https://github.com/psychoanalyze/psychoanalyze/commit/2705d6d880c190d3e40c544d9e88ec052fe4a4b3))
+
+* dash: display fitted values ([`72a3091`](https://github.com/psychoanalyze/psychoanalyze/commit/72a30915915eb446c0f20887ce37331422479adf))
+
+### Dev
+
+* dev: add github cli to devcontainer features ([`8bf721a`](https://github.com/psychoanalyze/psychoanalyze/commit/8bf721ade49a3fbd8c863bd77e02fc98833e5161))
+
+* dev: more python formatter settings ([`75fb542`](https://github.com/psychoanalyze/psychoanalyze/commit/75fb54250e5b18758378d7664ebba167830538ed))
+
+* dev: use python extension black + more extensions ([`21599a0`](https://github.com/psychoanalyze/psychoanalyze/commit/21599a0dc5fb76446bd561129931390d5e76ba7a))
+
+* dev: black settings ([`57555db`](https://github.com/psychoanalyze/psychoanalyze/commit/57555db7149734b0ccf8829407f0c1976fa998a1))
+
+* dev: add jupyter extension to defaults ([`ce70fa6`](https://github.com/psychoanalyze/psychoanalyze/commit/ce70fa65221bcb7da4dc2e33dd710b1b122f16fe))
+
+* dev: add some vscode settings ([`31e72bf`](https://github.com/psychoanalyze/psychoanalyze/commit/31e72bfc35461a6b12242982b39ec9177a62f7bf))
+
+* dev: shorten container name ([`8509885`](https://github.com/psychoanalyze/psychoanalyze/commit/8509885093deecf2b45336bdc521aa6f6c4e9270))
 
 ### Documentation
 
@@ -196,34 +281,24 @@ updates:
 
 * style: put dash latex in block ([`47ba5cc`](https://github.com/psychoanalyze/psychoanalyze/commit/47ba5cccd841e4e166c20338e67d62b5178714a0))
 
-### Unknown
-
-* dev: add github cli to devcontainer features ([`8bf721a`](https://github.com/psychoanalyze/psychoanalyze/commit/8bf721ade49a3fbd8c863bd77e02fc98833e5161))
-
-* dev: more python formatter settings ([`75fb542`](https://github.com/psychoanalyze/psychoanalyze/commit/75fb54250e5b18758378d7664ebba167830538ed))
-
-* dev: use python extension black + more extensions ([`21599a0`](https://github.com/psychoanalyze/psychoanalyze/commit/21599a0dc5fb76446bd561129931390d5e76ba7a))
-
-* dev: black settings ([`57555db`](https://github.com/psychoanalyze/psychoanalyze/commit/57555db7149734b0ccf8829407f0c1976fa998a1))
-
-* dash: persist data cross different views ([`ca2d07c`](https://github.com/psychoanalyze/psychoanalyze/commit/ca2d07c665249f9dd6dfde67b23b584fece157d6))
-
-* dash: show fit params in table ([`ba46f93`](https://github.com/psychoanalyze/psychoanalyze/commit/ba46f939a0cd07706283f1e8b4d022c2c81e999c))
-
-* dash: update title ([`a5cb241`](https://github.com/psychoanalyze/psychoanalyze/commit/a5cb24171c60e2177d74e68b4e93d8a8b21c3625))
-
-* dev: add jupyter extension to defaults ([`ce70fa6`](https://github.com/psychoanalyze/psychoanalyze/commit/ce70fa65221bcb7da4dc2e33dd710b1b122f16fe))
-
-* dev: add some vscode settings ([`31e72bf`](https://github.com/psychoanalyze/psychoanalyze/commit/31e72bfc35461a6b12242982b39ec9177a62f7bf))
-
-* dev: shorten container name ([`8509885`](https://github.com/psychoanalyze/psychoanalyze/commit/8509885093deecf2b45336bdc521aa6f6c4e9270))
-
-* dash: give predicted trace own color/label ([`2705d6d`](https://github.com/psychoanalyze/psychoanalyze/commit/2705d6d880c190d3e40c544d9e88ec052fe4a4b3))
-
-* dash: display fitted values ([`72a3091`](https://github.com/psychoanalyze/psychoanalyze/commit/72a30915915eb446c0f20887ce37331422479adf))
-
 
 ## v0.4.10 (2023-07-10)
+
+### Dash
+
+* dash: logit view toggle ([`1289b15`](https://github.com/psychoanalyze/psychoanalyze/commit/1289b151a868dd039c2412a7107a9d13ffb798ae))
+
+* dash: linear view ([`4172c29`](https://github.com/psychoanalyze/psychoanalyze/commit/4172c2954eb834b1f7ff3fb6c82bad85836beb45))
+
+* dash: plot model trace ([`b56336a`](https://github.com/psychoanalyze/psychoanalyze/commit/b56336a03eb195a504d7c7bf8ad8080a61961bf3))
+
+### Deps
+
+* deps: update dash ([`ce46d2a`](https://github.com/psychoanalyze/psychoanalyze/commit/ce46d2a24f6ea2f40f206128e9ec74d62950cbe9))
+
+### Dev
+
+* dev: go back to single-container setup, replacing pymc with cmstanpy ([`5c3ae5e`](https://github.com/psychoanalyze/psychoanalyze/commit/5c3ae5efaa74c9d36fdee0d2a83b1bee369b758f))
 
 ### Fix
 
@@ -242,18 +317,6 @@ updates:
 * style: color model trace blue ([`f3f8f64`](https://github.com/psychoanalyze/psychoanalyze/commit/f3f8f64107d1e428fe14bb4e8a17e771c79b569f))
 
 * style: display points in datatable ([`904fdd7`](https://github.com/psychoanalyze/psychoanalyze/commit/904fdd79e072abd7b514d3c49398755ea7bab2fd))
-
-### Unknown
-
-* dash: logit view toggle ([`1289b15`](https://github.com/psychoanalyze/psychoanalyze/commit/1289b151a868dd039c2412a7107a9d13ffb798ae))
-
-* dash: linear view ([`4172c29`](https://github.com/psychoanalyze/psychoanalyze/commit/4172c2954eb834b1f7ff3fb6c82bad85836beb45))
-
-* deps: update dash ([`ce46d2a`](https://github.com/psychoanalyze/psychoanalyze/commit/ce46d2a24f6ea2f40f206128e9ec74d62950cbe9))
-
-* dev: go back to single-container setup, replacing pymc with cmstanpy ([`5c3ae5e`](https://github.com/psychoanalyze/psychoanalyze/commit/5c3ae5efaa74c9d36fdee0d2a83b1bee369b758f))
-
-* dash: plot model trace ([`b56336a`](https://github.com/psychoanalyze/psychoanalyze/commit/b56336a03eb195a504d7c7bf8ad8080a61961bf3))
 
 
 ## v0.4.9 (2023-07-09)
@@ -275,10 +338,6 @@ updates:
 
 
 ## v0.4.7 (2023-07-09)
-
-### Build
-
-* build: add mkdocs to deps ([`121ce3f`](https://github.com/psychoanalyze/psychoanalyze/commit/121ce3f5f045f98e5bc81003a89784ed58a6b630))
 
 ### Chore
 
@@ -382,6 +441,8 @@ updates:
 
 ### Unknown
 
+* build: add mkdocs to deps ([`121ce3f`](https://github.com/psychoanalyze/psychoanalyze/commit/121ce3f5f045f98e5bc81003a89784ed58a6b630))
+
 * Merge pull request #11 from psychoanalyze/pre-commit-ci-update-config
 
 [pre-commit.ci] pre-commit autoupdate ([`362d537`](https://github.com/psychoanalyze/psychoanalyze/commit/362d537677b186ed4e29e06577c82ff381cf993c))
@@ -410,10 +471,6 @@ Refactor ([`f1baf41`](https://github.com/psychoanalyze/psychoanalyze/commit/f1ba
 
 
 ## v0.4.5 (2023-07-04)
-
-### Build
-
-* build: use lts version of node ([`ff3808b`](https://github.com/psychoanalyze/psychoanalyze/commit/ff3808bfad4794d941974a41aa0c72610faecdff))
 
 ### Chore
 
@@ -464,6 +521,8 @@ updates:
 - [github.com/PyCQA/bandit: 1.7.4 → 1.7.5](https://github.com/PyCQA/bandit/compare/1.7.4...1.7.5)
 - [github.com/compilerla/conventional-pre-commit: v2.1.1 → v2.3.0](https://github.com/compilerla/conventional-pre-commit/compare/v2.1.1...v2.3.0) ([`298292d`](https://github.com/psychoanalyze/psychoanalyze/commit/298292dd7ac7c17a8768529c168ed492703b9c57))
 
+* build: use lts version of node ([`ff3808b`](https://github.com/psychoanalyze/psychoanalyze/commit/ff3808bfad4794d941974a41aa0c72610faecdff))
+
 
 ## v0.4.4 (2023-06-18)
 
@@ -492,14 +551,6 @@ updates:
 
 
 ## v0.4.2 (2023-06-17)
-
-### Build
-
-* build: major clean up ([`117fa16`](https://github.com/psychoanalyze/psychoanalyze/commit/117fa1621e3f197ee4056f099ed84c5ef2b9bd6b))
-
-* build: major clean up ([`874d618`](https://github.com/psychoanalyze/psychoanalyze/commit/874d6188bf3e6e1db91b0b91d9d91631c1756a07))
-
-* build: path to production server ([`e0de038`](https://github.com/psychoanalyze/psychoanalyze/commit/e0de03872e56fb1abc64ea4447532d5ed7d85113))
 
 ### Chore
 
@@ -530,6 +581,14 @@ updates:
 ### Fix
 
 * fix: reinstall gunicorn ([`a4f3858`](https://github.com/psychoanalyze/psychoanalyze/commit/a4f3858bf0a2d7c66db6d72435762c4a458aa27b))
+
+### Unknown
+
+* build: major clean up ([`117fa16`](https://github.com/psychoanalyze/psychoanalyze/commit/117fa1621e3f197ee4056f099ed84c5ef2b9bd6b))
+
+* build: major clean up ([`874d618`](https://github.com/psychoanalyze/psychoanalyze/commit/874d6188bf3e6e1db91b0b91d9d91631c1756a07))
+
+* build: path to production server ([`e0de038`](https://github.com/psychoanalyze/psychoanalyze/commit/e0de03872e56fb1abc64ea4447532d5ed7d85113))
 
 
 ## v0.4.1 (2023-06-17)
@@ -667,38 +726,6 @@ updates:
 
 
 ## v0.0.1 (2023-06-07)
-
-### Build
-
-* build: use global python install for build command ([`1b2b711`](https://github.com/psychoanalyze/psychoanalyze/commit/1b2b711374014f79c3bea9f72a0ae7c0a090bb82))
-
-* build: merge upstream ([`05bfa75`](https://github.com/psychoanalyze/psychoanalyze/commit/05bfa753bd178225379bc788932d8ba685634f2d))
-
-* build: add semantic release to pyproject.toml ([`884c516`](https://github.com/psychoanalyze/psychoanalyze/commit/884c516d9944e0b75004c0933ae78a0432e7efd4))
-
-* build: manually change version in init.py ([`6b246be`](https://github.com/psychoanalyze/psychoanalyze/commit/6b246bebfd3017071b963276c3fb2743797d0730))
-
-* build: add conda path to devcontainer config ([`673b577`](https://github.com/psychoanalyze/psychoanalyze/commit/673b5776a0a197c3eef7f7c9fb901403449d959f))
-
-* build: integrate conda for pymc ([`eef75af`](https://github.com/psychoanalyze/psychoanalyze/commit/eef75af785a87866860f898be58fb110adcd498a))
-
-* build: strength duration dbt model ([`09d0928`](https://github.com/psychoanalyze/psychoanalyze/commit/09d0928d1b096dd99ad8d20e65c36e267083276b))
-
-* build: add ruff to devcontainer ([`433803c`](https://github.com/psychoanalyze/psychoanalyze/commit/433803c5a5c019d693e6720194c2aa78fb7122c8))
-
-* build: prune models ([`eab2d04`](https://github.com/psychoanalyze/psychoanalyze/commit/eab2d04cab080f6ad2ea2f7f31f3980137067c57))
-
-* build: add copilot to devcontainer ([`5b15794`](https://github.com/psychoanalyze/psychoanalyze/commit/5b15794d635e0c95d7be3e75519a6adf0e2a06df))
-
-* build: add gunicorn to deps ([`d0469dd`](https://github.com/psychoanalyze/psychoanalyze/commit/d0469ddd87cdf88b8b5a2b645a17f90f20eea87f))
-
-* build: dbt config ([`4249173`](https://github.com/psychoanalyze/psychoanalyze/commit/4249173ee5670c4a2f0624e8bd9cc787f8f7944b))
-
-* build: adbt models for long. thresh. plot ([`7143ad5`](https://github.com/psychoanalyze/psychoanalyze/commit/7143ad504b6017afcf0abca8e1ed15a30b9ea7f0))
-
-* build: stage sessions table ([`874373b`](https://github.com/psychoanalyze/psychoanalyze/commit/874373bf3a512ce93bbea43125294170da8fccd7))
-
-* build: conventional pre-commits ([`9c11811`](https://github.com/psychoanalyze/psychoanalyze/commit/9c11811f6a41362bc006fc468794ebc7b79a7d99))
 
 ### Chore
 
@@ -1016,7 +1043,37 @@ updates:
 
 ### Unknown
 
+* build: use global python install for build command ([`1b2b711`](https://github.com/psychoanalyze/psychoanalyze/commit/1b2b711374014f79c3bea9f72a0ae7c0a090bb82))
+
+* build: merge upstream ([`05bfa75`](https://github.com/psychoanalyze/psychoanalyze/commit/05bfa753bd178225379bc788932d8ba685634f2d))
+
+* build: add semantic release to pyproject.toml ([`884c516`](https://github.com/psychoanalyze/psychoanalyze/commit/884c516d9944e0b75004c0933ae78a0432e7efd4))
+
+* build: manually change version in init.py ([`6b246be`](https://github.com/psychoanalyze/psychoanalyze/commit/6b246bebfd3017071b963276c3fb2743797d0730))
+
+* build: add conda path to devcontainer config ([`673b577`](https://github.com/psychoanalyze/psychoanalyze/commit/673b5776a0a197c3eef7f7c9fb901403449d959f))
+
+* build: integrate conda for pymc ([`eef75af`](https://github.com/psychoanalyze/psychoanalyze/commit/eef75af785a87866860f898be58fb110adcd498a))
+
+* build: strength duration dbt model ([`09d0928`](https://github.com/psychoanalyze/psychoanalyze/commit/09d0928d1b096dd99ad8d20e65c36e267083276b))
+
+* build: add ruff to devcontainer ([`433803c`](https://github.com/psychoanalyze/psychoanalyze/commit/433803c5a5c019d693e6720194c2aa78fb7122c8))
+
+* build: prune models ([`eab2d04`](https://github.com/psychoanalyze/psychoanalyze/commit/eab2d04cab080f6ad2ea2f7f31f3980137067c57))
+
+* build: add copilot to devcontainer ([`5b15794`](https://github.com/psychoanalyze/psychoanalyze/commit/5b15794d635e0c95d7be3e75519a6adf0e2a06df))
+
+* build: add gunicorn to deps ([`d0469dd`](https://github.com/psychoanalyze/psychoanalyze/commit/d0469ddd87cdf88b8b5a2b645a17f90f20eea87f))
+
+* build: dbt config ([`4249173`](https://github.com/psychoanalyze/psychoanalyze/commit/4249173ee5670c4a2f0624e8bd9cc787f8f7944b))
+
 * Create CNAME ([`c91933c`](https://github.com/psychoanalyze/psychoanalyze/commit/c91933c3d144716c8b630205c019eda504a7d71c))
+
+* build: adbt models for long. thresh. plot ([`7143ad5`](https://github.com/psychoanalyze/psychoanalyze/commit/7143ad504b6017afcf0abca8e1ed15a30b9ea7f0))
+
+* build: stage sessions table ([`874373b`](https://github.com/psychoanalyze/psychoanalyze/commit/874373bf3a512ce93bbea43125294170da8fccd7))
+
+* build: conventional pre-commits ([`9c11811`](https://github.com/psychoanalyze/psychoanalyze/commit/9c11811f6a41362bc006fc468794ebc7b79a7d99))
 
 * add exposure for longitudinal threshold plot ([`2ec5e6a`](https://github.com/psychoanalyze/psychoanalyze/commit/2ec5e6ada4cb0d60ab6e6ccb4302004c829ec19e))
 
