@@ -13,11 +13,11 @@ defaults:
 jobs:
   ci:
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
-    steps:
+    permissions:
+      id-token: write
+      contents: write
 
+    steps:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
@@ -50,8 +50,7 @@ jobs:
         push: always
 
     - name: Semantic Release
-      run: |
-        git config --global user.name "semantic-release (via GitHub Action)"
-        git config --global user.email "ci@psychoanalyze.io"
-        poetry run semantic-release --strict version
-        poetry run semantic-release --strict publish
+      uses: python-semantic-release/python-semantic-release@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        root_options: "-vv --strict"
