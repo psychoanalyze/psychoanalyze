@@ -13,11 +13,11 @@ defaults:
 jobs:
   ci:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: write
-
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
     steps:
+
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
@@ -50,7 +50,6 @@ jobs:
         push: always
 
     - name: Semantic Release
-      uses: python-semantic-release/python-semantic-release@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        root_options: "-vv"
+      run: |
+        poetry run semantic-release version
+        poetry run semantic-release publish
