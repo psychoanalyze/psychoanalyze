@@ -7,7 +7,7 @@ To get an idea of PsychoAnalyze's capabilities, try out the dashboard at [https:
     - Upload your own dataset according to the specified schema and observe model fits.
 
 ## Notebooks
-For a more hands-on experience with PsychoAnalyze, follow our [notebook tutorial](notebooks.md).
+For a more hands-on experience with PsychoAnalyze, enjoy our [notebook tutorial](notebooks/tutorial.ipynb).
 
 ## Python Package
 

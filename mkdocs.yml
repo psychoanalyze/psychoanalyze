@@ -4,6 +4,19 @@ theme:
   name: material
   logo: assets/logo_bgwhite.png
   favicon: assets/logo_bgwhite.png
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      primary: indigo
+      scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      primary: teal
+      scheme: slate
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
 plugins:
 - search
 - mkdocstrings:
