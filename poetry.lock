@@ -4309,6 +4309,17 @@ files = [
 ]
 
 [[package]]
+name = "types-setuptools"
+version = "68.0.0.3"
+description = "Typing stubs for setuptools"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-setuptools-68.0.0.3.tar.gz", hash = "sha256:d57ae6076100b5704b3cc869fdefc671e1baf4c2cd6643f84265dfc0b955bf05"},
+    {file = "types_setuptools-68.0.0.3-py3-none-any.whl", hash = "sha256:fec09e5c18264c5c09351c00be01a34456fb7a88e457abe97401325f84ad9d36"},
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.7.1"
 description = "Backported and Experimental Type Hints for Python 3.7+"
@@ -4590,4 +4601,4 @@ test = ["hypothesis", "packaging", "pytest", "pytest-cov"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.4"
-content-hash = "e43a7999e363e1f39782876c63e8d7201873bd55028d82e7284f8c3cfeff5c66"
+content-hash = "1790cf049fd499567f3cd6127c520e6ef1aa1d340f78ffbfedb17ba1b525dc9b"
