@@ -26,6 +26,7 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
+      title: On this page
 extra_javascript:
  - https://cdn.plot.ly/plotly-2.12.1.min.js
  - docs/require.js
