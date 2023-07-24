@@ -1,24 +1,28 @@
 name: ci
 
 on:
-  status:
-
-defaults:
-  run:
-    shell: bash
+  pull_request:
+    branches:
+      - main
 
 jobs:
   ci:
-    if: github.event.state == 'success'
     runs-on: ubuntu-latest
+    concurrency: release
+    permissions:
+      id-token: write
+      contents: write
+
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
-    steps:
 
+    steps:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
+        ref: ${{ github.head_ref }}
+
 
     - name: Install Python Poetry
       run: pipx install poetry
@@ -49,15 +53,3 @@ jobs:
     #     runCmd: |
     #       poetry run pre-commit --all-files
     #       poetry run pytest
-
-    - name: Semantic Release - update version
-      run: poetry run semantic-release -vv version
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
-
-    - name: Semantic Release - publish
-      run: poetry run semantic-release -vv publish
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
