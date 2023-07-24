@@ -50,9 +50,8 @@
         "GitHub.copilot",
         "GitHub.copilot-chat",
         "eamodio.gitlens",
-        "quarto.quarto",
-        "sumneko.lua",
-        "github.vscode-github-actions"
+        "github.vscode-github-actions",
+        "ms-python.black-formatter"
       ]
     }
   }
