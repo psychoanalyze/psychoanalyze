@@ -74,6 +74,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#dashboard" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -260,10 +265,71 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Dashboard
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
         Dashboard
       </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    Introduction
+  </a>
+  
+    <nav class="md-nav" aria-label="Introduction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#input-panel" class="md-nav__link">
+    Input panel
+  </a>
+  
+    <nav class="md-nav" aria-label="Input panel">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#upload-data" class="md-nav__link">
+    Upload data
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -348,6 +414,49 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    Introduction
+  </a>
+  
+    <nav class="md-nav" aria-label="Introduction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#input-panel" class="md-nav__link">
+    Input panel
+  </a>
+  
+    <nav class="md-nav" aria-label="Input panel">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#upload-data" class="md-nav__link">
+    Upload data
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -365,9 +474,44 @@
   
 
 
-  <h1>Dashboard</h1>
-
-
+<h1 id="dashboard">Dashboard<a class="headerlink" href="#dashboard" title="Permanent link">&para;</a></h1>
+<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
+<p>Our dashboard is featured on our <a href="https://psychoanalyze.io">home page</a> and is powered by <a href="https://dash.plotly.com/">Dash</a>, a Python framework for building interactive data dashboards using the Flask web framework.</p>
+<p>While power users may be interested in examining or contributing to the code that powers the dashboard, use of the dashboard on our site requires no coding knowledge to use and aims to be of interest to people of all backgrounds.</p>
+<p>The dashboard is currently designed to be viewed on a full-sized laptop or desktop monitor and consists of 3 main components, 1 for each column in the interface:</p>
+<h3 id="input-panel">Input panel<a class="headerlink" href="#input-panel" title="Permanent link">&para;</a></h3>
+<h4 id="upload-data">Upload data<a class="headerlink" href="#upload-data" title="Permanent link">&para;</a></h4>
+<p>The first component in the input panel column allows anyone to upload a dataset to be processed by the dashboard. The dataset must be a table either in <code>.csv</code> or <code>.parquet</code> format, and for now is restricted to be in the form of a very simple schema as follows:</p>
+<table>
+<thead>
+<tr>
+<th>Column Name</th>
+<th>Description</th>
+<th>DataType</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Block</code></td>
+<td>A number representing an ID for a consecutive "block" of trials determined by the researcher.</td>
+<td><code>int</code></td>
+</tr>
+<tr>
+<td><code>Intensity</code></td>
+<td>A number representing the intensity of the stimulus presented in a trial.</td>
+<td><code>float</code></td>
+</tr>
+<tr>
+<td><code>Result</code></td>
+<td>The binary outcome of the trial, encoded as a 0 for false and a 1 for true.</td>
+<td><code>int</code></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>The ability for the dashboard to process more complex schemas is a top priority on our roadmap. For more info or questions, visit the dedicated <a href="">topic</a> on GitHub Discussions where the community may suggest schemas they would like to see supported.</p>
+</div>
 
 
 

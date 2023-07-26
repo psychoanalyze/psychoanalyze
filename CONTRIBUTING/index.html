@@ -550,7 +550,9 @@
 <h2 id="bug-reports">Bug Reports<a class="headerlink" href="#bug-reports" title="Permanent link">&para;</a></h2>
 <p>If you encounter a bug, please open an issue using the "Bug Report" template.</p>
 <h2 id="local-development-environment">Local Development Environment<a class="headerlink" href="#local-development-environment" title="Permanent link">&para;</a></h2>
-<p>!!! tip</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+</div>
 <p>Windows users will likely have more success following this guide if they use <a href="https://docs.microsoft.com/en-us/windows/wsl/install-win10">Windows Subsystem for Linux</a> as their command line interface. More thorough "pure"-Windows documentation is forthcoming.</p>
 <h3 id="option-1-dev-container">Option 1: Dev Container<a class="headerlink" href="#option-1-dev-container" title="Permanent link">&para;</a></h3>
 <p>The recommended way to set up a development environment is to use utilize our <a href="https://containers.dev/">Dev Container</a> configuration to build a containerized environment. You may run a Dev Container in the cloud using GitHub Codespaces, or locally using Docker Desktop on OSX and Windows.</p>
@@ -572,9 +574,10 @@
 <li><a href="https://pre-commit.com/">Pre-commit</a> for automated code formatting, linting, type checking, and automated testing as part of a pre-commit workflow.</li>
 </ul>
 <p>All other dependencies are defined in <code>pyproject.toml</code> and will be installed automatically in your active virtual environment when you run <code>poetry install</code>.</p>
-<p>!!! tip</p>
-<div class="highlight"><pre><span></span><code>Python and Poetry can be installed and managed with [`asdf`](https://asdf-vm.com/), an awesome environment management tool.
-</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Python and Poetry can be installed and managed with <a href="https://asdf-vm.com/"><code>asdf</code></a>, an awesome environment management tool.</p>
+</div>
 
 
 
