@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://psychoanalyze.io/</loc>
+         <loc>https://docs.psychoanalyze.io/</loc>
          <lastmod>2023-07-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://psychoanalyze.io/CONTRIBUTING/</loc>
+         <loc>https://docs.psychoanalyze.io/CONTRIBUTING/</loc>
          <lastmod>2023-07-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://psychoanalyze.io/api/</loc>
+         <loc>https://docs.psychoanalyze.io/api/</loc>
          <lastmod>2023-07-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://psychoanalyze.io/dashboard/</loc>
+         <loc>https://docs.psychoanalyze.io/dashboard/</loc>
          <lastmod>2023-07-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://psychoanalyze.io/tests/</loc>
+         <loc>https://docs.psychoanalyze.io/tests/</loc>
          <lastmod>2023-07-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://psychoanalyze.io/notebooks/</loc>
+         <loc>https://docs.psychoanalyze.io/notebooks/</loc>
          <lastmod>2023-07-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
