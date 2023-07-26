@@ -13,9 +13,9 @@ For a high-level view of what you can do with PsychoAnalyze, try out the interac
 
 For guidance, check out our brief [dashboard guide](dashboard.md), or just start clicking around to see what happens!
 
-Try:
+Try...
 
-- Simulating data by adjusting model/simulation parameters.
+- Simulating data by adjusting model simulation parameters.
 - Downloading results in various file formats:
     - Tabular data: `.csv`, `.parquet`, `.json`, `.duckdb`
     - Figures: `.png`, `.svg`, `.pdf`
@@ -46,4 +46,4 @@ For custom applications, you can use `psychoanalyze` as a Python package (availa
 
 ## Want to contribute to PsychoAnalyze?
 
-Check out our [contributing guide](CONTRIBUTING.md) and see what's going on in 💡[Discussions](https://github.com/)!
+Check out our [contributing guide](CONTRIBUTING.md), or see what's going on in [Discussions](https://github.com/)!💡
