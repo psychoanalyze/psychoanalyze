@@ -63,7 +63,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo">
   
     
     
@@ -81,6 +81,24 @@
       
     </div>
     <div data-md-component="announce">
+      
+        <aside class="md-banner">
+          <div class="md-banner__inner md-grid md-typeset">
+            
+              <button class="md-banner__button md-icon" aria-label="Don't show this again">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+              </button>
+            
+            
+
+<i>PsychoAnalyze</i> is in <b>alpha</b> release! Read what this means about stability and planned features <a href="/alpha">here</a>.
+
+
+          </div>
+          
+            <script>var content,el=document.querySelector("[data-md-component=announce]");el&&(content=el.querySelector(".md-typeset"),__md_hash(content.innerHTML)===__md_get("__announce")&&(el.hidden=!0))</script>
+          
+        </aside>
       
     </div>
     
@@ -123,7 +141,7 @@
             
             
             
-            <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+            <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
             
               <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
@@ -823,23 +841,23 @@ for accepted contributions.</li>
 <span class="normal"><a href="#__codelineno-0-36">36</a></span>
 <span class="normal"><a href="#__codelineno-0-37">37</a></span>
 <span class="normal"><a href="#__codelineno-0-38">38</a></span>
-<span class="normal"><a href="#__codelineno-0-39">39</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="k">def</span> <span class="nf">test_aggregate</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Makes sure that thresholds at a given stimulus intensity are aggregated.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26"></a>    <span class="n">curve_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span>
-<a id="__codelineno-0-27" name="__codelineno-0-27"></a>        <span class="p">[</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28"></a>            <span class="p">{</span><span class="s2">&quot;Reference Charge (nC)&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Difference Threshold (nC)&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<a id="__codelineno-0-29" name="__codelineno-0-29"></a>            <span class="p">{</span><span class="s2">&quot;Reference Charge (nC)&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Difference Threshold (nC)&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
-<a id="__codelineno-0-30" name="__codelineno-0-30"></a>        <span class="p">],</span>
-<a id="__codelineno-0-31" name="__codelineno-0-31"></a>        <span class="n">index</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32"></a>            <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;Monkey&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">],</span> <span class="s2">&quot;Dimension&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Amp&quot;</span><span class="p">,</span> <span class="s2">&quot;Amp&quot;</span><span class="p">]}),</span>
-<a id="__codelineno-0-33" name="__codelineno-0-33"></a>        <span class="p">),</span>
-<a id="__codelineno-0-34" name="__codelineno-0-34"></a>    <span class="p">)</span>
-<a id="__codelineno-0-35" name="__codelineno-0-35"></a>    <span class="n">agg</span> <span class="o">=</span> <span class="n">weber</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">curve_data</span><span class="p">)</span>
-<a id="__codelineno-0-36" name="__codelineno-0-36"></a>    <span class="k">assert</span> <span class="p">(</span>
-<a id="__codelineno-0-37" name="__codelineno-0-37"></a>        <span class="n">agg</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">agg</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="s2">&quot;Difference Threshold (nC)&quot;</span><span class="p">)]</span>
-<a id="__codelineno-0-38" name="__codelineno-0-38"></a>        <span class="o">==</span> <span class="n">curve_data</span><span class="p">[</span><span class="s2">&quot;Difference Threshold (nC)&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-<a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="p">)</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-39">39</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="k">def</span> <span class="nf">test_aggregate</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Makes sure that thresholds at a given stimulus intensity are aggregated.&quot;&quot;&quot;</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26"></a>    <span class="n">curve_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27"></a>        <span class="p">[</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28"></a>            <span class="p">{</span><span class="s2">&quot;Reference Charge (nC)&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Difference Threshold (nC)&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29"></a>            <span class="p">{</span><span class="s2">&quot;Reference Charge (nC)&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Difference Threshold (nC)&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30"></a>        <span class="p">],</span>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31"></a>        <span class="n">index</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32"></a>            <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;Monkey&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">],</span> <span class="s2">&quot;Dimension&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Amp&quot;</span><span class="p">,</span> <span class="s2">&quot;Amp&quot;</span><span class="p">]}),</span>
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33"></a>        <span class="p">),</span>
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34"></a>    <span class="p">)</span>
+</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35"></a>    <span class="n">agg</span> <span class="o">=</span> <span class="n">weber</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">curve_data</span><span class="p">)</span>
+</span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36"></a>    <span class="k">assert</span> <span class="p">(</span>
+</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37"></a>        <span class="n">agg</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">agg</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="s2">&quot;Difference Threshold (nC)&quot;</span><span class="p">)]</span>
+</span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38"></a>        <span class="o">==</span> <span class="n">curve_data</span><span class="p">[</span><span class="s2">&quot;Difference Threshold (nC)&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="p">)</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -874,20 +892,20 @@ for accepted contributions.</li>
 <span class="normal"><a href="#__codelineno-0-51">51</a></span>
 <span class="normal"><a href="#__codelineno-0-52">52</a></span>
 <span class="normal"><a href="#__codelineno-0-53">53</a></span>
-<span class="normal"><a href="#__codelineno-0-54">54</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="k">def</span> <span class="nf">test_load</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Given weber_curves.csv, loads dataframe.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-44" name="__codelineno-0-44"></a>    <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-<a id="__codelineno-0-45" name="__codelineno-0-45"></a>        <span class="p">{</span><span class="n">level_name</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">level_name</span> <span class="ow">in</span> <span class="n">types</span><span class="o">.</span><span class="n">block_index_levels</span><span class="p">}</span>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a>        <span class="o">|</span> <span class="p">{</span>
-<a id="__codelineno-0-47" name="__codelineno-0-47"></a>            <span class="s2">&quot;Reference Charge (nC)&quot;</span><span class="p">:</span> <span class="p">[],</span>
-<a id="__codelineno-0-48" name="__codelineno-0-48"></a>            <span class="s2">&quot;location_CI_5&quot;</span><span class="p">:</span> <span class="p">[],</span>
-<a id="__codelineno-0-49" name="__codelineno-0-49"></a>            <span class="s2">&quot;location_CI_95&quot;</span><span class="p">:</span> <span class="p">[],</span>
-<a id="__codelineno-0-50" name="__codelineno-0-50"></a>            <span class="s2">&quot;Fixed_Param_Value&quot;</span><span class="p">:</span> <span class="p">[],</span>
-<a id="__codelineno-0-51" name="__codelineno-0-51"></a>            <span class="s2">&quot;Threshold_Charge_nC&quot;</span><span class="p">:</span> <span class="p">[],</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a>        <span class="p">},</span>
-<a id="__codelineno-0-53" name="__codelineno-0-53"></a>    <span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;weber_curves.csv&quot;</span><span class="p">,</span> <span class="n">index_label</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">weber</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;weber_curves.csv&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-54">54</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="k">def</span> <span class="nf">test_load</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Given weber_curves.csv, loads dataframe.&quot;&quot;&quot;</span>
+</span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44"></a>    <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45"></a>        <span class="p">{</span><span class="n">level_name</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">level_name</span> <span class="ow">in</span> <span class="n">types</span><span class="o">.</span><span class="n">block_index_levels</span><span class="p">}</span>
+</span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46"></a>        <span class="o">|</span> <span class="p">{</span>
+</span><span id="__span-0-47"><a id="__codelineno-0-47" name="__codelineno-0-47"></a>            <span class="s2">&quot;Reference Charge (nC)&quot;</span><span class="p">:</span> <span class="p">[],</span>
+</span><span id="__span-0-48"><a id="__codelineno-0-48" name="__codelineno-0-48"></a>            <span class="s2">&quot;location_CI_5&quot;</span><span class="p">:</span> <span class="p">[],</span>
+</span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49"></a>            <span class="s2">&quot;location_CI_95&quot;</span><span class="p">:</span> <span class="p">[],</span>
+</span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50"></a>            <span class="s2">&quot;Fixed_Param_Value&quot;</span><span class="p">:</span> <span class="p">[],</span>
+</span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51"></a>            <span class="s2">&quot;Threshold_Charge_nC&quot;</span><span class="p">:</span> <span class="p">[],</span>
+</span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52"></a>        <span class="p">},</span>
+</span><span id="__span-0-53"><a id="__codelineno-0-53" name="__codelineno-0-53"></a>    <span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;weber_curves.csv&quot;</span><span class="p">,</span> <span class="n">index_label</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span id="__span-0-54"><a id="__codelineno-0-54" name="__codelineno-0-54"></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">weber</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;weber_curves.csv&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -981,11 +999,11 @@ for accepted contributions.</li>
             <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-25">25</a></span>
 <span class="normal"><a href="#__codelineno-0-26">26</a></span>
 <span class="normal"><a href="#__codelineno-0-27">27</a></span>
-<span class="normal"><a href="#__codelineno-0-28">28</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">()</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26"></a><span class="k">def</span> <span class="nf">subjects</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-27" name="__codelineno-0-27"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Subjects for session-level data.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;Monkey&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;U&quot;</span><span class="p">],</span> <span class="s2">&quot;Surgery Date&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">]})</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-28">28</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">()</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26"></a><span class="k">def</span> <span class="nf">subjects</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Subjects for session-level data.&quot;&quot;&quot;</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;Monkey&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;U&quot;</span><span class="p">],</span> <span class="s2">&quot;Surgery Date&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">]})</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -1010,10 +1028,10 @@ for accepted contributions.</li>
             <summary>Source code in <code>tests/test_sessions.py</code></summary>
             <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-31">31</a></span>
 <span class="normal"><a href="#__codelineno-0-32">32</a></span>
-<span class="normal"><a href="#__codelineno-0-33">33</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-31" name="__codelineno-0-31"></a><span class="k">def</span> <span class="nf">test_generate_sessions</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test appropriate number of sessions are generated.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-33" name="__codelineno-0-33"></a>    <span class="k">assert</span> <span class="n">sessions</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-33">33</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31"></a><span class="k">def</span> <span class="nf">test_generate_sessions</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test appropriate number of sessions are generated.&quot;&quot;&quot;</span>
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33"></a>    <span class="k">assert</span> <span class="n">sessions</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -1046,18 +1064,18 @@ for accepted contributions.</li>
 <span class="normal"><a href="#__codelineno-0-43">43</a></span>
 <span class="normal"><a href="#__codelineno-0-44">44</a></span>
 <span class="normal"><a href="#__codelineno-0-45">45</a></span>
-<span class="normal"><a href="#__codelineno-0-46">46</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="k">def</span> <span class="nf">test_from_trials_csv</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test loading trials from csv.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-38" name="__codelineno-0-38"></a>    <span class="n">csv_dir</span> <span class="o">=</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
-<a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="n">csv_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
-<a id="__codelineno-0-40" name="__codelineno-0-40"></a>    <span class="n">csv_path</span> <span class="o">=</span> <span class="n">csv_dir</span> <span class="o">/</span> <span class="s2">&quot;trials.csv&quot;</span>
-<a id="__codelineno-0-41" name="__codelineno-0-41"></a>    <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="n">field</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Monkey&quot;</span><span class="p">,</span> <span class="s2">&quot;Date&quot;</span><span class="p">]}</span>
-<a id="__codelineno-0-42" name="__codelineno-0-42"></a>    <span class="n">trials</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<a id="__codelineno-0-43" name="__codelineno-0-43"></a>    <span class="n">trials</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">csv_path</span><span class="p">)</span>
-<a id="__codelineno-0-44" name="__codelineno-0-44"></a>
-<a id="__codelineno-0-45" name="__codelineno-0-45"></a>    <span class="n">_sessions</span> <span class="o">=</span> <span class="n">sessions</span><span class="o">.</span><span class="n">from_trials_csv</span><span class="p">(</span><span class="n">csv_path</span><span class="p">)</span>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a>    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">_sessions</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s2">&quot;Monkey&quot;</span><span class="p">,</span> <span class="s2">&quot;Date&quot;</span><span class="p">}</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-46">46</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="k">def</span> <span class="nf">test_from_trials_csv</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test loading trials from csv.&quot;&quot;&quot;</span>
+</span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38"></a>    <span class="n">csv_dir</span> <span class="o">=</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
+</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="n">csv_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+</span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40"></a>    <span class="n">csv_path</span> <span class="o">=</span> <span class="n">csv_dir</span> <span class="o">/</span> <span class="s2">&quot;trials.csv&quot;</span>
+</span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41"></a>    <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="n">field</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Monkey&quot;</span><span class="p">,</span> <span class="s2">&quot;Date&quot;</span><span class="p">]}</span>
+</span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42"></a>    <span class="n">trials</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43"></a>    <span class="n">trials</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">csv_path</span><span class="p">)</span>
+</span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44"></a>
+</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45"></a>    <span class="n">_sessions</span> <span class="o">=</span> <span class="n">sessions</span><span class="o">.</span><span class="n">from_trials_csv</span><span class="p">(</span><span class="n">csv_path</span><span class="p">)</span>
+</span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46"></a>    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">_sessions</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s2">&quot;Monkey&quot;</span><span class="p">,</span> <span class="s2">&quot;Date&quot;</span><span class="p">}</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -1088,16 +1106,16 @@ for accepted contributions.</li>
 <span class="normal"><a href="#__codelineno-0-54">54</a></span>
 <span class="normal"><a href="#__codelineno-0-55">55</a></span>
 <span class="normal"><a href="#__codelineno-0-56">56</a></span>
-<span class="normal"><a href="#__codelineno-0-57">57</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="k">def</span> <span class="nf">test_day_marks_from_monkey_two_sessions</span><span class="p">(</span><span class="n">subjects</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests calculations of days from dates for multiple subjects.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-51" name="__codelineno-0-51"></a>    <span class="n">_sessions</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a>        <span class="p">{</span><span class="s2">&quot;Monkey&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">],</span> <span class="s2">&quot;Date&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;2020-01-02&quot;</span><span class="p">,</span> <span class="s2">&quot;2020-01-03&quot;</span><span class="p">]},</span>
-<a id="__codelineno-0-53" name="__codelineno-0-53"></a>    <span class="p">)</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a>    <span class="k">assert</span> <span class="n">sessions</span><span class="o">.</span><span class="n">day_marks</span><span class="p">(</span><span class="n">subjects</span><span class="p">,</span> <span class="n">_sessions</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
-<a id="__codelineno-0-55" name="__codelineno-0-55"></a>        <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;2020-01-02&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-56" name="__codelineno-0-56"></a>        <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;2020-01-03&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-57" name="__codelineno-0-57"></a>    <span class="p">}</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-57">57</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="k">def</span> <span class="nf">test_day_marks_from_monkey_two_sessions</span><span class="p">(</span><span class="n">subjects</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests calculations of days from dates for multiple subjects.&quot;&quot;&quot;</span>
+</span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51"></a>    <span class="n">_sessions</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+</span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52"></a>        <span class="p">{</span><span class="s2">&quot;Monkey&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">],</span> <span class="s2">&quot;Date&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;2020-01-02&quot;</span><span class="p">,</span> <span class="s2">&quot;2020-01-03&quot;</span><span class="p">]},</span>
+</span><span id="__span-0-53"><a id="__codelineno-0-53" name="__codelineno-0-53"></a>    <span class="p">)</span>
+</span><span id="__span-0-54"><a id="__codelineno-0-54" name="__codelineno-0-54"></a>    <span class="k">assert</span> <span class="n">sessions</span><span class="o">.</span><span class="n">day_marks</span><span class="p">(</span><span class="n">subjects</span><span class="p">,</span> <span class="n">_sessions</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+</span><span id="__span-0-55"><a id="__codelineno-0-55" name="__codelineno-0-55"></a>        <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;2020-01-02&quot;</span><span class="p">,</span>
+</span><span id="__span-0-56"><a id="__codelineno-0-56" name="__codelineno-0-56"></a>        <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;2020-01-03&quot;</span><span class="p">,</span>
+</span><span id="__span-0-57"><a id="__codelineno-0-57" name="__codelineno-0-57"></a>    <span class="p">}</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -1124,12 +1142,12 @@ for accepted contributions.</li>
 <span class="normal"><a href="#__codelineno-0-61">61</a></span>
 <span class="normal"><a href="#__codelineno-0-62">62</a></span>
 <span class="normal"><a href="#__codelineno-0-63">63</a></span>
-<span class="normal"><a href="#__codelineno-0-64">64</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="k">def</span> <span class="nf">test_day_marks_from_monkey_one_session</span><span class="p">(</span><span class="n">subjects</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests calculations of days from dates for single subject.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a>    <span class="n">_sessions</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;Monkey&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;U&quot;</span><span class="p">],</span> <span class="s2">&quot;Date&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;2020-01-02&quot;</span><span class="p">]})</span>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a>    <span class="k">assert</span> <span class="n">sessions</span><span class="o">.</span><span class="n">day_marks</span><span class="p">(</span><span class="n">subjects</span><span class="p">,</span> <span class="n">_sessions</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;2020-01-02&quot;</span><span class="p">}</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-64">64</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-60"><a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="k">def</span> <span class="nf">test_day_marks_from_monkey_one_session</span><span class="p">(</span><span class="n">subjects</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-61"><a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests calculations of days from dates for single subject.&quot;&quot;&quot;</span>
+</span><span id="__span-0-62"><a id="__codelineno-0-62" name="__codelineno-0-62"></a>    <span class="n">_sessions</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;Monkey&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;U&quot;</span><span class="p">],</span> <span class="s2">&quot;Date&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;2020-01-02&quot;</span><span class="p">]})</span>
+</span><span id="__span-0-63"><a id="__codelineno-0-63" name="__codelineno-0-63"></a>
+</span><span id="__span-0-64"><a id="__codelineno-0-64" name="__codelineno-0-64"></a>    <span class="k">assert</span> <span class="n">sessions</span><span class="o">.</span><span class="n">day_marks</span><span class="p">(</span><span class="n">subjects</span><span class="p">,</span> <span class="n">_sessions</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;2020-01-02&quot;</span><span class="p">}</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -1199,23 +1217,23 @@ for accepted contributions.</li>
 <span class="normal"><a href="#__codelineno-0-32">32</a></span>
 <span class="normal"><a href="#__codelineno-0-33">33</a></span>
 <span class="normal"><a href="#__codelineno-0-34">34</a></span>
-<span class="normal"><a href="#__codelineno-0-35">35</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="k">def</span> <span class="nf">test_thresholds</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests threshold plot.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22"></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23"></a>        <span class="p">{</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24"></a>            <span class="s2">&quot;Subject&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">],</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25"></a>            <span class="s2">&quot;5%&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26"></a>            <span class="s2">&quot;50%&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
-<a id="__codelineno-0-27" name="__codelineno-0-27"></a>            <span class="s2">&quot;95%&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28"></a>            <span class="s2">&quot;Block&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
-<a id="__codelineno-0-29" name="__codelineno-0-29"></a>        <span class="p">},</span>
-<a id="__codelineno-0-30" name="__codelineno-0-30"></a>    <span class="p">)</span>
-<a id="__codelineno-0-31" name="__codelineno-0-31"></a>    <span class="n">fig</span> <span class="o">=</span> <span class="n">blocks</span><span class="o">.</span><span class="n">plot_thresholds</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32"></a>    <span class="n">subjects</span> <span class="o">=</span> <span class="p">{</span><span class="n">trace</span><span class="p">[</span><span class="s2">&quot;legendgroup&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">trace</span> <span class="ow">in</span> <span class="n">fig</span><span class="o">.</span><span class="n">data</span><span class="p">}</span>
-<a id="__codelineno-0-33" name="__codelineno-0-33"></a>    <span class="k">assert</span> <span class="n">subjects</span> <span class="o">==</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">}</span>
-<a id="__codelineno-0-34" name="__codelineno-0-34"></a>    <span class="k">assert</span> <span class="n">fig</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="s2">&quot;Block&quot;</span>
-<a id="__codelineno-0-35" name="__codelineno-0-35"></a>    <span class="k">assert</span> <span class="n">fig</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="s2">&quot;50%&quot;</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-35">35</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="k">def</span> <span class="nf">test_thresholds</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests threshold plot.&quot;&quot;&quot;</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22"></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23"></a>        <span class="p">{</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24"></a>            <span class="s2">&quot;Subject&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">],</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25"></a>            <span class="s2">&quot;5%&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26"></a>            <span class="s2">&quot;50%&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27"></a>            <span class="s2">&quot;95%&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28"></a>            <span class="s2">&quot;Block&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29"></a>        <span class="p">},</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30"></a>    <span class="p">)</span>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31"></a>    <span class="n">fig</span> <span class="o">=</span> <span class="n">blocks</span><span class="o">.</span><span class="n">plot_thresholds</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32"></a>    <span class="n">subjects</span> <span class="o">=</span> <span class="p">{</span><span class="n">trace</span><span class="p">[</span><span class="s2">&quot;legendgroup&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">trace</span> <span class="ow">in</span> <span class="n">fig</span><span class="o">.</span><span class="n">data</span><span class="p">}</span>
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33"></a>    <span class="k">assert</span> <span class="n">subjects</span> <span class="o">==</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">}</span>
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34"></a>    <span class="k">assert</span> <span class="n">fig</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="s2">&quot;Block&quot;</span>
+</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35"></a>    <span class="k">assert</span> <span class="n">fig</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="s2">&quot;50%&quot;</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -1282,20 +1300,20 @@ for accepted contributions.</li>
 <span class="normal"><a href="#__codelineno-0-29">29</a></span>
 <span class="normal"><a href="#__codelineno-0-30">30</a></span>
 <span class="normal"><a href="#__codelineno-0-31">31</a></span>
-<span class="normal"><a href="#__codelineno-0-32">32</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="k">def</span> <span class="nf">test_bayes</span><span class="p">():</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test plotting bayesian representation of psi data.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22"></a>    <span class="n">simulated</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23"></a>        <span class="p">{</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24"></a>            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25"></a>            <span class="s2">&quot;Hit Rate&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.19</span><span class="p">,</span> <span class="mf">0.55</span><span class="p">,</span> <span class="mf">0.81</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">],</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26"></a>        <span class="p">},</span>
-<a id="__codelineno-0-27" name="__codelineno-0-27"></a>    <span class="p">)</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28"></a>    <span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">([</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Hit Rate&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-29" name="__codelineno-0-29"></a>    <span class="n">estimated</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mf">0.011</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.56</span><span class="p">,</span> <span class="mf">0.80</span><span class="p">,</span> <span class="mf">0.98</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
-<a id="__codelineno-0-30" name="__codelineno-0-30"></a>    <span class="n">fig</span> <span class="o">=</span> <span class="n">pa_bayes</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">simulated</span><span class="p">,</span> <span class="n">estimated</span><span class="p">)</span>
-<a id="__codelineno-0-31" name="__codelineno-0-31"></a>    <span class="k">assert</span> <span class="n">fig</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="s2">&quot;x&quot;</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32"></a>    <span class="k">assert</span> <span class="n">fig</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="s2">&quot;Hit Rate&quot;</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-32">32</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="k">def</span> <span class="nf">test_bayes</span><span class="p">():</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test plotting bayesian representation of psi data.&quot;&quot;&quot;</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22"></a>    <span class="n">simulated</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23"></a>        <span class="p">{</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24"></a>            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25"></a>            <span class="s2">&quot;Hit Rate&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.19</span><span class="p">,</span> <span class="mf">0.55</span><span class="p">,</span> <span class="mf">0.81</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">],</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26"></a>        <span class="p">},</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27"></a>    <span class="p">)</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28"></a>    <span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">([</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Hit Rate&quot;</span><span class="p">)</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29"></a>    <span class="n">estimated</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mf">0.011</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.56</span><span class="p">,</span> <span class="mf">0.80</span><span class="p">,</span> <span class="mf">0.98</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30"></a>    <span class="n">fig</span> <span class="o">=</span> <span class="n">pa_bayes</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">simulated</span><span class="p">,</span> <span class="n">estimated</span><span class="p">)</span>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31"></a>    <span class="k">assert</span> <span class="n">fig</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="s2">&quot;x&quot;</span>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32"></a>    <span class="k">assert</span> <span class="n">fig</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="s2">&quot;Hit Rate&quot;</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -1355,11 +1373,11 @@ for accepted contributions.</li>
             <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-23">23</a></span>
 <span class="normal"><a href="#__codelineno-0-24">24</a></span>
 <span class="normal"><a href="#__codelineno-0-25">25</a></span>
-<span class="normal"><a href="#__codelineno-0-26">26</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">()</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="k">def</span> <span class="nf">subjects</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;List of subject names.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26"></a>    <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">]</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-26">26</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">()</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="k">def</span> <span class="nf">subjects</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;List of subject names.&quot;&quot;&quot;</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26"></a>    <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">]</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -1419,11 +1437,11 @@ for accepted contributions.</li>
             <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-22">22</a></span>
 <span class="normal"><a href="#__codelineno-0-23">23</a></span>
 <span class="normal"><a href="#__codelineno-0-24">24</a></span>
-<span class="normal"><a href="#__codelineno-0-25">25</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">()</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="k">def</span> <span class="nf">s_d_columns</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">:</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Columns needed for a strength-duration dataframe.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25"></a>    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;Monkey&quot;</span><span class="p">,</span> <span class="s2">&quot;Block&quot;</span><span class="p">,</span> <span class="s2">&quot;Dimension&quot;</span><span class="p">}</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-25">25</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">()</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="k">def</span> <span class="nf">s_d_columns</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">:</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Columns needed for a strength-duration dataframe.&quot;&quot;&quot;</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25"></a>    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;Monkey&quot;</span><span class="p">,</span> <span class="s2">&quot;Block&quot;</span><span class="p">,</span> <span class="s2">&quot;Dimension&quot;</span><span class="p">}</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -1458,20 +1476,20 @@ for accepted contributions.</li>
 <span class="normal"><a href="#__codelineno-0-37">37</a></span>
 <span class="normal"><a href="#__codelineno-0-38">38</a></span>
 <span class="normal"><a href="#__codelineno-0-39">39</a></span>
-<span class="normal"><a href="#__codelineno-0-40">40</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-28" name="__codelineno-0-28"></a><span class="k">def</span> <span class="nf">test_strength_duration</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-29" name="__codelineno-0-29"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test strength_duration construction.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-30" name="__codelineno-0-30"></a>    <span class="n">df_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span>
-<a id="__codelineno-0-31" name="__codelineno-0-31"></a>        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32"></a>            <span class="p">{</span><span class="s2">&quot;Monkey&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;Block&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;Dimension&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;Fixed Magnitude&quot;</span><span class="p">:</span> <span class="p">[]},</span>
-<a id="__codelineno-0-33" name="__codelineno-0-33"></a>        <span class="p">),</span>
-<a id="__codelineno-0-34" name="__codelineno-0-34"></a>    <span class="p">)</span>
-<a id="__codelineno-0-35" name="__codelineno-0-35"></a>    <span class="n">blocks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;Threshold&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;Fixed Magnitude&quot;</span><span class="p">:</span> <span class="p">[]},</span> <span class="n">index</span><span class="o">=</span><span class="n">df_index</span><span class="p">)</span>
-<a id="__codelineno-0-36" name="__codelineno-0-36"></a>    <span class="n">s_d</span> <span class="o">=</span> <span class="n">strength_duration</span><span class="o">.</span><span class="n">from_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="o">=</span><span class="n">blocks</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;Amp&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-37" name="__codelineno-0-37"></a>    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">s_d</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
-<a id="__codelineno-0-38" name="__codelineno-0-38"></a>        <span class="s2">&quot;Fixed Pulse Width (μs)&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-39" name="__codelineno-0-39"></a>        <span class="s2">&quot;Threshold Amplitude (μA)&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-40" name="__codelineno-0-40"></a>    <span class="p">}</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-40">40</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28"></a><span class="k">def</span> <span class="nf">test_strength_duration</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test strength_duration construction.&quot;&quot;&quot;</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30"></a>    <span class="n">df_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31"></a>        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32"></a>            <span class="p">{</span><span class="s2">&quot;Monkey&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;Block&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;Dimension&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;Fixed Magnitude&quot;</span><span class="p">:</span> <span class="p">[]},</span>
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33"></a>        <span class="p">),</span>
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34"></a>    <span class="p">)</span>
+</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35"></a>    <span class="n">blocks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;Threshold&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;Fixed Magnitude&quot;</span><span class="p">:</span> <span class="p">[]},</span> <span class="n">index</span><span class="o">=</span><span class="n">df_index</span><span class="p">)</span>
+</span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36"></a>    <span class="n">s_d</span> <span class="o">=</span> <span class="n">strength_duration</span><span class="o">.</span><span class="n">from_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="o">=</span><span class="n">blocks</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;Amp&quot;</span><span class="p">)</span>
+</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37"></a>    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">s_d</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+</span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38"></a>        <span class="s2">&quot;Fixed Pulse Width (μs)&quot;</span><span class="p">,</span>
+</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39"></a>        <span class="s2">&quot;Threshold Amplitude (μA)&quot;</span><span class="p">,</span>
+</span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40"></a>    <span class="p">}</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -1497,11 +1515,11 @@ for accepted contributions.</li>
             <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-43">43</a></span>
 <span class="normal"><a href="#__codelineno-0-44">44</a></span>
 <span class="normal"><a href="#__codelineno-0-45">45</a></span>
-<span class="normal"><a href="#__codelineno-0-46">46</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">()</span>
-<a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="k">def</span> <span class="nf">s_d_empty_df</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Empty strength-duration dataframe.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;Threshold&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;Fixed Magnitude&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;Dimension&quot;</span><span class="p">:</span> <span class="p">[]})</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-46">46</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">()</span>
+</span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="k">def</span> <span class="nf">s_d_empty_df</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Empty strength-duration dataframe.&quot;&quot;&quot;</span>
+</span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;Threshold&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;Fixed Magnitude&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;Dimension&quot;</span><span class="p">:</span> <span class="p">[]})</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -1531,15 +1549,15 @@ for accepted contributions.</li>
 <span class="normal"><a href="#__codelineno-0-53">53</a></span>
 <span class="normal"><a href="#__codelineno-0-54">54</a></span>
 <span class="normal"><a href="#__codelineno-0-55">55</a></span>
-<span class="normal"><a href="#__codelineno-0-56">56</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="k">def</span> <span class="nf">test_strength_duration_amp</span><span class="p">(</span><span class="n">s_d_columns</span><span class="p">:</span> <span class="nb">set</span><span class="p">,</span> <span class="n">s_d_empty_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests Strength-duration data for amplitude-modulated data.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-51" name="__codelineno-0-51"></a>    <span class="n">blocks</span> <span class="o">=</span> <span class="n">s_d_empty_df</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a>    <span class="n">s_d</span> <span class="o">=</span> <span class="n">strength_duration</span><span class="o">.</span><span class="n">from_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="o">=</span><span class="n">blocks</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;Amp&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-53" name="__codelineno-0-53"></a>    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">s_d</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">s_d_columns</span> <span class="o">|</span> <span class="p">{</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a>        <span class="s2">&quot;Threshold Amplitude (μA)&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-55" name="__codelineno-0-55"></a>        <span class="s2">&quot;Fixed Pulse Width (μs)&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-56" name="__codelineno-0-56"></a>    <span class="p">}</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-56">56</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="k">def</span> <span class="nf">test_strength_duration_amp</span><span class="p">(</span><span class="n">s_d_columns</span><span class="p">:</span> <span class="nb">set</span><span class="p">,</span> <span class="n">s_d_empty_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests Strength-duration data for amplitude-modulated data.&quot;&quot;&quot;</span>
+</span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51"></a>    <span class="n">blocks</span> <span class="o">=</span> <span class="n">s_d_empty_df</span>
+</span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52"></a>    <span class="n">s_d</span> <span class="o">=</span> <span class="n">strength_duration</span><span class="o">.</span><span class="n">from_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="o">=</span><span class="n">blocks</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;Amp&quot;</span><span class="p">)</span>
+</span><span id="__span-0-53"><a id="__codelineno-0-53" name="__codelineno-0-53"></a>    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">s_d</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">s_d_columns</span> <span class="o">|</span> <span class="p">{</span>
+</span><span id="__span-0-54"><a id="__codelineno-0-54" name="__codelineno-0-54"></a>        <span class="s2">&quot;Threshold Amplitude (μA)&quot;</span><span class="p">,</span>
+</span><span id="__span-0-55"><a id="__codelineno-0-55" name="__codelineno-0-55"></a>        <span class="s2">&quot;Fixed Pulse Width (μs)&quot;</span><span class="p">,</span>
+</span><span id="__span-0-56"><a id="__codelineno-0-56" name="__codelineno-0-56"></a>    <span class="p">}</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -1571,17 +1589,17 @@ for accepted contributions.</li>
 <span class="normal"><a href="#__codelineno-0-65">65</a></span>
 <span class="normal"><a href="#__codelineno-0-66">66</a></span>
 <span class="normal"><a href="#__codelineno-0-67">67</a></span>
-<span class="normal"><a href="#__codelineno-0-68">68</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="k">def</span> <span class="nf">test_strength_duration_pw</span><span class="p">(</span><span class="n">s_d_columns</span><span class="p">:</span> <span class="nb">set</span><span class="p">,</span> <span class="n">s_d_empty_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test strength-duration calcs for pulse-width-modulated data.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a>    <span class="n">s_d</span> <span class="o">=</span> <span class="n">strength_duration</span><span class="o">.</span><span class="n">from_blocks</span><span class="p">(</span>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a>        <span class="n">blocks</span><span class="o">=</span><span class="n">s_d_empty_df</span><span class="p">,</span>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a>        <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;Width&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a>    <span class="p">)</span>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a>    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">s_d</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">s_d_columns</span> <span class="o">|</span> <span class="p">{</span>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a>        <span class="s2">&quot;Fixed Amplitude (μA)&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a>        <span class="s2">&quot;Threshold Pulse Width (μs)&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-68" name="__codelineno-0-68"></a>    <span class="p">}</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-68">68</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-59"><a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="k">def</span> <span class="nf">test_strength_duration_pw</span><span class="p">(</span><span class="n">s_d_columns</span><span class="p">:</span> <span class="nb">set</span><span class="p">,</span> <span class="n">s_d_empty_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-60"><a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test strength-duration calcs for pulse-width-modulated data.&quot;&quot;&quot;</span>
+</span><span id="__span-0-61"><a id="__codelineno-0-61" name="__codelineno-0-61"></a>    <span class="n">s_d</span> <span class="o">=</span> <span class="n">strength_duration</span><span class="o">.</span><span class="n">from_blocks</span><span class="p">(</span>
+</span><span id="__span-0-62"><a id="__codelineno-0-62" name="__codelineno-0-62"></a>        <span class="n">blocks</span><span class="o">=</span><span class="n">s_d_empty_df</span><span class="p">,</span>
+</span><span id="__span-0-63"><a id="__codelineno-0-63" name="__codelineno-0-63"></a>        <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;Width&quot;</span><span class="p">,</span>
+</span><span id="__span-0-64"><a id="__codelineno-0-64" name="__codelineno-0-64"></a>    <span class="p">)</span>
+</span><span id="__span-0-65"><a id="__codelineno-0-65" name="__codelineno-0-65"></a>    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">s_d</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">s_d_columns</span> <span class="o">|</span> <span class="p">{</span>
+</span><span id="__span-0-66"><a id="__codelineno-0-66" name="__codelineno-0-66"></a>        <span class="s2">&quot;Fixed Amplitude (μA)&quot;</span><span class="p">,</span>
+</span><span id="__span-0-67"><a id="__codelineno-0-67" name="__codelineno-0-67"></a>        <span class="s2">&quot;Threshold Pulse Width (μs)&quot;</span><span class="p">,</span>
+</span><span id="__span-0-68"><a id="__codelineno-0-68" name="__codelineno-0-68"></a>    <span class="p">}</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -1620,24 +1638,24 @@ for accepted contributions.</li>
 <span class="normal"><a href="#__codelineno-0-103">103</a></span>
 <span class="normal"><a href="#__codelineno-0-104">104</a></span>
 <span class="normal"><a href="#__codelineno-0-105">105</a></span>
-<span class="normal"><a href="#__codelineno-0-106">106</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="k">def</span> <span class="nf">test_plot_with_data</span><span class="p">():</span>
-<a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test strenght-duration plot with data.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-92" name="__codelineno-0-92"></a>    <span class="n">x_data</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span>
-<a id="__codelineno-0-93" name="__codelineno-0-93"></a>    <span class="n">y_data</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span>
-<a id="__codelineno-0-94" name="__codelineno-0-94"></a>    <span class="n">fig</span> <span class="o">=</span> <span class="n">strength_duration</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-<a id="__codelineno-0-95" name="__codelineno-0-95"></a>        <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;Width&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-96" name="__codelineno-0-96"></a>        <span class="n">blocks</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a>            <span class="p">{</span>
-<a id="__codelineno-0-98" name="__codelineno-0-98"></a>                <span class="s2">&quot;Dimension&quot;</span><span class="p">:</span> <span class="p">[],</span>
-<a id="__codelineno-0-99" name="__codelineno-0-99"></a>                <span class="s2">&quot;Fixed Amplitude (μA)&quot;</span><span class="p">:</span> <span class="p">[],</span>
-<a id="__codelineno-0-100" name="__codelineno-0-100"></a>                <span class="s2">&quot;Threshold Pulse Width (μs)&quot;</span><span class="p">:</span> <span class="p">[],</span>
-<a id="__codelineno-0-101" name="__codelineno-0-101"></a>            <span class="p">},</span>
-<a id="__codelineno-0-102" name="__codelineno-0-102"></a>        <span class="p">),</span>
-<a id="__codelineno-0-103" name="__codelineno-0-103"></a>        <span class="n">x_data</span><span class="o">=</span><span class="n">x_data</span><span class="p">,</span>
-<a id="__codelineno-0-104" name="__codelineno-0-104"></a>        <span class="n">y_data</span><span class="o">=</span><span class="n">y_data</span><span class="p">,</span>
-<a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="p">)</span>
-<a id="__codelineno-0-106" name="__codelineno-0-106"></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">fig</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-106">106</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-90"><a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="k">def</span> <span class="nf">test_plot_with_data</span><span class="p">():</span>
+</span><span id="__span-0-91"><a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test strenght-duration plot with data.&quot;&quot;&quot;</span>
+</span><span id="__span-0-92"><a id="__codelineno-0-92" name="__codelineno-0-92"></a>    <span class="n">x_data</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span>
+</span><span id="__span-0-93"><a id="__codelineno-0-93" name="__codelineno-0-93"></a>    <span class="n">y_data</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span>
+</span><span id="__span-0-94"><a id="__codelineno-0-94" name="__codelineno-0-94"></a>    <span class="n">fig</span> <span class="o">=</span> <span class="n">strength_duration</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+</span><span id="__span-0-95"><a id="__codelineno-0-95" name="__codelineno-0-95"></a>        <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;Width&quot;</span><span class="p">,</span>
+</span><span id="__span-0-96"><a id="__codelineno-0-96" name="__codelineno-0-96"></a>        <span class="n">blocks</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+</span><span id="__span-0-97"><a id="__codelineno-0-97" name="__codelineno-0-97"></a>            <span class="p">{</span>
+</span><span id="__span-0-98"><a id="__codelineno-0-98" name="__codelineno-0-98"></a>                <span class="s2">&quot;Dimension&quot;</span><span class="p">:</span> <span class="p">[],</span>
+</span><span id="__span-0-99"><a id="__codelineno-0-99" name="__codelineno-0-99"></a>                <span class="s2">&quot;Fixed Amplitude (μA)&quot;</span><span class="p">:</span> <span class="p">[],</span>
+</span><span id="__span-0-100"><a id="__codelineno-0-100" name="__codelineno-0-100"></a>                <span class="s2">&quot;Threshold Pulse Width (μs)&quot;</span><span class="p">:</span> <span class="p">[],</span>
+</span><span id="__span-0-101"><a id="__codelineno-0-101" name="__codelineno-0-101"></a>            <span class="p">},</span>
+</span><span id="__span-0-102"><a id="__codelineno-0-102" name="__codelineno-0-102"></a>        <span class="p">),</span>
+</span><span id="__span-0-103"><a id="__codelineno-0-103" name="__codelineno-0-103"></a>        <span class="n">x_data</span><span class="o">=</span><span class="n">x_data</span><span class="p">,</span>
+</span><span id="__span-0-104"><a id="__codelineno-0-104" name="__codelineno-0-104"></a>        <span class="n">y_data</span><span class="o">=</span><span class="n">y_data</span><span class="p">,</span>
+</span><span id="__span-0-105"><a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="p">)</span>
+</span><span id="__span-0-106"><a id="__codelineno-0-106" name="__codelineno-0-106"></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">fig</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -1697,11 +1715,11 @@ for accepted contributions.</li>
             <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-25">25</a></span>
 <span class="normal"><a href="#__codelineno-0-26">26</a></span>
 <span class="normal"><a href="#__codelineno-0-27">27</a></span>
-<span class="normal"><a href="#__codelineno-0-28">28</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">()</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26"></a><span class="k">def</span> <span class="nf">subjects</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-27" name="__codelineno-0-27"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Subjects.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28"></a>    <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">]</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-28">28</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">()</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26"></a><span class="k">def</span> <span class="nf">subjects</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Subjects.&quot;&quot;&quot;</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28"></a>    <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">]</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -1727,11 +1745,11 @@ for accepted contributions.</li>
             <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-31">31</a></span>
 <span class="normal"><a href="#__codelineno-0-32">32</a></span>
 <span class="normal"><a href="#__codelineno-0-33">33</a></span>
-<span class="normal"><a href="#__codelineno-0-34">34</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-31" name="__codelineno-0-31"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">()</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="k">def</span> <span class="nf">x</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Intensity values.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-34" name="__codelineno-0-34"></a>    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-34">34</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">()</span>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="k">def</span> <span class="nf">x</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Intensity values.&quot;&quot;&quot;</span>
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34"></a>    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -1776,30 +1794,30 @@ for accepted contributions.</li>
 <span class="normal"><a href="#__codelineno-0-56">56</a></span>
 <span class="normal"><a href="#__codelineno-0-57">57</a></span>
 <span class="normal"><a href="#__codelineno-0-58">58</a></span>
-<span class="normal"><a href="#__codelineno-0-59">59</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="k">def</span> <span class="nf">test_normalize</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a denormalized dataframe, returns normalized data.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-0-40" name="__codelineno-0-40"></a>        <span class="s2">&quot;Session&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Monkey&quot;</span><span class="p">,</span> <span class="s2">&quot;Block&quot;</span><span class="p">],</span>
-<a id="__codelineno-0-41" name="__codelineno-0-41"></a>        <span class="s2">&quot;Reference Stimulus&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Amp2&quot;</span><span class="p">,</span> <span class="s2">&quot;Width2&quot;</span><span class="p">,</span> <span class="s2">&quot;Freq2&quot;</span><span class="p">,</span> <span class="s2">&quot;Dur2&quot;</span><span class="p">],</span>
-<a id="__codelineno-0-42" name="__codelineno-0-42"></a>        <span class="s2">&quot;Channel Configuration&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Active Channels&quot;</span><span class="p">,</span> <span class="s2">&quot;Return Channels&quot;</span><span class="p">],</span>
-<a id="__codelineno-0-43" name="__codelineno-0-43"></a>        <span class="s2">&quot;Test Stimulus&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Amp1&quot;</span><span class="p">,</span> <span class="s2">&quot;Width1&quot;</span><span class="p">,</span> <span class="s2">&quot;Freq1&quot;</span><span class="p">,</span> <span class="s2">&quot;Dur1&quot;</span><span class="p">],</span>
-<a id="__codelineno-0-44" name="__codelineno-0-44"></a>    <span class="p">}</span>
-<a id="__codelineno-0-45" name="__codelineno-0-45"></a>    <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a>        <span class="n">field</span><span class="p">:</span> <span class="p">[]</span>
-<a id="__codelineno-0-47" name="__codelineno-0-47"></a>        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;Session&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-48" name="__codelineno-0-48"></a>        <span class="o">+</span> <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;Reference Stimulus&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-49" name="__codelineno-0-49"></a>        <span class="o">+</span> <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;Channel Configuration&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-50" name="__codelineno-0-50"></a>        <span class="o">+</span> <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;Test Stimulus&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-51" name="__codelineno-0-51"></a>    <span class="p">}</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a>    <span class="n">_trials</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<a id="__codelineno-0-53" name="__codelineno-0-53"></a>    <span class="n">normalized_data</span> <span class="o">=</span> <span class="n">trials</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">_trials</span><span class="p">)</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a>    <span class="k">assert</span> <span class="n">normalized_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">==</span> <span class="p">{</span>
-<a id="__codelineno-0-55" name="__codelineno-0-55"></a>        <span class="s2">&quot;Session&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-56" name="__codelineno-0-56"></a>        <span class="s2">&quot;Reference Stimulus&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-57" name="__codelineno-0-57"></a>        <span class="s2">&quot;Channel Config&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-58" name="__codelineno-0-58"></a>        <span class="s2">&quot;Test Stimulus&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-59" name="__codelineno-0-59"></a>    <span class="p">}</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-59">59</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="k">def</span> <span class="nf">test_normalize</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a denormalized dataframe, returns normalized data.&quot;&quot;&quot;</span>
+</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40"></a>        <span class="s2">&quot;Session&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Monkey&quot;</span><span class="p">,</span> <span class="s2">&quot;Block&quot;</span><span class="p">],</span>
+</span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41"></a>        <span class="s2">&quot;Reference Stimulus&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Amp2&quot;</span><span class="p">,</span> <span class="s2">&quot;Width2&quot;</span><span class="p">,</span> <span class="s2">&quot;Freq2&quot;</span><span class="p">,</span> <span class="s2">&quot;Dur2&quot;</span><span class="p">],</span>
+</span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42"></a>        <span class="s2">&quot;Channel Configuration&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Active Channels&quot;</span><span class="p">,</span> <span class="s2">&quot;Return Channels&quot;</span><span class="p">],</span>
+</span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43"></a>        <span class="s2">&quot;Test Stimulus&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Amp1&quot;</span><span class="p">,</span> <span class="s2">&quot;Width1&quot;</span><span class="p">,</span> <span class="s2">&quot;Freq1&quot;</span><span class="p">,</span> <span class="s2">&quot;Dur1&quot;</span><span class="p">],</span>
+</span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44"></a>    <span class="p">}</span>
+</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45"></a>    <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46"></a>        <span class="n">field</span><span class="p">:</span> <span class="p">[]</span>
+</span><span id="__span-0-47"><a id="__codelineno-0-47" name="__codelineno-0-47"></a>        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;Session&quot;</span><span class="p">]</span>
+</span><span id="__span-0-48"><a id="__codelineno-0-48" name="__codelineno-0-48"></a>        <span class="o">+</span> <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;Reference Stimulus&quot;</span><span class="p">]</span>
+</span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49"></a>        <span class="o">+</span> <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;Channel Configuration&quot;</span><span class="p">]</span>
+</span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50"></a>        <span class="o">+</span> <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;Test Stimulus&quot;</span><span class="p">]</span>
+</span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51"></a>    <span class="p">}</span>
+</span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52"></a>    <span class="n">_trials</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span id="__span-0-53"><a id="__codelineno-0-53" name="__codelineno-0-53"></a>    <span class="n">normalized_data</span> <span class="o">=</span> <span class="n">trials</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">_trials</span><span class="p">)</span>
+</span><span id="__span-0-54"><a id="__codelineno-0-54" name="__codelineno-0-54"></a>    <span class="k">assert</span> <span class="n">normalized_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">==</span> <span class="p">{</span>
+</span><span id="__span-0-55"><a id="__codelineno-0-55" name="__codelineno-0-55"></a>        <span class="s2">&quot;Session&quot;</span><span class="p">,</span>
+</span><span id="__span-0-56"><a id="__codelineno-0-56" name="__codelineno-0-56"></a>        <span class="s2">&quot;Reference Stimulus&quot;</span><span class="p">,</span>
+</span><span id="__span-0-57"><a id="__codelineno-0-57" name="__codelineno-0-57"></a>        <span class="s2">&quot;Channel Config&quot;</span><span class="p">,</span>
+</span><span id="__span-0-58"><a id="__codelineno-0-58" name="__codelineno-0-58"></a>        <span class="s2">&quot;Test Stimulus&quot;</span><span class="p">,</span>
+</span><span id="__span-0-59"><a id="__codelineno-0-59" name="__codelineno-0-59"></a>    <span class="p">}</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -1824,10 +1842,10 @@ for accepted contributions.</li>
             <summary>Source code in <code>tests/test_trials.py</code></summary>
             <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-62">62</a></span>
 <span class="normal"><a href="#__codelineno-0-63">63</a></span>
-<span class="normal"><a href="#__codelineno-0-64">64</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="k">def</span> <span class="nf">test_labels</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Given trial result integers, translates to labels.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a>    <span class="k">assert</span> <span class="n">trials</span><span class="o">.</span><span class="n">labels</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="p">[</span><span class="s2">&quot;Miss&quot;</span><span class="p">,</span> <span class="s2">&quot;Hit&quot;</span><span class="p">]</span>
-</code></pre></div></td></tr></table></div>
+<span class="normal"><a href="#__codelineno-0-64">64</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-62"><a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="k">def</span> <span class="nf">test_labels</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-63"><a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Given trial result integers, translates to labels.&quot;&quot;&quot;</span>
+</span><span id="__span-0-64"><a id="__codelineno-0-64" name="__codelineno-0-64"></a>    <span class="k">assert</span> <span class="n">trials</span><span class="o">.</span><span class="n">labels</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="p">[</span><span class="s2">&quot;Miss&quot;</span><span class="p">,</span> <span class="s2">&quot;Hit&quot;</span><span class="p">]</span>
+</span></code></pre></div></td></tr></table></div>
           </details>
   </div>
 
@@ -1916,7 +1934,7 @@ for accepted contributions.</li>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "toc.follow", "toc.integrate", "content.action.edit"], "search": "../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "toc.follow", "toc.integrate", "content.action.edit", "content.code.copy", "announce.dismiss"], "search": "../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="../assets/javascripts/bundle.220ee61c.min.js"></script>
