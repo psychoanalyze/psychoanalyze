@@ -7,7 +7,7 @@ theme:
   favicon: assets/logo_bgwhite.png
   palette:
     - media: "(prefers-color-scheme: light)"
-      primary: indigo
+      primary: teal
       scheme: default
       toggle:
         icon: material/toggle-switch-off-outline
@@ -26,6 +26,9 @@ theme:
     - toc.follow
     - toc.integrate
     - content.action.edit
+    - content.code.copy
+    - announce.dismiss
+  custom_dir: docs/overrides
 plugins:
 - search
 - mkdocstrings:
@@ -42,6 +45,8 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.highlight:
       anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
@@ -51,6 +56,7 @@ markdown_extensions:
   - toc:
       permalink: true
       title: On this page
+  - footnotes
 watch:
   - psychoanalyze
   - tests
