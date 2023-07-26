@@ -50,6 +50,6 @@ nav:
  - 'index.md'
  - 'dashboard.md'
  - 'api.md'
- - 'contributing.md'
+ - 'CONTRIBUTING.md'
  - 'tests.md'
- - 'Notebook': notebooks/tutorial.ipynb
+ - 'notebooks'

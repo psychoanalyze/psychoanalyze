@@ -14,5 +14,11 @@ Interactive data simulation and analysis for psychophysics.
 ## Dashboard
 See what `psychoanalyze` can do by [viewing our dashboard](https://psychoanalyze.io/).
 
+## Install with Python
+```console
+pip install psychoanalyze
+
+psychoanalyze --help
+```
 ## Documentation
-View the full documentation [here](https://docs.psychoanalyze.io).
+View the full documentation at [https://docs.psychoanalyze.io](https://docs.psychoanalyze.io).
