@@ -58,6 +58,9 @@ types-pytz = "^2023.3.0.0"
 python-semantic-release = "^8.0.2"
 jupyter = "^1.0.0"
 types-setuptools = "^68.0.0.3"
+mkdocs = "^1.4.3"
+mkdocs-material = "^9.1.19"
+mkdocstrings = {extras = ["python"], version = "^0.22.0"}
 
 [tool.poetry.scripts]
 psychoanalyze = "psychoanalyze.main:main"
