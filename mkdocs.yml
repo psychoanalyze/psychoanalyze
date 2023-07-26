@@ -29,6 +29,8 @@ plugins:
 repo_url: https://github.com/psychoanalyze/psychoanalyze
 edit_uri: edit/main/docs/
 markdown_extensions:
+  - admonition
+  - pymdownx.details
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
