@@ -1,6 +1,8 @@
 # Notebooks
 
-*Notebooks* are IDE-type environments that allow you to interactively run Python code in the browser, and has gained popularity in data science and the sciences. Common notebook frameworks and environments include [Jupyter](https://jupyter.org/), [Quarto](https://quarto.org/), and [Google Colab](https://colab.research.google.com/).
+*Notebooks* are IDE-type environments that allow you to interactively run Python code in the browser, and is a popular tool of choice for researchers and data scientists across many domains.
+
+Common notebook frameworks and environments include [Jupyter](https://jupyter.org/), [Quarto](https://quarto.org/), and [Google Colab](https://colab.research.google.com/).
 
 PsychoAnalyze provides a couple of notebook features that can be used to explore the package's functionality.
 
@@ -8,8 +10,8 @@ PsychoAnalyze provides a couple of notebook features that can be used to explore
 
 Check out our tutorial notebook to walk through a basic analysis workflow for a hypothetical [yes/no experiment](https://stats.stackexchange.com/questions/91326/simple-yes-no-question-uncertain-how-to-analyze-the-results).
 
-    - Download the [`.ipynb` file](tutorial.ipynb) and the [tutorial dataset](tutorial_trials.csv).
-    - View the static version on [GitHub](https://github.com/psychoanalyze/psychoanalyze/blob/main/docs/notebooks/tutorial.ipynb).
+- Download the [`.ipynb` file](tutorial.ipynb) and the [tutorial dataset](tutorial_trials.csv).
+- View the static version on [GitHub](https://github.com/psychoanalyze/psychoanalyze/blob/main/docs/notebooks/tutorial.ipynb).
 
 ## JupyterHub
 
