@@ -6,12 +6,17 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.psychoanalyze.io/CONTRIBUTING/</loc>
+         <loc>https://docs.psychoanalyze.io/api/</loc>
          <lastmod>2023-07-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.psychoanalyze.io/api/</loc>
+         <loc>https://docs.psychoanalyze.io/contributing/</loc>
+         <lastmod>2023-07-26</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://docs.psychoanalyze.io/tests/</loc>
          <lastmod>2023-07-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -21,7 +26,17 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.psychoanalyze.io/tests/</loc>
+         <loc>https://docs.psychoanalyze.io/dashboard/input/</loc>
+         <lastmod>2023-07-26</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://docs.psychoanalyze.io/dashboard/output/</loc>
+         <lastmod>2023-07-26</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://docs.psychoanalyze.io/dashboard/viz/</loc>
          <lastmod>2023-07-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
