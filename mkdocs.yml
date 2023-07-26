@@ -1,8 +1,9 @@
 site_name: PsychoAnalyze
-site_url: https://psychoanalyze.io
+site_url: https://docs.psychoanalyze.io
 theme:
   name: material
-  logo: assets/logo_bgwhite.png
+  icon:
+    logo: material/chart-bell-curve-cumulative
   favicon: assets/logo_bgwhite.png
   palette:
     - media: "(prefers-color-scheme: light)"
@@ -64,6 +65,7 @@ extra_javascript:
   - javascripts/katex.js
   - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js
   - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js
-
 extra_css:
   - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css
+extra:
+  homepage: https://psychoanalyze.io
