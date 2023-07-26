@@ -23,8 +23,8 @@ theme:
     - navigation.tracking
     - navigation.tabs
     - navigation.tabs.sticky
+    - navigation.indexes
     - toc.follow
-    - toc.integrate
     - content.action.edit
     - content.code.copy
     - announce.dismiss
@@ -57,16 +57,30 @@ markdown_extensions:
       permalink: true
       title: On this page
   - footnotes
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
 watch:
   - psychoanalyze
   - tests
 nav:
-  - 'index.md'
-  - 'dashboard.md'
-  - 'api.md'
-  - Developers: 'CONTRIBUTING.md'
-  - 'tests.md'
-  - Notebooks: '/notebooks/'
+  - Getting Started:
+    - 'index.md'
+    - Dashboard:
+      - 'dashboard/index.md'
+      - Input Panel: 'dashboard/input.md'
+      - Visualization Panel: 'dashboard/viz.md'
+      - Output Panel: 'dashboard/output.md'
+    - Notebooks: 'notebooks/index.md'
+    - Developers:
+      - 'api.md'
+      - 'tests.md'
+    - 'contributing.md'
+  - API Reference:
+    - Psychoanalyze: 'api.md'
+    - 'tests.md'
 extra_javascript:
   - javascripts/katex.js
   - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js
