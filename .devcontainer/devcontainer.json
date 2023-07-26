@@ -42,7 +42,7 @@
         "ms-python.vscode-pylance",
         "charliermarsh.ruff",
         "innoverio.vscode-dbt-power-user",
-        "bungcip.better-toml",
+        "tamasfe.even-better-toml",
         "ms-azuretools.vscode-docker",
         "ivan-bocharov.stan-vscode",
         "ms-toolsai.jupyter",

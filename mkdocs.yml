@@ -19,6 +19,12 @@ theme:
         name: Switch to light mode
   features:
     - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - toc.follow
+    - toc.integrate
+    - content.action.edit
 plugins:
 - search
 - mkdocstrings:
@@ -44,9 +50,6 @@ markdown_extensions:
   - toc:
       permalink: true
       title: On this page
-extra_javascript:
-  - https://cdn.plot.ly/plotly-2.12.1.min.js
-  - docs/require.js
 watch:
   - psychoanalyze
   - tests
@@ -54,6 +57,13 @@ nav:
   - 'index.md'
   - 'dashboard.md'
   - 'api.md'
-  - 'CONTRIBUTING.md'
+  - Developers: 'CONTRIBUTING.md'
   - 'tests.md'
   - Notebooks: '/notebooks/'
+extra_javascript:
+  - javascripts/katex.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js
+
+extra_css:
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css
