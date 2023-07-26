@@ -75,12 +75,12 @@ nav:
       - Output Panel: 'dashboard/output.md'
     - Notebooks: 'notebooks/index.md'
     - Developers:
-      - 'api.md'
-      - 'tests.md'
-    - 'contributing.md'
+      - API Reference: 'api.md'
+      - Testing Reference: 'tests.md'
+    - Contributing: 'contributing.md'
   - API Reference:
     - Psychoanalyze: 'api.md'
-    - 'tests.md'
+    - Testing Reference: 'tests.md'
 extra_javascript:
   - javascripts/katex.js
   - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js
