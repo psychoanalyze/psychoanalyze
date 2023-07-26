@@ -1,0 +1,149 @@
+[
+  {
+    "objectID": "chapter6.html",
+    "href": "chapter6.html",
+    "title": "Chapter 5",
+    "section": "",
+    "text": "Exercise 1\n\nimport pandas as pd\nimport plotly.express as px\nfrom scipy.stats import norm\n\nfar = [.94, .84, .58, .27, .12, .02]\nhr = [.99, .96, .94, .84, .58, .42]\ndf = pd.DataFrame(\n    {\n        \"Criterion Level\": [1,2,3,4,5,6],\n        \"Hit Rate\": hr,\n        \"False Alarm Rate\": far\n    }\n)\n\nz_df = pd.DataFrame(\n    {\n        \"Z_SN\": [norm.ppf(1.0-p) for p in hr],\n        \"Z_N\": [norm.ppf(1.0-p) for p in far]\n    }\n)\n\npx.scatter(z_df, x=\"Z_N\", y=\"Z_SN\", trendline='ols')"
+  },
+  {
+    "objectID": "chapter2.html",
+    "href": "chapter2.html",
+    "title": "Chapter 2",
+    "section": "",
+    "text": "import pandas as pd\nimport plotly.express as px\n\ndf = pd.DataFrame(\n    {\n        \"Wavelength in nm\": [400, 420, 440, 460, 480, 500, 520, 540, 560, 580, 600, 620],\n        \"System A\": [80, 52, 40, 38, 37, 37, 36, 36, 38, 40, 43, 48],\n        \"System B\": [140, 108, 80, 56, 38, 20, 10, 7, 8, 12, 15, 30]\n    }\n)\npx.scatter(df, x='Wavelength in nm', y=[\"System A\", \"System B\"])"
+  },
+  {
+    "objectID": "chapter7.html",
+    "href": "chapter7.html",
+    "title": "Psychophysics: The Fundamentals",
+    "section": "",
+    "text": "import pandas as pd\nimport plotly.express as px\n\n\nsn = [2, 12, 46, 116, 24]\nn = [30, 68, 68, 32, 2]\n\nfa_rates = []\nhit_rates = []\nfor criterion in range(1,5):\n    sn_below = sn[:criterion]\n    sn_above = sn[criterion:]\n    n_below = n[:criterion]\n    n_above = n[criterion:]\n\n    fa_rate = sum(n_above) / sum(n_above + n_below)\n    hit_rate = sum(sn_above) / sum(sn_above + sn_below)\n\n    fa_rates.append(fa_rate)\n    hit_rates.append(hit_rate)\n\nanswer = pd.DataFrame(\n    {\n        \"false alarm rate\": fa_rates,\n        \"hit rate\": hit_rates,\n    }\n)\n\npx.scatter(answer, x=\"false alarm rate\", y=\"hit rate\")"
+  },
+  {
+    "objectID": "chapter4.html",
+    "href": "chapter4.html",
+    "title": "Chapter 4",
+    "section": "",
+    "text": "Figure 3\n\nimport pandas as pd\nimport plotly.express as px\nimport numpy as np\nfrom scipy.stats import norm\n\ndf = pd.DataFrame(\n    {\n        \"Stimulus Intensity\": [2,3,4,5,6],\n        \"p(yes)\": [0.01, 0.2, .5, .85, .98]\n    }\n)\n\nx = np.linspace(4-3, 4+3)\ndf2 = pd.DataFrame(\n    {\n        \"Stimulus Intensity of momentary threshold\": x,\n        \"Ordinate of normal curve\": norm.pdf(x, loc=4),\n    }\n)\n\npx.scatter(df, x=\"Stimulus Intensity\", y=\"p(yes)\").show()\npx.line(df2, x=\"Stimulus Intensity of momentary threshold\", y=\"Ordinate of normal curve\").show()\n\n\n                                                \n\n\n\n                                                \n\n\n\n\nFigure 15\n\ntable_4_1 = pd.DataFrame({\n    \"p(S)\": [.90, .90, .70, .70, .50, .50, .30, .30, .10, .10],\n    \"Number of stimulus trials\": [180, 180, 140, 140, 100, 100, 60, 60, 20, 20],\n    \"Number of no stimulus trials\": [20, 20, 60, 60, 100, 100, 140, 140, 180, 180],\n    \"Trial Type\": [\"Stimulus\", \"No Stimulus\"] * 5,\n    \"Yes\": [.99, .95, .91, .64, .69, .31, .36, .09, .05, .01],\n    \"No\": [.01, .05, .09, .36, .31, .69, .64, .91, .95, .99]\n})\n\nroc_points = pd.DataFrame(\n    {\n        \"False Alarm Rate [p(yes|no stimulus)]\": [.95, .64, .31, .09, .01],\n        \"Hit Rate [p(yes|stimulus)]\": [.99, .91, .69, .36, .05],\n    }\n)\n\npx.line(roc_points, x=\"False Alarm Rate [p(yes|no stimulus)]\", y=\"Hit Rate [p(yes|stimulus)]\")\n\n\n                                                \n\n\n\n\nExercise 1\n\nfrom scipy.stats import skewnorm\n\nx = np.linspace(-4, 4)\ny = skewnorm.pdf(x, -4)\npx.scatter(x=x, y=y).show()\npsi = skewnorm.cdf(x, -4)\npx.scatter(x=x, y=psi).show()\n\n\n\n\n                                                \n\n\n\n                                                \n\n\n\n\n\n\nExercise 2\n\ndf = pd.DataFrame(\n    {\n        \"Number of Emitted Quanta\": [0, 1, 2, 3, 4, 5, 6, 7],\n        \"Probability\": [.13, .26, .26, .17, .09, .03, .015, .008]\n    }\n)\n\np_stimulus_detected = .31\n\n\n\nExercise 3\n\nx1 = np.linspace(-4, 4)\nx2 = np.linspace(0, 8)\ny1 = norm.cdf(x1)\ny2 = norm.cdf(x2, 4, .5)\n\ndf = pd.concat(\n    [\n        pd.DataFrame({\n            \"x\": x1,\n            \"y\": y1,\n        }),\n        pd.DataFrame(\n            {\n                \"x\": x2,\n                \"y\": y2\n            }\n        )\n    ],\n    keys=[1,2]\n)\npx.scatter(df, x='x',y='y')\n\n\n                                                \n\n\n\n\nExercise 4\n\np_star_hits = [.20, .50]\np_fas = [.00, .20, .40, .60, .80, 1.00]\n\np_hits = [[p_star_hit + p_fa * (1-p_star_hit) for p_star_hit in p_star_hits] for p_fa in p_fas]\n\ndf = pd.DataFrame(p_hits, columns=[\"p*(hits)=.20\", \"p*(hits)=.30\"], index=pd.Index(p_fas, name=\"p(false alarms)\"))\n\npx.line(df.reset_index(), x=\"p(false alarms)\", y=[\"p*(hits)=.20\", \"p*(hits)=.30\"])"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Differential Sensitivity",
+    "section": "",
+    "text": "\\[ \\Delta \\phi = c \\phi \\]\n\\[ \\frac{\\Delta \\phi}{\\phi} = c \\]\n\n\nCode\nimport plotly.express as px\nimport psychoanalyze as pa\nimport pandas as pd\nimport numpy as np\n\n\nc = pd.Series([.1, .2], name=\"c\")\n\nφ = pd.Series([10.0, 15.0, 20.0, 25.0, 30.0], name=\"φ\")\n\nΔφ = pd.DataFrame(np.outer(φ, c), columns=[\"c=.1\", \"c=.2\"], index=φ)\n\nweber1 = pd.Series(Δφ[\"c=.1\"] / φ.values, name=\"Δφ/φ\", index=φ)\nweber2 = pd.Series(Δφ[\"c=.2\"] / φ.values, name=\"Δφ/φ\", index=φ)\n\npx.scatter(Δφ.reset_index(), x=\"φ\", y=[\"c=.1\", \"c=.2\"], labels={\"value\": \"Δφ\", \"variable\": \"c\"},template=\"plotly_white\").show()\n\npx.scatter(pd.concat([weber1, weber2], keys=[\"c=.1\", \"c=.2\"], names=[\"c\"]).reset_index(), x=\"φ\", y=\"Δφ/φ\",color='c',template=\"plotly_white\").show()\n\n\n\n\n\n\n\n                                                \n(a) ?(caption)\n\n\n\n\n\n                                                \n(b) ?(caption)\n\n\n\nFigure 1: ?(caption)"
+  },
+  {
+    "objectID": "index.html#chapter-1",
+    "href": "index.html#chapter-1",
+    "title": "Gescheider Exercises",
+    "section": "",
+    "text": "Code\nimport plotly.express as px\nimport psychoanalyze as pa\nimport pandas as pd\nimport numpy as np\n\ndf = pd.DataFrame(\n    {\n        \"c\": [0.1] * 5 + [0.2] * 5,\n        \"φ\": [10, 15, 20, 25, 30] * 2,\n    }\n)\n\npx.scatter(pa.gescheider.weber(df), x=\"φ\", y=\"Δφ\", color='c').show()\npx.scatter(pa.gescheider.weber(df), x=\"φ\", y=\"Δφ/φ\", color='c').show()\n\n\n\n\n\n\n\n                                                \n(a) JND vs Stimulus Level\n\n\n\n\n\n                                                \n(b) Weber Fraction vs Stimulus Level\n\n\n\nFigure 1: Weber’s Law\n\n\n\n\n\n\n\n\nCode\nΔφ = 2.4\nφ = 10.0\n\nc = Δφ / φ\n\nφ_predict = pd.Series([3.0, 5.0, 10.0, 20.0, 30.0])\nΔφ_predict = φ_predict * c\ntheoretical = pd.DataFrame(\n    {\n        \"Δφ\": Δφ_predict,\n    },\n    index=pd.Index(φ_predict, name=\"φ\")\n)\nobserved = pd.DataFrame(\n    {\n        \"Δφ\": [1.0, 1.4, 2.4, 4.4, 6.4],\n    }\n    ,index=pd.Index(φ_predict, name=\"φ\")\n)\ndf = pd.concat(\n    [theoretical, observed], keys=[\"theoretical\", \"observed\"], names=[\"source\"]\n)\npx.scatter(df.reset_index(), x=\"φ\", y=\"Δφ\", color=\"source\")\n\n\n\n                                                \n\n\n\n\n\n\n\nCode\nweber_fraction = observed[\"Δφ\"] / observed.index.values\nweber_fraction.index = φ_predict\npx.scatter(weber_fraction)\n\n\n\n                                                \n\n\n\n\n\n\n\nCode\na = 2.0\n\nobserved[\"Δφ/(φ-a)\"] = observed[\"Δφ\"] / (observed.index.values + a)\n\npx.scatter(observed, x=observed.index.values, y=\"Δφ/(φ-a)\")\n\n\n\n                                                \n\n\n\n\n\n\n\nCode\ndef fechner_method(c, φ_0):\n    φ_i = φ_0\n    φ = [φ_0]\n    for _ in range(10): \n        φ_i += φ_i * c\n        φ.append(φ_i)\n    return φ\n\n\n\n\nCode\nc = .1\n\nφ = 5.0\nφ_0 = [5.0]\n\nfor i in range(10):\n    φ += φ * c\n    φ_0.append(φ)\n\n\nc = .2\n\nφ = 5.0\nφ_1 = [5.0]\n\nfor i in range(10):\n    φ += φ * c\n    φ_1.append(φ)\n\n\nn_jnd = [0,1,2,3,4,5,6,7,8,9,10]\n\ndf = pd.concat([pd.Series(φ_0, name=\"φ\", index=pd.Index(n_jnd, name=\"Ψ\")), pd.Series(φ_1, name=\"φ\", index=pd.Index(n_jnd, name='Ψ'))], keys=['c=.1', 'c=.2'], names=['c'])\ndf = df.reset_index()\npx.scatter(df, x=\"φ\", y='Ψ', color='c').show()\n\n\n\n\n\n                                                \n\n\n\n\n\n\n\n\n\nCode\ndf['log(φ)'] = np.log(df['φ'])\n\npx.scatter(df, x='log(φ)', y='Ψ', color='c', trendline='ols')"
+  },
+  {
+    "objectID": "chapter5.html",
+    "href": "chapter5.html",
+    "title": "Chapter 5",
+    "section": "",
+    "text": "Exercise 1\n\nimport pandas as pd\nimport plotly.express as px\nfrom scipy.stats import norm\n\nd_prime_1 = .8\n\n\np_hits = [.1, .3, .5, .7, .8]\nZ_SN = [norm.ppf(1.0-p) for p in p_hits]\n\n\nZ_N_1 = [norm.cdf(d_prime_1 + z) for z in Z_SN]\np_false_alarms_1 = [1.0 - z for z in Z_N_1]\n\nd_prime_2 = 1.6\nZ_N_2 = [norm.cdf(d_prime_2 + z) for z in Z_SN]\np_false_alarms_2 = [1.0 - z for z in Z_N_2]\n\ndf = pd.DataFrame(\n    {\n        \"d' = 0.8\": p_false_alarms_1,\n        \"d' = 1.6\": p_false_alarms_2,\n        \"Hit Rate\": p_hits\n    }\n)\npx.line(df, x=[\"d' = 0.8\", \"d' = 1.6\"], y=\"Hit Rate\")\n\n\n                                                \n\n\n\n\nExercise 2\n\ndf = pd.DataFrame(\n    {\n        \"Observer\": [1,2,3,4,5],\n        \"False Alarm Rate\": [.18, .38, .42, .30, .70],\n        \"Hit Rate\": [.84, .96, .69, .48, .98]\n    }\n)\n\nanswer = pd.DataFrame(\n    {\n        \"Observer\": [1,2,3,4,5],\n        \"d'\": [1.91, 2.06, .70, .47, 1.53],\n        \"β\": [.935, .226, .900, 1.144, .141]\n    }\n)\nanswer\n\n\n\n\n\n\n\n\nObserver\nd'\nβ\n\n\n\n\n0\n1\n1.91\n0.935\n\n\n1\n2\n2.06\n0.226\n\n\n2\n3\n0.70\n0.900\n\n\n3\n4\n0.47\n1.144\n\n\n4\n5\n1.53\n0.141\n\n\n\n\n\n\n\n\n\nExercise 3\n\np_S = .30\n\nβ_opt = .70/.30 * (2 - -1) / (2 - -1)\nβ_opt\n\np_S = .70\n\nβ_opt = .30/.70 * (2 - -1) / (2 - -1)\nβ_opt\n\n0.4285714285714286\n\n\n\n\nExercise 4\n\nP_opt = .5/.5 * (1 - -.5) / (2 - -1.5)\nP_opt\n\n0.42857142857142855"
+  },
+  {
+    "objectID": "chapter3.html",
+    "href": "chapter3.html",
+    "title": "Chapter 3",
+    "section": "",
+    "text": "Exercise 1\n\nimport pandas as pd\nimport plotly.express as px\n\ndata = pd.Series(\n    [0.04, 0.05, 0.20, 0.34, 0.53, 0.72, 0.94, 0.96, 0.99],\n    index=pd.Index([2, 4, 6, 8, 10, 12, 14, 16, 18], name=\"Stimulus Intensity\"),\n    name=\"p(yes)\",\n)\n\npx.line(data).add_hline(y=0.5, line_dash=\"dash\")\n\n\n                                                \n\n\n\n\nExercise 2\n\nfrom scipy.stats import norm\n\nz = pd.Series(norm.ppf(data), name='z', index=data.index)\n\npx.line(z, y='z')\n\n\n                                                \n\n\n\n\nExercise 3\n\ndf = pd.DataFrame(\n    {\n        \"Comparison Stimulus\": [60, 70, 80, 90, 100, 110, 120, 130, 140],\n        \"p greater\": [.02, .08, .15, .30, .53, .68, .87, .91, .98]\n    }\n)\n\ndf['z'] = df['p greater'].apply(norm.ppf)\n\npx.scatter(df, x=\"Comparison Stimulus\", y='z', trendline='ols').show()\npd.DataFrame({\"PSE\":[100]})\n\n\n                                                \n\n\n\n\n\n\n\n\n\nPSE\n\n\n\n\n0\n100\n\n\n\n\n\n\n\n\n\nExercise 4\n\nstandard_stimulus = 100\n\n# pd.DataFrame(\n#     {\n#         'Stimulus Intensity': [140, 135, 130, 125, 120, 115, 110, 105, 100, 95, 90, 85, 80, 75, 70, 65, 60],\n#         \"A\"\n#     }\n# )\n\n\nblock_1 = pd.Series([\"G\"] + [\"E\"] * 6 + [\"L\"] * 5, index=[125, 120, 115, 110, 105, 100, 95, 90, 85, 80, 75, 70,], name=\"A\")\n\nblock_2 = pd.Series([\"G\"] * 4 + [\"E\"] * 6 + [\"L\"], index=[135, 130, 125, 120, 115, 110, 105, 100, 95, 90, 85,], name=\"D\")\n\nblock_3 = pd.Series([\"G\"] + [\"E\"] * 4 + [\"L\"] * 5, index=[115, 110, 105, 100, 95, 90, 85, 80, 75, 70,], name=\"A\")\n\nblock_4 = pd.Series([\"G\"] * 5 + [\"E\"] * 7 + [\"L\"], index=[140, 135, 130, 125, 120, 115, 110, 105, 100, 95, 90, 85, 80], name=\"D\")\n\npd.concat([block_1, block_2, block_3, block_4], keys=[\"A\", \"D\", \"A\", \"D\"], names=[\"direction\"])\n\nT_U = pd.Series([122.5, 117.5, 112.5, 117.5, 127.5, 122.5], index=[\"A\", \"D\"] * 3)\n\nT_L = pd.Series([92.5, 87.5, 92.5, 82.5, 87.5, 77.5], index=[\"A\", \"D\"] * 3)\n\npd.concat([T_U, T_L], keys=[\"T_U\", \"T_L\"])\n\nIU = 120-86.7\n\nPSE = (120 + 86.7) / 2\n\nMeanDL = 16.65\n\nCE = 3.4\n\n\n\nExercise 5\n\nstandard_stimulus = 100\n\nset_comparison_stimulus = [85, 105, 97, 95, 98, 105, 110, 98, 104, 82, 112, 95, 107, 109, 96, 65, 93, 102, 91, 108, 94, 108, 138, 79, 117, 98, 125, 102, 131, 94, 118, 99, 85, 100, 99, 135, 80, 73, 107, 104, 102, 115, 96, 120, 101, 88, 103, 67, 104, 94]\n\nPSE = 100.66\n\nCE = .66\nDL = 15.18"
+  },
+  {
+    "objectID": "index.html#exercise-1",
+    "href": "index.html#exercise-1",
+    "title": "Chapter 1",
+    "section": "",
+    "text": "Code\nimport plotly.express as px\nimport psychoanalyze as pa\nimport pandas as pd\nimport numpy as np\n\ndf = pd.DataFrame(\n    {\n        \"c\": [0.1] * 5 + [0.2] * 5,\n        \"φ\": [10, 15, 20, 25, 30] * 2,\n    }\n)\n\npx.scatter(pa.gescheider.weber(df), x=\"φ\", y=\"Δφ\", color='c').show()\npx.scatter(pa.gescheider.weber(df), x=\"φ\", y=\"Δφ/φ\", color='c').show()\n\n\n\n\n\n\n\n                                                \n(a) JND vs Stimulus Level\n\n\n\n\n\n                                                \n(b) Weber Fraction vs Stimulus Level\n\n\n\nFigure 1: Weber’s Law"
+  },
+  {
+    "objectID": "index.html#exercise-2-3",
+    "href": "index.html#exercise-2-3",
+    "title": "Differential Sensitivity",
+    "section": "Exercise 2 & 3",
+    "text": "Exercise 2 & 3\n\n\nCode\nΔφ = 2.4\nφ = 10.0\n\nc = Δφ / φ\n\nφ_predict = pd.Series([3.0, 5.0, 10.0, 20.0, 30.0])\nΔφ_predict = φ_predict * c\ntheoretical = pd.DataFrame(\n    {\n        \"Δφ\": Δφ_predict,\n    },\n    index=pd.Index(φ_predict, name=\"φ\")\n)\nobserved = pd.DataFrame(\n    {\n        \"Δφ\": [1.0, 1.4, 2.4, 4.4, 6.4],\n    }\n    ,index=pd.Index(φ_predict, name=\"φ\")\n)\ndf = pd.concat(\n    [theoretical, observed], keys=[\"theoretical\", \"observed\"], names=[\"source\"]\n)\npx.scatter(df.reset_index(), x=\"φ\", y=\"Δφ\", color=\"source\")"
+  },
+  {
+    "objectID": "index.html#exercise-4",
+    "href": "index.html#exercise-4",
+    "title": "Differential Sensitivity",
+    "section": "Exercise 4",
+    "text": "Exercise 4\n\n\nCode\nweber_fraction = observed[\"Δφ\"] / observed.index.values\nweber_fraction.index = φ_predict\npx.scatter(weber_fraction)"
+  },
+  {
+    "objectID": "index.html#exercise-5",
+    "href": "index.html#exercise-5",
+    "title": "Differential Sensitivity",
+    "section": "Exercise 5",
+    "text": "Exercise 5\n\n\nCode\na = 2.0\n\nobserved[\"Δφ/(φ-a)\"] = observed[\"Δφ\"] / (observed.index.values + a)\n\npx.scatter(observed, x=observed.index.values, y=\"Δφ/(φ-a)\")"
+  },
+  {
+    "objectID": "index.html#exercise-6",
+    "href": "index.html#exercise-6",
+    "title": "Differential Sensitivity",
+    "section": "Exercise 6",
+    "text": "Exercise 6\n\n\nCode\ndef fechner_method(c, φ_0):\n    φ_i = φ_0\n    φ = [φ_0]\n    for _ in range(10): \n        φ_i += φ_i * c\n        φ.append(φ_i)\n    return φ\n\n\n\n\nCode\nc = .1\n\nφ = 5.0\nφ_0 = [5.0]\n\nfor i in range(10):\n    φ += φ * c\n    φ_0.append(φ)\n\n\nc = .2\n\nφ = 5.0\nφ_1 = [5.0]\n\nfor i in range(10):\n    φ += φ * c\n    φ_1.append(φ)\n\n\nn_jnd = [0,1,2,3,4,5,6,7,8,9,10]\n\ndf = pd.concat([pd.Series(φ_0, name=\"φ\", index=pd.Index(n_jnd, name=\"Ψ\")), pd.Series(φ_1, name=\"φ\", index=pd.Index(n_jnd, name='Ψ'))], keys=['c=.1', 'c=.2'], names=['c'])\ndf = df.reset_index()\npx.scatter(df, x=\"φ\", y='Ψ', color='c').show()"
+  },
+  {
+    "objectID": "index.html#exercise-7",
+    "href": "index.html#exercise-7",
+    "title": "Differential Sensitivity",
+    "section": "Exercise 7",
+    "text": "Exercise 7\n\n\nCode\ndf['log(φ)'] = np.log(df['φ'])\n\npx.scatter(df, x='log(φ)', y='Ψ', color='c', trendline='ols', template=\"plotly_white\").show()"
+  },
+  {
+    "objectID": "chapter9.html",
+    "href": "chapter9.html",
+    "title": "Exercise 1",
+    "section": "",
+    "text": "import plotly.express as px\n\npx.scatter().show()\npx.scatter().show()"
+  },
+  {
+    "objectID": "index.html#webers-law",
+    "href": "index.html#webers-law",
+    "title": "Differential Sensitivity",
+    "section": "",
+    "text": "\\[ \\Delta \\phi = c \\phi \\]\n\\[ \\frac{\\Delta \\phi}{\\phi} = c \\]\n\n\nCode\nimport plotly.express as px\nimport psychoanalyze as pa\nimport pandas as pd\nimport numpy as np\n\n\nc = pd.Series([.1, .2], name=\"c\")\n\nφ = pd.Series([10.0, 15.0, 20.0, 25.0, 30.0], name=\"φ\")\n\nΔφ = pd.DataFrame(np.outer(φ, c), columns=[\"c=.1\", \"c=.2\"], index=φ)\n\nweber1 = pd.Series(Δφ[\"c=.1\"] / φ.values, name=\"Δφ/φ\", index=φ)\nweber2 = pd.Series(Δφ[\"c=.2\"] / φ.values, name=\"Δφ/φ\", index=φ)\n\npx.scatter(Δφ.reset_index(), x=\"φ\", y=[\"c=.1\", \"c=.2\"], labels={\"value\": \"Δφ\", \"variable\": \"c\"},template=\"plotly_white\").show()\n\npx.scatter(pd.concat([weber1, weber2], keys=[\"c=.1\", \"c=.2\"], names=[\"c\"]).reset_index(), x=\"φ\", y=\"Δφ/φ\",color='c',template=\"plotly_white\").show()\n\n\n\n\n\n\n\n                                                \n(a) ?(caption)\n\n\n\n\n\n                                                \n(b) ?(caption)\n\n\n\nFigure 1: ?(caption)"
+  },
+  {
+    "objectID": "index.html#predict-jnds-w-webers-law",
+    "href": "index.html#predict-jnds-w-webers-law",
+    "title": "Differential Sensitivity",
+    "section": "Predict JNDs w/ Weber’s Law",
+    "text": "Predict JNDs w/ Weber’s Law\n\n\nCode\nΔφ = 2.4\nφ = 10.0\n\nc = Δφ / φ\n\nφ_predict = pd.Series([3.0, 5.0, 10.0, 20.0, 30.0])\nΔφ_predict = φ_predict * c\npredicted = pd.DataFrame(\n    {\n        \"Δφ\": Δφ_predict,\n    },\n    index=pd.Index(φ_predict, name=\"φ\")\n)\nobserved = pd.DataFrame(\n    {\n        \"Δφ\": [1.0, 1.4, 2.4, 4.4, 6.4],\n    }\n    ,index=pd.Index(φ_predict, name=\"φ\")\n)\ndf = pd.concat(\n    [predicted, observed], keys=[\"predicted\", \"observed\"], names=[\"source\"]\n)\npx.scatter(df.reset_index(), x=\"φ\", y=\"Δφ\", color=\"source\", template=\"plotly_white\").show()"
+  },
+  {
+    "objectID": "index.html#calculate-weber-fraction-from-data",
+    "href": "index.html#calculate-weber-fraction-from-data",
+    "title": "Differential Sensitivity",
+    "section": "Calculate Weber Fraction from data",
+    "text": "Calculate Weber Fraction from data\n\n\nCode\nweber_fraction = observed[\"Δφ\"] / observed.index.values\nweber_fraction.index = φ_predict\npx.scatter(weber_fraction, template=\"plotly_white\").show()"
+  },
+  {
+    "objectID": "index.html#webers-law-wintercept-parameter",
+    "href": "index.html#webers-law-wintercept-parameter",
+    "title": "Differential Sensitivity",
+    "section": "Weber’s Law w/intercept parameter",
+    "text": "Weber’s Law w/intercept parameter\n\n\nCode\na = 2.0\n\nobserved[\"Δφ/(φ-a)\"] = observed[\"Δφ\"] / (observed.index.values + a)\n\npx.scatter(observed, x=observed.index.values, y=\"Δφ/(φ-a)\", template='plotly_white').show()"
+  },
+  {
+    "objectID": "index.html#fechners-jnd-scaling",
+    "href": "index.html#fechners-jnd-scaling",
+    "title": "Differential Sensitivity",
+    "section": "Fechner’s JND scaling",
+    "text": "Fechner’s JND scaling\n\n\nCode\ndef fechner_method(c, φ_0):\n    φ_i = φ_0\n    φ = [φ_0]\n    for _ in range(10): \n        φ_i += φ_i * c\n        φ.append(φ_i)\n    return φ\n\n\n\n\nCode\nc = .1\n\nφ = 5.0\nφ_0 = [5.0]\n\nfor i in range(10):\n    φ += φ * c\n    φ_0.append(φ)\n\n\nc = .2\n\nφ = 5.0\nφ_1 = [5.0]\n\nfor i in range(10):\n    φ += φ * c\n    φ_1.append(φ)\n\n\nn_jnd = [0,1,2,3,4,5,6,7,8,9,10]\n\ndf = pd.concat([pd.Series(φ_0, name=\"φ\", index=pd.Index(n_jnd, name=\"Ψ\")), pd.Series(φ_1, name=\"φ\", index=pd.Index(n_jnd, name='Ψ'))], keys=['c=.1', 'c=.2'], names=['c'])\ndf = df.reset_index()\npx.scatter(df, x=\"φ\", y='Ψ', color='c', template=\"plotly_white\").show()"
+  },
+  {
+    "objectID": "index.html#log-scaling",
+    "href": "index.html#log-scaling",
+    "title": "Differential Sensitivity",
+    "section": "Log scaling",
+    "text": "Log scaling\n\n\nCode\ndf['log(φ)'] = np.log(df['φ'])\n\npx.scatter(df, x='log(φ)', y='Ψ', color='c', trendline='ols', template=\"plotly_white\").show()"
+  }
+]

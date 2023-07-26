@@ -1,0 +1,30 @@
+
+## Chapter 5
+
+### Exercise 1
+```{python}
+
+import pandas as pd
+import plotly.express as px
+from scipy.stats import norm
+
+far = [.94, .84, .58, .27, .12, .02]
+hr = [.99, .96, .94, .84, .58, .42]
+df = pd.DataFrame(
+    {
+        "Criterion Level": [1,2,3,4,5,6],
+        "Hit Rate": hr,
+        "False Alarm Rate": far
+    }
+)
+
+z_df = pd.DataFrame(
+    {
+        "Z_SN": [norm.ppf(1.0-p) for p in hr],
+        "Z_N": [norm.ppf(1.0-p) for p in far]
+    }
+)
+
+px.scatter(z_df, x="Z_N", y="Z_SN", trendline='ols')
+
+```

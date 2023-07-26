@@ -1,0 +1,34 @@
+
+```{python}
+
+import pandas as pd
+import plotly.express as px
+
+
+sn = [2, 12, 46, 116, 24]
+n = [30, 68, 68, 32, 2]
+
+fa_rates = []
+hit_rates = []
+for criterion in range(1,5):
+    sn_below = sn[:criterion]
+    sn_above = sn[criterion:]
+    n_below = n[:criterion]
+    n_above = n[criterion:]
+
+    fa_rate = sum(n_above) / sum(n_above + n_below)
+    hit_rate = sum(sn_above) / sum(sn_above + sn_below)
+
+    fa_rates.append(fa_rate)
+    hit_rates.append(hit_rate)
+
+answer = pd.DataFrame(
+    {
+        "false alarm rate": fa_rates,
+        "hit rate": hit_rates,
+    }
+)
+
+px.scatter(answer, x="false alarm rate", y="hit rate")
+
+```
