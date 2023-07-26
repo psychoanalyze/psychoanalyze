@@ -46,6 +46,8 @@
     
       <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -89,7 +91,7 @@
 
   
 
-<header class="md-header md-header--shadow" data-md-component="header">
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="PsychoAnalyze" class="md-header__button md-logo" aria-label="PsychoAnalyze" data-md-component="logo">
       
@@ -192,13 +194,96 @@
     
   </nav>
   
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href=".." class="md-tabs__link">
+      Getting Started
+    </a>
+  </li>
+
+      
+        
+  
+  
+    
+  
+
+
+  <li class="md-tabs__item">
+    <a href="./" class="md-tabs__link md-tabs__link--active">
+      Dashboard
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../api/" class="md-tabs__link">
+      API Reference
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../CONTRIBUTING/" class="md-tabs__link">
+      Developers
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../tests/" class="md-tabs__link">
+      Tests
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="/notebooks/" class="md-tabs__link">
+      Notebooks
+    </a>
+  </li>
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
 </header>
     
     <div class="md-container" data-md-component="container">
       
       
-        
-          
         
       
       <main class="md-main" data-md-component="main">
@@ -211,8 +296,12 @@
                   <div class="md-sidebar__inner">
                     
 
+  
 
-<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="PsychoAnalyze" class="md-nav__button md-logo" aria-label="PsychoAnalyze" data-md-component="logo">
       
@@ -304,16 +393,57 @@
         
           <li class="md-nav__item">
   <a href="#input-panel" class="md-nav__link">
-    Input panel
+    Input Panel
   </a>
   
-    <nav class="md-nav" aria-label="Input panel">
+    <nav class="md-nav" aria-label="Input Panel">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#upload-data" class="md-nav__link">
     Upload data
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simulate-data" class="md-nav__link">
+    Simulate data
+  </a>
+  
+    <nav class="md-nav" aria-label="Simulate data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#link-function" class="md-nav__link">
+    Link Function
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model-parameters" class="md-nav__link">
+    Model Parameters
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stimulus" class="md-nav__link">
+    Stimulus
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simulation" class="md-nav__link">
+    Simulation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -359,7 +489,7 @@
   
     <li class="md-nav__item">
       <a href="../CONTRIBUTING/" class="md-nav__link">
-        Contribute
+        Developers
       </a>
     </li>
   
@@ -402,67 +532,6 @@
               </div>
             
             
-              
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-  
-
-<nav class="md-nav md-nav--secondary" aria-label="On this page">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      On this page
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#introduction" class="md-nav__link">
-    Introduction
-  </a>
-  
-    <nav class="md-nav" aria-label="Introduction">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#input-panel" class="md-nav__link">
-    Input panel
-  </a>
-  
-    <nav class="md-nav" aria-label="Input panel">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#upload-data" class="md-nav__link">
-    Upload data
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
           
           
             <div class="md-content" data-md-component="content">
@@ -471,15 +540,41 @@
                   
 
   
+    <a href="https://github.com/psychoanalyze/psychoanalyze/edit/main/docs/dashboard.md" title="Edit this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
+    </a>
+  
   
 
 
 <h1 id="dashboard">Dashboard<a class="headerlink" href="#dashboard" title="Permanent link">&para;</a></h1>
+<p>The PsychoAnalyze dashboard is featured on the home page of our website:</p>
+<p><a href="https://psychoanalyze.io">https://psychoanalyze.io</a></p>
+<details class="abstract">
+<summary>About the <em>alpha</em> release and our roadmap:</summary>
+<p>These docs have been written for the <em>alpha</em> release of PsychoAnalyze. Visit our <a href="">roadmap</a> to see how we plan to expand the use cases of our dashboard in upcoming releases. In the meantime, relevant sections will contain notes on planned features. The <em>alpha</em> released focused on high-level infrastructure for the project. The next major release will focus on accomodating a wide variety of experimental formats, analytical methods, and visualization options. Help us accomodate your use case by proposing a feature on GitHub as an <a href="https://github.com/psychoanalyze/psychoanalyze/issues/new?assignees=&amp;labels=enhancement&amp;projects=&amp;template=feature-request.md&amp;title=%5BNEW%5D">Issue</a> or <a href="https://github.com/orgs/psychoanalyze/discussions/categories/ideas">Discussion</a>.</p>
+</details>
 <h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
-<p>Our dashboard is featured on our <a href="https://psychoanalyze.io">home page</a> and is powered by <a href="https://dash.plotly.com/">Dash</a>, a Python framework for building interactive data dashboards using the Flask web framework.</p>
-<p>While power users may be interested in examining or contributing to the code that powers the dashboard, use of the dashboard on our site requires no coding knowledge to use and aims to be of interest to people of all backgrounds.</p>
-<p>The dashboard is currently designed to be viewed on a full-sized laptop or desktop monitor and consists of 3 main components, 1 for each column in the interface:</p>
-<h3 id="input-panel">Input panel<a class="headerlink" href="#input-panel" title="Permanent link">&para;</a></h3>
+<p>Our dashboard is a <em><a href="https://dash.plotly.com/">Dash</a></em> application. <em>Dash</em> is a Python framework for building interactive data dashboards that run in the browser.</p>
+<p>While Python developers may be interested in examining or contributing to the code that powers the dashboard, use of the dashboard on our site requires no coding knowledge and aims to be useful to people of all backgrounds.</p>
+<p>The dashboard is currently designed to be viewed on a full-sized laptop or desktop monitor and consists of three main panels, one for each column in the interface:</p>
+<ul>
+<li><a href="#input-panel">Input panel</a></li>
+<li><a href="#visualization-panel">Visualization panel</a></li>
+<li><a href="#output-panel">Output Panel</a></li>
+</ul>
+<div class="admonition abstract">
+<p class="admonition-title">On our roadmap:</p>
+<ul>
+<li>CSS support for mobile devices and tablets</li>
+<li>Support for customizing the dashboard layout</li>
+<li>Support for customizing the dashboard theme</li>
+<li>Support for Streamlit</li>
+</ul>
+</div>
+<h3 id="input-panel">Input Panel<a class="headerlink" href="#input-panel" title="Permanent link">&para;</a></h3>
+<p>The Input Panel provides the user to determine the data processed by the dashboard, either via upload or selection of model parameters and experimental conditions.</p>
 <h4 id="upload-data">Upload data<a class="headerlink" href="#upload-data" title="Permanent link">&para;</a></h4>
 <p>The first component in the input panel column allows anyone to upload a dataset to be processed by the dashboard. The dataset must be a table either in <code>.csv</code> or <code>.parquet</code> format, and for now is restricted to be in the form of a very simple schema as follows:</p>
 <table>
@@ -508,9 +603,56 @@
 </tr>
 </tbody>
 </table>
-<div class="admonition info">
-<p class="admonition-title">Info</p>
-<p>The ability for the dashboard to process more complex schemas is a top priority on our roadmap. For more info or questions, visit the dedicated <a href="">topic</a> on GitHub Discussions where the community may suggest schemas they would like to see supported.</p>
+<div class="admonition abstract">
+<p class="admonition-title">On our roadmap:</p>
+<ul>
+<li>Support for multiple subjects</li>
+<li>Support for multi-electrode stimulus arrays</li>
+<li>Support for longitudinal studies</li>
+<li>Support for different sensory domains, such as audition and vision.</li>
+</ul>
+</div>
+<h4 id="simulate-data">Simulate data<a class="headerlink" href="#simulate-data" title="Permanent link">&para;</a></h4>
+<p>By default, the dashboard displays the results from a simulation of a hypothetical yes-no experiment. A sequence of randomly-sampled trial outcomes are generated, processed, fit the the psychometric function, and visualized, with assistance from PsychoAnalyze's <a href="api">API functions</a>. The simulation estimates the psychometric function's <em>location</em> and <em>scale</em> parameters according to the chosen <a href="#link-function">link function</a> $F(x)$, which is the <em>logistic equation</em> by default.:</p>
+<p>$$
+\psi(x) = F(x) = \frac{1}{1 + e^{-\frac{x - \mu}{\sigma}}}
+$$</p>
+<ul>
+<li>$\mu$ is the <em>location</em> parameter, which represents the psychophysical "threshold".</li>
+<li>$\sigma$ is the <em>scale</em> parameter, which represents the slope (<em>i.e.</em>, sensitivity) of the psychometric curve near the threshold.</li>
+</ul>
+<h5 id="link-function">Link Function<a class="headerlink" href="#link-function" title="Permanent link">&para;</a></h5>
+<ul>
+<li>In an upcoming release, PsychoAnalyze will support a variety of link functions. For now, the only supported link function is the <a href="https://en.wikipedia.org/wiki/Logit">logit function</a>. You can toggle the visibility of the equation for the logit function by clicking the <code>Show/Hide</code> button.</li>
+</ul>
+<h5 id="model-parameters">Model Parameters<a class="headerlink" href="#model-parameters" title="Permanent link">&para;</a></h5>
+<p>You may adjust the parameters $\mu$ and $\sigma$ for model simulations using the sliders and input boxes in the panel. The simulation is completely regenerated in the browser's memory each time any parameter in the Input Panel is adjusted.</p>
+<div class="admonition abstract">
+<p class="admonition-title">On our roadmap:</p>
+<ul>
+<li>Support for other link functions, beginning with the probit function.</li>
+<li>Support for other model parameters, such as guess rate, lapse rate, and the <em>beta</em> parameter for the <a href="https://doi.org/10.1016/j.visres.2016.02.002">beta-binomial approach</a>.</li>
+</ul>
+</div>
+<h5 id="stimulus">Stimulus<a class="headerlink" href="#stimulus" title="Permanent link">&para;</a></h5>
+<p>You may adjust the <em>n levels</em> parameter to change the number of stimulus intensity levels representing the trial conditions of a <a href="https://en.wikipedia.org/wiki/Psychophysics#Method_of_constant_stimuli">method-of-constant-stimuli</a> experiment. In the plot, this is represented by the number of dots across the x-axis.</p>
+<div class="admonition abstract">
+<p class="admonition-title">On our roadmap:</p>
+<ul>
+<li>Support for choices of <em>n_min</em> and <em>n_max</em> that are decoupled from the choice of model parameters.</li>
+<li>Support for other sampling methods such as method-of-adjustment, method-of-limits, and modern Bayesian sampling algorithms.</li>
+</ul>
+</div>
+<h5 id="simulation">Simulation<a class="headerlink" href="#simulation" title="Permanent link">&para;</a></h5>
+<p>The simulation generates balanced blocks, with a randomly selected stimulus intensity level for each trial. Thus, each block will have exactly <em>n</em> trials per block, but the number of trials at each stimulus intensity level <em>x</em> will be randomly distributed. The number of blocks is determined by the <em>n blocks</em> parameter. Model fits for each block are calculated, but only but only blocks selected in the data table in the Output column in the right-hand side are visible.</p>
+<div class="admonition abstract">
+<p class="admonition-title">On our roadmap:</p>
+<ul>
+<li>Support for unbalanced blocks.</li>
+<li>Simulation animations</li>
+<li>Bayesian inferencing methods via PyMC</li>
+<li>Simulations for model comparisons</li>
+</ul>
 </div>
 
 
@@ -549,17 +691,21 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant"], "search": "../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "toc.follow", "toc.integrate", "content.action.edit"], "search": "../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="../assets/javascripts/bundle.220ee61c.min.js"></script>
       
         
-          <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+          <script src="../javascripts/katex.js"></script>
         
       
         
-          <script src="../docs/require.js"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+        
+      
+        
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
         
       
     

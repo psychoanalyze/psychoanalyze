@@ -44,6 +44,8 @@
     
       <link rel="stylesheet" href="assets/_mkdocstrings.css">
     
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css">
+    
     <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -87,7 +89,7 @@
 
   
 
-<header class="md-header md-header--shadow" data-md-component="header">
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="." title="PsychoAnalyze" class="md-header__button md-logo" aria-label="PsychoAnalyze" data-md-component="logo">
       
@@ -190,13 +192,96 @@
     
   </nav>
   
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+    
+  
+
+
+  <li class="md-tabs__item">
+    <a href="." class="md-tabs__link md-tabs__link--active">
+      Getting Started
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="dashboard/" class="md-tabs__link">
+      Dashboard
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="api/" class="md-tabs__link">
+      API Reference
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="CONTRIBUTING/" class="md-tabs__link">
+      Developers
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="tests/" class="md-tabs__link">
+      Tests
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="/notebooks/" class="md-tabs__link">
+      Notebooks
+    </a>
+  </li>
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
 </header>
     
     <div class="md-container" data-md-component="container">
       
       
-        
-          
         
       
       <main class="md-main" data-md-component="main">
@@ -209,8 +294,12 @@
                   <div class="md-sidebar__inner">
                     
 
+  
 
-<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href="." title="PsychoAnalyze" class="md-nav__button md-logo" aria-label="PsychoAnalyze" data-md-component="logo">
       
@@ -303,24 +392,11 @@
     Python Package
   </a>
   
-    <nav class="md-nav" aria-label="Python Package">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#install-in-a-python-environment" class="md-nav__link">
-    Install in a Python environment
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
-  <a href="#want-to-contribute-to-psychoanalyze" class="md-nav__link">
-    Want to contribute to PsychoAnalyze?
+  <a href="#developers" class="md-nav__link">
+    Developers
   </a>
   
 </li>
@@ -372,7 +448,7 @@
   
     <li class="md-nav__item">
       <a href="CONTRIBUTING/" class="md-nav__link">
-        Contribute
+        Developers
       </a>
     </li>
   
@@ -415,82 +491,6 @@
               </div>
             
             
-              
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-  
-
-<nav class="md-nav md-nav--secondary" aria-label="On this page">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      On this page
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#introduction" class="md-nav__link">
-    Introduction
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dashboard" class="md-nav__link">
-    Dashboard
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#notebook-tutorial" class="md-nav__link">
-    Notebook Tutorial
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#python-package" class="md-nav__link">
-    Python Package
-  </a>
-  
-    <nav class="md-nav" aria-label="Python Package">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#install-in-a-python-environment" class="md-nav__link">
-    Install in a Python environment
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#want-to-contribute-to-psychoanalyze" class="md-nav__link">
-    Want to contribute to PsychoAnalyze?
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
           
           
             <div class="md-content" data-md-component="content">
@@ -498,6 +498,11 @@
                 
                   
 
+  
+    <a href="https://github.com/psychoanalyze/psychoanalyze/edit/main/docs/index.md" title="Edit this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
+    </a>
   
   
 
@@ -507,7 +512,7 @@
 <p><strong>PsychoAnalyze</strong> was developed to support research for the <a href="https://moranlab.wustl.edu/">Moran Lab</a> at Washington University in St. Louis. It is a multi-purpose data platform to assist researchers analyzing data from psychophysical experiments, providing prepackaged libraries for helpful data transformation methods, model-fitting routines, and data visualization features specific to this research domain.</p>
 <div class="admonition question">
 <p class="admonition-title">New to psychophysics?</p>
-<p><em><a href="https://en.wikipedia.org/wiki/Psychophysics">Psychophysics</a></em> is a branch of study within behavioral psychology and neuroscience that provides an experimental and analytical framework for the broad purpose of quantifying the relationship between physical stimuli and perceptual experience. For an excellent review of the history and impact of psychophysics, check out the following review published in <em>Neuroscience by J.C.A. Read: </em><a href="https://www-sciencedirect-com.libproxy.wustl.edu/science/article/pii/S0306452214004369">The place of human psychophysics in modern neuroscience</a>.</p>
+<p><em><a href="https://en.wikipedia.org/wiki/Psychophysics">Psychophysics</a></em> is a branch of study within behavioral psychology and neuroscience that provides an experimental and analytical framework for the broad purpose of quantifying and modeling the relationship between physical stimuli and perceptual experience. For an excellent review of the history and impact of psychophysics, check out the following review published in <em>Neuroscience by J.C.A. Read: </em><a href="https://doi.org/10.1016/j.visres.2016.02.002">The place of human psychophysics in modern neuroscience</a>.</p>
 </div>
 <h2 id="dashboard">Dashboard<a class="headerlink" href="#dashboard" title="Permanent link">&para;</a></h2>
 <p>For a high-level view of what you can do with PsychoAnalyze, try out the interactive dashboard at <a href="https://psychoanalyze.io">https://psychoanalyze.io</a>.</p>
@@ -529,8 +534,8 @@
 <h2 id="notebook-tutorial">Notebook Tutorial<a class="headerlink" href="#notebook-tutorial" title="Permanent link">&para;</a></h2>
 <p>For a more hands-on experience with PsychoAnalyze, enjoy our <a href="notebooks/tutorial.ipynb">notebook tutorial</a>. Consider submitting a notebook of your own to our gallery!</p>
 <h2 id="python-package">Python Package<a class="headerlink" href="#python-package" title="Permanent link">&para;</a></h2>
-<p>For custom applications, you can use <code>psychoanalyze</code> as a Python package (available on <a href="https://pypi.org/project/psychoanalyze/">PyPI</a>) to develop your own analysis scripts or apps. You'll want to check out our <a href="api/">Python API documentation</a> and our <a href="tests/">test documentation</a>.</p>
-<h3 id="install-in-a-python-environment">Install in a Python environment<a class="headerlink" href="#install-in-a-python-environment" title="Permanent link">&para;</a></h3>
+<p>For custom applications, you can use <code>psychoanalyze</code> as a Python package (available on <a href="https://pypi.org/project/psychoanalyze/">PyPI</a>) to develop your own analysis scripts or apps.</p>
+<p>To install <code>psychoanalyze</code> in a Python virtual environment:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Poetry</label><label for="__tabbed_1_2">Pip</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -543,7 +548,13 @@
 </div>
 </div>
 </div>
-<h2 id="want-to-contribute-to-psychoanalyze">Want to contribute to PsychoAnalyze?<a class="headerlink" href="#want-to-contribute-to-psychoanalyze" title="Permanent link">&para;</a></h2>
+<p>To get started using <code>psychoanalyze</code> from the command line, execute:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="go">psychoanalyze --help</span>
+</code></pre></div>
+<p>in your virtual environment for an overview of the available commands.</p>
+<p>For a tutorial on using <code>psychoanalyze</code> to perform analysis in your own Python scripts and and apps, check out our section on <a href="notebooks">notebooks</a>.</p>
+<h2 id="developers">Developers<a class="headerlink" href="#developers" title="Permanent link">&para;</a></h2>
+<p>Want to contribute to PsychoAnalyze's code base, or simply get a local instance of Dash or Jupyter running?</p>
 <p>Check out our <a href="CONTRIBUTING/">contributing guide</a>, or see what's going on in <a href="https://github.com/">Discussions</a>!💡</p>
 
 
@@ -582,17 +593,21 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": ".", "features": ["navigation.instant"], "search": "assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": ".", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "toc.follow", "toc.integrate", "content.action.edit"], "search": "assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="assets/javascripts/bundle.220ee61c.min.js"></script>
       
         
-          <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+          <script src="javascripts/katex.js"></script>
         
       
         
-          <script src="docs/require.js"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+        
+      
+        
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
         
       
     

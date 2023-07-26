@@ -44,6 +44,8 @@
     
       <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -87,7 +89,7 @@
 
   
 
-<header class="md-header md-header--shadow" data-md-component="header">
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="PsychoAnalyze" class="md-header__button md-logo" aria-label="PsychoAnalyze" data-md-component="logo">
       
@@ -190,13 +192,96 @@
     
   </nav>
   
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href=".." class="md-tabs__link">
+      Getting Started
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../dashboard/" class="md-tabs__link">
+      Dashboard
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../api/" class="md-tabs__link">
+      API Reference
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../CONTRIBUTING/" class="md-tabs__link">
+      Developers
+    </a>
+  </li>
+
+      
+        
+  
+  
+    
+  
+
+
+  <li class="md-tabs__item">
+    <a href="./" class="md-tabs__link md-tabs__link--active">
+      Tests
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="/notebooks/" class="md-tabs__link">
+      Notebooks
+    </a>
+  </li>
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
 </header>
     
     <div class="md-container" data-md-component="container">
       
       
-        
-          
         
       
       <main class="md-main" data-md-component="main">
@@ -209,8 +294,12 @@
                   <div class="md-sidebar__inner">
                     
 
+  
 
-<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="PsychoAnalyze" class="md-nav__button md-logo" aria-label="PsychoAnalyze" data-md-component="logo">
       
@@ -288,7 +377,7 @@
   
     <li class="md-nav__item">
       <a href="../CONTRIBUTING/" class="md-nav__link">
-        Contribute
+        Developers
       </a>
     </li>
   
@@ -621,290 +710,6 @@
               </div>
             
             
-              
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-  
-
-<nav class="md-nav md-nav--secondary" aria-label="On this page">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      On this page
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#tests" class="md-nav__link">
-    tests
-  </a>
-  
-    <nav class="md-nav" aria-label="tests">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_weber" class="md-nav__link">
-    test_weber
-  </a>
-  
-    <nav class="md-nav" aria-label="test_weber">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_weber.test_aggregate" class="md-nav__link">
-    test_aggregate()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_weber.test_load" class="md-nav__link">
-    test_load()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_points" class="md-nav__link">
-    test_points
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_sessions" class="md-nav__link">
-    test_sessions
-  </a>
-  
-    <nav class="md-nav" aria-label="test_sessions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_sessions.subjects" class="md-nav__link">
-    subjects()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_sessions.test_generate_sessions" class="md-nav__link">
-    test_generate_sessions()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_sessions.test_from_trials_csv" class="md-nav__link">
-    test_from_trials_csv()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_sessions.test_day_marks_from_monkey_two_sessions" class="md-nav__link">
-    test_day_marks_from_monkey_two_sessions()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_sessions.test_day_marks_from_monkey_one_session" class="md-nav__link">
-    test_day_marks_from_monkey_one_session()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_blocks" class="md-nav__link">
-    test_blocks
-  </a>
-  
-    <nav class="md-nav" aria-label="test_blocks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_blocks.test_thresholds" class="md-nav__link">
-    test_thresholds()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_bayes" class="md-nav__link">
-    test_bayes
-  </a>
-  
-    <nav class="md-nav" aria-label="test_bayes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_bayes.test_bayes" class="md-nav__link">
-    test_bayes()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_data" class="md-nav__link">
-    test_data
-  </a>
-  
-    <nav class="md-nav" aria-label="test_data">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_data.subjects" class="md-nav__link">
-    subjects()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_strength_duration" class="md-nav__link">
-    test_strength_duration
-  </a>
-  
-    <nav class="md-nav" aria-label="test_strength_duration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_strength_duration.s_d_columns" class="md-nav__link">
-    s_d_columns()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_strength_duration.test_strength_duration" class="md-nav__link">
-    test_strength_duration()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_strength_duration.s_d_empty_df" class="md-nav__link">
-    s_d_empty_df()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_strength_duration.test_strength_duration_amp" class="md-nav__link">
-    test_strength_duration_amp()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_strength_duration.test_strength_duration_pw" class="md-nav__link">
-    test_strength_duration_pw()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_strength_duration.test_plot_with_data" class="md-nav__link">
-    test_plot_with_data()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_trials" class="md-nav__link">
-    test_trials
-  </a>
-  
-    <nav class="md-nav" aria-label="test_trials">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_trials.subjects" class="md-nav__link">
-    subjects()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_trials.x" class="md-nav__link">
-    x()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_trials.test_normalize" class="md-nav__link">
-    test_normalize()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_trials.test_labels" class="md-nav__link">
-    test_labels()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tests.test_ecdf" class="md-nav__link">
-    test_ecdf
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
           
           
             <div class="md-content" data-md-component="content">
@@ -912,6 +717,11 @@
                 
                   
 
+  
+    <a href="https://github.com/psychoanalyze/psychoanalyze/edit/main/docs/tests.md" title="Edit this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
+    </a>
   
   
 
@@ -2104,17 +1914,21 @@ for accepted contributions.</li>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant"], "search": "../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "toc.follow", "toc.integrate", "content.action.edit"], "search": "../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="../assets/javascripts/bundle.220ee61c.min.js"></script>
       
         
-          <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+          <script src="../javascripts/katex.js"></script>
         
       
         
-          <script src="../docs/require.js"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+        
+      
+        
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
         
       
     

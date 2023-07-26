@@ -46,6 +46,8 @@
     
       <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -89,7 +91,7 @@
 
   
 
-<header class="md-header md-header--shadow" data-md-component="header">
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="PsychoAnalyze" class="md-header__button md-logo" aria-label="PsychoAnalyze" data-md-component="logo">
       
@@ -192,13 +194,96 @@
     
   </nav>
   
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href=".." class="md-tabs__link">
+      Getting Started
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../dashboard/" class="md-tabs__link">
+      Dashboard
+    </a>
+  </li>
+
+      
+        
+  
+  
+    
+  
+
+
+  <li class="md-tabs__item">
+    <a href="./" class="md-tabs__link md-tabs__link--active">
+      API Reference
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../CONTRIBUTING/" class="md-tabs__link">
+      Developers
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../tests/" class="md-tabs__link">
+      Tests
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="/notebooks/" class="md-tabs__link">
+      Notebooks
+    </a>
+  </li>
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
 </header>
     
     <div class="md-container" data-md-component="container">
       
       
-        
-          
         
       
       <main class="md-main" data-md-component="main">
@@ -211,8 +296,12 @@
                   <div class="md-sidebar__inner">
                     
 
+  
 
-<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="PsychoAnalyze" class="md-nav__button md-logo" aria-label="PsychoAnalyze" data-md-component="logo">
       
@@ -1245,7 +1334,7 @@
   
     <li class="md-nav__item">
       <a href="../CONTRIBUTING/" class="md-nav__link">
-        Contribute
+        Developers
       </a>
     </li>
   
@@ -1288,953 +1377,6 @@
               </div>
             
             
-              
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-  
-
-<nav class="md-nav md-nav--secondary" aria-label="On this page">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      On this page
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#psychoanalyze" class="md-nav__link">
-    psychoanalyze
-  </a>
-  
-    <nav class="md-nav" aria-label="psychoanalyze">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.main" class="md-nav__link">
-    main
-  </a>
-  
-    <nav class="md-nav" aria-label="main">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.main.main" class="md-nav__link">
-    main()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.params" class="md-nav__link">
-    params
-  </a>
-  
-    <nav class="md-nav" aria-label="params">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.params.intercept_to_location" class="md-nav__link">
-    intercept_to_location()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.params.location_to_intercept" class="md-nav__link">
-    location_to_intercept()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.params.slope_to_scale" class="md-nav__link">
-    slope_to_scale()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.params.scale_to_slope" class="md-nav__link">
-    scale_to_slope()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.plot" class="md-nav__link">
-    plot
-  </a>
-  
-    <nav class="md-nav" aria-label="plot">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.plot.standard_logistic" class="md-nav__link">
-    standard_logistic()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.plot.logistic" class="md-nav__link">
-    logistic()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.sigmoids" class="md-nav__link">
-    sigmoids
-  </a>
-  
-    <nav class="md-nav" aria-label="sigmoids">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.sigmoids.weibull" class="md-nav__link">
-    weibull()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.sigmoids.gumbel" class="md-nav__link">
-    gumbel()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.sigmoids.quick" class="md-nav__link">
-    quick()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.sigmoids.log_quick" class="md-nav__link">
-    log_quick()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data" class="md-nav__link">
-    data
-  </a>
-  
-    <nav class="md-nav" aria-label="data">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points" class="md-nav__link">
-    points
-  </a>
-  
-    <nav class="md-nav" aria-label="points">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.from_trials" class="md-nav__link">
-    from_trials()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.load" class="md-nav__link">
-    load()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.dimension" class="md-nav__link">
-    dimension()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.prep_fit" class="md-nav__link">
-    prep_fit()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.model" class="md-nav__link">
-    model()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.hits" class="md-nav__link">
-    hits()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.generate" class="md-nav__link">
-    generate()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.generate_point" class="md-nav__link">
-    generate_point()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.datatable" class="md-nav__link">
-    datatable()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.from_store" class="md-nav__link">
-    from_store()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.combine_plots" class="md-nav__link">
-    combine_plots()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.n" class="md-nav__link">
-    n()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.generate_n" class="md-nav__link">
-    generate_n()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.to_block" class="md-nav__link">
-    to_block()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.psi" class="md-nav__link">
-    psi()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.plot" class="md-nav__link">
-    plot()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.hit_rate" class="md-nav__link">
-    hit_rate()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.transform" class="md-nav__link">
-    transform()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.points.generate_index" class="md-nav__link">
-    generate_index()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.stimulus" class="md-nav__link">
-    stimulus
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.subjects" class="md-nav__link">
-    subjects
-  </a>
-  
-    <nav class="md-nav" aria-label="subjects">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.subjects.load" class="md-nav__link">
-    load()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.subjects.generate_letter_names" class="md-nav__link">
-    generate_letter_names()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.subjects.generate_trials" class="md-nav__link">
-    generate_trials()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.blocks" class="md-nav__link">
-    blocks
-  </a>
-  
-    <nav class="md-nav" aria-label="blocks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.blocks.generate" class="md-nav__link">
-    generate()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.blocks.dimensions" class="md-nav__link">
-    dimensions()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.blocks.plot_fits" class="md-nav__link">
-    plot_fits()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.blocks.load" class="md-nav__link">
-    load()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.blocks.days" class="md-nav__link">
-    days()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.blocks.n_trials" class="md-nav__link">
-    n_trials()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.blocks.is_valid" class="md-nav__link">
-    is_valid()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.blocks.subject_counts" class="md-nav__link">
-    subject_counts()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.blocks.fit" class="md-nav__link">
-    fit()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.blocks.generate_trials" class="md-nav__link">
-    generate_trials()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.blocks.from_points" class="md-nav__link">
-    from_points()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.blocks.plot_thresholds" class="md-nav__link">
-    plot_thresholds()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.blocks.transform_errors" class="md-nav__link">
-    transform_errors()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.blocks.reshape_fit_results" class="md-nav__link">
-    reshape_fit_results()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.blocks.standard_logistic" class="md-nav__link">
-    standard_logistic()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.blocks.logistic" class="md-nav__link">
-    logistic()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.trials" class="md-nav__link">
-    trials
-  </a>
-  
-    <nav class="md-nav" aria-label="trials">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.trials.generate_trial_index" class="md-nav__link">
-    generate_trial_index()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.trials.generate" class="md-nav__link">
-    generate()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.trials.load" class="md-nav__link">
-    load()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.trials.from_store" class="md-nav__link">
-    from_store()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.trials.to_store" class="md-nav__link">
-    to_store()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.trials.normalize" class="md-nav__link">
-    normalize()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.trials.result" class="md-nav__link">
-    result()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.trials.results" class="md-nav__link">
-    results()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.trials.labels" class="md-nav__link">
-    labels()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.trials.psi" class="md-nav__link">
-    psi()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.trials.moc_sample" class="md-nav__link">
-    moc_sample()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.trials.fit" class="md-nav__link">
-    fit()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.sessions" class="md-nav__link">
-    sessions
-  </a>
-  
-    <nav class="md-nav" aria-label="sessions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.sessions.generate" class="md-nav__link">
-    generate()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.sessions.cache_results" class="md-nav__link">
-    cache_results()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.sessions.from_trials_csv" class="md-nav__link">
-    from_trials_csv()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.sessions.day_marks" class="md-nav__link">
-    day_marks()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.sessions.days" class="md-nav__link">
-    days()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.sessions.n_trials" class="md-nav__link">
-    n_trials()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.sessions.load" class="md-nav__link">
-    load()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.sessions.generate_trials" class="md-nav__link">
-    generate_trials()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.types" class="md-nav__link">
-    types
-  </a>
-  
-    <nav class="md-nav" aria-label="types">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.types.PsiAnimation" class="md-nav__link">
-    PsiAnimation
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.types.PsiAnimationFrame" class="md-nav__link">
-    PsiAnimationFrame
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.types.Blocks" class="md-nav__link">
-    Blocks
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.types.Points" class="md-nav__link">
-    Points
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.data.types.Trials" class="md-nav__link">
-    Trials
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.dashboard" class="md-nav__link">
-    dashboard
-  </a>
-  
-    <nav class="md-nav" aria-label="dashboard">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.dashboard.app" class="md-nav__link">
-    app
-  </a>
-  
-    <nav class="md-nav" aria-label="app">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.dashboard.app.update_data" class="md-nav__link">
-    update_data()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.dashboard.app.update_points_table" class="md-nav__link">
-    update_points_table()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.dashboard.app.update_blocks_table" class="md-nav__link">
-    update_blocks_table()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.dashboard.app.filter_points" class="md-nav__link">
-    filter_points()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.dashboard.app.update_fig" class="md-nav__link">
-    update_fig()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.dashboard.app.export_image" class="md-nav__link">
-    export_image()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.dashboard.app.export_data" class="md-nav__link">
-    export_data()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.dashboard.app.toggle_eqn" class="md-nav__link">
-    toggle_eqn()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.dashboard.app.toggle_param" class="md-nav__link">
-    toggle_param()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.dashboard.app.set_params_to_preset" class="md-nav__link">
-    set_params_to_preset()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.dashboard.app.set_fixed_params_to_preset" class="md-nav__link">
-    set_fixed_params_to_preset()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.dashboard.app.update_page_size" class="md-nav__link">
-    update_page_size()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.dashboard.components" class="md-nav__link">
-    components
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.dashboard.layout" class="md-nav__link">
-    layout
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.analysis" class="md-nav__link">
-    analysis
-  </a>
-  
-    <nav class="md-nav" aria-label="analysis">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.analysis.strength_duration" class="md-nav__link">
-    strength_duration
-  </a>
-  
-    <nav class="md-nav" aria-label="strength_duration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.analysis.strength_duration.from_blocks" class="md-nav__link">
-    from_blocks()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.analysis.strength_duration.plot" class="md-nav__link">
-    plot()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.analysis.bayes" class="md-nav__link">
-    bayes
-  </a>
-  
-    <nav class="md-nav" aria-label="bayes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.analysis.bayes.plot" class="md-nav__link">
-    plot()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.analysis.ecdf" class="md-nav__link">
-    ecdf
-  </a>
-  
-    <nav class="md-nav" aria-label="ecdf">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.analysis.ecdf.plot" class="md-nav__link">
-    plot()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.analysis.weber" class="md-nav__link">
-    weber
-  </a>
-  
-    <nav class="md-nav" aria-label="weber">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.analysis.weber.plot" class="md-nav__link">
-    plot()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.analysis.weber.aggregate" class="md-nav__link">
-    aggregate()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#psychoanalyze.analysis.weber.load" class="md-nav__link">
-    load()
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
           
           
             <div class="md-content" data-md-component="content">
@@ -2242,6 +1384,11 @@
                 
                   
 
+  
+    <a href="https://github.com/psychoanalyze/psychoanalyze/edit/main/docs/api.md" title="Edit this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
+    </a>
   
   
 
@@ -7154,17 +6301,21 @@ relates to the baseline intensities of the stimuli according to Weber's Law.</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant"], "search": "../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "toc.follow", "toc.integrate", "content.action.edit"], "search": "../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="../assets/javascripts/bundle.220ee61c.min.js"></script>
       
         
-          <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+          <script src="../javascripts/katex.js"></script>
         
       
         
-          <script src="../docs/require.js"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+        
+      
+        
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
         
       
     
