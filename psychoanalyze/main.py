@@ -19,12 +19,15 @@ import importlib.metadata
 import typer
 from rich.console import Console
 
+from psychoanalyze.dashboard import app as dash_app
 
-def main(command: str = "version") -> None:
+app = typer.Typer()
+
+
+@app.command()
+def main(command: str) -> None:
     """Main commands."""
     if command == "version":
         Console().print(importlib.metadata.version("psychoanalyze"))
-
-
-if __name__ == "__main__":
-    typer.run(main)
+    if command == "dash":
+        dash_app.app.run(debug=True)
