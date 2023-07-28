@@ -30,6 +30,12 @@ jobs:
       - name: Install dependencies
         run: poetry install
 
+      - name: Update Version
+        run: poetry run semantic-release version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+
       - name: Update Version & Publish
         run: |
           branch="release-$(git rev-parse --short HEAD)"
