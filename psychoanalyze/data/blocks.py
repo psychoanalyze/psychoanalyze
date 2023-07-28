@@ -29,7 +29,6 @@ from scipy.stats import logistic as scipy_logistic
 from sklearn.linear_model import LogisticRegression
 
 from psychoanalyze.data import (
-    points,
     sessions,
     stimulus,
     subjects,
@@ -55,13 +54,6 @@ def generate(
         {"n": n, "Hits": np.random.default_rng().binomial(n, p)},
         index=index,
     )
-
-
-def dimensions(_points: pd.DataFrame, dims: list[str]) -> pd.Series:
-    """Calculate dimensions for multiple blocks."""
-    return _points.groupby(
-        [dim for dim in list(_points.index.names) if dim not in dims],
-    ).apply(points.dimension)
 
 
 def plot_fits(blocks: pd.DataFrame) -> go.Figure:
