@@ -19,12 +19,11 @@ import importlib.metadata
 import typer
 from rich.console import Console
 
+app = typer.Typer()
 
-def main(command: str = "version") -> None:
+
+@app.command()
+def main(command: str) -> None:
     """Main commands."""
     if command == "version":
         Console().print(importlib.metadata.version("psychoanalyze"))
-
-
-if __name__ == "__main__":
-    typer.run(main)

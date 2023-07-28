@@ -63,7 +63,7 @@ mkdocs-material = "^9.1.19"
 mkdocstrings = {extras = ["python"], version = "^0.22.0"}
 
 [tool.poetry.scripts]
-psychoanalyze = "psychoanalyze.main:main"
+psychoanalyze = "psychoanalyze.main:app"
 
 
 [build-system]
