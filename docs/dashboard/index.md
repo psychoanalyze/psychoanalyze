@@ -12,9 +12,9 @@ While Python developers may be interested in examining or contributing to the co
 
 The dashboard is currently intended to be viewed on a full-sized laptop or desktop monitor and consists of three main panels, one for each column in the interface:
 
-- [Input Panel](input)
-- [Visualization Panel](visualization)
-- [Output Panel](output)
+- [Input Panel](input.md)
+- [Visualization Panel](viz.md)
+- [Output Panel](output.md)
 
 !!! abstract "On our roadmap:"
 

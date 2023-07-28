@@ -66,6 +66,13 @@ psychoanalyze = "psychoanalyze.main:app"
 [tool.poetry.extras]
 docs = ["mkdocs", "mkdocs-materal", "mkdocstrings-python"]
 
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+mkdocs-material = "^9.1.21"
+mkdocstrings = { extras = ["python"], version = "^0.22.0" }
+
 [tool.semantic_release]
 version_toml = ["pyproject.toml:tool.poetry.version"]
 build_command = "poetry build"
