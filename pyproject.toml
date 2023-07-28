@@ -92,7 +92,7 @@ allowed_tags = [
     "refactor",
     "perf",
     "chore",
-    "notebook",
+    "nb",
 ]
 
 [tool.bandit]
