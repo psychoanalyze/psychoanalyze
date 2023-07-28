@@ -2,6 +2,7 @@ pull_request_rules:
   - name: Automatic merge on approval
     conditions:
       - "#approved-reviews-by>=1"
+      - "author=schlich"
     actions:
       merge:
         method: merge
