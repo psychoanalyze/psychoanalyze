@@ -18,6 +18,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install Poetry
+        run: pipx install poetry
+
       - name: Update Version
         run: poetry run semantic-release version
         env:
