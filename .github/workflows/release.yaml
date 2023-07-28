@@ -1,17 +1,12 @@
 name: Semantic Release
 
 on:
-  workflow_run:
-    workflows:
-      - ci
+  push:
     branches:
       - main
-    types:
-      - completed
 
 jobs:
   release:
-    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     concurrency: release
     permissions:
