@@ -35,7 +35,7 @@ jobs:
         run: |
           branch=$(git rev-parse --short HEAD)
           git switch -c release/$branch
-          poetry run semantic-release version --strict
+          poetry run semantic-release --strict version
           gh pr create --title "Auto-release" --body "Automated release" --head release/$branch
           poetry run semantic-release publish
         env:
