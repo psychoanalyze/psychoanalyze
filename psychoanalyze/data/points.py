@@ -53,20 +53,6 @@ def load(data_path: Path) -> pd.DataFrame:
     return from_trials(trials)
 
 
-def dimension(points: pd.DataFrame) -> str:
-    """Determine modulated dimension from point-level data."""
-    amp1, width1 = (
-        points.index.get_level_values(param) for param in ["Amp1", "Width1"]
-    )
-    if amp1.nunique() > 1 and width1.nunique() == 1:
-        return "Amp"
-    if width1.nunique() > 1 and amp1.nunique() == 1:
-        return "Width"
-    if width1.nunique() > 1 and amp1.nunique() > 1:
-        return "Both"
-    return "Neither"
-
-
 def prep_fit(points: pd.DataFrame, dimension: str = "Amp1") -> dict:
     """Transform points data for numpy-related fitting procedures."""
     points = points.reset_index()
