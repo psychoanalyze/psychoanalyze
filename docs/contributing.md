@@ -2,13 +2,15 @@
 
 *PsychoAnalyze* welcomes contributions, feature requests and bug reports from everyone!
 
-If you are a researcher seeking to use PsychoAnalyze in your own research context, we'd love to hear from you!
+If you are a researcher seeking to use PsychoAnalyze in your own research context, we'd love to help you get started!
 
-- ✉️ [E-mail](mailto:t.schlic@wustl.edu)
+Here are 3 suggested ways to
 
-- 🧪 [Feature Request](https://github.com/psychoanalyze/psychoanalyze/issues/new?assignees=&labels=enhancement&projects=&template=feature-request.md&title=%5BNEW%5D) - for well-posed suggestions.
+- 🧪 [Open a Feature Request](https://github.com/psychoanalyze/psychoanalyze/issues/new?assignees=&labels=enhancement&projects=&template=feature-request.md&title=%5BNEW%5D) - for well-posed suggestions.
 
-- 💡[Discussions](https://github.com/orgs/psychoanalyze/discussions) - For feedback on your idea for a new feature or use case.
+- 💡[Start a Discussion](https://github.com/orgs/psychoanalyze/discussions) - For feedback on your idea for a new feature or use case.
+
+- ✉️ [Send us an E-mail](mailto:t.schlic@wustl.edu)
 
 If you have experience working in Python, we'd love to have your help developing PsychoAnalyze! See our [Developer Guide](#developers) to set up your environment and familiarize yourself with the code base. Then, consider picking up an [issue](https://github.com/psychoanalyze/psychoanalyze/issues) on GitHub!
 
