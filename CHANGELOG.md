@@ -2,9 +2,215 @@
 
 
 
+## v0.8.0 (2023-07-28)
+
+### Chore
+
+* chore: Merge branch &#39;dev&#39; of https://github.com/psychoanalyze/psychoanalyze into dev ([`1c3c1dc`](https://github.com/psychoanalyze/psychoanalyze/commit/1c3c1dc8a7e375d241696af175a1f22ab9dc0f88))
+
+* chore: merge main; rebase for dev merges from now on! ([`a030f96`](https://github.com/psychoanalyze/psychoanalyze/commit/a030f96f267723e4589e795ff2d3ebc870034cc1))
+
+* chore: remove unused fn ([`4cff93d`](https://github.com/psychoanalyze/psychoanalyze/commit/4cff93ddb6ddb805e771582f8fa9620e6c72ed84))
+
+* chore: Merge branch &#39;dev&#39; of https://github.com/psychoanalyze/psychoanalyze into dev ([`49ec39e`](https://github.com/psychoanalyze/psychoanalyze/commit/49ec39e2b394ec19421a15837b6d4ca132759fef))
+
+* chore: remove legacy tests ([`3871346`](https://github.com/psychoanalyze/psychoanalyze/commit/3871346fa876138a7eeb8ea9f3a62106f98d04c5))
+
+* chore: Merge branch &#39;dev&#39; of https://github.com/psychoanalyze/psychoanalyze into dev ([`71d46cc`](https://github.com/psychoanalyze/psychoanalyze/commit/71d46cc9532e270b33290ca48adcef7e33812204))
+
+* chore: Merge branch &#39;main&#39; of https://github.com/psychoanalyze/psychoanalyze ([`292f747`](https://github.com/psychoanalyze/psychoanalyze/commit/292f74734e8ed504efd7b3551809d5b570a88c2b))
+
+* chore: Merge branch &#39;main&#39; of https://github.com/psychoanalyze/psychoanalyze ([`8ac341a`](https://github.com/psychoanalyze/psychoanalyze/commit/8ac341ade571a433c0360c21ebd40c0c481d18db))
+
+### Ci
+
+* ci: token again ([`16b1847`](https://github.com/psychoanalyze/psychoanalyze/commit/16b1847ebfc4e5136dbdd0825abe0bb3ad512904))
+
+* ci: match token again ([`e2fa60c`](https://github.com/psychoanalyze/psychoanalyze/commit/e2fa60ccc1e357c1d9c084d8f38d579d50992e6b))
+
+* ci: add head sha to pr branch name ([`47442a0`](https://github.com/psychoanalyze/psychoanalyze/commit/47442a0967197a96675e0abba689ddf339432728))
+
+* ci: try gh token again ([`89e04a8`](https://github.com/psychoanalyze/psychoanalyze/commit/89e04a80ad6f668cd7a5c7cc5c09becb44dfad8c))
+
+* ci: rename gh_token ([`fb04f35`](https://github.com/psychoanalyze/psychoanalyze/commit/fb04f357b26cd9cc08b9b4650489a0242c8c1423))
+
+* ci: allow release from release branch ([`ecca775`](https://github.com/psychoanalyze/psychoanalyze/commit/ecca775508467a73d1bc2b42e848299b23663b0a))
+
+* ci: use 8.0 python-semantic-release syntax ([`d33476d`](https://github.com/psychoanalyze/psychoanalyze/commit/d33476d1db46251d50215bf21c41ae4f2d45e1fe))
+
+* ci: remove old version command ([`cda0eee`](https://github.com/psychoanalyze/psychoanalyze/commit/cda0eee2bb4f24f75d7b495ab647fe58dbb6c975))
+
+* ci: new branch for version release ([`4fe4098`](https://github.com/psychoanalyze/psychoanalyze/commit/4fe409876cdb589b21c8f70012c808139234210e))
+
+* ci: install deps ([`4ecf8c3`](https://github.com/psychoanalyze/psychoanalyze/commit/4ecf8c305de05194240736da8706dc27d55b9356))
+
+* ci: install deps ([`93409b1`](https://github.com/psychoanalyze/psychoanalyze/commit/93409b102a1f63eb1273ba8c765d6cd62b9c6b89))
+
+* ci: install poetry for semantic-release ([`a55f089`](https://github.com/psychoanalyze/psychoanalyze/commit/a55f089b7175ff63167623025db00c10b294706e))
+
+* ci: install poetry for semantic-release ([`6559a87`](https://github.com/psychoanalyze/psychoanalyze/commit/6559a879ccedad8b3017e58bb45a7d8dbe698565))
+
+* ci: release on push to main ([`328173b`](https://github.com/psychoanalyze/psychoanalyze/commit/328173b0cddbd36de2549bfac50113628daf67b9))
+
+* ci: release on push to main ([`0a068c9`](https://github.com/psychoanalyze/psychoanalyze/commit/0a068c9262bc2eec3a345e0c9dcdc20eebd758e9))
+
+* ci: only run release workflow on ci success ([`0e04fdd`](https://github.com/psychoanalyze/psychoanalyze/commit/0e04fddc7494aa25640605d675c3b6f0b3b97b21))
+
+* ci: separate action for release ([`d463831`](https://github.com/psychoanalyze/psychoanalyze/commit/d463831e952d7c3ae23070fb8cb2782f98ce1ecc))
+
+* ci: check out head ref during checkout action for semantic release ([`99fd642`](https://github.com/psychoanalyze/psychoanalyze/commit/99fd642b6278439812217324e2d2583c9e2efbc9))
+
+* ci: force prs to main ([`3c85434`](https://github.com/psychoanalyze/psychoanalyze/commit/3c85434367c2cc624863ff81ee3255bf64523e0d))
+
+* ci: fix typo for &#34;state&#34; ([`cb7f938`](https://github.com/psychoanalyze/psychoanalyze/commit/cb7f938f571f02ec7873a0a650b7a087b072b4c6))
+
+* ci: just check status event ([`25e044c`](https://github.com/psychoanalyze/psychoanalyze/commit/25e044c66d3e1a646dbdd3c2ccbe8869988b5de6))
+
+* ci: try check suite instead of check run ([`e8d468e`](https://github.com/psychoanalyze/psychoanalyze/commit/e8d468e7eb76316e5124d3e08b14d2cb6ad02c3b))
+
+* ci: fix workflow syntax ([`69d9021`](https://github.com/psychoanalyze/psychoanalyze/commit/69d90214910f95b6a9496add7ffe6223ddad2511))
+
+* ci: try conditional workflow run ([`2f6841a`](https://github.com/psychoanalyze/psychoanalyze/commit/2f6841a65a7225d69e1e4f6f7130835300d1ef77))
+
+* ci: try remove dev container and add pre-commit check to ci workflow ([`7dc4ac9`](https://github.com/psychoanalyze/psychoanalyze/commit/7dc4ac943bab6bf8d775d956595d5dd695520df9))
+
+* ci: force pre-commit, use active venv for poetry ([`b3583cc`](https://github.com/psychoanalyze/psychoanalyze/commit/b3583cc169ec8cb9f426f4d7b171ee898d17400f))
+
+* ci: run checks in dev container ([`f78957c`](https://github.com/psychoanalyze/psychoanalyze/commit/f78957c50c9d342824b99541bcd041a890c10f7f))
+
+* ci: try using dev container for env setup ([`ab7f05b`](https://github.com/psychoanalyze/psychoanalyze/commit/ab7f05b123c91c04854c0b874bb95fe9de8b40e2))
+
+* ci: re-add secrets to tasks ([`4736042`](https://github.com/psychoanalyze/psychoanalyze/commit/473604205f6bc5e5fab8b6a5ff44148e9fa79f69))
+
+### Dash
+
+* dash: remove lambda and gamma inputs ([`c2a434b`](https://github.com/psychoanalyze/psychoanalyze/commit/c2a434b92bbce1c8788bf3deea59d39dc4dc24dc))
+
+### Deps
+
+* deps: pin poetry ([`807ae08`](https://github.com/psychoanalyze/psychoanalyze/commit/807ae08af81944c57e5550ed87ce58d6c6b6b303))
+
+* deps: update ruff ([`59745d4`](https://github.com/psychoanalyze/psychoanalyze/commit/59745d4ce0fc57c9b0cc860264f3e820133ff2b7))
+
+### Dev
+
+* dev: install gh pr extension in devcontainer ([`0295e9f`](https://github.com/psychoanalyze/psychoanalyze/commit/0295e9fc97bd905fee987eed5d3fecc5d97e2a8b))
+
+* dev: clean up default extensions ([`dbfe890`](https://github.com/psychoanalyze/psychoanalyze/commit/dbfe8901024f349b5b0be0fd13668a79c7de946c))
+
+### Documentation
+
+* docs: tweak contributing language ([`e33fde0`](https://github.com/psychoanalyze/psychoanalyze/commit/e33fde0e09b73ddafd86859b94ad7bc0a0bc27b0))
+
+* docs: nav ([`83defdd`](https://github.com/psychoanalyze/psychoanalyze/commit/83defdda47d69e634767f4066b78757ee5e11d91))
+
+* docs: finishing touches ([`68601af`](https://github.com/psychoanalyze/psychoanalyze/commit/68601af290e33a6c14973053b9eb6db10e02fca7))
+
+* docs: almost there! ([`4ba0bb5`](https://github.com/psychoanalyze/psychoanalyze/commit/4ba0bb5899b0694964be6a7c97c4992a5b18eb92))
+
+* docs: use icon for docs logo ([`2f401e9`](https://github.com/psychoanalyze/psychoanalyze/commit/2f401e9ca1e9d2672943fee737881a730242588f))
+
+* docs: dashboard guide ([`297ff47`](https://github.com/psychoanalyze/psychoanalyze/commit/297ff4717bf3d22e7697d0f3ed6e364fe7892436))
+
+* docs: home page phrasing ([`8965dc2`](https://github.com/psychoanalyze/psychoanalyze/commit/8965dc21280a1a68c568dfd3dd018765270429cc))
+
+* docs: tweak settings &amp; main page language ([`bf91d31`](https://github.com/psychoanalyze/psychoanalyze/commit/bf91d31ad3a0c1b7be88cb7420b4abe10b381091))
+
+* docs: home page ([`2d1d620`](https://github.com/psychoanalyze/psychoanalyze/commit/2d1d620101a903e52b8231d50e072fa5257326e1))
+
+* docs: dashboard ([`6576fbc`](https://github.com/psychoanalyze/psychoanalyze/commit/6576fbc0b215b36c345c783cfb8bdc9e09661a28))
+
+* docs: notebook tweaks ([`58180e4`](https://github.com/psychoanalyze/psychoanalyze/commit/58180e45b2b974c122b8af7f1e369d56b51c61a1))
+
+* docs: notebooks ([`3af3773`](https://github.com/psychoanalyze/psychoanalyze/commit/3af3773c5a8d4e0082d6df1b494ea55af35f4116))
+
+* docs: more language tweaks ([`e570dd7`](https://github.com/psychoanalyze/psychoanalyze/commit/e570dd7b3873253a59e4dd6711084b5a53724a30))
+
+* docs: fix some language ([`cf61828`](https://github.com/psychoanalyze/psychoanalyze/commit/cf61828a4dce3d6e47e7309e91ecf29972460262))
+
+* docs: match subtitle ([`4e592e1`](https://github.com/psychoanalyze/psychoanalyze/commit/4e592e1d902aff1536a4a70f753fdc1dc097dbc6))
+
+* docs: &#34;On this page&#34; instead of &#34;Table of Contents&#34; ([`7d80840`](https://github.com/psychoanalyze/psychoanalyze/commit/7d808405ef433f167f610e6c82ae75ded89184fb))
+
+### Feature
+
+* feat: cli dash command ([`72de7c8`](https://github.com/psychoanalyze/psychoanalyze/commit/72de7c8b92ee76cdd8306a6e18ab332b7e7e2c5a))
+
+* feat: CLI commands! Just --version for now. ([`4e1391b`](https://github.com/psychoanalyze/psychoanalyze/commit/4e1391bcd07427ae918569825af5149f5ee68347))
+
+### Fix
+
+* fix: mkdocstrings python handler syntax ([`4654a4b`](https://github.com/psychoanalyze/psychoanalyze/commit/4654a4bee13ed9bd54f8a82a5704ff90edc1e1e6))
+
+* fix: hard code gamma and lambda ([`63c3ef1`](https://github.com/psychoanalyze/psychoanalyze/commit/63c3ef152a387b97379810c6ab69ad42213b0dad))
+
+* fix: cli ([`c99ab68`](https://github.com/psychoanalyze/psychoanalyze/commit/c99ab68f91d52e3a1b76b50eaf3251aff52f8bb3))
+
+### Unknown
+
+* Merge pull request #25 from psychoanalyze/dev
+
+Dev ([`10bc38b`](https://github.com/psychoanalyze/psychoanalyze/commit/10bc38bc6f65b9c6c689d68e93d1321bbb06ee35))
+
+* Merge branch &#39;main&#39; into dev
+
+Signed-off-by: Ty Schlichenmeyer &lt;t.schlic@wustl.edu&gt; ([`c8348bb`](https://github.com/psychoanalyze/psychoanalyze/commit/c8348bb0c3917540e563cf2d2db98be640e35e46))
+
+* Merge branch &#39;main&#39; into dev ([`aff5938`](https://github.com/psychoanalyze/psychoanalyze/commit/aff5938b0f64c185ebdcaaf8f1f2028ba3266808))
+
+* Merge pull request #21 from psychoanalyze/dev
+
+Dev ([`8f1e895`](https://github.com/psychoanalyze/psychoanalyze/commit/8f1e89549dc90fd9cbc9de15c120152b5b908dda))
+
+* Merge pull request #18 from psychoanalyze/pre-commit-ci-update-config
+
+ci(pre-commit) ([`47100f3`](https://github.com/psychoanalyze/psychoanalyze/commit/47100f3e4b269b12b5af8e0f0d99ef95e2e19fb6))
+
+* Merge branch &#39;main&#39; into pre-commit-ci-update-config ([`354fbe8`](https://github.com/psychoanalyze/psychoanalyze/commit/354fbe86843d4eefcab5546e9ab27d8757db5a53))
+
+* Merge pull request #20 from psychoanalyze/dev
+
+Re-merge dev? ([`d9a6605`](https://github.com/psychoanalyze/psychoanalyze/commit/d9a6605898b336600ebbc04c2ed127c1c3044471))
+
+* CLI and major docs updates
+
+New feature! `psychoanalyze` CLI!  🤞 CI and release work the right way ([`f6dff4e`](https://github.com/psychoanalyze/psychoanalyze/commit/f6dff4e941cd3fcc18306cfbeb2d59082c9144ce))
+
+* ci(pre-commit)
+
+updates:
+- [github.com/astral-sh/ruff-pre-commit: v0.0.278 → v0.0.280](https://github.com/astral-sh/ruff-pre-commit/compare/v0.0.278...v0.0.280) ([`3aa969d`](https://github.com/psychoanalyze/psychoanalyze/commit/3aa969d66ba750ee52480712600ecfc3dc0ab7f8))
+
+* Merge pull request #16 from psychoanalyze/main
+
+Tidy up GitHub Actions for versioning etc! ([`507e6e3`](https://github.com/psychoanalyze/psychoanalyze/commit/507e6e3724a92bd0c6c5d51ef18f9bafb439d756))
+
+* Merge pull request #14 from psychoanalyze/schlich-patch-1
+
+Update issue templates ([`8c841e6`](https://github.com/psychoanalyze/psychoanalyze/commit/8c841e6cfa3e754e7644692c93be1a596ad0baee))
+
+* Merge branch &#39;main&#39; into schlich-patch-1 ([`eb02860`](https://github.com/psychoanalyze/psychoanalyze/commit/eb02860a36d2f6f6600afc5bd399fe31b6f372e6))
+
+* Merge pull request #15 from psychoanalyze/dev
+
+We&#39;re gonna have to open pull requests like adults now! ([`83ec4b2`](https://github.com/psychoanalyze/psychoanalyze/commit/83ec4b293a0590f690c0e20fb95920b7458678b6))
+
+* [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+for more information, see https://pre-commit.ci ([`b43aa2a`](https://github.com/psychoanalyze/psychoanalyze/commit/b43aa2a7d413fd25b2f1680a9f6d42fcc428ecf2))
+
+* Update issue templates ([`df0c3cd`](https://github.com/psychoanalyze/psychoanalyze/commit/df0c3cd8847ce139df2d657c4e0b6fef68a78748))
+
+* Merge pull request #13 from psychoanalyze/pre-commit-ci-update-config
+
+chore: [pre-commit.ci] pre-commit autoupdate ([`3f367c3`](https://github.com/psychoanalyze/psychoanalyze/commit/3f367c39e4d7f32d1b8a896bca435efad0f805b4))
+
+
 ## v0.7.1 (2023-07-23)
 
 ### Chore
+
+* chore(release): release 0.7.1 ([`bd15032`](https://github.com/psychoanalyze/psychoanalyze/commit/bd1503243cb51552bf7176fe80ebdc48cba7ba48))
 
 * chore: Merge branch &#39;main&#39; of https://github.com/psychoanalyze/psychoanalyze ([`c803454`](https://github.com/psychoanalyze/psychoanalyze/commit/c803454a2552374f575a37ae7a46ff80d3419bde))
 
@@ -117,6 +323,13 @@
 * test: remove orphaned test ([`b385a86`](https://github.com/psychoanalyze/psychoanalyze/commit/b385a864cfa4c9302bbf1cef706188daa0234a7d))
 
 * test: fix broken test ([`9e3d846`](https://github.com/psychoanalyze/psychoanalyze/commit/9e3d8461728525d496764308f1df880db6a651ca))
+
+### Unknown
+
+* [pre-commit.ci] pre-commit autoupdate
+
+updates:
+- [github.com/astral-sh/ruff-pre-commit: v0.0.277 → v0.0.278](https://github.com/astral-sh/ruff-pre-commit/compare/v0.0.277...v0.0.278) ([`6cb272b`](https://github.com/psychoanalyze/psychoanalyze/commit/6cb272b0993d6e231acfe53c1c3b0918e8b73581))
 
 
 ## v0.6.2 (2023-07-16)
