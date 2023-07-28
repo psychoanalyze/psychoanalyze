@@ -63,7 +63,7 @@ types-setuptools = "^68.0.0.3"
 psychoanalyze = "psychoanalyze.main:app"
 
 [tool.poetry.extras]
-docs = ["mkdocs", "mkdocs-materal", "mkdocstrings[python]"]
+docs = ["mkdocs", "mkdocs-materal", "mkdocstrings-python"]
 
 [tool.semantic_release]
 version_toml = ["pyproject.toml:tool.poetry.version"]
