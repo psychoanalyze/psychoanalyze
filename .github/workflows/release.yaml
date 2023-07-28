@@ -32,10 +32,9 @@ jobs:
 
       - name: Update Version & Publish
         run: |
-          branch="release-$(git rev-parse --short HEAD)"
-          git switch -c $branch
+          git switch -c release
           poetry run semantic-release version
-          gh pr create --title "Auto-release" --body "Automated release" --head
+          gh pr create --title "Auto-release" --body "Automated release"
           poetry run semantic-release publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
