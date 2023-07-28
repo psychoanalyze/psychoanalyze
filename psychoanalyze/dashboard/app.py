@@ -87,6 +87,7 @@ def update_data(
         "n_blocks",
     ]
     n_params = pd.Series(n_param, index=n_param_values)
+    param = [*param, 0.0, 0.0]
     params = pd.Series(param, index=["x_0", "k", "gamma", "lambda"])
     params["intercept"] = -params["x_0"] / params["k"]
     params["slope"] = 1 / params["k"]
@@ -189,6 +190,7 @@ def update_fig(  # noqa: PLR0913
     max_x: float,
 ) -> go.Figure:
     """Update plot and tables based on data store and selected view."""
+    param = [*param, 0.0, 0.0]
     params = pd.Series(param, index=["x_0", "k", "gamma", "lambda"])
     params["intercept"] = -params["x_0"] / params["k"]
     params["slope"] = 1 / params["k"]

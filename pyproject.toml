@@ -5,7 +5,7 @@ description = "Interactive analysis and simulation of psychophysical data."
 authors = ["Ty Schlichenmeyer <t.schlic@wustl.edu>"]
 license = "GPL-3.0-or-later"
 readme = "README.md"
-packages = [ { include = "psychoanalyze" }]
+packages = [{ include = "psychoanalyze" }]
 homepage = "https://psychoanalyze.io"
 repository = "https://github.com/psychoanalyze/psychoanalyze"
 documentation = "https://docs.psychoanalyze.io"
@@ -38,7 +38,7 @@ scikit-learn = "^1.2.2"
 bambi = "^0.11.0"
 cmdstanpy = "^1.1.0"
 pandas-stubs = "^2.0.2.230605"
-pandera = {extras = ["mypy"], version = "^0.15.1"}
+pandera = { extras = ["mypy"], version = "^0.15.1" }
 pytest = "^7.3.2"
 hypothesis = "^6.79.0"
 datatest = "^0.11.1"
@@ -46,7 +46,7 @@ pytest-mock = "^3.11.1"
 gunicorn = "^20.1.0"
 mypy = "^1.4.1"
 click = "^8.1.3"
-typer = {extras = ["all"], version = "^0.9.0"}
+typer = { extras = ["all"], version = "^0.9.0" }
 tuna = "^0.5.11"
 ruff = "^0.0.280"
 black = "^23.3.0"
@@ -58,22 +58,15 @@ types-pytz = "^2023.3.0.0"
 python-semantic-release = "^8.0.2"
 jupyter = "^1.0.0"
 types-setuptools = "^68.0.0.3"
-mkdocs = "^1.4.3"
-mkdocs-material = "^9.1.19"
-mkdocstrings = {extras = ["python"], version = "^0.22.0"}
 
 [tool.poetry.scripts]
 psychoanalyze = "psychoanalyze.main:app"
 
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.poetry.extras]
+docs = ["mkdocs", "mkdocs-materal", "mkdocstrings[python]"]
 
 [tool.semantic_release]
-version_toml = [
-    "pyproject.toml:tool.poetry.version"
-]
+version_toml = ["pyproject.toml:tool.poetry.version"]
 branch = "main"
 build_command = "poetry build"
 commit_message = "chore(release): release {version}"
@@ -92,7 +85,7 @@ allowed_tags = [
     "refactor",
     "perf",
     "chore",
-    "notebook"
+    "notebook",
 ]
 
 [tool.bandit]
@@ -116,7 +109,7 @@ module = [
     'bambi',
     'hypothesis',
     'statsmodels.*',
-    'pytz'
+    'pytz',
 ]
 ignore_missing_imports = true
 
@@ -130,3 +123,7 @@ convention = "google"
 
 [tool.ruff.per-file-ignores]
 "tests/*.py" = ["D100", "D103", "ANN201"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
