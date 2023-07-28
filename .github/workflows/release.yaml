@@ -32,7 +32,8 @@ jobs:
 
       - name: Update Version & Publish
         run: |
-          git switch -c release
+          branch=$(git rev-parse --short HEAD)
+          git switch -c release/$branch
           poetry run semantic-release version
           gh pr create --title "Auto-release" --body "Automated release"
           poetry run semantic-release publish
