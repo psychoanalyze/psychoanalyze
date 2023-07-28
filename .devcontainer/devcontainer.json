@@ -51,7 +51,8 @@
         "GitHub.copilot-chat",
         "eamodio.gitlens",
         "github.vscode-github-actions",
-        "ms-python.black-formatter"
+        "ms-python.black-formatter",
+        "GitHub.vscode-pull-request-github"
       ]
     }
   }
