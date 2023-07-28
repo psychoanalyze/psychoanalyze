@@ -33,9 +33,9 @@ jobs:
       - name: Update Version & Publish
         run: |
           branch="release-$(git rev-parse --short HEAD)"
-          git checkout -b $branch
-          poetry run semantic-release --define="branch=$branch" version
-          gh pr create -- title Release --body "Automated release" --head $branch
+          git switch -c $branch
+          poetry run semantic-release version
+          gh pr create --title "Auto-release" --body "Automated release" --head
           poetry run semantic-release publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
