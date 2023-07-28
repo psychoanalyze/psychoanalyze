@@ -38,5 +38,5 @@ jobs:
           gh pr create --title "Auto-release" --body "Automated release"
           poetry run semantic-release publish
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
