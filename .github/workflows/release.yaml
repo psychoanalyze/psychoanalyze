@@ -31,13 +31,18 @@ jobs:
       - name: Install dependencies
         run: poetry install
 
-      - name: Update Version & Publish
+      - name: Update Version
+        continue-on-error: true
         run: |
           branch=$(git rev-parse --short HEAD)
           git switch -c release/$branch
-          poetry run semantic-release --strict version
+          poetry run semantic-release version
           gh pr create --title "Auto-release" --body "Automated release" --head release/$branch
-          poetry run semantic-release publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish
+        run:
+          poetry run semantic-release publish
+        env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
