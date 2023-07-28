@@ -9,6 +9,9 @@ jobs:
   release:
     runs-on: ubuntu-latest
     concurrency: release
+    environment:
+      name: pypi
+      url: https://pypi.org/p/psychoanalyze
     permissions:
       id-token: write
       contents: write
@@ -19,30 +22,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Poetry
-        run: pipx install poetry
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v4
+      - name: Python Semantic Release
+        id: release
+        uses: python-semantic-release/python-semantic-release@v8.0.0
         with:
-          python-version: 3.11
-          cache: 'poetry'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install dependencies
-        run: poetry install
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        if: steps.release.outputs.released == 'true'
 
-      - name: Update Version
-        continue-on-error: true
-        run: |
-          branch=$(git rev-parse --short HEAD)
-          git switch -c release/$branch
-          poetry run semantic-release version
-          gh pr create --title "Auto-release" --body "Automated release" --head release/$branch
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish
-        run:
-          poetry run semantic-release publish
-        env:
-          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+      - name: Publish package distributions to GitHub Releases
+        uses: python-semantic-release/upload-to-gh-release@main
+        if: steps.release.outputs.released == 'true'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
