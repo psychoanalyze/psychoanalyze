@@ -35,7 +35,7 @@ jobs:
           branch=$(git rev-parse --short HEAD)
           git switch -c release/$branch
           poetry run semantic-release version
-          gh pr create --title "Auto-release" --body "Automated release"
+          gh pr create --title "Auto-release" --body "Automated release" --head release/$branch
           poetry run semantic-release publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
