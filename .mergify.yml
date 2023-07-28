@@ -1,8 +1,8 @@
 pull_request_rules:
   - name: Automatic merge on approval
     conditions:
-      - "#approved-reviews-by>=1"
-      - "author=schlich"
+      - check-success=pre-commit.ci - pr
+      - author=schlich
     actions:
       merge:
         method: merge
