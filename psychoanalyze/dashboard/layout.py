@@ -196,12 +196,9 @@ layout = dbc.Container(
                 dbc.NavItem(
                     [
                         dbc.NavLink(
-                            "GitHub",
+                            "Notebook",
                             href=(
-                                """"https://nb.psychoanalyze.io/hub/user-redirect/git-pull
-                                ?repo=https%3A%2F%2Fgithub.com%2Fpsychoanalyze%2Fpsychoanalyze
-                                &urlpath=lab%2Ftree%2Fpsychoanalyze%2Fdocs%2Fnotebooks%2Ftutorial.ipynb
-                                &branch=master"""
+                                """"https://nb.psychoanalyze.io/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Fpsychoanalyze%2Fpsychoanalyze&urlpath=lab%2Ftree%2Fpsychoanalyze%2Fdocs%2Fnotebooks%2Ftutorial.ipynb&branch=master"""
                             ),
                         ),
                         html.I(className="bi bi-journal-code"),
