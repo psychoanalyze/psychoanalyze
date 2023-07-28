@@ -1,9 +1,34 @@
 site_name: PsychoAnalyze
-site_url: https://psychoanalyze.io
+site_url: https://docs.psychoanalyze.io
 theme:
   name: material
-  logo: assets/logo_bgwhite.png
+  icon:
+    logo: material/chart-bell-curve-cumulative
   favicon: assets/logo_bgwhite.png
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      primary: teal
+      scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      primary: teal
+      scheme: slate
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.indexes
+    - toc.follow
+    - content.action.edit
+    - content.code.copy
+    - announce.dismiss
+  custom_dir: docs/overrides
 plugins:
 - search
 - mkdocstrings:
@@ -16,8 +41,12 @@ plugins:
 repo_url: https://github.com/psychoanalyze/psychoanalyze
 edit_uri: edit/main/docs/
 markdown_extensions:
+  - admonition
+  - pymdownx.details
   - pymdownx.highlight:
       anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
@@ -26,16 +55,37 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
-extra_javascript:
- - https://cdn.plot.ly/plotly-2.12.1.min.js
- - docs/require.js
+      title: On this page
+  - footnotes
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
 watch:
- - psychoanalyze
- - tests
+  - psychoanalyze
+  - tests
 nav:
- - 'index.md'
- - 'dashboard.md'
- - 'api.md'
- - 'contributing.md'
- - 'tests.md'
- - 'Notebook': notebooks/tutorial.ipynb
+  - Getting Started:
+    - 'index.md'
+    - Dashboard:
+      - 'dashboard/index.md'
+      - Input Panel: 'dashboard/input.md'
+      - Visualization Panel: 'dashboard/viz.md'
+      - Output Panel: 'dashboard/output.md'
+    - Notebooks: 'notebooks/index.md'
+    - Developers:
+      - API Reference: 'api.md'
+      - Testing Reference: 'tests.md'
+    - Contributing: 'contributing.md'
+  - API Reference:
+    - Psychoanalyze: 'api.md'
+    - Testing Reference: 'tests.md'
+extra_javascript:
+  - javascripts/katex.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js
+extra_css:
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css
+extra:
+  homepage: https://psychoanalyze.io

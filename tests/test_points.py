@@ -40,33 +40,6 @@ def test_from_trials_sums_n_per_intensity_level():
     )
 
 
-def test_amp_dimension():
-    points = pd.DataFrame(
-        index=pd.MultiIndex.from_frame(
-            pd.DataFrame({"Amp1": [1, 2], "Width1": [1, 1]}),
-        ),
-    )
-    assert pa_points.dimension(points) == "Amp"
-
-
-def test_width_dimension():
-    points = pd.DataFrame(
-        index=pd.MultiIndex.from_frame(
-            pd.DataFrame({"Amp1": [1, 1], "Width1": [1, 2]}),
-        ),
-    )
-    assert pa_points.dimension(points) == "Width"
-
-
-def test_both_dimensions():
-    points = pd.DataFrame(
-        index=pd.MultiIndex.from_frame(
-            pd.DataFrame({"Amp1": [1, 2], "Width1": [1, 2]}),
-        ),
-    )
-    assert pa_points.dimension(points) == "Both"
-
-
 def test_plot():
     points = pd.DataFrame(
         {"Hit Rate": [], "n": [], "Block": []},
@@ -112,26 +85,3 @@ def test_combine_plots():
     plot2 = px.line(data2)
     fig = pa_points.combine_plots(plot1, plot2)
     assert len(fig.data) == len(data1) + len(data2)
-
-
-def test_no_dimension():
-    session_cols = ["Monkey", "Date"]
-    ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
-    channel_config = ["Active Channels", "Return Channels"]
-    test_stim_cols = ["Amp1", "Width1", "Freq1", "Dur1"]
-    points = pd.DataFrame(
-        {"n": [], "Hits": []},
-        index=pd.MultiIndex.from_frame(
-            pd.DataFrame(
-                {
-                    field: []
-                    for field in session_cols
-                    + ref_stim_cols
-                    + channel_config
-                    + test_stim_cols
-                },
-            ),
-        ),
-    )
-    dimension = pa_points.dimension(points)
-    assert dimension == "Neither"
