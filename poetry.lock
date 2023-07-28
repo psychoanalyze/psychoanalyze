@@ -522,13 +522,13 @@ files = [
 
 [[package]]
 name = "click"
-version = "8.1.6"
+version = "8.1.3"
 description = "Composable command line interface toolkit"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "click-8.1.6-py3-none-any.whl", hash = "sha256:fa244bb30b3b5ee2cae3da8f55c9e5e0c0e86093306301fb418eb9dc40fbded5"},
-    {file = "click-8.1.6.tar.gz", hash = "sha256:48ee849951919527a045bfe3bf7baa8a959c423134e1a5b98c05c20ba75a1cbd"},
+    {file = "click-8.1.3-py3-none-any.whl", hash = "sha256:bb4d8133cb15a609f44e8213d9b391b0809795062913b383c62be0ee95b1db48"},
+    {file = "click-8.1.3.tar.gz", hash = "sha256:7682dc8afb30297001674575ea00d1814d808d6a36af415a82bd481d37ba7b8e"},
 ]
 
 [package.dependencies]
@@ -786,19 +786,19 @@ files = [
 
 [[package]]
 name = "dbt-core"
-version = "1.5.2"
+version = "1.5.3"
 description = "With dbt, data analysts and engineers can build analytics the way engineers build applications."
 optional = false
 python-versions = ">=3.7.2"
 files = [
-    {file = "dbt-core-1.5.2.tar.gz", hash = "sha256:e206563dd591f94573e56b19818d5cd87c462b1f1ad8f34eb88a2761bcc25b25"},
-    {file = "dbt_core-1.5.2-py3-none-any.whl", hash = "sha256:f0e30547d3207b18663f995261b76d5de785935b60030d53c626276dcbff9e61"},
+    {file = "dbt-core-1.5.3.tar.gz", hash = "sha256:4abac0431a4b09c2b00c2971932cc6be0c66ab2414db98e124878b06cb0fcbfa"},
+    {file = "dbt_core-1.5.3-py3-none-any.whl", hash = "sha256:f27601061d7303a1bd95bc803625e4957d33bcd2b20292dab7280c5801ca37a6"},
 ]
 
 [package.dependencies]
 agate = ">=1.6,<1.7.1"
 cffi = ">=1.9,<2.0.0"
-click = ">=7.0,<9"
+click = ">=7.0,<8.1.4"
 colorama = ">=0.3.9,<0.4.7"
 dbt-extractor = ">=0.4.1,<0.5.0"
 hologram = ">=0.0.14,<=0.0.16"
@@ -815,7 +815,7 @@ protobuf = ">=4.0.0"
 pytz = ">=2015.7"
 pyyaml = ">=6.0"
 requests = "<3.0.0"
-sqlparse = ">=0.2.3,<0.4.4"
+sqlparse = ">=0.2.3"
 typing-extensions = ">=3.7.4"
 werkzeug = ">=1,<3"
 
@@ -4026,14 +4026,19 @@ files = [
 
 [[package]]
 name = "sqlparse"
-version = "0.4.3"
+version = "0.4.4"
 description = "A non-validating SQL parser."
 optional = false
 python-versions = ">=3.5"
 files = [
-    {file = "sqlparse-0.4.3-py3-none-any.whl", hash = "sha256:0323c0ec29cd52bceabc1b4d9d579e311f3e4961b98d174201d5622a23b85e34"},
-    {file = "sqlparse-0.4.3.tar.gz", hash = "sha256:69ca804846bb114d2ec380e4360a8a340db83f0ccf3afceeb1404df028f57268"},
+    {file = "sqlparse-0.4.4-py3-none-any.whl", hash = "sha256:5430a4fe2ac7d0f93e66f1efc6e1338a41884b7ddf2a350cedd20ccc4d9d28f3"},
+    {file = "sqlparse-0.4.4.tar.gz", hash = "sha256:d446183e84b8349fa3061f0fe7f06ca94ba65b426946ffebe6e3e8295332420c"},
 ]
+
+[package.extras]
+dev = ["build", "flake8"]
+doc = ["sphinx"]
+test = ["pytest", "pytest-cov"]
 
 [[package]]
 name = "stack-data"
@@ -4607,4 +4612,4 @@ docs = []
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.4"
-content-hash = "dcca08ceaca1bcfbb5587714911474c90ec141ee40a84fe973bc0388df62a68b"
+content-hash = "67fdd045dbb6752ea2ba79ab659093f359172bc6dbcee7cab20ebc06ed99cad4"
