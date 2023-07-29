@@ -2,9 +2,11 @@
 
 
 
-## v0.8.0 (2023-07-28)
+## v0.8.1 (2023-07-29)
 
 ### Chore
+
+* chore(release): release 0.8.0 ([`3c1c24e`](https://github.com/psychoanalyze/psychoanalyze/commit/3c1c24e62ee2cb7a1c18a949c7f119a96b2593c0))
 
 * chore: Merge branch &#39;dev&#39; of https://github.com/psychoanalyze/psychoanalyze into dev ([`1c3c1dc`](https://github.com/psychoanalyze/psychoanalyze/commit/1c3c1dc8a7e375d241696af175a1f22ab9dc0f88))
 
@@ -23,6 +25,30 @@
 * chore: Merge branch &#39;main&#39; of https://github.com/psychoanalyze/psychoanalyze ([`8ac341a`](https://github.com/psychoanalyze/psychoanalyze/commit/8ac341ade571a433c0360c21ebd40c0c481d18db))
 
 ### Ci
+
+* ci: increase semantic-release verbosity ([`9285c14`](https://github.com/psychoanalyze/psychoanalyze/commit/9285c14d881d2be0b0536f53352771f2e7ed41ea))
+
+* ci: auto pr merges for me and not for thee (#46)
+
+* ci: auto pr merges for me and not for thee
+
+* ci: use check success check ([`ddaec05`](https://github.com/psychoanalyze/psychoanalyze/commit/ddaec054c91ce71afca8a0bc87712f37cc30225b))
+
+* ci(Mergify): configuration update (#44)
+
+Signed-off-by: Ty Schlichenmeyer &lt;ty.schlich@gmail.com&gt; ([`dd2b412`](https://github.com/psychoanalyze/psychoanalyze/commit/dd2b412ed32d911a08499db93437635ef8b9607e))
+
+* ci: release to main branch (#39) ([`0b8111e`](https://github.com/psychoanalyze/psychoanalyze/commit/0b8111efb9a2536cc67c18fa68d87342ae8e3364))
+
+* ci: position strict option ([`090eee2`](https://github.com/psychoanalyze/psychoanalyze/commit/090eee2bf2cc6fe6acb4f73e71761beeaa7e66a5))
+
+* ci: add strict command for sem-release (#34) ([`e7675be`](https://github.com/psychoanalyze/psychoanalyze/commit/e7675be411dbedd150b8981939d607487e36a4e7))
+
+* ci: add head arg to gh pr create ([`cea76ef`](https://github.com/psychoanalyze/psychoanalyze/commit/cea76ef7fe92dc5b1bf87a8ac0a92d005363c049))
+
+* ci: token again ([`4205fe7`](https://github.com/psychoanalyze/psychoanalyze/commit/4205fe7e62001399f7afa28374a2ff49c1a68983))
+
+* ci: match token again ([`3cbcb57`](https://github.com/psychoanalyze/psychoanalyze/commit/3cbcb57cc07b3043db806aa7d689b850fd1fd884))
 
 * ci: token again ([`16b1847`](https://github.com/psychoanalyze/psychoanalyze/commit/16b1847ebfc4e5136dbdd0825abe0bb3ad512904))
 
@@ -84,9 +110,13 @@
 
 ### Dash
 
+* dash: fix url link to nb ([`881a45b`](https://github.com/psychoanalyze/psychoanalyze/commit/881a45b32bebd27408cd6acb2298aecdf0b655ab))
+
 * dash: remove lambda and gamma inputs ([`c2a434b`](https://github.com/psychoanalyze/psychoanalyze/commit/c2a434b92bbce1c8788bf3deea59d39dc4dc24dc))
 
 ### Deps
+
+* deps: update dbt-core (#42) ([`65631ab`](https://github.com/psychoanalyze/psychoanalyze/commit/65631ab537f0c45ee7880c06c0c279f3923f48b7))
 
 * deps: pin poetry ([`807ae08`](https://github.com/psychoanalyze/psychoanalyze/commit/807ae08af81944c57e5550ed87ce58d6c6b6b303))
 
@@ -99,6 +129,10 @@
 * dev: clean up default extensions ([`dbfe890`](https://github.com/psychoanalyze/psychoanalyze/commit/dbfe8901024f349b5b0be0fd13668a79c7de946c))
 
 ### Documentation
+
+* docs: isolate deps/make optiona, add content for viz + other (#45) ([`75687eb`](https://github.com/psychoanalyze/psychoanalyze/commit/75687ebe158ad3c8eb3ace2bd37e7bbe4619b616))
+
+* docs(dash): fix url link to go to main not master (#43) ([`1d8a005`](https://github.com/psychoanalyze/psychoanalyze/commit/1d8a005ca3f456514795812fcd057e59aae92357))
 
 * docs: tweak contributing language ([`e33fde0`](https://github.com/psychoanalyze/psychoanalyze/commit/e33fde0e09b73ddafd86859b94ad7bc0a0bc27b0))
 
@@ -140,13 +174,97 @@
 
 ### Fix
 
+* fix: use latest release for semantic-release action ([`b0f5ef3`](https://github.com/psychoanalyze/psychoanalyze/commit/b0f5ef3802200ca64d371f28f0193517c03df988))
+
+* fix: hotfix for version bump ([`244ff0a`](https://github.com/psychoanalyze/psychoanalyze/commit/244ff0a6ae7831352c29265961c2ac61cc0873f9))
+
+* fix(hot): subpackage install? (#48) ([`17c2740`](https://github.com/psychoanalyze/psychoanalyze/commit/17c274002b9caed169cc8db964ee3240eb69f650))
+
 * fix: mkdocstrings python handler syntax ([`4654a4b`](https://github.com/psychoanalyze/psychoanalyze/commit/4654a4bee13ed9bd54f8a82a5704ff90edc1e1e6))
 
 * fix: hard code gamma and lambda ([`63c3ef1`](https://github.com/psychoanalyze/psychoanalyze/commit/63c3ef152a387b97379810c6ab69ad42213b0dad))
 
 * fix: cli ([`c99ab68`](https://github.com/psychoanalyze/psychoanalyze/commit/c99ab68f91d52e3a1b76b50eaf3251aff52f8bb3))
 
+### Nb
+
+* nb: change nb to readme (#47) ([`5d6b472`](https://github.com/psychoanalyze/psychoanalyze/commit/5d6b4727ae6796adc5a6cf3547dd90093e7edea6))
+
 ### Unknown
+
+* Merge pull request #51 from psychoanalyze/semantic-release/verbosity
+
+ci: increase semantic-release verbosity ([`2168703`](https://github.com/psychoanalyze/psychoanalyze/commit/2168703d6415f579f073833a1b0f76d4ba91df5b))
+
+* Merge pull request #49 from psychoanalyze/hotfix/version-bump
+
+fix: hotfix for version bump ([`290413a`](https://github.com/psychoanalyze/psychoanalyze/commit/290413a179e6435e236aec6c77deb64c34c9b177))
+
+* Merge pull request #41 from psychoanalyze:bugfix/no-ref/notebook-url-link
+
+dash: fix url link to nb ([`60b191c`](https://github.com/psychoanalyze/psychoanalyze/commit/60b191c30552dea9cd2f04b47f6271e0841dfb77))
+
+* Dev (#40)
+
+* ci: release to main branch
+
+* docs: add notebook link ([`255ed16`](https://github.com/psychoanalyze/psychoanalyze/commit/255ed1683f2b8e569ec307fab88a14275ffe2f23))
+
+* Dev (#38)
+
+* ci: add strict command for sem-release
+
+* ci: position strict option
+
+* ci: remove &#34;ci&#34; workflow, not doing anything anymore
+
+* ci: release &amp; publish in separate steps
+
+* ci: use semantic-release template
+
+---------
+
+Signed-off-by: Ty Schlichenmeyer &lt;t.schlic@wustl.edu&gt; ([`2c4bc87`](https://github.com/psychoanalyze/psychoanalyze/commit/2c4bc87f3105059b9d989a4e3276aa0565ebd192))
+
+* Dev (#37)
+
+* ci: add strict command for sem-release
+
+* ci: position strict option
+
+* ci: remove &#34;ci&#34; workflow, not doing anything anymore
+
+* ci: release &amp; publish in separate steps
+
+---------
+
+Signed-off-by: Ty Schlichenmeyer &lt;t.schlic@wustl.edu&gt; ([`9ea2aab`](https://github.com/psychoanalyze/psychoanalyze/commit/9ea2aab4a6c309b095542be13d28969c94f7ab04))
+
+* Dev (#36)
+
+* ci: add strict command for sem-release
+
+* ci: position strict option
+
+* ci: remove &#34;ci&#34; workflow, not doing anything anymore
+
+---------
+
+Signed-off-by: Ty Schlichenmeyer &lt;t.schlic@wustl.edu&gt; ([`d2a5ace`](https://github.com/psychoanalyze/psychoanalyze/commit/d2a5ace304211b8fe7bc7dbeea00dd69a25a997c))
+
+* Dev (#32)
+
+* ci: try gh token again
+
+* ci: add head sha to pr branch name
+
+* ci: match token again
+
+* ci: token again
+
+* ci: add head arg to gh pr create
+
+* ci: give action write perms for pull requests ([`00329d7`](https://github.com/psychoanalyze/psychoanalyze/commit/00329d7537a3b8bfcdc3e71398514c8c6b3e8b36))
 
 * Merge pull request #25 from psychoanalyze/dev
 
