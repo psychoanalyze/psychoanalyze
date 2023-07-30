@@ -33,13 +33,13 @@ There are several existing software packages that provide tools for psychophysic
 
 - [PsychoPy](https://www.psychopy.org/) [@peirce_psychopy2_2019] is a Python package that provides a complete suite of tools for designing and running psychophysical experiments on a personal computer device.
 
-- [PsychToolbox] is a MATLAB package that similarly provides routine for stimulus presentation and data collection.
+- [PsychToolbox](http://psychtoolbox.org/citations) [@brainard_psychophysics_1997] is a MATLAB package that similarly provides routine for stimulus presentation and data collection.
 
-- [Palamedes](http://www.palamedestoolbox.org/) is a MATLAB toolbox that provides an advanced set of curve-fitting procedures, including procedures that use subject-level data to use hierarchical Bayesian methods for more accurate estimates.
+- [Palamedes](http://www.palamedestoolbox.org/) [@prins_applying_2018] is a MATLAB toolbox that provides an advanced set of curve-fitting procedures, including procedures that use subject-level data to use hierarchical Bayesian methods for more accurate estimates.
 
-- [psignifit] Is primarily developed in MATLAB, but ported to Python. It primarily provides methods for fitting the psychometric function using Bayesian methods.
+- [psignifit](https://github.com/wichmann-lab/psignifit/wiki) [@schutt_painfree_2016] Is primarily developed in MATLAB, but ported to Python. It primarily provides methods for fitting the psychometric function using Bayesian methods.
 
-- [BayesFit] is a Python-first model-fitting library, but is no longer being actively being maintained.
+- [BayesFit](http://doi.org/10.5334/jors.202) [@slugocki_bayesfit:_2019] is a Python-first model-fitting library, but is no longer being actively being maintained.
 
 As described, these packages mostly focus on stimulus presentation software or model-fitting methods. *PsychoAnalyze* seeks to provide additional data manipulation and visualization tools for the ongoing experiment, especially experiments performed with a large number of trial blocks and a variety of experimental conditions. Various "plug-in" modules may be developed that utilize these libraries and their I/O file formats to provide a more streamlined workflow for data analysis.
 
