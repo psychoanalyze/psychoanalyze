@@ -29,7 +29,7 @@ At the core of the psychophysical model is the *psychometric function*, a hypoth
 
 # Statement of need
 
-*PsychoAnalyze* provides data manipulation and visualization tools built on modularity and extensibility, with an aim of empowering researchers to fully explore and contextualize their data, while minimizing time spend wrestling with custom analysis scripts.
+*PsychoAnalyze* provides data manipulation and visualization tools built on modularity and extensibility, aiming to empower researchers to more fully explore and contextualize their data, while minimizing time spent wrestling with custom analysis scripts.
 
 In addition to a Python package and a command-line tool, *PsychoAnalyze* offers a web-hosted dashboard demonstrating the capabilities of the package. On its own, the dashboard provides researchers with a no-code interface to fit their data to a psychometric function and visualize the results in an interactive setting.
 
