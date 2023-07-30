@@ -2,9 +2,28 @@
 
 
 
+## v0.8.3 (2023-07-30)
+
+### Deps
+
+* deps: update lockfile ([`7f7c400`](https://github.com/psychoanalyze/psychoanalyze/commit/7f7c400959de247fa9113080af9f470904e02c35))
+
+### Fix
+
+* fix: move some dependencies to dev group ([`cf35e47`](https://github.com/psychoanalyze/psychoanalyze/commit/cf35e47196ec11c106c9afc31d3c040f64fc0161))
+
+### Unknown
+
+* Merge pull request #57 from psychoanalyze/release/0.8.2
+
+Release/0.8.2 ([`92ad95b`](https://github.com/psychoanalyze/psychoanalyze/commit/92ad95bd4e51817ce177cba953b8de6a6e579246))
+
+
 ## v0.8.2 (2023-07-29)
 
 ### Chore
+
+* chore(release): release 0.8.2 ([`e493a3a`](https://github.com/psychoanalyze/psychoanalyze/commit/e493a3ab2806e34add74a4df01c41d21068f7bdb))
 
 * chore: python specify patch version ([`47a0d74`](https://github.com/psychoanalyze/psychoanalyze/commit/47a0d74786d7915e623781c19675fe913b14d603))
 
