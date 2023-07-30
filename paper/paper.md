@@ -43,9 +43,9 @@ For example, psychoanalyze provides methods to:
 
 - Transform model parameters from one parameterization to another (*e.g.*, location/scale form to intercept/slope form, or linear form to z-scored form)
 
-\begin{equation}
-\psi(x) = \fract{1}{1 + e^{\alpha + \beta x}} -> \frac{1}{1 + e^{-\fract{(x - \mu)}{\sigma}}}
-\end{equation}
+$$
+\psi(x) = \frac{1}{1 + e^{\alpha + \beta x}} -> \frac{1}{1 + e^{-\frac{(x - \mu)}{\sigma}}}
+$$
 
 The *Alpha* release of PsychoAnalyze packaged with this publication demonstrates Various "plug-in" modules may be developed that utilize these libraries and their I/O file formats to provide a more streamlined workflow for data analysis.
 
