@@ -2,9 +2,52 @@
 
 
 
+## v0.8.2 (2023-07-29)
+
+### Chore
+
+* chore: python specify patch version ([`47a0d74`](https://github.com/psychoanalyze/psychoanalyze/commit/47a0d74786d7915e623781c19675fe913b14d603))
+
+* chore: Merge branch &#39;main&#39; into semver/force-patch ([`b1735bc`](https://github.com/psychoanalyze/psychoanalyze/commit/b1735bc4796cd2c801594298b49e3176eb0792e0))
+
+### Ci
+
+* ci: pin python-semantic-release gh action version ([`f23aad5`](https://github.com/psychoanalyze/psychoanalyze/commit/f23aad5b1b9f91648848933f17ada0b93e460bbe))
+
+### Dev
+
+* dev: update lockfile ([`ab1945e`](https://github.com/psychoanalyze/psychoanalyze/commit/ab1945e7c28cb6e379f4302adca9f7e535cf9cb2))
+
+### Unknown
+
+* Merge pull request #56 from psychoanalyze/python/patch-config
+
+chore: python specify patch version ([`7e84dfb`](https://github.com/psychoanalyze/psychoanalyze/commit/7e84dfb5010c04637a7d1c3dc9247922b26f6d27))
+
+* Merge pull request #55 from psychoanalyze/build/python-versions
+
+build: allow more python versions in config ([`51d3018`](https://github.com/psychoanalyze/psychoanalyze/commit/51d3018b52ebd8c811225f47b9e4f319d9437c51))
+
+* build: allow more python versions in config ([`376b557`](https://github.com/psychoanalyze/psychoanalyze/commit/376b557be5c414245fe769e547432bb12bd6406a))
+
+* Merge pull request #54 from psychoanalyze/ci/patch
+
+ci: pin python-semantic-release gh action version ([`54550f5`](https://github.com/psychoanalyze/psychoanalyze/commit/54550f5848d2d26e9572d05befdba724e318cb77))
+
+* Merge pull request #53 from psychoanalyze/semver/force-patch
+
+Semver/force patch ([`9dbf827`](https://github.com/psychoanalyze/psychoanalyze/commit/9dbf8278e3b0fd59689539a99a286a96cefa4b32))
+
+* Merge pull request #52 from psychoanalyze/semver/force-patch
+
+chore(release): release 0.8.1 ([`05a5401`](https://github.com/psychoanalyze/psychoanalyze/commit/05a5401a2003af1b72449b2e648569835bedd009))
+
+
 ## v0.8.1 (2023-07-29)
 
 ### Chore
+
+* chore(release): release 0.8.1 ([`2c6bbaa`](https://github.com/psychoanalyze/psychoanalyze/commit/2c6bbaaa1eb5fff6052254ccadfd6b7e879a24d8))
 
 * chore(release): release 0.8.0 ([`3c1c24e`](https://github.com/psychoanalyze/psychoanalyze/commit/3c1c24e62ee2cb7a1c18a949c7f119a96b2593c0))
 
