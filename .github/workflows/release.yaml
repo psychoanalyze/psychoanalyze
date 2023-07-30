@@ -27,7 +27,7 @@ jobs:
         uses: python-semantic-release/python-semantic-release@v8.0.4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          skip_build: true
+          vcs_release: false
 
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
