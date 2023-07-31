@@ -17,7 +17,7 @@
         <link rel="next" href="../output/">
       
       <link rel="icon" href="../../assets/logo_bgwhite.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.19">
+      <meta name="generator" content="mkdocs-1.5.1, mkdocs-material-9.1.21">
     
     
       
@@ -75,6 +75,11 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
+      
+        
+        <a href="#visualization-panel" class="md-skip">
+          Skip to content
+        </a>
       
     </div>
     <div data-md-component="announce">
@@ -429,9 +434,53 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Visualization Panel
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         Visualization Panel
       </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#visualization-panel" class="md-nav__link">
+    Visualization Panel
+  </a>
+  
+    <nav class="md-nav" aria-label="Visualization Panel">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#psychometric-function-plot" class="md-nav__link">
+    Psychometric Function Plot
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -650,6 +699,34 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#visualization-panel" class="md-nav__link">
+    Visualization Panel
+  </a>
+  
+    <nav class="md-nav" aria-label="Visualization Panel">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#psychometric-function-plot" class="md-nav__link">
+    Psychometric Function Plot
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -673,7 +750,20 @@
 
   <h1>Visualization Panel</h1>
 
-
+<h2 id="visualization-panel">Visualization Panel<a class="headerlink" href="#visualization-panel" title="Permanent link">&para;</a></h2>
+<p>The Visualization Panel is the central column of the dashboard. It contains the plot of the psychometric function.</p>
+<p>!!! abstract On the roadmap:</p>
+<ul>
+<li>Figure-specific controls such as:<ul>
+<li>Axis label/legend visibility and customization</li>
+<li>Toggle log axes</li>
+<li>Toggle error bars &amp; aggregation options (e.g. show count on separate plot, toggle mean vs MAP estimate, etc.)</li>
+</ul>
+</li>
+</ul>
+<h3 id="psychometric-function-plot">Psychometric Function Plot<a class="headerlink" href="#psychometric-function-plot" title="Permanent link">&para;</a></h3>
+<p>The psychometric function plot is the central feature of the dashboard. It is a plot of the psychometric function, which is a function that describes the relationship between a stimulus intensity level and the probability of a correct response. The psychometric function is a model of the psychophysical process that underlies the data collected in a psychophysical experiment.</p>
+<p>The psychometric function plot is generated using the <a href="https://plotly.com/python/">Plotly</a> Python library. It is an interactive plot that allows the user to zoom in and out, pan, and hover over data points to see their values. Click a legend item to toggle the visibility of the corresponding data series, or double-click a legend item to isolate the trace.</p>
 
 
 
