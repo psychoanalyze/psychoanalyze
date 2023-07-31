@@ -1,8 +1,3 @@
-"""Main Dash app file.
-
-Contains callbacks.
-"""
-
 # Copyright 2023 Tyler Schlichenmeyer
 
 # This file is part of PsychoAnalyze.
@@ -17,9 +12,13 @@ Contains callbacks.
 # You should have received a copy of the GNU General Public License along with
 # PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
+"""Main Dash app file.
+
+Contains callbacks.
+"""
+
 import base64
 import io
-import random
 import zipfile
 from collections.abc import Hashable
 from datetime import datetime
@@ -47,8 +46,12 @@ from dash_bootstrap_components import icons, themes
 from scipy.special import expit, logit
 
 from psychoanalyze.dashboard.layout import layout
+from psychoanalyze.dashboard.utils import process_upload
 from psychoanalyze.data import blocks as pa_blocks
 from psychoanalyze.data import points as pa_points
+from psychoanalyze.data.logistic import to_intercept, to_slope
+from psychoanalyze.data.points import generate_index
+from psychoanalyze.data.trials import generate
 
 app = Dash(
     __name__,
@@ -74,57 +77,28 @@ Records = list[dict[Hashable, Any]]
     Input({"type": "n-param", "name": ALL}, "value"),
     Input({"type": "param", "name": ALL}, "value"),
 )
-def update_data(
+def update_trials(
     contents: str,
     filename: str,
     n_param: list[int],
     param: list[float],
 ) -> tuple[Records, float, float]:
     """Update points table."""
-    n_param_values = [
-        "n_levels",
-        "n_trials",
-        "n_blocks",
-    ]
-    n_params = pd.Series(n_param, index=n_param_values)
-    param = [*param, 0.0, 0.0]
-    params = pd.Series(param, index=["x_0", "k", "gamma", "lambda"])
-    params["intercept"] = -params["x_0"] / params["k"]
-    params["slope"] = 1 / params["k"]
+    n_params = pd.Series(n_param, index=["n_levels", "n_trials", "n_blocks"])
+    params = pd.Series([*param, 0.0, 0.0], index=["x_0", "k", "gamma", "lambda"])
+    params["intercept"] = to_intercept(params["x_0"], params["k"])
+    params["slope"] = to_slope(params["k"])
     min_x = (logit(0.01) - params["intercept"]) / params["slope"]
     max_x = (logit(0.99) - params["intercept"]) / params["slope"]
     if callback_context.triggered_id == "upload":
-        _, content_string = contents.split(",")
-        decoded = base64.b64decode(content_string)
-        if "zip" in filename:
-            with zipfile.ZipFile(io.BytesIO(decoded)) as z:
-                trials = pd.read_csv(z.open("trials.csv"))
-        else:
-            trials = pd.read_csv(io.StringIO(decoded.decode("utf-8")))
+        trials = process_upload(contents, filename)
     else:
-        points_ix = pd.Index(
-            np.linspace(min_x, max_x, n_params["n_levels"]),
-            name="Intensity",
+        trials = generate(
+            n_trials=n_params["n_trials"],
+            options=generate_index(n_params["n_levels"], [min_x, max_x]),
+            params=params.to_dict(),
+            n_blocks=n_params["n_blocks"],
         )
-        all_trials = {}
-        for i in range(n_params["n_blocks"]):
-            execution_plan = pd.Index(
-                [random.choice(points_ix) for _ in range(n_params["n_trials"])],
-                name="Intensity",
-            )
-            trials_i = pd.Series(
-                [
-                    int(
-                        random.random()
-                        < expit(x * params["slope"] + params["intercept"]),
-                    )
-                    for x in execution_plan
-                ],
-                name="Result",
-                index=execution_plan,
-            )
-            all_trials[i] = trials_i
-        trials = pd.concat(all_trials, names=["Block"]).reset_index()
     return trials.to_dict("records"), min_x, max_x
 
 
