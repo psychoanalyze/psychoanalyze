@@ -2,7 +2,24 @@
 
 
 
+## v0.8.5 (2023-07-31)
+
+### Fix
+
+* fix: duckdb install ([`c6ee295`](https://github.com/psychoanalyze/psychoanalyze/commit/c6ee295c0d718c226662a7f7281c6556c54be403))
+
+### Unknown
+
+* Merge pull request #64 from psychoanalyze/release/0.8.4
+
+chore(release): release 0.8.4 ([`1c2e64d`](https://github.com/psychoanalyze/psychoanalyze/commit/1c2e64d559c6598853c98f5b28da89b6c556b636))
+
+
 ## v0.8.4 (2023-07-31)
+
+### Chore
+
+* chore(release): release 0.8.4 ([`9ac0d6c`](https://github.com/psychoanalyze/psychoanalyze/commit/9ac0d6c304491516f146c69fe1f5e0b16a449316))
 
 ### Ci
 
