@@ -16,6 +16,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://docs.psychoanalyze.io/notebooks/</loc>
+         <lastmod>2023-07-31</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://docs.psychoanalyze.io/tests/</loc>
          <lastmod>2023-07-31</lastmod>
          <changefreq>daily</changefreq>
@@ -37,11 +42,6 @@
     </url>
     <url>
          <loc>https://docs.psychoanalyze.io/dashboard/viz/</loc>
-         <lastmod>2023-07-31</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://docs.psychoanalyze.io/notebooks/</loc>
          <lastmod>2023-07-31</lastmod>
          <changefreq>daily</changefreq>
     </url>
