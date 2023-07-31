@@ -3,14 +3,13 @@
   "image": "mcr.microsoft.com/devcontainers/python:0-3.11",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "features": {
-    "ghcr.io/devcontainers-contrib/features/poetry:2": {"version": "1.5.1"},
+    "ghcr.io/devcontainers-contrib/features/poetry:2": {
+      "version": "1.5.1"
+    },
     "ghcr.io/devcontainers-contrib/features/pre-commit:1": {},
     "ghcr.io/eitsupi/devcontainer-features/duckdb-cli:1": {},
     "ghcr.io/devcontainers/features/node:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {},
-    "ghcr.io/devcontainers-contrib/features/mkdocs:2"	: {
-      "plugins": "mkdocs-material mkdocstrings-python mkdocs-jupyter"
-    },
     "ghcr.io/devcontainers-contrib/features/act-asdf:2": {}
   },
   "remoteUser": "vscode",
@@ -26,7 +25,7 @@
         "editor.formatOnSave": true,
         "python.formatting.provider": "black",
         "python.testing.pytestArgs": [
-            "tests"
+          "tests"
         ],
         "python.testing.unittestEnabled": false,
         "python.testing.pytestEnabled": true,
@@ -41,7 +40,6 @@
         "ms-python.python",
         "ms-python.vscode-pylance",
         "charliermarsh.ruff",
-        "innoverio.vscode-dbt-power-user",
         "tamasfe.even-better-toml",
         "ms-azuretools.vscode-docker",
         "ivan-bocharov.stan-vscode",
@@ -52,7 +50,8 @@
         "eamodio.gitlens",
         "github.vscode-github-actions",
         "ms-python.black-formatter",
-        "GitHub.vscode-pull-request-github"
+        "GitHub.vscode-pull-request-github",
+        "ms-kubernetes-tools.vscode-aks-tools"
       ]
     }
   }
