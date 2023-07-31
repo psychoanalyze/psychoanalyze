@@ -73,7 +73,7 @@ nav:
       - Input Panel: 'dashboard/input.md'
       - Visualization Panel: 'dashboard/viz.md'
       - Output Panel: 'dashboard/output.md'
-    - Notebooks: 'notebooks/index.md'
+    - Notebooks: 'notebooks.md'
     - Developers:
       - API Reference: 'api.md'
       - Testing Reference: 'tests.md'
