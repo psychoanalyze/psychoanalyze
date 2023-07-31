@@ -157,14 +157,14 @@ def combine_plots(fig1: go.Figure, fig2: go.Figure) -> go.Figure:
     return go.Figure(data=fig1.data + fig2.data)
 
 
-def n(trials: pd.Series) -> pd.Series:
+def n(trials: pd.Index) -> pd.Index:
     """Count trials at each point."""
     return pd.Series(trials.value_counts(), name="n")
 
 
 def generate_n(n_trials: int, options: pd.Index) -> pd.Series:
     """Simulate how many trials were performed per intensity level."""
-    return n(pa_trials.generate_trial_index(n_trials, options))
+    return pd.Series(n(pa_trials.generate_trial_index(n_trials, options)))
 
 
 def to_block(points: pd.DataFrame) -> pd.DataFrame:

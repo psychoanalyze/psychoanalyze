@@ -63,6 +63,7 @@ types-setuptools = "^68.0.0.3"
 hypothesis = "^6.79.0"
 pandas-stubs = "^2.0.2.230605"
 datatest = "^0.11.1"
+dash = {extras = ["testing"], version = "^2.11.1"}
 
 
 [tool.poetry.group.docs]
