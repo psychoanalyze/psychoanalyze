@@ -31,29 +31,29 @@ At the core of the psychophysical model is the *psychometric function*, a hypoth
 
 *PsychoAnalyze* provides data manipulation and visualization tools built on modularity and extensibility, aiming to empower researchers to more fully explore and contextualize their data, while minimizing time spent wrestling with custom analysis scripts.
 
-In addition to a Python package and a command-line tool, *PsychoAnalyze* offers a web-hosted dashboard demonstrating the capabilities of the package. On its own, the dashboard provides researchers with a no-code interface to fit their data to a psychometric function and visualize the results in an interactive setting.
+In addition to a Python package and a command-line tool, *PsychoAnalyze* offers a web-hosted dashboard demonstrating the capabilities of the package. On its own, the dashboard provides researchers with a no-code interface to fit their data to a psychometric function and visualize the results in an interactive setting. Further, developers may examine the dashboard code to contextualize the API of the package/library functions.
 
 Because Python has rapidly gained popularity among both the scientific and data science communities, a Python package that properly utilizes and integrates the wealth of developer tools and data tools available in the Python ecosystem can provide researchers and developers with stronger mental models and a tighter feedback loop.
 
-For example, psychoanalyze provides methods to:
+For example, PsychoAnalyze provides convenient methods to:
 
 - Aggregate trial-level data to an appropriate format (*e.g.*, grouped by intensity level of the stimulus) for model-fitting procedures.
 
 - Generate simulation data according to common psychophysical experimental procedures.
 
-- Export to a variety of formats such as CSV, Parquet, and DuckDB (data) or PNG, SVG, and PDF (figures).
+- Export results to a variety of formats such as CSV, Parquet, and DuckDB (data) or PNG, SVG, and PDF (figures).
 
 - Transform model parameters between parameterizations, *e.g.* *location $\mu$ / scale $\sigma$* form to *intercept $\beta_0$ / slope $\beta_1$* form:
 
   $$
-  \psi(x) = \frac{1}{1 + e^{-\frac{(x - \mu)}{\sigma}}} \iff \frac{1}{1 + e^{\beta_0 + \beta_1 x}}
+  \psi(x) = \frac{1}{1 + e^{-\frac{(x - \mu)}{\sigma}}} \iff \frac{1}{1 + e^{-(\beta_0 + \beta_1 x)}}
   $$
 
 # Roadmap
 
-Development of the *alpha* release of PsychoAnalyze, packaged with this submission, focused on breadth and extensibility over supporting a wide range of customizable options at the start. Integration of developer tooling and careful project architecture were priorities, in order to enable rapid iteration of features in the next release phase. Development will likely prioritize "plug-in" modules for the software packages in the following *Citations* section and more advanced features outlined in the project roadmap on GitHub.
+The release of PsychoAnalyze corresponding to this submission is labeled as an *alpha* (v1.0.0) release, primarily conveying that the software is not feature complete. Software development in the \emph{pre-alpha} phase focused on breadth and extensibility over supporting a wide range of customizable options from the start, although the ability to factor in such options was factored into project architecture. Integration of developer tooling and careful project architecture were priorities, with the intention of enabling rapid iteration of features in the next release phase. Development will likely prioritize "plug-in" modules for the software packages in the following *Citations* section and more advanced features outlined in the project roadmap on GitHub.
 
-*PsychoAnalyze* was developed in support of the research of the authors [@schlichenmeyer_detection_2022]. This research will inform the next iteration of development in addition to feedback and requests from the community.
+*PsychoAnalyze* was developed in support of the research of the authors [@schlichenmeyer_detection_2022]. This research, in addition to feedback and requests from the community, will inform the next iteration of development.
 
 # Citations
 
@@ -61,11 +61,11 @@ There are several existing software packages that provide tools for psychophysic
 
 - [PsychoPy](https://www.psychopy.org/) [@peirce_psychopy2_2019] is a Python package that provides a complete suite of tools for designing and running psychophysical experiments on a personal computer device.
 
-- [PsychToolbox](http://psychtoolbox.org/citations) [@brainard_psychophysics_1997] is a MATLAB package that similarly provides routine for stimulus presentation and data collection.
+- [PsychToolbox](http://psychtoolbox.org/citations) [@brainard_psychophysics_1997] is a MATLAB package that similarly provides routines for stimulus presentation and data collection.
 
 - [Palamedes](http://www.palamedestoolbox.org/) [@prins_applying_2018] is a MATLAB toolbox that provides an advanced set of curve-fitting procedures, including procedures that use subject-level data to use hierarchical Bayesian methods for more accurate estimates.
 
-- [psignifit](https://github.com/wichmann-lab/psignifit/wiki) [@schutt_painfree_2016] Is primarily developed in MATLAB, but ported to Python. It primarily provides methods for fitting the psychometric function using Bayesian methods.
+- [psignifit](https://github.com/wichmann-lab/psignifit/wiki) [@schutt_painfree_2016] Is primarily developed in MATLAB, but ported to Python. It mainly provides methods for fitting the psychometric function using Bayesian methods.
 
 - [BayesFit](http://doi.org/10.5334/jors.202) [@slugocki_bayesfit:_2019] is a Python-first model-fitting library, but is no longer being actively being maintained.
 
