@@ -2,7 +2,28 @@
 
 
 
+## v0.8.7 (2023-08-04)
+
+### Dev
+
+* dev: remove to-be-deprecated default python formatter setting vscode ([`1d58776`](https://github.com/psychoanalyze/psychoanalyze/commit/1d587760e609646170a1eb5ae0f14beeaa1a0e1e))
+
+### Fix
+
+* fix: add docstring to check tab completion in ipython ([`820a754`](https://github.com/psychoanalyze/psychoanalyze/commit/820a754901bb7ea223ae34b3bd8e45212571b804))
+
+### Unknown
+
+* Merge pull request #71 from psychoanalyze/release/0.8.6
+
+chore(release): release 0.8.6 ([`a087e64`](https://github.com/psychoanalyze/psychoanalyze/commit/a087e642840452dc9389776c4c5bae729fca2e62))
+
+
 ## v0.8.6 (2023-08-04)
+
+### Chore
+
+* chore(release): release 0.8.6 ([`36952c1`](https://github.com/psychoanalyze/psychoanalyze/commit/36952c1f731392ab91681186425dda54bcb6cadd))
 
 ### Deps
 

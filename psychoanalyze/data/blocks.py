@@ -187,7 +187,15 @@ def logistic(location: float, scale: float) -> pd.Series:
 
 
 def plot_logistic(location: float, scale: float) -> go.Scatter:
-    """Plot a logistic function."""
+    """Plot a logistic function.
+
+    Parameters:
+        location: x₀ in the location-scale parameterization, corresponds to threshold.
+        scale: σ corresponds to the width of the curve (inverse of slope)
+
+    Returns:
+        A Plotly figure of the psychometric function with a logistic link function.
+    """
     return px.line(
         logistic(location, scale),
         y="Ψ(x)",
