@@ -16,6 +16,9 @@ Interactive data simulation and analysis for psychophysics.
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/psychoanalyze/psychoanalyze/main.svg)](https://results.pre-commit.ci/latest/github/psychoanalyze/psychoanalyze/main)
 
 
+## Documentation
+View the full documentation at [https://docs.psychoanalyze.io](https://docs.psychoanalyze.io).
+
 ## Dashboard
 See what `psychoanalyze` can do by [viewing our dashboard](https://psychoanalyze.io/).
 
@@ -33,22 +36,24 @@ $ psychoanalyze --help
 
 Notebooks are hosted in a [separate repository](https://github.com/psychoanalyze/notebooks) in the [PsychoAnalyze GitHub organization](https://github.com/psychoanalyze).
 
-#### Binder
+### Binder
 
 A fully executable notebook environment is available on Binder:
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/psychoanalyze/notebooks/main?urlpath=git-pull%3Frepo%3Dhttps%253A%252F%252Fgithub.com%252Fpsychoanalyze%252Fnotebooks%26urlpath%3Dlab%252Ftree%252Fnotebooks%252Ftutorial.ipynb%26branch%3Dmain)
 
-#### JupyterHub on `psychoanalyze.io`
+### JupyterHub on `psychoanalyze.io`
 
-> *GitHub login required*
+*GitHub login required*
 
 We host our own JupyterHub instance on the `nb.psychoanalyze.io` domain. If you'd like to try it out, log in via GitHub with [this link](https://nb.psychoanalyze.io/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Fpsychoanalyze%2Fnotebooks&urlpath=lab%2Ftree%2Fnotebooks%2Ftutorial.ipynb&branch=main) to spin up your own server.  Your GitHub username will be visible to the maintainers of the project.
 
-#### Static
+### Static
 
 Static HTML copies of a notebooks are available by navigating to the `.ipynb` file on GitHub, e.g. [https://github.com/]
 
+## Deployment
 
-## Documentation
-View the full documentation at [https://docs.psychoanalyze.io](https://docs.psychoanalyze.io).
+If you'd like to spin up your own instance of the dashboard on the web, you may  use the following button for a Heroku setup:
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/heroku/node-js-getting-started)

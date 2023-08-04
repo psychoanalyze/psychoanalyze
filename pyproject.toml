@@ -1,14 +1,14 @@
 [tool.poetry]
 name = "psychoanalyze"
 version = "0.8.9"
-description = "Interactive analysis and simulation of psychophysical data."
+description = "Interactive data analysis and simulation for psychophysics."
 authors = ["Ty Schlichenmeyer <t.schlic@wustl.edu>"]
 license = "GPL-3.0-or-later"
 readme = "README.md"
 homepage = "https://psychoanalyze.io"
 repository = "https://github.com/psychoanalyze/psychoanalyze"
 documentation = "https://docs.psychoanalyze.io"
-keywords = ["psychophysics", "neuroscience", "psychology"]
+keywords = ["psychophysics", "neuroscience", "psychology", "python"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Web Environment",
