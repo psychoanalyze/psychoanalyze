@@ -51,7 +51,7 @@ For example, PsychoAnalyze provides convenient methods to:
 
 # Roadmap
 
-The release of PsychoAnalyze corresponding to this submission is labeled as an *alpha* (v1.0.0) release, primarily conveying that the software is not feature complete. Software development in the *pre-alpha* phase focused on breadth and extensibility over supporting a wide range of customizable options from the start, although the ability to factor in such options was factored into project architecture. Integration of developer tooling and careful project architecture were priorities, with the intention of enabling rapid iteration of features in the next release phase. Development will likely prioritize "plug-in" modules for the software packages in the following *Citations* section and more advanced features outlined in the project roadmap on GitHub.
+The release of PsychoAnalyze corresponding to this submission is labeled as an *alpha* (v1.0.0) release, primarily conveying that the software is not feature complete. Software development in the *pre-alpha* phase focused on breadth and extensibility over support for a wide range of customizable options, although the ability to factor in such options was integrated into the project design. Integration of developer tooling and careful architecture were priorities, with the intention of enabling rapid iteration of features in the next release phase. Development will likely prioritize "plug-in" modules for the software packages in the following *Citations* section and more advanced features outlined in the project roadmap on GitHub.
 
 *PsychoAnalyze* was developed in support of the research of the authors [@schlichenmeyer_detection_2022]. This research, in addition to feedback and requests from the community, will inform the next iteration of development.
 
@@ -67,7 +67,7 @@ There are several existing software packages that provide tools for psychophysic
 
 - [psignifit](https://github.com/wichmann-lab/psignifit/wiki) [@schutt_painfree_2016] Is primarily developed in MATLAB, but ported to Python. It mainly provides methods for fitting the psychometric function using Bayesian methods.
 
-- [BayesFit](http://doi.org/10.5334/jors.202) [@slugocki_bayesfit:_2019] is a Python-first model-fitting library, but is no longer being actively being maintained.
+- [BayesFit](http://doi.org/10.5334/jors.202) [@slugocki_bayesfit:_2019] is a Python-first model-fitting library, but is no longer being actively maintained.
 
 
 # Acknowledgements
