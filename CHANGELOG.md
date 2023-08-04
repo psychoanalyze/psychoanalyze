@@ -2,7 +2,46 @@
 
 
 
+## v0.8.9 (2023-08-04)
+
+### Documentation
+
+* docs: linkify badges ([`4820b1e`](https://github.com/psychoanalyze/psychoanalyze/commit/4820b1e5459f4843a845dc4b9c5ad330c3d94e88))
+
+* docs: readme badge fix ([`b08cac1`](https://github.com/psychoanalyze/psychoanalyze/commit/b08cac12e5fa8bae3a906c6ed82a8033ffe62ca6))
+
+* docs: fix readme badges ([`46acb22`](https://github.com/psychoanalyze/psychoanalyze/commit/46acb221819b66dd8dce7f1dbfa5558b0c9eb023))
+
+* docs: update readme ([`f8e039a`](https://github.com/psychoanalyze/psychoanalyze/commit/f8e039ac39f1acd757805f6cabfa6b79adb4e9a5))
+
+### Unknown
+
+* Docs/readme (#77)
+
+* docs: readme badge fix
+
+* docs: readme badge fix
+
+* docs: readme badges again ([`b3422f3`](https://github.com/psychoanalyze/psychoanalyze/commit/b3422f3095b80b3d263413965115ef7509e6cbfa))
+
+* Merge pull request #75 from psychoanalyze/docs/readme
+
+docs: fix readme badges ([`488181b`](https://github.com/psychoanalyze/psychoanalyze/commit/488181b0e8d6475dc27f45f0920d7a3d0f07ec44))
+
+* Merge pull request #74 from psychoanalyze/docs/readme
+
+docs: update readme ([`f3a5f7d`](https://github.com/psychoanalyze/psychoanalyze/commit/f3a5f7d881804de08ebdcb1faaaba31fd5bff94f))
+
+* Merge pull request #73 from psychoanalyze/deps/cleanup
+
+Deps/cleanup ([`7eb11c1`](https://github.com/psychoanalyze/psychoanalyze/commit/7eb11c1cac3598900caf1cbe150b2d2cbebaeaae))
+
+
 ## v0.8.8 (2023-08-04)
+
+### Chore
+
+* chore(release): release 0.8.8 ([`436e06b`](https://github.com/psychoanalyze/psychoanalyze/commit/436e06b04e454ce4e47cc7cdef1a7bcc9ea9bd07))
 
 ### Deps
 
