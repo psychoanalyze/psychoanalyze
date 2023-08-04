@@ -1,0 +1,7 @@
+{
+    "name": "PsychoAnalyze",
+    "description": "Interactive data analysis and simulation for psychophysics.",
+    "repository": "https://github.com/psychoanalyze/psychoanalyze",
+    "logo": "https://psychoanalyze.io/assets/logo_transparent_100x100.png",
+    "keywords": ["python", "psychophysics", "openscience"]
+}
