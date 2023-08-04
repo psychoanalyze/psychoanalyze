@@ -20,7 +20,6 @@ stimulus intensity levels would have 8 corresponding points.
 """
 from pathlib import Path
 
-import cmdstanpy as stan
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -62,11 +61,6 @@ def prep_fit(points: pd.DataFrame, dimension: str = "Amp1") -> dict:
         "N": points["n"].to_numpy(),
         "hits": points["Hits"].to_numpy(),
     }
-
-
-def model() -> stan.CmdStanModel:
-    """Instantiate Stan binomial regression model."""
-    return stan.CmdStanModel(stan_file="models/binomial_regression.stan")
 
 
 def hits(
