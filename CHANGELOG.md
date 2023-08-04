@@ -2,7 +2,55 @@
 
 
 
+## v0.8.6 (2023-08-04)
+
+### Deps
+
+* deps: remove mkdocs ([`0738301`](https://github.com/psychoanalyze/psychoanalyze/commit/0738301c7016e3bd726995ab77baa5ebf1c4fd00))
+
+### Documentation
+
+* docs: fix loose admonition ([`c8c7f4f`](https://github.com/psychoanalyze/psychoanalyze/commit/c8c7f4fb03db13f8c874429b4d1e0ca5f9f3c788))
+
+* docs: adjust to new notebook layout ([`213c25b`](https://github.com/psychoanalyze/psychoanalyze/commit/213c25b179e3016ef8294bee927e057cf62f00af))
+
+### Fix
+
+* fix: circular import ([`2085395`](https://github.com/psychoanalyze/psychoanalyze/commit/208539539c85b1c0921914676849040b2157285c))
+
+### Refactor
+
+* refactor: dash ([`d221633`](https://github.com/psychoanalyze/psychoanalyze/commit/d221633b22b5636cac86722d2ba6b2fcfc7005a4))
+
+### Unknown
+
+* Merge pull request #70 from psychoanalyze/plot
+
+fix: circular import ([`a290217`](https://github.com/psychoanalyze/psychoanalyze/commit/a290217e0ae28b2e52d64604ecf30ec097fd6bd0))
+
+* Merge pull request #69 from psychoanalyze/docs/admonition
+
+docs: fix loose admonition ([`a4e53ff`](https://github.com/psychoanalyze/psychoanalyze/commit/a4e53ffae09b0d978ddd213abea90c2206bceb0a))
+
+* ci(pre-commit)
+
+updates:
+- [github.com/astral-sh/ruff-pre-commit: v0.0.280 → v0.0.281](https://github.com/astral-sh/ruff-pre-commit/compare/v0.0.280...v0.0.281) ([`38e9086`](https://github.com/psychoanalyze/psychoanalyze/commit/38e908611e2998cbd461d84adce1be5aab859d21))
+
+* Merge pull request #66 from psychoanalyze/refactor/dash
+
+Refactor/dash ([`c16af9b`](https://github.com/psychoanalyze/psychoanalyze/commit/c16af9b99d7b654c9f927997beb3022f864b3dc6))
+
+* Merge pull request #65 from psychoanalyze/release/0.8.5
+
+Release/0.8.5 ([`268b5b5`](https://github.com/psychoanalyze/psychoanalyze/commit/268b5b57dac0225dcdcb51dfc371b4ba08f4eb29))
+
+
 ## v0.8.5 (2023-07-31)
+
+### Chore
+
+* chore(release): release 0.8.5 ([`dd3251f`](https://github.com/psychoanalyze/psychoanalyze/commit/dd3251fd06bc175d78b8e599264b128476d2552e))
 
 ### Fix
 
