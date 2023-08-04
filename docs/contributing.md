@@ -4,13 +4,13 @@
 
 If you are a researcher seeking to use PsychoAnalyze in your own research context, we'd love to help you get started!
 
-Here are 3 suggested ways to
+Here are 3 ways you can
 
 - 🧪 [Open a Feature Request](https://github.com/psychoanalyze/psychoanalyze/issues/new?assignees=&labels=enhancement&projects=&template=feature-request.md&title=%5BNEW%5D) - for well-posed suggestions.
 
 - 💡[Start a Discussion](https://github.com/orgs/psychoanalyze/discussions) - For feedback on your idea for a new feature or use case.
 
-- ✉️ [Send us an E-mail](mailto:t.schlic@wustl.edu)
+- ✉️ [Send us an E-mail](mailto:info@psychoanalyze.io) for partnerships, sensitive discussion, or just a hello!
 
 Eager to contribute but not sure where to start? Check out our [roadmap](https://github.com/orgs/psychoanalyze/projects/2) to see what we have planned!
 
