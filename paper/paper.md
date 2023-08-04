@@ -25,7 +25,7 @@ bibliography: paper.bib
 
 At the core of the psychophysical model is the *psychometric function*, a hypothetical function that maps graded dimensions of the input stimulus to some experimental measure of the subject's induced response. Several software packages exist that provide tools for fitting the psychometric function to experimental data, but few provide tools for data manipulation and visualization that accomodate more complex experimental setups that require intricate data flows.
 
-*PsychoAnalyze* aims to make more advanced psychophysical analysis accessible to researchers without extensive software or data engineering background, and to provide an accessible development platform to encourage contributors from all backgrounds to build custom features for the package.
+*PsychoAnalyze* aims to make more advanced psychophysical analysis accessible to researchers without extensive software or data engineering background, and to provide an accessible development platform to encourage contributors from all backgrounds to contribute to the project.
 
 # Statement of need
 
@@ -51,7 +51,7 @@ For example, PsychoAnalyze provides convenient methods to:
 
 # Roadmap
 
-The release of PsychoAnalyze corresponding to this submission is labeled as an *alpha* (v1.0.0) release, primarily conveying that the software is not feature complete. Software development in the \emph{pre-alpha} phase focused on breadth and extensibility over supporting a wide range of customizable options from the start, although the ability to factor in such options was factored into project architecture. Integration of developer tooling and careful project architecture were priorities, with the intention of enabling rapid iteration of features in the next release phase. Development will likely prioritize "plug-in" modules for the software packages in the following *Citations* section and more advanced features outlined in the project roadmap on GitHub.
+The release of PsychoAnalyze corresponding to this submission is labeled as an *alpha* (v1.0.0) release, primarily conveying that the software is not feature complete. Software development in the *pre-alpha* phase focused on breadth and extensibility over supporting a wide range of customizable options from the start, although the ability to factor in such options was factored into project architecture. Integration of developer tooling and careful project architecture were priorities, with the intention of enabling rapid iteration of features in the next release phase. Development will likely prioritize "plug-in" modules for the software packages in the following *Citations* section and more advanced features outlined in the project roadmap on GitHub.
 
 *PsychoAnalyze* was developed in support of the research of the authors [@schlichenmeyer_detection_2022]. This research, in addition to feedback and requests from the community, will inform the next iteration of development.
 
