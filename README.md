@@ -50,7 +50,7 @@ We host our own JupyterHub instance on the `nb.psychoanalyze.io` domain. If you'
 
 ### Static
 
-Static HTML copies of a notebooks are available by navigating to the `.ipynb` file on GitHub, e.g. [https://github.com/]
+Static HTML copies of a notebooks are available by navigating to the `.ipynb` file on GitHub, e.g. [tutorial.ipynb](https://github.com/psychoanalyze/notebooks/blob/main/tutorial.ipynb)
 
 ## Deployment
 
