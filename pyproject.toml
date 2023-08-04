@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "psychoanalyze"
-version = "0.8.5"
+version = "0.8.6"
 description = "Interactive analysis and simulation of psychophysical data."
 authors = ["Ty Schlichenmeyer <t.schlic@wustl.edu>"]
 license = "GPL-3.0-or-later"
