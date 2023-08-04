@@ -35,7 +35,7 @@ Try...
     - Tabular data: `.csv`, `.parquet`, `.json`, `.duckdb`
     - Figures: `.png`, `.svg`, `.pdf`
 
-- Uploading your own dataset or our [tutorial dataset](notebooks/tutorial_trials.csv) according to the specified schema and observe/download the model fits.
+- Uploading your own dataset or our [tutorial dataset](https://github.com/psychoanalyze/notebooks/tutorial_trials.csv) according to the specified schema and observe/download the model fits.
 
 
 ## Python Installation
@@ -62,10 +62,10 @@ To get started using `psychoanalyze` from the command line, execute the `--help`
 $ psychoanalyze --help
 ```
 
-For more guidance implementing `psychoanalyze` in your own Python scripts and and apps, check out our [notebook example](notebooks/index.md) and our [API reference](api.md).
+For more guidance implementing `psychoanalyze` in your own Python scripts and and apps, check out our [notebook example](notebooks.md) and our [API reference](api.md).
 ## Python Notebooks
 
-For a more thorough introduction to the `psychoanalyze` package, enjoy our [notebook examples](notebooks/tutorial.ipynb)! Consider submitting a notebook of your own for inclusion in our collection.
+For a more thorough introduction to the `psychoanalyze` package, enjoy our [notebook examples](notebooks.md)! Consider submitting a notebook of your own for inclusion in our collection.
 
 
 ## Developers

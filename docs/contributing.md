@@ -28,7 +28,7 @@ If you encounter a bug, please open an issue using the "Bug Report" template.
 
 !!! tip
 
-Windows users will likely have more success following this guide if they use [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10) as their command line interface. More thorough "pure"-Windows documentation is forthcoming.
+    Windows users will likely have more success following this guide if they use [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10) as their command line interface. More thorough "pure"-Windows documentation is forthcoming.
 
 ### Option 1: Dev Container
 

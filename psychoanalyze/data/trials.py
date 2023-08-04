@@ -20,7 +20,7 @@ from typing import TypedDict
 
 import numpy as np
 import pandas as pd
-from pandera import SeriesSchema, check_output
+from pandera import SeriesSchema
 from sklearn.linear_model import LogisticRegression
 
 from psychoanalyze.data import types
@@ -35,28 +35,40 @@ codes = {0: "Miss", 1: "Hit"}
 Trial = TypedDict("Trial", {"Result": bool, "Stimulus Magnitude": float})
 
 
-def generate_trial_index(n_trials: int, options: pd.Index) -> pd.Series:
+def generate_trial_index(n_trials: int, options: pd.Index) -> pd.Index:
     """Generate n trials (no outcomes)."""
-    return pd.Series(
+    return pd.Index(
         [random.choice(options) for _ in range(n_trials)],
         name="Intensity",
     )
 
 
-@check_output(types.trials)
+def sample_trials(trials_ix: pd.Index, params: dict[str, float]) -> pd.Series:
+    """Sample trials from a given index."""
+    return pd.Series(
+        [int(random.random() <= psi(x, params)) for x in trials_ix],
+        index=trials_ix,
+        name="Result",
+    )
+
+
 def generate(
     n_trials: int,
     options: pd.Index,
     params: dict[str, float],
+    n_blocks: int,
 ) -> pd.DataFrame:
     """Generate n trials with outcomes."""
-    x = generate_trial_index(n_trials, options)
-    return pd.DataFrame(
+    return pd.concat(
         {
-            "Result": [int(random.random() <= psi(x_val, params)) for x_val in x],
-            "Intensity": x,
+            i: sample_trials(
+                trials_ix=generate_trial_index(n_trials, options),
+                params=params,
+            )
+            for i in range(n_blocks)
         },
-    )
+        names=["Block"],
+    ).reset_index()
 
 
 def load(data_path: Path) -> pd.DataFrame:
@@ -129,10 +141,10 @@ def labels(results: list[int]) -> list[str]:
 
 def psi(intensity: float, params: dict[str, float]) -> float:
     """Calculate the value of the psychometric function for a given intensity."""
-    gamma = params["Guess Rate"]
-    lambda_ = params["Lapse Rate"]
-    k = params["Slope"]
-    x_0 = params["Threshold"]
+    gamma = params["gamma"]
+    lambda_ = params["lambda"]
+    k = params["k"]
+    x_0 = params["x_0"]
     return gamma + (1 - gamma - lambda_) * (1 / (1 + np.exp(-k * (intensity - x_0))))
 
 

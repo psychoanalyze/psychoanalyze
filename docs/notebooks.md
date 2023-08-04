@@ -10,10 +10,7 @@ PsychoAnalyze provides a couple of notebook features that can be used to explore
 
 Check out our tutorial notebook to walk through a basic analysis workflow for a hypothetical [yes/no experiment](https://stats.stackexchange.com/questions/91326/simple-yes-no-question-uncertain-how-to-analyze-the-results).
 
-- Download the [`.ipynb` file](tutorial.ipynb) and the [tutorial dataset](tutorial_trials.csv).
-- View the static version on [GitHub](https://github.com/psychoanalyze/psychoanalyze/blob/main/docs/notebooks/tutorial.ipynb).
-
-## JupyterHub
+### JupyterHub
 
 We provide a ready-to-go, web-hosted notebook on our domain at [https://nb.psychoanalyze.io](https://nb.psychoanalyze.io), powered by JupyterHub. This is a great way to quickly start coding with the `psychoAnalyze` package, without needing to set up a development environment or install prerequisite software.
 

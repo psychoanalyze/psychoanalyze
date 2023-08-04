@@ -2,7 +2,75 @@
 
 
 
+## v0.8.5 (2023-07-31)
+
+### Fix
+
+* fix: duckdb install ([`c6ee295`](https://github.com/psychoanalyze/psychoanalyze/commit/c6ee295c0d718c226662a7f7281c6556c54be403))
+
+### Unknown
+
+* Merge pull request #64 from psychoanalyze/release/0.8.4
+
+chore(release): release 0.8.4 ([`1c2e64d`](https://github.com/psychoanalyze/psychoanalyze/commit/1c2e64d559c6598853c98f5b28da89b6c556b636))
+
+
+## v0.8.4 (2023-07-31)
+
+### Chore
+
+* chore(release): release 0.8.4 ([`9ac0d6c`](https://github.com/psychoanalyze/psychoanalyze/commit/9ac0d6c304491516f146c69fe1f5e0b16a449316))
+
+### Ci
+
+* ci: switch to manual releases ([`f2ed7d9`](https://github.com/psychoanalyze/psychoanalyze/commit/f2ed7d99f549ad5de7b661369fc2f7647627172f))
+
+* ci: skip vcs release on semrel action ([`c9b40d0`](https://github.com/psychoanalyze/psychoanalyze/commit/c9b40d0e5b28cf6c440813f8fc400cba341a282a))
+
+* ci: skip-build during sem-release ([`58ad63f`](https://github.com/psychoanalyze/psychoanalyze/commit/58ad63f635989f23b569e64fb9e4f9e97c1809ce))
+
+### Fix
+
+* fix: move notebooks to separate repo ([`2979296`](https://github.com/psychoanalyze/psychoanalyze/commit/2979296a958399331275b1a34d4e2caedc5655a0))
+
+### Nb
+
+* nb: fix dash link to go to root hub link ([`9287dcd`](https://github.com/psychoanalyze/psychoanalyze/commit/9287dcdb506c5136eb17d879cc45fdf03c6a32bc))
+
+### Unknown
+
+* Merge pull request #63 from psychoanalyze/nb/tutorial
+
+fix: move notebooks to separate repo ([`b124b9f`](https://github.com/psychoanalyze/psychoanalyze/commit/b124b9f4ef653ded1b24d714b3270912fc886a2d))
+
+* Merge pull request #62 from psychoanalyze/nb/dash-link
+
+nb: fix dash link to go to root hub link ([`d69a464`](https://github.com/psychoanalyze/psychoanalyze/commit/d69a4640c809bfb359f24df40f2f5900ce3d967a))
+
+* Merge pull request #61 from psychoanalyze/ci/manual-releases
+
+ci: switch to manual releases ([`6d6f85b`](https://github.com/psychoanalyze/psychoanalyze/commit/6d6f85bc7b45050b124fe5756543efe948151ae5))
+
+* Merge pull request #60 from psychoanalyze/semrel/skip-build
+
+ci: skip vcs release on semrel action ([`f90d637`](https://github.com/psychoanalyze/psychoanalyze/commit/f90d6379abe263c97efe2d14fb338a0709e2c471))
+
+* Merge branch &#39;main&#39; into semrel/skip-build ([`6822293`](https://github.com/psychoanalyze/psychoanalyze/commit/6822293d02c7ea39d333ce56f9bccc72e47d730d))
+
+* Merge pull request #59 from psychoanalyze/semrel/skip-build
+
+ci: skip-build during sem-release ([`d3979fb`](https://github.com/psychoanalyze/psychoanalyze/commit/d3979fb25e75e7642003e1f7c2d32ade5e17bae8))
+
+* Merge pull request #58 from psychoanalyze/build/dev-deps
+
+Build/dev deps ([`ad20439`](https://github.com/psychoanalyze/psychoanalyze/commit/ad20439821f1465474aaa4821b9df69815a37a5f))
+
+
 ## v0.8.3 (2023-07-30)
+
+### Chore
+
+* chore(release): release 0.8.3 ([`bb03a8c`](https://github.com/psychoanalyze/psychoanalyze/commit/bb03a8ccb46cd30f38d66ee6b916135562df4dad))
 
 ### Deps
 
