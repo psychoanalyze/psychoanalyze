@@ -37,7 +37,7 @@ $ psychoanalyze --help
 
 ## Notebooks
 
-Notebooks are hosted in a [separate repository](https://github.com/psychoanalyze/notebooks) in the [PsychoAnalyze GitHub organization](https://github.com/psychoanalyze).
+Example notebooks are hosted in a separate GitHub repository: [psychoanalyze/notebooks](https://github.com/psychoanalyze/notebooks).
 
 ### Binder
 
@@ -49,11 +49,11 @@ A fully executable notebook environment is available on Binder:
 
 *GitHub login required*
 
-We host our own JupyterHub instance on the `nb.psychoanalyze.io` domain. If you'd like to try it out, log in via GitHub with [this link](https://nb.psychoanalyze.io/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Fpsychoanalyze%2Fnotebooks&urlpath=lab%2Ftree%2Fnotebooks%2Ftutorial.ipynb&branch=main) to spin up your own server.  Your GitHub username will be visible to the maintainers of the project.
+We also host our own JupyterHub instance on the `nb.psychoanalyze.io` domain. If you'd like to try it out, log in via GitHub with [this link](https://nb.psychoanalyze.io/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Fpsychoanalyze%2Fnotebooks&urlpath=lab%2Ftree%2Fnotebooks%2Ftutorial.ipynb&branch=main) to spin up your own server.  Your GitHub username will be visible to the maintainers of the project.
 
 ### Static
 
-Static HTML copies of a notebooks are available by navigating to the `.ipynb` file on GitHub, e.g. [tutorial.ipynb](https://github.com/psychoanalyze/notebooks/blob/main/tutorial.ipynb)
+Static HTML copies of notebooks are available by navigating to the `.ipynb` file on GitHub, e.g. [tutorial.ipynb](https://github.com/psychoanalyze/notebooks/blob/main/tutorial.ipynb)
 
 ## Deployment
 
