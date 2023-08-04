@@ -25,7 +25,10 @@ See what `psychoanalyze` can do by [viewing our dashboard](https://psychoanalyze
 ## Install with Python
 ```console
 $ pip install psychoanalyze
+```
 
+### View CLI options
+```console
 $ psychoanalyze --help
 ```
 
