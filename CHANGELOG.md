@@ -2,11 +2,37 @@
 
 
 
-## v0.8.9 (2023-08-04)
+## v1.0.0-alpha.1 (2023-08-04)
+
+### Chore
+
+* chore: Merge branch &#39;main&#39; into joss-submission ([`bc3ace1`](https://github.com/psychoanalyze/psychoanalyze/commit/bc3ace19ba41e144a8dc26469122bb0fe7606025))
+
+* chore(release): release 0.8.9 ([`fd39993`](https://github.com/psychoanalyze/psychoanalyze/commit/fd399938440f1736d5545b09bd1c796cdaa00b88))
+
+### Dev
+
+* dev: deploy badge setup ([`42085aa`](https://github.com/psychoanalyze/psychoanalyze/commit/42085aa1f72dd53522f3353673cdccdf45c85059))
 
 ### Documentation
 
-* docs: linkify badges ([`4820b1e`](https://github.com/psychoanalyze/psychoanalyze/commit/4820b1e5459f4843a845dc4b9c5ad330c3d94e88))
+* docs: match tag in paper to tag in semversion dry run ([`8ca30c9`](https://github.com/psychoanalyze/psychoanalyze/commit/8ca30c9b437d4a9e50541aa8f88f91cb56b36593))
+
+* docs: specify alpha version tag in joss paper ([`4614b9d`](https://github.com/psychoanalyze/psychoanalyze/commit/4614b9df6fe1eef8f35bd5cddcfbad217665410f))
+
+* docs: code of conduct ([`a36fff3`](https://github.com/psychoanalyze/psychoanalyze/commit/a36fff3468773c4b881011f2a69e8f20c6c895ca))
+
+* docs: tidy up ([`eb43e24`](https://github.com/psychoanalyze/psychoanalyze/commit/eb43e24e6ec28ae751c074c1a733e5bc98d0875f))
+
+* docs: split cli command ([`a6513cd`](https://github.com/psychoanalyze/psychoanalyze/commit/a6513cd5d33ea11705302a9a472043317ccd92f2))
+
+* docs: fix tutorial nb on github link ([`b990a1d`](https://github.com/psychoanalyze/psychoanalyze/commit/b990a1d442e43d6fa42e1704e817eabb685c3320))
+
+* docs: include heroku deploy badge ([`1ed40dc`](https://github.com/psychoanalyze/psychoanalyze/commit/1ed40dce2ff73465ef9b97a0293d234da5047394))
+
+* docs: segment notebook section in readme ([`678e21a`](https://github.com/psychoanalyze/psychoanalyze/commit/678e21ab733d4794893dd20222ec38dc59dfac28))
+
+* docs: linkify badges ([`64b0a74`](https://github.com/psychoanalyze/psychoanalyze/commit/64b0a7430db5f48d45699576425ffc42415b0655))
 
 * docs: readme badge fix ([`b08cac1`](https://github.com/psychoanalyze/psychoanalyze/commit/b08cac12e5fa8bae3a906c6ed82a8033ffe62ca6))
 
@@ -15,6 +41,26 @@
 * docs: update readme ([`f8e039a`](https://github.com/psychoanalyze/psychoanalyze/commit/f8e039ac39f1acd757805f6cabfa6b79adb4e9a5))
 
 ### Unknown
+
+* Merge pull request #90 from psychoanalyze/docs/cleanup
+
+docs: tidy up ([`2d02008`](https://github.com/psychoanalyze/psychoanalyze/commit/2d02008412a2fd21700c854e1e8a7bcd0557ad4c))
+
+* Merge pull request #83 from psychoanalyze/readme/cli
+
+docs: split cli command ([`aab8964`](https://github.com/psychoanalyze/psychoanalyze/commit/aab8964748036af6373bcb3dff0c4a12a0f812f0))
+
+* Merge pull request #82 from psychoanalyze/heroku/badge
+
+Heroku/badge ([`4a21691`](https://github.com/psychoanalyze/psychoanalyze/commit/4a21691be3f43f10abf096d14854029dc9ef9e2d))
+
+* Merge pull request #81 from psychoanalyze/heroku/deploybadge
+
+dev: deploy badge setup ([`775cdd5`](https://github.com/psychoanalyze/psychoanalyze/commit/775cdd59984178c369c8625dbd15c7105bd8ed73))
+
+* Merge pull request #80 from psychoanalyze/readme/notebooks
+
+docs: segment notebook section in readme ([`341769c`](https://github.com/psychoanalyze/psychoanalyze/commit/341769c58bb0d628d035b94f0e888448fc44de8a))
 
 * Docs/readme (#77)
 
@@ -85,13 +131,23 @@ chore(release): release 0.8.6 ([`a087e64`](https://github.com/psychoanalyze/psyc
 
 * chore(release): release 0.8.6 ([`36952c1`](https://github.com/psychoanalyze/psychoanalyze/commit/36952c1f731392ab91681186425dda54bcb6cadd))
 
+* chore: Merge branch &#39;main&#39; into joss-submission ([`cc6a17c`](https://github.com/psychoanalyze/psychoanalyze/commit/cc6a17c1da9ecdb83601742a504651cd4adf6619))
+
 ### Deps
 
 * deps: remove mkdocs ([`0738301`](https://github.com/psychoanalyze/psychoanalyze/commit/0738301c7016e3bd726995ab77baa5ebf1c4fd00))
 
 ### Documentation
 
+* docs: Dan edits ([`7f2c6da`](https://github.com/psychoanalyze/psychoanalyze/commit/7f2c6da5fb5484527a5ba0748975332d4af245df))
+
+* docs: jk bibtex doesnt work ([`cb47593`](https://github.com/psychoanalyze/psychoanalyze/commit/cb47593731e865f6e84229740dccc3dfafc99ed9))
+
+* docs: bib to bibtex for pandoc convenience ([`f1d83b1`](https://github.com/psychoanalyze/psychoanalyze/commit/f1d83b17e93fd7dff9d160c6f71451a2313538fc))
+
 * docs: fix loose admonition ([`c8c7f4f`](https://github.com/psychoanalyze/psychoanalyze/commit/c8c7f4fb03db13f8c874429b4d1e0ca5f9f3c788))
+
+* docs: minor fixes to joss paper ([`dddd1dc`](https://github.com/psychoanalyze/psychoanalyze/commit/dddd1dce0545afeb5b2248cafedbea699e90d771))
 
 * docs: adjust to new notebook layout ([`213c25b`](https://github.com/psychoanalyze/psychoanalyze/commit/213c25b179e3016ef8294bee927e057cf62f00af))
 
@@ -157,6 +213,22 @@ chore(release): release 0.8.4 ([`1c2e64d`](https://github.com/psychoanalyze/psyc
 * ci: skip vcs release on semrel action ([`c9b40d0`](https://github.com/psychoanalyze/psychoanalyze/commit/c9b40d0e5b28cf6c440813f8fc400cba341a282a))
 
 * ci: skip-build during sem-release ([`58ad63f`](https://github.com/psychoanalyze/psychoanalyze/commit/58ad63f635989f23b569e64fb9e4f9e97c1809ce))
+
+### Documentation
+
+* docs: minor language fixes ([`501c2e7`](https://github.com/psychoanalyze/psychoanalyze/commit/501c2e76f241d378ed4baa23d81c88b424fad07e))
+
+* docs: first paper draft? ([`712d332`](https://github.com/psychoanalyze/psychoanalyze/commit/712d332aa4b7a237ce0fd70a8240d6f83edc6d29))
+
+* docs: fix matjax syntax ([`6c66440`](https://github.com/psychoanalyze/psychoanalyze/commit/6c664407953d5f0b7a3596d0f47ceb276fe70c26))
+
+* docs: try plain latex ([`f5a237f`](https://github.com/psychoanalyze/psychoanalyze/commit/f5a237f3c52f2319c26b1452ec70a603ee32c1dc))
+
+* docs: add justification, equation ([`e4a20fc`](https://github.com/psychoanalyze/psychoanalyze/commit/e4a20fcfc37d2308cd6d3ca4e2cbb0c02d618f78))
+
+* docs: add refs ([`d672ede`](https://github.com/psychoanalyze/psychoanalyze/commit/d672ededc511c559ed1b4870638839443ee02046))
+
+* docs: test paper build ([`01bc172`](https://github.com/psychoanalyze/psychoanalyze/commit/01bc172e01df22095eab031e38f0663e4a3bbc09))
 
 ### Fix
 
