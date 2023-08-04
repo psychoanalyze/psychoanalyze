@@ -11,10 +11,6 @@
         <link rel="canonical" href="https://docs.psychoanalyze.io/notebooks/">
       
       
-        <link rel="prev" href="../dashboard/output/">
-      
-      
-        <link rel="next" href="../api/">
       
       <link rel="icon" href="../assets/logo_bgwhite.png">
       <meta name="generator" content="mkdocs-1.5.1, mkdocs-material-9.1.21">
@@ -222,15 +218,13 @@
         
   
   
-    
-  
 
 
   
   
   
     <li class="md-tabs__item">
-      <a href=".." class="md-tabs__link md-tabs__link--active">
+      <a href=".." class="md-tabs__link">
         Getting Started
       </a>
     </li>
@@ -309,16 +303,14 @@
 
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
       
       
         
@@ -347,7 +339,7 @@
           
         </div>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_1">
           <span class="md-nav__icon md-icon"></span>
           Getting Started
@@ -456,74 +448,11 @@
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Notebooks
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="index.md" class="md-nav__link">
         Notebooks
       </a>
-      
-        
-
-  
-
-<nav class="md-nav md-nav--secondary" aria-label="On this page">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      On this page
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#tutorial-notebook" class="md-nav__link">
-    Tutorial notebook
-  </a>
-  
-    <nav class="md-nav" aria-label="Tutorial notebook">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jupyterhub" class="md-nav__link">
-    JupyterHub
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#submit-a-notebook" class="md-nav__link">
-    Submit a notebook!
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -719,18 +648,12 @@
     Tutorial notebook
   </a>
   
-    <nav class="md-nav" aria-label="Tutorial notebook">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
+</li>
+      
+        <li class="md-nav__item">
   <a href="#jupyterhub" class="md-nav__link">
     JupyterHub
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -756,7 +679,7 @@
                   
 
   
-    <a href="https://github.com/psychoanalyze/psychoanalyze/edit/main/docs/notebooks.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/psychoanalyze/psychoanalyze/edit/main/docs/notebooks/README.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
     </a>
@@ -770,7 +693,11 @@
 <p>PsychoAnalyze provides a couple of notebook features that can be used to explore the package's functionality.</p>
 <h2 id="tutorial-notebook">Tutorial notebook<a class="headerlink" href="#tutorial-notebook" title="Permanent link">&para;</a></h2>
 <p>Check out our tutorial notebook to walk through a basic analysis workflow for a hypothetical <a href="https://stats.stackexchange.com/questions/91326/simple-yes-no-question-uncertain-how-to-analyze-the-results">yes/no experiment</a>.</p>
-<h3 id="jupyterhub">JupyterHub<a class="headerlink" href="#jupyterhub" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Download the <a href="tutorial.ipynb"><code>.ipynb</code> file</a> and the <a href="tutorial_trials.csv">tutorial dataset</a>.</li>
+<li>View the static version on <a href="https://github.com/psychoanalyze/psychoanalyze/blob/main/docs/notebooks/tutorial.ipynb">GitHub</a>.</li>
+</ul>
+<h2 id="jupyterhub">JupyterHub<a class="headerlink" href="#jupyterhub" title="Permanent link">&para;</a></h2>
 <p>We provide a ready-to-go, web-hosted notebook on our domain at <a href="https://nb.psychoanalyze.io">https://nb.psychoanalyze.io</a>, powered by JupyterHub. This is a great way to quickly start coding with the <code>psychoAnalyze</code> package, without needing to set up a development environment or install prerequisite software.</p>
 <h2 id="submit-a-notebook">Submit a notebook!<a class="headerlink" href="#submit-a-notebook" title="Permanent link">&para;</a></h2>
 <p>On our roadmap is a gallery of notebooks that demonstrate PsychoAnalyze's functionality. This is a great way for us to learn how people are using PsychoAnalyze, and for you to share your work with the community.</p>
