@@ -2,7 +2,136 @@
 
 
 
+## v0.8.9 (2023-08-04)
+
+### Documentation
+
+* docs: linkify badges ([`4820b1e`](https://github.com/psychoanalyze/psychoanalyze/commit/4820b1e5459f4843a845dc4b9c5ad330c3d94e88))
+
+* docs: readme badge fix ([`b08cac1`](https://github.com/psychoanalyze/psychoanalyze/commit/b08cac12e5fa8bae3a906c6ed82a8033ffe62ca6))
+
+* docs: fix readme badges ([`46acb22`](https://github.com/psychoanalyze/psychoanalyze/commit/46acb221819b66dd8dce7f1dbfa5558b0c9eb023))
+
+* docs: update readme ([`f8e039a`](https://github.com/psychoanalyze/psychoanalyze/commit/f8e039ac39f1acd757805f6cabfa6b79adb4e9a5))
+
+### Unknown
+
+* Docs/readme (#77)
+
+* docs: readme badge fix
+
+* docs: readme badge fix
+
+* docs: readme badges again ([`b3422f3`](https://github.com/psychoanalyze/psychoanalyze/commit/b3422f3095b80b3d263413965115ef7509e6cbfa))
+
+* Merge pull request #75 from psychoanalyze/docs/readme
+
+docs: fix readme badges ([`488181b`](https://github.com/psychoanalyze/psychoanalyze/commit/488181b0e8d6475dc27f45f0920d7a3d0f07ec44))
+
+* Merge pull request #74 from psychoanalyze/docs/readme
+
+docs: update readme ([`f3a5f7d`](https://github.com/psychoanalyze/psychoanalyze/commit/f3a5f7d881804de08ebdcb1faaaba31fd5bff94f))
+
+* Merge pull request #73 from psychoanalyze/deps/cleanup
+
+Deps/cleanup ([`7eb11c1`](https://github.com/psychoanalyze/psychoanalyze/commit/7eb11c1cac3598900caf1cbe150b2d2cbebaeaae))
+
+
+## v0.8.8 (2023-08-04)
+
+### Chore
+
+* chore(release): release 0.8.8 ([`436e06b`](https://github.com/psychoanalyze/psychoanalyze/commit/436e06b04e454ce4e47cc7cdef1a7bcc9ea9bd07))
+
+### Deps
+
+* deps: cleanup ([`13ab75a`](https://github.com/psychoanalyze/psychoanalyze/commit/13ab75a460f91ccd03b6576b2e217cda4eb02edc))
+
+### Fix
+
+* fix: use explicit include for poetry package ([`ba26cee`](https://github.com/psychoanalyze/psychoanalyze/commit/ba26cee27cc4e3933c34c50069613250cf3952f9))
+
+### Unknown
+
+* Merge pull request #72 from psychoanalyze/docs/ipython
+
+Docs/ipython ([`0316325`](https://github.com/psychoanalyze/psychoanalyze/commit/03163256401322cbe3a98eb89318f15a65d7699e))
+
+
+## v0.8.7 (2023-08-04)
+
+### Chore
+
+* chore(release): release 0.8.7 ([`2484195`](https://github.com/psychoanalyze/psychoanalyze/commit/24841955c3f415a199fcc80db99ecc2a6aecf6e8))
+
+### Dev
+
+* dev: remove to-be-deprecated default python formatter setting vscode ([`1d58776`](https://github.com/psychoanalyze/psychoanalyze/commit/1d587760e609646170a1eb5ae0f14beeaa1a0e1e))
+
+### Fix
+
+* fix: add docstring to check tab completion in ipython ([`820a754`](https://github.com/psychoanalyze/psychoanalyze/commit/820a754901bb7ea223ae34b3bd8e45212571b804))
+
+### Unknown
+
+* Merge pull request #71 from psychoanalyze/release/0.8.6
+
+chore(release): release 0.8.6 ([`a087e64`](https://github.com/psychoanalyze/psychoanalyze/commit/a087e642840452dc9389776c4c5bae729fca2e62))
+
+
+## v0.8.6 (2023-08-04)
+
+### Chore
+
+* chore(release): release 0.8.6 ([`36952c1`](https://github.com/psychoanalyze/psychoanalyze/commit/36952c1f731392ab91681186425dda54bcb6cadd))
+
+### Deps
+
+* deps: remove mkdocs ([`0738301`](https://github.com/psychoanalyze/psychoanalyze/commit/0738301c7016e3bd726995ab77baa5ebf1c4fd00))
+
+### Documentation
+
+* docs: fix loose admonition ([`c8c7f4f`](https://github.com/psychoanalyze/psychoanalyze/commit/c8c7f4fb03db13f8c874429b4d1e0ca5f9f3c788))
+
+* docs: adjust to new notebook layout ([`213c25b`](https://github.com/psychoanalyze/psychoanalyze/commit/213c25b179e3016ef8294bee927e057cf62f00af))
+
+### Fix
+
+* fix: circular import ([`2085395`](https://github.com/psychoanalyze/psychoanalyze/commit/208539539c85b1c0921914676849040b2157285c))
+
+### Refactor
+
+* refactor: dash ([`d221633`](https://github.com/psychoanalyze/psychoanalyze/commit/d221633b22b5636cac86722d2ba6b2fcfc7005a4))
+
+### Unknown
+
+* Merge pull request #70 from psychoanalyze/plot
+
+fix: circular import ([`a290217`](https://github.com/psychoanalyze/psychoanalyze/commit/a290217e0ae28b2e52d64604ecf30ec097fd6bd0))
+
+* Merge pull request #69 from psychoanalyze/docs/admonition
+
+docs: fix loose admonition ([`a4e53ff`](https://github.com/psychoanalyze/psychoanalyze/commit/a4e53ffae09b0d978ddd213abea90c2206bceb0a))
+
+* ci(pre-commit)
+
+updates:
+- [github.com/astral-sh/ruff-pre-commit: v0.0.280 → v0.0.281](https://github.com/astral-sh/ruff-pre-commit/compare/v0.0.280...v0.0.281) ([`38e9086`](https://github.com/psychoanalyze/psychoanalyze/commit/38e908611e2998cbd461d84adce1be5aab859d21))
+
+* Merge pull request #66 from psychoanalyze/refactor/dash
+
+Refactor/dash ([`c16af9b`](https://github.com/psychoanalyze/psychoanalyze/commit/c16af9b99d7b654c9f927997beb3022f864b3dc6))
+
+* Merge pull request #65 from psychoanalyze/release/0.8.5
+
+Release/0.8.5 ([`268b5b5`](https://github.com/psychoanalyze/psychoanalyze/commit/268b5b57dac0225dcdcb51dfc371b4ba08f4eb29))
+
+
 ## v0.8.5 (2023-07-31)
+
+### Chore
+
+* chore(release): release 0.8.5 ([`dd3251f`](https://github.com/psychoanalyze/psychoanalyze/commit/dd3251fd06bc175d78b8e599264b128476d2552e))
 
 ### Fix
 

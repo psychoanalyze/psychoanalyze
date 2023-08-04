@@ -184,3 +184,30 @@ def logistic(location: float, scale: float) -> pd.Series:
     x = pd.Index(np.linspace(x_min, x_max, 100), name="Intensity")
     y = expit((x - location) / scale)
     return pd.Series(y, index=x, name="Ψ(x)")
+
+
+def plot_logistic(location: float, scale: float) -> go.Scatter:
+    """Plot a logistic function.
+
+    Parameters:
+        location: x₀ in the location-scale parameterization, corresponds to threshold.
+        scale: σ corresponds to the width of the curve (inverse of slope)
+
+    Returns:
+        A Plotly figure of the psychometric function with a logistic link function.
+    """
+    return px.line(
+        logistic(location, scale),
+        y="Ψ(x)",
+        template="plotly_white",
+    )
+
+
+def plot_standard_logistic() -> go.Scatter:
+    """Plot a standard logistic function."""
+    return px.line(
+        standard_logistic(),
+        y="f(x)",
+        template="plotly_white",
+        title="$f(x) = \\frac{1}{1 + e^{-x}}$",
+    )

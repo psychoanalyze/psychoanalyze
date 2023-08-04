@@ -1,14 +1,14 @@
 [tool.poetry]
 name = "psychoanalyze"
-version = "0.8.5"
-description = "Interactive analysis and simulation of psychophysical data."
+version = "0.8.9"
+description = "Interactive data analysis and simulation for psychophysics."
 authors = ["Ty Schlichenmeyer <t.schlic@wustl.edu>"]
 license = "GPL-3.0-or-later"
 readme = "README.md"
 homepage = "https://psychoanalyze.io"
 repository = "https://github.com/psychoanalyze/psychoanalyze"
 documentation = "https://docs.psychoanalyze.io"
-keywords = ["psychophysics", "neuroscience", "psychology"]
+keywords = ["psychophysics", "neuroscience", "psychology", "python"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Web Environment",
@@ -22,6 +22,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Medical Science Apps.",
 ]
 urls = { JupyterHub = "https://nb.psychoanalyze.io" }
+packages = [{ include = "psychoanalyze" }]
 
 [tool.poetry.dependencies]
 python = ">=3.9.0,<3.12.0"
@@ -30,11 +31,8 @@ scipy = "^1.10.1"
 numpy = "^1.25.0"
 dash-bootstrap-components = "^1.4.1"
 statsmodels = "^0.14.0"
-dash-daq = "^0.5.0"
 dash = "^2.11.1"
 scikit-learn = "^1.2.2"
-bambi = "^0.11.0"
-cmdstanpy = "^1.1.0"
 pandera = "^0.15.1"
 gunicorn = "^20.1.0"
 click = "^8.1.3"
@@ -63,7 +61,7 @@ types-setuptools = "^68.0.0.3"
 hypothesis = "^6.79.0"
 pandas-stubs = "^2.0.2.230605"
 datatest = "^0.11.1"
-dash = {extras = ["testing"], version = "^2.11.1"}
+dash = { extras = ["testing"], version = "^2.11.1" }
 
 
 [tool.poetry.group.docs]
@@ -123,7 +121,7 @@ ignore_missing_imports = true
 [tool.ruff]
 fix = true
 select = ["ALL", "CPY001"]
-ignore = ["S101", "S311", "D211", "D213"]
+ignore = ["S101", "S311", "D211", "D213", "RUF002"]
 
 [tool.ruff.pydocstyle]
 convention = "google"

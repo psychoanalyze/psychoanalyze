@@ -15,7 +15,7 @@
 
 !!! abstract "About the *alpha* release and our roadmap:"
 
-    *Psychoanalyze* is currently in an [*alpha* release phase](https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha). It is not feature-complete and makes no guarantees to be bug-free. Visit our [roadmap]() to see our plans for upcoming features. In the meantime, relevant sections of this documentation will contain notes on planned features.
+    *Psychoanalyze* is currently in an [*alpha* release phase](https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha). It is not feature-complete and makes no guarantees to be bug-free. Visit our [roadmap](https://github.com/orgs/psychoanalyze/projects/2) to see our plans for upcoming features. In the meantime, relevant sections of this documentation will contain notes on planned features.
 
 
     Pre-alpha development has focused on high-level infrastructure for the project with future modularity in mind. *Beta* release will be considered after integration of a much wider variety of experimental formats, analytical methods, and visualization options. Users should expect fast iteration for approved features, especially features with visible community support.
