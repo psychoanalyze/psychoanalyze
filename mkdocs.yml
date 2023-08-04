@@ -74,10 +74,11 @@ nav:
       - Visualization Panel: 'dashboard/viz.md'
       - Output Panel: 'dashboard/output.md'
     - Notebooks: 'notebooks.md'
+    - Contributing: 'contributing.md'
     - Developers:
+      - Environment: 'environment.md'
       - API Reference: 'api.md'
       - Testing Reference: 'tests.md'
-    - Contributing: 'contributing.md'
   - API Reference:
     - Psychoanalyze: 'api.md'
     - Testing Reference: 'tests.md'
