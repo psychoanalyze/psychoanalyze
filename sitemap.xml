@@ -16,6 +16,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://docs.psychoanalyze.io/environment/</loc>
+         <lastmod>2023-08-04</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://docs.psychoanalyze.io/notebooks/</loc>
          <lastmod>2023-08-04</lastmod>
          <changefreq>daily</changefreq>
