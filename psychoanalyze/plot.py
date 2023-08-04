@@ -14,10 +14,7 @@
 
 """Global plot settings and generic plot utilities."""
 
-import plotly.express as px
 import plotly.graph_objects as go
-
-from psychoanalyze.data import blocks
 
 axis_settings = {
     "ticks": "outside",
@@ -51,22 +48,3 @@ labels = {
         "y": "Threshold Pulse Width (μs)",
     },
 }
-
-
-def standard_logistic() -> go.Scatter:
-    """Plot a standard logistic function."""
-    return px.line(
-        blocks.standard_logistic(),
-        y="f(x)",
-        template="plotly_white",
-        title="$f(x) = \\frac{1}{1 + e^{-x}}$",
-    )
-
-
-def logistic(location: float, scale: float) -> go.Scatter:
-    """Plot a logistic function."""
-    return px.line(
-        blocks.logistic(location, scale),
-        y="Ψ(x)",
-        template="plotly_white",
-    )
