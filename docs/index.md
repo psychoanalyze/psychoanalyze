@@ -40,7 +40,7 @@ Try...
 
 ## Python Installation
 
-For custom applications, we provide the `psychoanalyze` Python package (available on [PyPI](https://pypi.org/project/psychoanalyze/)) to use in your own scripts or applications.
+For custom applications, we provide the `psychoanalyze` Python package (available on [PyPI](https://pypi.org/project/psychoanalyze/)) to use in your own scripts or apps.
 
 To install `psychoanalyze` in a Python virtual environment, run the installation command in your terminal:
 
