@@ -2,7 +2,28 @@
 
 
 
+## v0.8.8 (2023-08-04)
+
+### Deps
+
+* deps: cleanup ([`13ab75a`](https://github.com/psychoanalyze/psychoanalyze/commit/13ab75a460f91ccd03b6576b2e217cda4eb02edc))
+
+### Fix
+
+* fix: use explicit include for poetry package ([`ba26cee`](https://github.com/psychoanalyze/psychoanalyze/commit/ba26cee27cc4e3933c34c50069613250cf3952f9))
+
+### Unknown
+
+* Merge pull request #72 from psychoanalyze/docs/ipython
+
+Docs/ipython ([`0316325`](https://github.com/psychoanalyze/psychoanalyze/commit/03163256401322cbe3a98eb89318f15a65d7699e))
+
+
 ## v0.8.7 (2023-08-04)
+
+### Chore
+
+* chore(release): release 0.8.7 ([`2484195`](https://github.com/psychoanalyze/psychoanalyze/commit/24841955c3f415a199fcc80db99ecc2a6aecf6e8))
 
 ### Dev
 
