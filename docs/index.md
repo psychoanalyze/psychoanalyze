@@ -13,7 +13,7 @@
     For an excellent review of the history and impact of psychophysics, check out the following review published in *Neuroscience by J.C.A. Read: *[The place of human psychophysics in modern neuroscience](https://doi.org/10.1016/j.visres.2016.02.002).
 
 
-!!! abstract "About the *alpha* release and our roadmap:"
+??? abstract "About the *alpha* release and our roadmap:"
 
     *Psychoanalyze* is currently in an [*alpha* release phase](https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha). It is not feature-complete and makes no guarantees to be bug-free. Visit our [roadmap](https://github.com/orgs/psychoanalyze/projects/2) to see our plans for upcoming features. In the meantime, relevant sections of this documentation will contain notes on planned features.
 
