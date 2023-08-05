@@ -60,5 +60,3 @@ Static HTML copies of notebooks are available by navigating to the `.ipynb` file
 If you'd like to spin up your own instance of the dashboard on the web, you may  use the following button for a Heroku setup:
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/heroku/node-js-getting-started)
-
-> Tip: Deploying your own Heroku apps are a great way to get one of your own, private, cloud-hosted and cloud-managed PostgreSQL databases up and running if you are new to database management.
