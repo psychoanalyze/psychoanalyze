@@ -1,0 +1,19 @@
+{
+  "features": {
+    "ghcr.io/devcontainers-contrib/features/hatch:2": {
+      "version": "2.0.17",
+      "resolved": "ghcr.io/devcontainers-contrib/features/hatch@sha256:01caa800a7e20eaf23e73ea6cccecfbc44ab44ab3d421056d113a5c42a101085",
+      "integrity": "sha256:01caa800a7e20eaf23e73ea6cccecfbc44ab44ab3d421056d113a5c42a101085"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "1.0.11",
+      "resolved": "ghcr.io/devcontainers/features/github-cli@sha256:464564228ccdd6028f01f8a62a3cfbaf76e9ba7953b29ac0e53ba2c262604312",
+      "integrity": "sha256:464564228ccdd6028f01f8a62a3cfbaf76e9ba7953b29ac0e53ba2c262604312"
+    },
+    "ghcr.io/eitsupi/devcontainer-features/duckdb-cli:1": {
+      "version": "1.0.1",
+      "resolved": "ghcr.io/eitsupi/devcontainer-features/duckdb-cli@sha256:8443b478ed1246a80ff105a5cee945ca0fc8af51e082114337bbd6a072c1f2d8",
+      "integrity": "sha256:8443b478ed1246a80ff105a5cee945ca0fc8af51e082114337bbd6a072c1f2d8"
+    }
+  }
+}
