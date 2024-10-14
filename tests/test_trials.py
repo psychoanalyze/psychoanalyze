@@ -22,13 +22,13 @@ import pytest
 from psychoanalyze.data import trials
 
 
-@pytest.fixture()
+@pytest.fixture
 def subjects() -> list[str]:
     """Subjects."""
     return ["A", "B"]
 
 
-@pytest.fixture()
+@pytest.fixture
 def x() -> list[int]:
     """Intensity values."""
     return list(range(8))

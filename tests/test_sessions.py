@@ -22,7 +22,7 @@ import pytest
 from psychoanalyze.data import sessions
 
 
-@pytest.fixture()
+@pytest.fixture
 def subjects() -> pd.DataFrame:
     """Subjects for session-level data."""
     return pd.DataFrame({"Monkey": ["U"], "Surgery Date": ["2020-01-01"]})
