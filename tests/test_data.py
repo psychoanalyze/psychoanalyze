@@ -13,7 +13,6 @@
 # PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
 """Test general-purpose data operations."""
-# import datatest as dt
 import pandas as pd
 import pytest
 from hypothesis import assume, given
@@ -33,7 +32,6 @@ def test_params():
     x = pd.Index([])
     fits = pd.DataFrame({"5%": [], "50%": [], "95%": []})
     reshaped = data.blocks.reshape_fit_results(fits=fits, x=x, y="p")
-    # dt.validate(reshaped.index, x)
     assert set(reshaped.columns) <= {"err+", "err-", "p"}
 
 
