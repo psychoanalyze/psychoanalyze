@@ -162,3 +162,5 @@ node_modules
 docs/notebooks/tutorial_files/**/*.js
 docs/notebooks/tutorial_files/**/*.css
 docs/notebooks/tutorial/*.html
+
+_site
