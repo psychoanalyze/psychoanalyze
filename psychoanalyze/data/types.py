@@ -16,6 +16,7 @@
 
 Contains data table schemas of the hierarchical entities described above.
 """
+
 from pandera import (
     Column,
     DataFrameModel,

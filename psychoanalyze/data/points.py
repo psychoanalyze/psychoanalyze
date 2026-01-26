@@ -18,6 +18,7 @@
 experiments at each stimulus level measured. For example, a block that samples 8
 stimulus intensity levels would have 8 corresponding points.
 """
+
 from pathlib import Path
 
 import numpy as np

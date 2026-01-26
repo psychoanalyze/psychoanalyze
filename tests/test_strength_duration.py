@@ -13,13 +13,14 @@
 # PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
 """Tests for psychoanalyze.strength_duration module."""
+
 import pandas as pd
 import pytest
 
 from psychoanalyze.analysis import strength_duration
 
 
-@pytest.fixture()
+@pytest.fixture
 def s_d_columns() -> set:
     """Columns needed for a strength-duration dataframe."""
     return {"Monkey", "Block", "Dimension"}
@@ -40,7 +41,7 @@ def test_strength_duration() -> None:
     }
 
 
-@pytest.fixture()
+@pytest.fixture
 def s_d_empty_df() -> pd.DataFrame:
     """Empty strength-duration dataframe."""
     return pd.DataFrame({"Threshold": [], "Fixed Magnitude": [], "Dimension": []})

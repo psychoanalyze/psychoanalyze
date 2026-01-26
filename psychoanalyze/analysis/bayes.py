@@ -13,6 +13,7 @@
 # PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
 """Bayesian analysis of psychophysical data."""
+
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go

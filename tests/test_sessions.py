@@ -13,6 +13,7 @@
 # PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
 """Tests for psychoanalyze.sessions module."""
+
 from pathlib import Path
 from typing import Any
 
@@ -22,7 +23,7 @@ import pytest
 from psychoanalyze.data import sessions
 
 
-@pytest.fixture()
+@pytest.fixture
 def subjects() -> pd.DataFrame:
     """Subjects for session-level data."""
     return pd.DataFrame({"Monkey": ["U"], "Surgery Date": ["2020-01-01"]})

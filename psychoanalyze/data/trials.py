@@ -13,6 +13,7 @@
 # PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
 """Functions for data manipulations at the trial level."""
+
 import json
 import random
 from pathlib import Path

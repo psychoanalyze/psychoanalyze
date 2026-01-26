@@ -18,6 +18,7 @@
 data hierarchy. They represent a specific set of experimental conditions and generally
 correspond to a single fit of the psychometric function.
 """
+
 from pathlib import Path
 
 import numpy as np

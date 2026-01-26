@@ -13,6 +13,7 @@
 # PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
 """Test psychoanalyze.weber functions."""
+
 from pathlib import Path
 
 import pandas as pd

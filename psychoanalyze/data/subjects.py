@@ -13,6 +13,7 @@
 # PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
 """Data transformation functions for subject-level data."""
+
 import string
 from pathlib import Path
 
