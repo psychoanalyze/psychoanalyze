@@ -1,16 +1,3 @@
-# Copyright 2023 Tyler Schlichenmeyer
-
-# This file is part of PsychoAnalyze.
-# PsychoAnalyze is free software: you can redistribute it and/or modify it under the
-# terms of the GNU General Public License as published by the Free Software Foundation,
-# either version 3 of the License, or (at your option) any later version.
-
-# PsychoAnalyze is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-# PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License along with
-# PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
 """Tests for psychoanalyze.points module."""
 
@@ -19,8 +6,6 @@ import pandas as pd
 import plotly.express as px
 
 from psychoanalyze.data import points as pa_points
-
-
 def test_from_trials_sums_n_per_intensity_level():
     trials = pd.DataFrame(
         {
@@ -38,8 +23,6 @@ def test_from_trials_sums_n_per_intensity_level():
             name="n trials",
         ),
     )
-
-
 def test_plot():
     points = pd.DataFrame(
         {"Hit Rate": [], "n": [], "Block": []},
@@ -48,8 +31,6 @@ def test_plot():
     fig = pa_points.plot(points, y="Hit Rate")
     assert fig.layout.yaxis.title.text == "Hit Rate"
     assert fig.layout.xaxis.title.text == "Intensity"
-
-
 def test_generate():
     x = list(np.linspace(-3, 3, 7))
     points = pa_points.generate(
@@ -65,8 +46,6 @@ def test_generate():
     assert set(points.index) == set(x)
     assert set(points.columns) >= {"Hits", "n", "Hit Rate"}
     assert points.index.name == "Intensity"
-
-
 def test_datatable():
     data = pd.DataFrame(
         index=pd.MultiIndex.from_frame(
@@ -76,8 +55,6 @@ def test_datatable():
     datatable = pa_points.datatable(data)
     amp_column = [column for column in datatable.columns if column["name"] == "Amp1"]
     assert amp_column[0]["format"].to_plotly_json()["specifier"] == ".2f"
-
-
 def test_combine_plots():
     data1 = pd.DataFrame({"A": [1]})
     data2 = pd.DataFrame({"B": [1]})

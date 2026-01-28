@@ -1,16 +1,3 @@
-# Copyright 2023 Tyler Schlichenmeyer
-
-# This file is part of PsychoAnalyze.
-# PsychoAnalyze is free software: you can redistribute it and/or modify it under the
-# terms of the GNU General Public License as published by the Free Software Foundation,
-# either version 3 of the License, or (at your option) any later version.
-
-# PsychoAnalyze is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-# PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License along with
-# PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
 """Test functions related to Weber's Law analysis.
 
@@ -22,8 +9,6 @@ from pathlib import Path
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-
-
 def plot(
     data: pd.DataFrame,
     trendline: str = "ols",
@@ -43,8 +28,6 @@ def plot(
         template="plotly_white",
         hover_data=["Date"],
     )
-
-
 def aggregate(data: pd.DataFrame) -> pd.DataFrame:
     """Calculate agg stats for Weber data."""
     return (
@@ -54,8 +37,6 @@ def aggregate(data: pd.DataFrame) -> pd.DataFrame:
         .agg(["mean", "count", "std"])
         .rename(columns={"mean": "Difference Threshold (nC)"})
     )
-
-
 def load(path: Path) -> pd.DataFrame:
     """Load weber file from a csv."""
     weber = pd.read_csv(path, parse_dates=["Date"])

@@ -3,7 +3,7 @@ name = "psychoanalyze"
 version = "1.0.0-alpha.1"
 description = "Interactive data analysis and simulation for psychophysics."
 authors = [{ name = "Ty Schlichenmeyer", email = "t.schlic@wustl.edu" }]
-license = { text = "GPL-3.0-or-later" }
+license = { text = "MIT" }
 readme = "README.md"
 keywords = ["psychophysics", "neuroscience", "psychology", "python"]
 classifiers = [
@@ -11,7 +11,7 @@ classifiers = [
     "Environment :: Web Environment",
     "Framework :: marimo",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering :: Visualization",
@@ -39,6 +39,7 @@ dependencies = [
     # "duckdb>=0.8.1",
     "ty>=0.0.14",
     "marimo[mcp]>=0.19.2",
+    "pyzmq>=27.1.0",
 ]
 
 [project.scripts]
@@ -127,8 +128,8 @@ ignore_missing_imports = true
 
 [tool.ruff]
 fix = true
-select = ["ALL", "CPY001"]
-ignore = ["S101", "S311", "D211", "D213", "RUF002"]
+select = ["ALL"]
+ignore = ["S101", "S311", "D211", "D213", "RUF002", "CPY001"]
 
 [tool.ruff.pydocstyle]
 convention = "google"

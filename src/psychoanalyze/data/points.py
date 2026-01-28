@@ -1,16 +1,3 @@
-# Copyright 2023 Tyler Schlichenmeyer
-
-# This file is part of PsychoAnalyze.
-# PsychoAnalyze is free software: you can redistribute it and/or modify it under the
-# terms of the GNU General Public License as published by the Free Software Foundation,
-# either version 3 of the License, or (at your option) any later version.
-
-# PsychoAnalyze is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-# PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License along with
-# PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
 """Utilities for points-level data.
 
@@ -33,8 +20,6 @@ from psychoanalyze.data import trials as pa_trials
 from psychoanalyze.data import types
 
 index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
-
-
 @check_io(trials=types.trials, out=types.points)
 def from_trials(trials: pd.DataFrame) -> pd.DataFrame:
     """Aggregate point-level measures from trial data."""
@@ -43,15 +28,11 @@ def from_trials(trials: pd.DataFrame) -> pd.DataFrame:
     points["Hit Rate"] = points["Hits"] / points["n trials"]
     points["logit(Hit Rate)"] = logit(points["Hit Rate"])
     return points.reset_index()
-
-
 @check_output(types.points)
 def load(data_path: Path) -> pd.DataFrame:
     """Load points data from csv."""
     trials = pa_trials.load(data_path)
     return from_trials(trials)
-
-
 def prep_fit(points: pd.DataFrame, dimension: str = "Amp1") -> dict:
     """Transform points data for numpy-related fitting procedures."""
     points = points.reset_index()
@@ -61,8 +42,6 @@ def prep_fit(points: pd.DataFrame, dimension: str = "Amp1") -> dict:
         "N": points["n"].to_numpy(),
         "hits": points["Hits"].to_numpy(),
     }
-
-
 def hits(
     n: pd.Series,
     params: dict[str, float],
@@ -79,8 +58,6 @@ def hits(
         index=n.index,
         name="Hits",
     )
-
-
 def generate(
     n_trials: int,
     options: pd.Index,
@@ -100,13 +77,9 @@ def generate(
         index=n.index,
     )
     return pd.concat([points, _hit_rate, logit_hit_rate], axis=1)
-
-
 def generate_point(n: int, p: float) -> int:
     """Sample n hits from n trials and probability p from binomial dist."""
     return np.random.default_rng().binomial(n, p)
-
-
 def datatable(data: pd.DataFrame) -> dash_table.DataTable:
     """Convert dataframe to Dash DataTable-friendly format."""
     return dash_table.DataTable(
@@ -138,34 +111,22 @@ def datatable(data: pd.DataFrame) -> dash_table.DataTable:
         ],
         id="experiment-psych-table",
     )
-
-
 def from_store(store_data: str) -> pd.DataFrame:
     """Get points-level measures from trials-level data store."""
     trials = pa_trials.from_store(store_data)
     return from_trials(trials)
-
-
 def combine_plots(fig1: go.Figure, fig2: go.Figure) -> go.Figure:
     """Combine two points-level plots. Possible duplicate."""
     return go.Figure(data=fig1.data + fig2.data)
-
-
 def n(trials: pd.Index) -> pd.Index:
     """Count trials at each point."""
     return pd.Series(trials.value_counts(), name="n")
-
-
 def generate_n(n_trials: int, options: pd.Index) -> pd.Series:
     """Simulate how many trials were performed per intensity level."""
     return pd.Series(n(pa_trials.generate_trial_index(n_trials, options)))
-
-
 def to_block(points: pd.DataFrame) -> pd.DataFrame:
     """Aggregate to block-level measures from points-level data."""
     return points.groupby(level="Block").sum()
-
-
 def psi(
     x: pd.Index,
     params: dict[str, float],
@@ -178,8 +139,6 @@ def psi(
         index=x,
         name="p(x)",
     )
-
-
 def plot(points: pd.DataFrame, y: str) -> go.Figure:
     """Plot the psychometric function."""
     return px.scatter(
@@ -190,18 +149,12 @@ def plot(points: pd.DataFrame, y: str) -> go.Figure:
         color="Block",
         template="plotly_white",
     )
-
-
 def hit_rate(df: pd.DataFrame) -> pd.Series:
     """Calculate hit rate from hits and number of trials."""
     return pd.Series(df["Hits"] / df["n"], name="Hit Rate")
-
-
 def transform(hit_rate: float, y: str) -> float:
     """Logit transform hit rate."""
     return logit(hit_rate) if y == "alpha" else hit_rate
-
-
 def generate_index(n_levels: int, x_range: list[float]) -> pd.Index:
     """Generate evenly-spaced values along the modulated stimulus dimension."""
     min_x = x_range[0]

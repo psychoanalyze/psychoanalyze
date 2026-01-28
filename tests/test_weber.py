@@ -1,16 +1,3 @@
-# Copyright 2023 Tyler Schlichenmeyer
-
-# This file is part of PsychoAnalyze.
-# PsychoAnalyze is free software: you can redistribute it and/or modify it under the
-# terms of the GNU General Public License as published by the Free Software Foundation,
-# either version 3 of the License, or (at your option) any later version.
-
-# PsychoAnalyze is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-# PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License along with
-# PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
 """Test psychoanalyze.weber functions."""
 from pathlib import Path
@@ -19,8 +6,6 @@ import pandas as pd
 
 from psychoanalyze.analysis import weber
 from psychoanalyze.data import types
-
-
 def test_aggregate() -> None:
     """Makes sure that thresholds at a given stimulus intensity are aggregated."""
     curve_data = pd.DataFrame.from_records(
@@ -37,8 +22,6 @@ def test_aggregate() -> None:
         agg.iloc[0, agg.columns.get_loc("Difference Threshold (nC)")]
         == curve_data["Difference Threshold (nC)"].mean()
     )
-
-
 def test_load(tmp_path: Path) -> None:
     """Given weber_curves.csv, loads dataframe."""
     pd.DataFrame(

@@ -1,0 +1,27 @@
+/* restyle radio items */
+.radio-group .form-check {
+    padding-left: 0;
+    margin-right: 0;
+  }
+
+.radio-group .btn-group > .form-check:not(:last-child) > .btn {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.radio-group .btn-group > .form-check:not(:first-child) > .btn {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: -1px;
+}
+
+input[type=number]:enabled::-webkit-inner-spin-button,
+input[type=number]:enabled::-webkit-outer-spin-button {
+
+    opacity: 1;
+
+}
+
+.Select-menu-outer {
+  color: black;
+}
