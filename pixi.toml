@@ -1,0 +1,19 @@
+[project]
+authors = ["schlich <ty.schlich@gmail.com>"]
+channels = ["conda-forge"]
+name = "psychoanalyze"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+pytest = ">=8.3.5,<9"
+pandas = ">=2.2.3,<3"
+dash = ">=2.18.2,<3"
+pandera = ">=0.23.1,<0.24"
+python = ">=3.10"
+scikit-learn = ">=1.6.1,<2"
+hypothesis = ">=6.129.2,<7"
+duckdb = ">=1.2.1,<2"
+dash-bootstrap-components = ">=1.7.1,<2"
