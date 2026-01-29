@@ -37,6 +37,8 @@ dependencies = [
     # "kaleido==0.2.1",
     # "pyarrow>=12.0.1",
     # "duckdb>=0.8.1",
+    "ty>=0.0.14",
+    "marimo[mcp]>=0.19.2",
 ]
 
 [project.scripts]
@@ -62,6 +64,8 @@ dev = [
     # "pandas-stubs>=2.0.2.230605",
     # "datatest>=0.11.1",
     # "dash[testing]>=2.11.1",
+    "pytest>=9.0.2",
+    "ruff>=0.14.14",
 ]
 
 docs = [

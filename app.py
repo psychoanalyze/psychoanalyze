@@ -18,11 +18,11 @@ Replaces the former Dash dashboard (removed).
 import marimo
 
 __generated_with = "0.19.2"
-app = marimo.App(width="columns")
+app = marimo.App(width="full", app_title="PsychoAnalyze")
 
 
 @app.cell
-def __():
+def _():
     import io
     import zipfile
 
@@ -34,25 +34,26 @@ def __():
     from scipy.special import expit, logit
     from sklearn.linear_model import LogisticRegression
 
+
     def to_intercept(location: float, scale: float) -> float:
         return -location / scale
 
+
     def to_slope(scale: float) -> float:
         return 1 / scale
+
 
     def psi(intensity: float, params: dict) -> float:
         gamma = params.get("gamma", 0.0)
         lambda_ = params.get("lambda", 0.0)
         k = params["k"]
         x_0 = params["x_0"]
-        return gamma + (1 - gamma - lambda_) * (
-            1 / (1 + np.exp(-k * (intensity - x_0)))
-        )
+        return gamma + (1 - gamma - lambda_) * (1 / (1 + np.exp(-k * (intensity - x_0))))
+
 
     def generate_index(n_levels: int, x_range: list[float]) -> pd.Index:
-        return pd.Index(
-            np.linspace(x_range[0], x_range[1], n_levels), name="Intensity"
-        )
+        return pd.Index(np.linspace(x_range[0], x_range[1], n_levels), name="Intensity")
+
 
     def generate_trials(
         n_trials: int,
@@ -64,50 +65,47 @@ def __():
         out = []
         for i in range(n_blocks):
             intensities = rng.choice(options.to_numpy(), size=n_trials)
-            results = np.array(
-                [int(rng.random() <= psi(x, params)) for x in intensities]
-            )
+            results = np.array([int(rng.random() <= psi(x, params)) for x in intensities])
             df = pd.DataFrame({"Intensity": intensities, "Result": results})
             df["Block"] = i
             out.append(df)
         return pd.concat(out, ignore_index=True)[["Block", "Intensity", "Result"]]
 
+
     def from_trials(trials_df: pd.DataFrame) -> pd.DataFrame:
-        points = trials_df.groupby(["Block", "Intensity"])["Result"].agg(
-            ["count", "sum"]
-        )
+        points = trials_df.groupby(["Block", "Intensity"])["Result"].agg(["count", "sum"])
         points = points.rename(columns={"count": "n trials", "sum": "Hits"})
         points["Hit Rate"] = points["Hits"] / points["n trials"]
         return points.reset_index()
 
+
     def block_fit(trials_df: pd.DataFrame) -> pd.Series:
-        fit = LogisticRegression().fit(
-            trials_df[["Intensity"]], trials_df["Result"]
+        fit = LogisticRegression().fit(trials_df[["Intensity"]], trials_df["Result"])
+        return pd.Series(
+            {
+                "intercept": float(fit.intercept_[0]),
+                "slope": float(fit.coef_[0][0]),
+            }
         )
-        return pd.Series({
-            "intercept": float(fit.intercept_[0]),
-            "slope": float(fit.coef_[0][0]),
-        })
+
 
     def process_upload_bytes(contents: bytes, filename: str) -> pd.DataFrame:
         if "zip" in filename:
             with zipfile.ZipFile(io.BytesIO(contents)) as z:
                 return pd.read_csv(z.open("trials.csv"))
         return pd.read_csv(io.BytesIO(contents.decode("utf-8")))
-
     return (
-        mo,
-        np,
-        pd,
-        px,
-        go,
-        expit,
-        logit,
-        process_upload_bytes,
         block_fit,
+        expit,
         from_trials,
         generate_index,
         generate_trials,
+        logit,
+        mo,
+        np,
+        pd,
+        process_upload_bytes,
+        px,
         to_intercept,
         to_slope,
     )
@@ -116,14 +114,12 @@ def __():
 @app.cell
 def _(mo):
     # Header
-    mo.md(
-        r"""
-        # PsychoAnalyze
-        *Interactive data simulation & analysis for psychophysics.*
+    mo.md(r"""
+    # PsychoAnalyze
+    *Interactive data simulation & analysis for psychophysics.*
 
-        [Notebooks](https://nb.psychoanalyze.io) · [GitHub](https://github.com/psychoanalyze/psychoanalyze) · [Docs](https://docs.psychoanalyze.io)
-        """
-    )
+    [Notebooks](https://nb.psychoanalyze.io) · [GitHub](https://github.com/psychoanalyze/psychoanalyze) · [Docs](https://docs.psychoanalyze.io)
+    """)
     return
 
 
@@ -142,7 +138,9 @@ def _(mo):
 @app.cell
 def _(mo):
     # Link function (display only in marimo)
-    mo.md(r"## Link function: $\psi(x) = \gamma + (1 - \gamma - \lambda)F(x)$")
+    mo.md(r"""
+    ## Link function: $\psi(x) = \gamma + (1 - \gamma - \lambda)F(x)$
+    """)
     return
 
 
@@ -169,10 +167,7 @@ def _(mo):
         ],
         gap=2,
     )
-    return (k_num, preset_dropdown, x_0_num)
-
-
-# Preset dropdown is for reference; edit x₀ and k in the number inputs above.
+    return k_num, x_0_num
 
 
 @app.cell
@@ -180,7 +175,7 @@ def _(k_num, x_0_num):
     # Single source of truth for x_0, k (avoids MultipleDefinitionError)
     x_0 = x_0_num.value if x_0_num.value is not None else 0.0
     k = k_num.value if k_num.value is not None else 1.0
-    return (k, x_0)
+    return k, x_0
 
 
 @app.cell
@@ -200,18 +195,16 @@ def _(k, logit, mo, to_intercept, to_slope, x_0):
         ],
         gap=2,
     )
-    return (intercept, max_x, min_x, n_levels_num, slope)
+    return max_x, min_x, n_levels_num
 
 
 @app.cell
-def _(mo, n_levels_num):
+def _(mo):
     # Simulate: n_trials, n_blocks
     n_trials_num = mo.ui.number(
         value=100, start=1, stop=10000, step=1, label="trials per block"
     )
-    n_blocks_num = mo.ui.number(
-        value=5, start=1, stop=100, step=1, label="blocks"
-    )
+    n_blocks_num = mo.ui.number(value=5, start=1, stop=100, step=1, label="blocks")
     mo.hstack(
         [
             mo.md("**Simulate** "),
@@ -220,7 +213,7 @@ def _(mo, n_levels_num):
         ],
         gap=2,
     )
-    return (n_blocks_num, n_trials_num)
+    return n_blocks_num, n_trials_num
 
 
 @app.cell
@@ -246,18 +239,14 @@ def _(
         else:
             trials_df = generate_trials(
                 n_trials=n_trials_num.value or 100,
-                options=generate_index(
-                    n_levels_num.value or 7, [min_x, max_x]
-                ),
+                options=generate_index(n_levels_num.value or 7, [min_x, max_x]),
                 params={"x_0": x_0, "k": k, "gamma": 0.0, "lambda": 0.0},
                 n_blocks=n_blocks_num.value or 5,
             )
     else:
         trials_df = generate_trials(
             n_trials=n_trials_num.value or 100,
-            options=generate_index(
-                n_levels_num.value or 7, [min_x, max_x]
-            ),
+            options=generate_index(n_levels_num.value or 7, [min_x, max_x]),
             params={"x_0": x_0, "k": k, "gamma": 0.0, "lambda": 0.0},
             n_blocks=n_blocks_num.value or 5,
         )
@@ -269,36 +258,14 @@ def _(
 def _(block_fit, from_trials, trials_df):
     # Points and blocks from trials
     points_df = from_trials(trials_df)
-    blocks_df = (
-        trials_df.groupby("Block")
-        .apply(block_fit)
-        .reset_index()
-    )
+    blocks_df = trials_df.groupby("Block").apply(block_fit).reset_index()
     blocks_df["gamma"] = 0.0
     blocks_df["lambda"] = 0.0
-    return (blocks_df, points_df)
+    return blocks_df, points_df
 
 
 @app.cell
-def _(blocks_df, mo):
-    # Blocks table with multi-selection
-    blocks_table = mo.ui.table(
-        blocks_df,
-        selection="multi",
-        initial_selection=[0, 2] if len(blocks_df) > 2 else list(range(len(blocks_df))),
-        label="Blocks",
-        format_mapping={
-            "intercept": "{:.2f}".format,
-            "slope": "{:.2f}".format,
-        },
-    )
-    mo.md("## Blocks")
-    blocks_table
-    return (blocks_table,)
-
-
-@app.cell
-def _(blocks_table, blocks_df, k, x_0):
+def _(blocks_df, blocks_table, k, pd, x_0):
     # Selected block rows for plot (include Model)
     if blocks_table.value is not None and hasattr(blocks_table.value, "__len__"):
         try:
@@ -336,11 +303,11 @@ def _(blocks_table, blocks_df, k, x_0):
     block_rows.append(
         {"Block": "Model", "intercept": model_intercept, "slope": model_slope}
     )
-    return (block_rows, model_intercept, model_slope, selected_blocks_df)
+    return (block_rows,)
 
 
 @app.cell
-def _(blocks_table, points_df):
+def _(blocks_table, pd, points_df):
     # Filter points by selected blocks
     if blocks_table.value is not None:
         try:
@@ -351,9 +318,7 @@ def _(blocks_table, points_df):
             )
             if len(sel) > 0 and "Block" in sel.columns:
                 block_ids = sel["Block"].tolist()
-                points_filtered_df = points_df[
-                    points_df["Block"].isin(block_ids)
-                ]
+                points_filtered_df = points_df[points_df["Block"].isin(block_ids)]
             else:
                 points_filtered_df = points_df
         except Exception:
@@ -364,14 +329,48 @@ def _(blocks_table, points_df):
 
 
 @app.cell
-def _(block_rows, expit, go, max_x, min_x, mo, np, pd, points_filtered_df, px):
+def _(mo, points_filtered_df):
+    # Points table
+    mo.md("## Points")
+    points_table = mo.ui.table(
+        points_filtered_df,
+        pagination=True,
+        page_size=10,
+        label="Points",
+        format_mapping={
+            "Intensity": "{:.2f}".format,
+            "Hit Rate": "{:.2f}".format,
+        },
+    )
+    points_table
+    return
+
+
+@app.cell
+def _(blocks_df, mo):
+    # Blocks table with multi-selection
+    blocks_table = mo.ui.table(
+        blocks_df,
+        selection="multi",
+        initial_selection=[0, 2] if len(blocks_df) > 2 else list(range(len(blocks_df))),
+        label="Blocks",
+        format_mapping={
+            "intercept": "{:.2f}".format,
+            "slope": "{:.2f}".format,
+        },
+    )
+    mo.md("## Blocks")
+    blocks_table
+    return (blocks_table,)
+
+
+@app.cell
+def _(block_rows, expit, max_x, min_x, mo, np, pd, points_filtered_df, px):
     # Plot: scatter points + logistic curves
     x = np.linspace(min_x, max_x, 100)
     fits_list = []
     for blk in block_rows:
-        y = expit(
-            x * blk["slope"] + blk["intercept"]
-        )
+        y = expit(x * blk["slope"] + blk["intercept"])
         fits_list.append(
             pd.DataFrame(
                 {
@@ -380,7 +379,7 @@ def _(block_rows, expit, go, max_x, min_x, mo, np, pd, points_filtered_df, px):
                     "Block": blk["Block"],
                 }
             )
-    )
+        )
     fits_df = pd.concat(fits_list, ignore_index=True)
     points_plot_df = points_filtered_df.copy()
     points_plot_df["Block"] = points_plot_df["Block"].astype(str)
@@ -404,35 +403,7 @@ def _(block_rows, expit, go, max_x, min_x, mo, np, pd, points_filtered_df, px):
     plot_ui = mo.ui.plotly(fig)
     mo.md(r"## Psychometric function: $\psi(x) = \gamma + (1 - \gamma - \lambda)F(x)$")
     plot_ui
-    return (fig, fits_df, plot_ui, points_plot_df, results_fig)
-
-
-@app.cell
-def _(mo, points_filtered_df):
-    # Points table
-    mo.md("## Points")
-    points_table = mo.ui.table(
-        points_filtered_df,
-        pagination=True,
-        page_size=10,
-        label="Points",
-        format_mapping={
-            "Intensity": "{:.2f}".format,
-            "Hit Rate": "{:.2f}".format,
-        },
-    )
-    points_table
-    return (points_table,)
-
-
-@app.cell
-def _(mo):
-    # Export note: tables have built-in download; plot can be saved via browser
-    mo.md(
-        "**Export:** Use each table's download button for data. "
-        "Right-click the plot → Save image as for the figure."
-    )
-    return ()
+    return
 
 
 if __name__ == "__main__":
