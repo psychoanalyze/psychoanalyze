@@ -13,6 +13,7 @@
 # PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
 """Test general-purpose data operations."""
+
 import datatest as dt
 import pandas as pd
 import pytest
@@ -23,7 +24,7 @@ from psychoanalyze import data
 from psychoanalyze.data import logistic
 
 
-@pytest.fixture()
+@pytest.fixture
 def subjects() -> list[str]:
     """List of subject names."""
     return ["A", "B"]

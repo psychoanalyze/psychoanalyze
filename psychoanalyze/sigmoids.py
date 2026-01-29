@@ -13,6 +13,7 @@
 # PsychoAnalyze. If not, see <https://www.gnu.org/licenses/>.
 
 """Sigmoid functions used in the psychometric function."""
+
 from typing import Any
 
 import numpy as np
