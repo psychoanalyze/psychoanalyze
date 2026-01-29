@@ -9,7 +9,7 @@ keywords = ["psychophysics", "neuroscience", "psychology", "python"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Web Environment",
-    "Framework :: Dash",
+    "Framework :: marimo",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Natural Language :: English",
@@ -22,13 +22,14 @@ urls = { JupyterHub = "https://nb.psychoanalyze.io" }
 requires-python = ">=3.14"
 
 dependencies = [
-    # "pandas>=2.0.2",
-    # "scipy>=1.10.1",
-    # "numpy>=1.25.0",
+    "numpy>=1.25.0",
+    "pandas>=2.0.2",
+    "plotly>=5.18.0",
+    "scipy>=1.10.1",
+    "scikit-learn>=1.2.2",
     # "dash-bootstrap-components>=1.4.1",
     # "statsmodels>=0.14.0",
     # "dash>=2.11.1",
-    # "scikit-learn>=1.2.2",
     # "pandera>=0.15.1",
     # "gunicorn>=20.1.0",
     # "click>=8.1.3",

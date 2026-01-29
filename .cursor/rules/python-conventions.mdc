@@ -1,0 +1,17 @@
+---
+description: 'Python coding conventions and guidelines'
+globs: '**/*.py'
+alwaysApply: false
+---
+
+## Type Annotations
+
+- Provide type hints for function parameters and return types. Prefer broad (general/wide) types as input and return narrow (specific) types as output.
+- Use builtin types and operators for type annotations when possible (e.g., `list[str] | dict[str, int]` instead of `Optional[List[str], Dict[str, int]]). Avoid using `Any` unless absolutely necessary.
+- Use ty as the type checker and language server
+
+## Package/Project management
+- Use `uv` for all package and project management tasks.
+
+## Linting/Formatting
+- Use `ruff` for all linting and formatting needs.

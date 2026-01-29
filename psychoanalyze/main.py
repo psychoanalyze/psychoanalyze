@@ -15,11 +15,11 @@
 """PsychoAnalyze command line interface."""
 
 import importlib.metadata
+import subprocess
+import sys
 
 import typer
 from rich.console import Console
-
-from psychoanalyze.dashboard import app as dash_app
 
 app = typer.Typer()
 
@@ -29,5 +29,7 @@ def main(command: str) -> None:
     """Main commands."""
     if command == "version":
         Console().print(importlib.metadata.version("psychoanalyze"))
-    if command == "dash":
-        dash_app.app.run(debug=True)
+    if command == "marimo":
+        subprocess.run(
+            [sys.executable, "-m", "marimo", "edit", "app.py"],
+        )
