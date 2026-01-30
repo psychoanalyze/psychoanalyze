@@ -18,10 +18,10 @@ import base64
 import io
 import zipfile
 
-import pandas as pd
+import polars as pl
 
 
-def process_upload(contents: str, filename: str) -> pd.DataFrame:
+def process_upload(contents: str, filename: str) -> pl.DataFrame:
     """Process a file upload.
 
     Params:
@@ -35,7 +35,7 @@ def process_upload(contents: str, filename: str) -> pd.DataFrame:
     decoded = base64.b64decode(content_string)
     if "zip" in filename:
         with zipfile.ZipFile(io.BytesIO(decoded)) as z:
-            trials = pd.read_csv(z.open("trials.csv"))
+            trials = pl.read_csv(z.open("trials.csv"))
     else:
-        trials = pd.read_csv(io.StringIO(decoded.decode("utf-8")))
+        trials = pl.read_csv(io.BytesIO(decoded))
     return trials

@@ -1,20 +1,26 @@
 
-"""Tests for psychoanalyze.points module."""
+"""Tests for psychoanalyze.trials module."""
 
 from typing import Any
 
-import pandas as pd
+import polars as pl
 import pytest
 
 from psychoanalyze.data import trials
-@pytest.fixture()
+
+
+@pytest.fixture
 def subjects() -> list[str]:
     """Subjects."""
     return ["A", "B"]
-@pytest.fixture()
+
+
+@pytest.fixture
 def x() -> list[int]:
     """Intensity values."""
     return list(range(8))
+
+
 def test_normalize() -> None:
     """Given a denormalized dataframe, returns normalized data."""
     fields = {
@@ -30,7 +36,7 @@ def test_normalize() -> None:
         + fields["Channel Configuration"]
         + fields["Test Stimulus"]
     }
-    _trials = pd.DataFrame(data)
+    _trials = pl.DataFrame(data)
     normalized_data = trials.normalize(_trials)
     assert normalized_data.keys() == {
         "Session",
@@ -38,6 +44,8 @@ def test_normalize() -> None:
         "Channel Config",
         "Test Stimulus",
     }
+
+
 def test_labels() -> None:
     """Given trial result integers, translates to labels."""
     assert trials.labels([0, 1]) == ["Miss", "Hit"]

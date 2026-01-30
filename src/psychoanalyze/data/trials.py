@@ -6,90 +6,90 @@ from pathlib import Path
 from typing import TypedDict
 
 import numpy as np
-import pandas as pd
-from pandera import SeriesSchema
+import polars as pl
 from sklearn.linear_model import LogisticRegression
-
-from psychoanalyze.data import types
-
-schema = SeriesSchema(bool, name="Test Trials")
 
 data_path = Path("data/trials.csv")
 
 codes = {0: "Miss", 1: "Hit"}
 Trial = TypedDict("Trial", {"Result": bool, "Stimulus Magnitude": float})
-def generate_trial_index(n_trials: int, options: pd.Index) -> pd.Index:
+
+
+def generate_trial_index(n_trials: int, options: list[float]) -> list[float]:
     """Generate n trials (no outcomes)."""
-    return pd.Index(
-        [random.choice(options) for _ in range(n_trials)],
-        name="Intensity",
-    )
-def sample_trials(trials_ix: pd.Index, params: dict[str, float]) -> pd.Series:
+    return [random.choice(options) for _ in range(n_trials)]
+
+
+def sample_trials(trials_ix: list[float], params: dict[str, float]) -> pl.DataFrame:
     """Sample trials from a given index."""
-    return pd.Series(
-        [int(random.random() <= psi(x, params)) for x in trials_ix],
-        index=trials_ix,
-        name="Result",
-    )
+    results = [int(random.random() <= psi(x, params)) for x in trials_ix]
+    return pl.DataFrame({"Intensity": trials_ix, "Result": results})
+
+
 def generate(
     n_trials: int,
-    options: pd.Index,
+    options: list[float],
     params: dict[str, float],
     n_blocks: int,
-) -> pd.DataFrame:
+) -> pl.DataFrame:
     """Generate n trials with outcomes."""
-    return pd.concat(
-        {
-            i: sample_trials(
-                trials_ix=generate_trial_index(n_trials, options),
-                params=params,
-            )
-            for i in range(n_blocks)
-        },
-        names=["Block"],
-    ).reset_index()
-def load(data_path: Path) -> pd.DataFrame:
+    frames = []
+    for i in range(n_blocks):
+        trials_ix = generate_trial_index(n_trials, options)
+        df = sample_trials(trials_ix, params)
+        df = df.with_columns(pl.lit(i).alias("Block"))
+        frames.append(df)
+    return pl.concat(frames).select(["Block", "Intensity", "Result"])
+
+
+def load(data_path: Path) -> pl.DataFrame:
     """Load trials data from csv."""
-    return types.trials.validate(
-        pd.read_csv(
-            data_path,
-            dtype={
-                "Result": int,
-                "Intensity": float,
-                "Block": int,
-            },
-        ),
+    return pl.read_csv(
+        data_path,
+        schema_overrides={
+            "Result": pl.Int64,
+            "Intensity": pl.Float64,
+            "Block": pl.Int64,
+        },
     )
-def from_store(store_data: str) -> pd.DataFrame:
+
+
+def from_store(store_data: str) -> pl.DataFrame:
     """Convert JSON-formatted string to DataFrame."""
     df_dict = json.loads(store_data)
-    index_names = df_dict.pop("index_names")
-    index = pd.MultiIndex.from_tuples(df_dict["index"])
-    trials = pd.DataFrame({"Result": df_dict["data"][0]}, index=index)
-    trials.index.names = index_names
-    return types.trials.validate(trials)
-def to_store(trials: pd.DataFrame) -> str:
+    return pl.DataFrame(df_dict["data"])
+
+
+def to_store(trials: pl.DataFrame) -> str:
     """Convert data to a JSON-formatted string for dcc.Store."""
-    data_dict = trials.to_dict(orient="split")
-    data_dict["index_names"] = types.points_index_levels
-    return json.dumps(data_dict)
-def normalize(trials: pd.DataFrame) -> dict[str, pd.DataFrame]:
+    return json.dumps({"data": trials.to_dicts()})
+
+
+def normalize(trials: pl.DataFrame) -> dict[str, pl.DataFrame]:
     """Normalize denormalized trial data."""
     return {
-        "Session": trials[["Monkey", "Block"]].drop_duplicates(),
-        "Reference Stimulus": trials[["Amp2", "Width2", "Freq2", "Dur2"]],
-        "Channel Config": trials[["Active Channels", "Return Channels"]],
-        "Test Stimulus": trials[["Amp1", "Width1", "Freq1", "Dur1"]],
+        "Session": trials.select(["Monkey", "Block"]).unique(),
+        "Reference Stimulus": trials.select(["Amp2", "Width2", "Freq2", "Dur2"]),
+        "Channel Config": trials.select(["Active Channels", "Return Channels"]),
+        "Test Stimulus": trials.select(["Amp1", "Width1", "Freq1", "Dur1"]),
     }
+
+
 def result(p: float) -> bool:
     """Return a trial result given a probability p."""
     return random.random() < p
-def results(n: int, p_x: pd.Series) -> list[Trial]:
+
+
+def results(n: int, p_x: pl.DataFrame) -> list[Trial]:
     """Return a list of trial results in dict format."""
+    intensities = p_x["Intensity"].to_list()
+    probs = p_x["p"].to_list()
+    prob_map = dict(zip(intensities, probs))
+
     results = []
     for _ in range(n):
-        stimulus_magnitude = random.choice(p_x.index.to_list())
-        _result = result(p_x[stimulus_magnitude])
+        stimulus_magnitude = random.choice(intensities)
+        _result = result(prob_map[stimulus_magnitude])
         results.append(
             Trial(
                 {
@@ -99,9 +99,13 @@ def results(n: int, p_x: pd.Series) -> list[Trial]:
             ),
         )
     return results
+
+
 def labels(results: list[int]) -> list[str]:
     """Convert a list of outcome codes to their labels."""
     return [codes[result] for result in results]
+
+
 def psi(intensity: float, params: dict[str, float]) -> float:
     """Calculate the value of the psychometric function for a given intensity."""
     gamma = params["gamma"]
@@ -109,22 +113,25 @@ def psi(intensity: float, params: dict[str, float]) -> float:
     k = params["k"]
     x_0 = params["x_0"]
     return gamma + (1 - gamma - lambda_) * (1 / (1 + np.exp(-k * (intensity - x_0))))
-def moc_sample(n_trials: int, model_params: dict[str, float]) -> pd.DataFrame:
+
+
+def moc_sample(n_trials: int, model_params: dict[str, float]) -> pl.DataFrame:
     """Sample results from a method-of-constant-stimuli experiment."""
     x_0 = model_params["x_0"]
     k = model_params["k"]
     intensity_choices = np.linspace(x_0 - 4 / k, x_0 + 4 / k, 7)
     intensities = [float(random.choice(intensity_choices)) for _ in range(n_trials)]
-    intensity_index = pd.Index(intensities, name="Intensity")
     results = [
         int(random.random() <= psi(intensity, model_params))
         for intensity in intensities
     ]
-    return pd.DataFrame(
-        {"Result": pd.Series(results, dtype=int)},
-        index=intensity_index,
-    )
-def fit(trials: pd.DataFrame) -> dict[str, float]:
+    return pl.DataFrame({"Intensity": intensities, "Result": results})
+
+
+def fit(trials: pl.DataFrame) -> dict[str, float]:
     """Fit trial data using logistic regression."""
-    fits = LogisticRegression().fit(trials[["Intensity"]], trials["Result"])
+    fits = LogisticRegression().fit(
+        trials.select("Intensity").to_numpy(),
+        trials["Result"].to_numpy(),
+    )
     return {"Threshold": -fits.intercept_[0], "Slope": fits.coef_[0][0]}

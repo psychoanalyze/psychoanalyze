@@ -1,10 +1,12 @@
 
-import pandas as pd
+import polars as pl
 
 from psychoanalyze.data import blocks
+
+
 def test_thresholds() -> None:
     """Tests threshold plot."""
-    data = pd.DataFrame(
+    data = pl.DataFrame(
         {
             "Subject": ["A", "B"],
             "5%": [1, 2],

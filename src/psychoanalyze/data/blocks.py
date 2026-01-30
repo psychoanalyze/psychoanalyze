@@ -8,16 +8,14 @@ correspond to a single fit of the psychometric function.
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import polars as pl
 from scipy.special import expit
 from scipy.stats import logistic as scipy_logistic
 from sklearn.linear_model import LogisticRegression
 
 from psychoanalyze.data import (
-    sessions,
-    stimulus,
     subjects,
     trials,
 )
@@ -25,76 +23,92 @@ from psychoanalyze.plot import template
 
 dims = ["Amp2", "Width2", "Freq2", "Dur2", "Active Channels", "Return Channels"]
 index_levels = dims
+
+
 def generate(
     n_trials_per_level: int,
     x_min: float,
     x_max: float,
     n_levels: int,
-) -> pd.DataFrame:
+) -> pl.DataFrame:
     """Generate block-level data."""
-    index = pd.Index(np.linspace(x_min, x_max, n_levels), name="x")
-    n = [n_trials_per_level] * len(index)
-    p = scipy_logistic.cdf(index)
-    return pd.DataFrame(
-        {"n": n, "Hits": np.random.default_rng().binomial(n, p)},
-        index=index,
-    )
-def plot_fits(blocks: pd.DataFrame) -> go.Figure:
+    x = np.linspace(x_min, x_max, n_levels)
+    n = [n_trials_per_level] * len(x)
+    p = scipy_logistic.cdf(x)
+    hits = np.random.default_rng().binomial(n, p)
+    return pl.DataFrame({"x": x, "n": n, "Hits": hits})
+
+
+def plot_fits(blocks: pl.DataFrame) -> go.Figure:
     """Plot fits."""
     x = np.linspace(-3, 3, 100)
     y = expit(x)
-    return px.line(blocks.reset_index(), x=x, y=y)
-def load(data_path: Path) -> pd.DataFrame:
+    return px.line(x=x, y=y)
+
+
+def load(data_path: Path) -> pl.DataFrame:
     """Load block data from csv."""
     full_path = data_path / "blocks.csv"
     channel_config = ["Active Channels", "Return Channels"]
-    blocks = pd.read_csv(full_path / "blocks.csv", parse_dates=["Date"]).set_index(
-        sessions.dims + stimulus.ref_dims + channel_config,
-    )
-    blocks["Block"] = days(blocks, subjects.load(full_path))
+    blocks = pl.read_csv(full_path / "blocks.csv")
+    blocks = blocks.with_columns(pl.col("Date").str.to_datetime())
+    subj = subjects.load(full_path)
+    blocks = days(blocks, subj)
     return blocks
-def days(blocks: pd.DataFrame, intervention_dates: pd.DataFrame) -> pd.Series:
+
+
+def days(blocks: pl.DataFrame, intervention_dates: pl.DataFrame) -> pl.DataFrame:
     """Calculate days for block-level data. Possible duplicate."""
-    blocks = blocks.join(intervention_dates, on="Subject")
-    days = pd.Series(
-        blocks.index.get_level_values("Date") - blocks["Surgery Date"],
-    ).dt.days
-    days.name = "Days"
-    return days
-def n_trials(trials: pd.DataFrame) -> pd.Series:
+    blocks = blocks.join(intervention_dates, on="Subject", how="left")
+    blocks = blocks.with_columns(
+        (pl.col("Date") - pl.col("Surgery Date")).dt.total_days().alias("Days"),
+    )
+    return blocks
+
+
+def n_trials(trials: pl.DataFrame) -> pl.DataFrame:
     """Calculate n trials for each block."""
     session_cols = ["Subject", "Date"]
     ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
     channel_config = ["Active Channels", "Return Channels"]
-    return trials.groupby(session_cols + ref_stim_cols + channel_config)[
-        "Result"
-    ].count()
-def is_valid(block: pd.DataFrame) -> bool:
-    """Determine if curve data is valid."""
-    return any(block["Hit Rate"] > 0.5) & any(block["Hit Rate"] < 0.5)  # noqa: PLR2004
-def subject_counts(data: pd.DataFrame) -> pd.DataFrame:
-    """Determine how many subjects are in the data."""
-    summary = (
-        data.index.get_level_values("Subject").value_counts().rename("Total Blocks")
+    return trials.group_by(session_cols + ref_stim_cols + channel_config).agg(
+        pl.len().alias("n_trials"),
     )
-    summary.index.name = "Subject"
-    return summary
-def fit(trials: pd.DataFrame) -> pd.Series:
+
+
+def is_valid(block: pl.DataFrame) -> bool:
+    """Determine if curve data is valid."""
+    hit_rates = block["Hit Rate"].to_list()
+    return any(h > 0.5 for h in hit_rates) and any(h < 0.5 for h in hit_rates)
+
+
+def subject_counts(data: pl.DataFrame) -> pl.DataFrame:
+    """Determine how many subjects are in the data."""
+    return data.group_by("Subject").agg(pl.len().alias("Total Blocks"))
+
+
+def fit(trials: pl.DataFrame) -> dict[str, float]:
     """Fit logistic regression to trial data."""
     fit = LogisticRegression().fit(
-        trials[["Intensity"]],
-        trials["Result"],
+        trials.select("Intensity").to_numpy(),
+        trials["Result"].to_numpy(),
     )
     intercept = fit.intercept_[0]
     slope = fit.coef_[0][0]
-    return pd.Series({"intercept": intercept, "slope": slope})
-def generate_trials(n_trials: int, model_params: dict[str, float]) -> pd.DataFrame:
+    return {"intercept": intercept, "slope": slope}
+
+
+def generate_trials(n_trials: int, model_params: dict[str, float]) -> pl.DataFrame:
     """Generate trials for block-level context."""
     return trials.moc_sample(n_trials, model_params)
-def from_points(points: pd.DataFrame) -> pd.DataFrame:
+
+
+def from_points(points: pl.DataFrame) -> pl.DataFrame:
     """Aggregate block measures from points data."""
-    return points.groupby("BlockID")[["n"]].sum()
-def plot_thresholds(blocks: pd.DataFrame) -> go.Figure:
+    return points.group_by("BlockID").agg(pl.sum("n"))
+
+
+def plot_thresholds(blocks: pl.DataFrame) -> go.Figure:
     """Plot longitudinal threshold data.
 
     Args:
@@ -103,8 +117,9 @@ def plot_thresholds(blocks: pd.DataFrame) -> go.Figure:
     Returns:
         A plotly Graph Object.
     """
+    blocks = transform_errors(blocks)
     return px.scatter(
-        transform_errors(blocks),
+        blocks.to_pandas(),
         x="Block",
         y="50%",
         error_y="err+",
@@ -113,34 +128,42 @@ def plot_thresholds(blocks: pd.DataFrame) -> go.Figure:
         color_discrete_map={"U": "#e41a1c", "Y": "#377eb8", "Z": "#4daf4a"},
         template=template,
     )
-def transform_errors(fit: pd.DataFrame) -> pd.DataFrame:
+
+
+def transform_errors(fit: pl.DataFrame) -> pl.DataFrame:
     """Transform errors from absolute to relative."""
-    fit["err+"] = fit["95%"] - fit["50%"]
-    fit["err-"] = fit["50%"] - fit["5%"]
-    return fit.drop(columns=["95%", "5%"])
-def reshape_fit_results(fits: pd.DataFrame, x: pd.Index, y: str) -> pd.DataFrame:
+    return fit.with_columns(
+        (pl.col("95%") - pl.col("50%")).alias("err+"),
+        (pl.col("50%") - pl.col("5%")).alias("err-"),
+    ).drop(["95%", "5%"])
+
+
+def reshape_fit_results(fits: pl.DataFrame, x: list[float], y: str) -> pl.DataFrame:
     """Reshape fit params for plotting."""
     rows = [f"{y}[{i}]" for i in range(1, len(x) + 1)]
-    param_fits = fits.loc[
-        rows,  # row eg 'p[1]:p[8]'
-        ["5%", "50%", "95%"],  # col
-    ]
+    param_fits = fits.filter(pl.col("index").is_in(rows)).select(["5%", "50%", "95%"])
     param_fits = transform_errors(param_fits)
-    param_fits = param_fits.rename(columns={"50%": y})
-    param_fits.index = x
+    param_fits = param_fits.rename({"50%": y})
+    param_fits = param_fits.with_columns(pl.Series("Intensity", x))
     return param_fits
-def standard_logistic() -> pd.Series:
+
+
+def standard_logistic() -> pl.DataFrame:
     """Generate points for a line trace of a standard logistic function."""
-    x = pd.Index(np.linspace(-3, 3, 100), name="x")
+    x = np.linspace(-3, 3, 100)
     y = expit(x)
-    return pd.Series(y, index=x, name="f(x)")
-def logistic(location: float, scale: float) -> pd.Series:
+    return pl.DataFrame({"x": x, "f(x)": y})
+
+
+def logistic(location: float, scale: float) -> pl.DataFrame:
     """Generate points for a line trace of a logistic function."""
     x_min = (location - 4) * scale
     x_max = (location + 4) * scale
-    x = pd.Index(np.linspace(x_min, x_max, 100), name="Intensity")
+    x = np.linspace(x_min, x_max, 100)
     y = expit((x - location) / scale)
-    return pd.Series(y, index=x, name="Ψ(x)")
+    return pl.DataFrame({"Intensity": x, "Ψ(x)": y})
+
+
 def plot_logistic(location: float, scale: float) -> go.Scatter:
     """Plot a logistic function.
 
@@ -151,15 +174,21 @@ def plot_logistic(location: float, scale: float) -> go.Scatter:
     Returns:
         A Plotly figure of the psychometric function with a logistic link function.
     """
+    df = logistic(location, scale)
     return px.line(
-        logistic(location, scale),
+        df.to_pandas(),
+        x="Intensity",
         y="Ψ(x)",
         template="plotly_white",
     )
+
+
 def plot_standard_logistic() -> go.Scatter:
     """Plot a standard logistic function."""
+    df = standard_logistic()
     return px.line(
-        standard_logistic(),
+        df.to_pandas(),
+        x="x",
         y="f(x)",
         template="plotly_white",
         title="$f(x) = \\frac{1}{1 + e^{-x}}$",

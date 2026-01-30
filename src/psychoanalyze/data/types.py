@@ -1,16 +1,12 @@
 
-"""Pandera schemas for psychoanalyze dataframes.
+"""Patito schemas for psychoanalyze dataframes.
 
 Contains data table schemas of the hierarchical entities described above.
+Uses patito for Polars DataFrame validation.
 """
-from pandera import (
-    Column,
-    DataFrameModel,
-    DataFrameSchema,
-    Index,
-    MultiIndex,
-    typing,
-)
+from datetime import datetime
+
+import patito as pt
 
 session_dims = ["Monkey", "Date"]
 block_stim_dims = ["Amp2", "Width2", "Freq2", "Dur2"]
@@ -20,66 +16,61 @@ point_dims = ["Amp1", "Width1", "Freq1", "Dur1"]
 
 block_index_levels = session_dims + block_dims
 points_index_levels = block_index_levels + point_dims
-points = DataFrameSchema(
-    {
-        "n trials": Column(int),
-        "Hits": Column(int),
-        "Hit Rate": Column(float),
-        "logit(Hit Rate)": Column(float),
-        "Block": Column(int, required=False),
-        "Intensity": Column(float),
-    },
-)
 
-trials = DataFrameSchema(
-    columns={
-        "Intensity": Column(float),
-        "Result": Column(int),
-        "Block": Column(int),
-    },
-)
-blocks = DataFrameSchema(
-    columns={"Threshold": Column(dtype=float), "width": Column(dtype=float)},
-    index=MultiIndex(
-        [
-            Index(str, name="Monkey"),
-            Index("datetime64", name="Date", coerce=True),
-        ]
-        + [Index(float, name=dim) for dim in block_stim_dims]
-        + [Index(int, name=dim) for dim in block_channel_dims],
-    ),
-)
-psi_animation = DataFrameSchema(
-    {
-        "Trial": Column(int),
-        "Intensity": Column(float),
-        "Hit Rate": Column(float),
-    },
-)
-class PsiAnimation(DataFrameModel):
-    """Pandera type for psychometric function animation dataset."""
 
-    trial_id: typing.Series[int]
-    intensity: typing.Series[float]
-    hit_rate: typing.Series[float]
-class PsiAnimationFrame(DataFrameModel):
-    """Pandera type for a single psychometric function animation frame."""
+class Trials(pt.Model):
+    """Trial-level data schema."""
 
-    intensity: typing.Series[float]
-    hit_rate: typing.Series[float]
-class Blocks(DataFrameModel):
-    """Blocks type for Pandera."""
+    Intensity: float
+    Result: int
+    Block: int
 
-    slope: float
-    threshold: float
-class Points(DataFrameModel):
-    """Pandera data type."""
 
-    n: int
+class Points(pt.Model):
+    """Points-level data schema."""
+
+    Block: int
+    Intensity: float
+    n_trials: int = pt.Field(alias="n trials")
     Hits: int
-    block_id: int
-class Trials(DataFrameModel):
-    """Trials data type for pandera + mypy type checking."""
+    Hit_Rate: float = pt.Field(alias="Hit Rate")
+    logit_Hit_Rate: float | None = pt.Field(alias="logit(Hit Rate)", default=None)
 
-    result: int
-    intensity: typing.Index[float]
+
+class Blocks(pt.Model):
+    """Block-level data schema."""
+
+    Threshold: float
+    width: float | None = None
+    Monkey: str | None = None
+    Date: datetime | None = None
+
+
+class PsiAnimation(pt.Model):
+    """Psychometric function animation dataset."""
+
+    trial_id: int
+    intensity: float
+    hit_rate: float
+
+
+class PsiAnimationFrame(pt.Model):
+    """Single psychometric function animation frame."""
+
+    intensity: float
+    hit_rate: float
+
+
+def validate_trials(df: pt.DataFrame) -> pt.DataFrame:
+    """Validate a trials DataFrame."""
+    return Trials.validate(df)
+
+
+def validate_points(df: pt.DataFrame) -> pt.DataFrame:
+    """Validate a points DataFrame."""
+    return Points.validate(df)
+
+
+def validate_blocks(df: pt.DataFrame) -> pt.DataFrame:
+    """Validate a blocks DataFrame."""
+    return Blocks.validate(df)

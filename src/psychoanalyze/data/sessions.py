@@ -6,49 +6,66 @@ contain several blocks.
 """
 from pathlib import Path
 
-import pandas as pd
+import polars as pl
 
 from psychoanalyze.data import blocks
 
 dims = ["Monkey", "Date"]
 index_levels = dims
+
+
 def generate(n: int) -> list[int]:
     """Generate session-level data."""
     return list(range(n))
-def cache_results(sessions: pd.DataFrame) -> None:
+
+
+def cache_results(sessions: pl.DataFrame) -> None:
     """Save session data to csv."""
-    sessions.to_csv("data/normalized/sessions.csv", index=False)
-def from_trials_csv(path: Path) -> pd.DataFrame:
+    sessions.write_csv("data/normalized/sessions.csv")
+
+
+def from_trials_csv(path: Path) -> pl.DataFrame:
     """Aggregate to session level from trial-level data."""
-    return pd.read_csv(path)[["Monkey", "Date"]].drop_duplicates()
-def day_marks(subjects: pd.DataFrame, sessions: pd.DataFrame, monkey: str) -> dict:
+    return pl.read_csv(path).select(["Monkey", "Date"]).unique()
+
+
+def day_marks(subjects: pl.DataFrame, sessions: pl.DataFrame, monkey: str) -> dict:
     """Calculate days since surgery date for a given subject."""
-    surgery_date = pd.to_datetime(
-        subjects.loc[subjects["Monkey"] == monkey, "Surgery Date"],
-    )[0]
-    sessions = sessions[sessions["Monkey"] == "U"]
-    sessions["Days"] = (pd.to_datetime(sessions["Date"]) - surgery_date).dt.days
-    return {sessions.loc[i, "Days"]: sessions.loc[i, "Date"] for i in sessions.index}
-def days(sessions: pd.DataFrame, subjects: pd.DataFrame) -> pd.Series:
+    surgery_date = subjects.filter(pl.col("Monkey") == monkey)["Surgery Date"][0]
+    sessions = sessions.filter(pl.col("Monkey") == "U")
+    sessions = sessions.with_columns(
+        (pl.col("Date").str.to_datetime() - surgery_date).dt.total_days().alias("Days"),
+    )
+    return dict(zip(sessions["Days"].to_list(), sessions["Date"].to_list()))
+
+
+def days(sessions: pl.DataFrame, subjects: pl.DataFrame) -> pl.Series:
     """Calculate days since surgery date."""
     sessions_subjects = sessions.join(subjects, on="Monkey")
     return (
-        pd.to_datetime(sessions_subjects.index.get_level_values("Date"))
-        - sessions_subjects["Surgery Date"]
-    ).dt.days
-def n_trials(trials: pd.DataFrame) -> pd.DataFrame:
+        sessions_subjects["Date"] - sessions_subjects["Surgery Date"]
+    ).dt.total_days()
+
+
+def n_trials(trials: pl.DataFrame) -> pl.DataFrame:
     """Count trials per session."""
-    return trials.groupby(["Monkey", "Date"])[["Result"]].count()
-def load(data_dir: Path) -> pd.DataFrame:
+    return trials.group_by(["Monkey", "Date"]).agg(pl.len().alias("n_trials"))
+
+
+def load(data_dir: Path) -> pl.DataFrame:
     """Load session-level data from csv."""
-    return pd.read_csv(data_dir / "sessions.csv", index_col=["Monkey", "Date"])
+    return pl.read_csv(data_dir / "sessions.csv")
+
+
 def generate_trials(
     n_trials: int,
     model_params: dict[str, float],
     n_days: int,
-) -> pd.DataFrame:
+) -> pl.DataFrame:
     """Generate trial-level data for session-level context."""
-    return pd.concat(
-        {day: blocks.generate_trials(n_trials, model_params) for day in range(n_days)},
-        names=["Block"],
-    )
+    frames = []
+    for day in range(n_days):
+        df = blocks.generate_trials(n_trials, model_params)
+        df = df.with_columns(pl.lit(day).alias("Block"))
+        frames.append(df)
+    return pl.concat(frames)

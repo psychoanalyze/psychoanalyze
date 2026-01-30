@@ -4,12 +4,14 @@
 Contains functions assessing the relationship
 between the amplitude and the time course of the stimulus.
 """
-import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import polars as pl
 
 from psychoanalyze.plot import labels, template
-def from_blocks(blocks: pd.DataFrame, dim: str) -> pd.DataFrame:
+
+
+def from_blocks(blocks: pl.DataFrame, dim: str) -> pl.DataFrame:
     """Calculate strength-duration measures from block data."""
     if dim == "Amp":
         ylabel = "Threshold Amplitude (μA)"
@@ -18,11 +20,15 @@ def from_blocks(blocks: pd.DataFrame, dim: str) -> pd.DataFrame:
         ylabel = "Fixed Amplitude (μA)"
         xlabel = "Threshold Pulse Width (μs)"
 
-    blocks[ylabel] = blocks["Threshold"]
-    blocks[xlabel] = blocks["Fixed Magnitude"]
-    return blocks.drop(columns=["Threshold", "Fixed Magnitude"])
+    blocks = blocks.with_columns(
+        pl.col("Threshold").alias(ylabel),
+        pl.col("Fixed Magnitude").alias(xlabel),
+    )
+    return blocks.drop(["Threshold", "Fixed Magnitude"])
+
+
 def plot(
-    blocks: pd.DataFrame,
+    blocks: pl.DataFrame | None,
     dim: str,
     x_data: list[float],
     y_data: list[float],
@@ -40,9 +46,9 @@ def plot(
     x = labels_given_dim["x"]
     y = labels_given_dim["y"]
     if blocks is not None:
-        sd_df = blocks[blocks["Dimension"] == dim]
+        sd_df = blocks.filter(pl.col("Dimension") == dim).to_pandas()
     else:
-        sd_df = pd.DataFrame({x: x_data, y: y_data})
+        sd_df = {x: x_data, y: y_data}
     return px.scatter(
         sd_df,
         x=x,

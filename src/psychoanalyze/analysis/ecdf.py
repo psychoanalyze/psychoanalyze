@@ -1,12 +1,15 @@
 
 """Empirical Distribution Functions (eCDF)."""
-import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-def plot(blocks: pd.DataFrame, param: str) -> go.Figure:
+import polars as pl
+
+
+def plot(blocks: pl.DataFrame, param: str) -> go.Figure:
     """Plot empirical cumulative distrubtion function (eCDF) of fitted params."""
+    df = blocks.to_pandas()
     return px.ecdf(
-        blocks.reset_index(),
+        df,
         x=param,
-        color=blocks.get("Monkey"),
+        color=df.get("Monkey"),
     ).update_layout(xaxis_title=param)

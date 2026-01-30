@@ -17,8 +17,8 @@ def _():
 
     import marimo as mo
     import numpy as np
-    import pandas as pd
     import plotly.express as px
+    import polars as pl
     from scipy.special import expit, logit
     from sklearn.linear_model import LogisticRegression
 
@@ -38,50 +38,51 @@ def _():
         x_0 = params["x_0"]
         return gamma + (1 - gamma - lambda_) * (1 / (1 + np.exp(-k * (intensity - x_0))))
 
-
-    def generate_index(n_levels: int, x_range: list[float]) -> pd.Index:
-        return pd.Index(np.linspace(x_range[0], x_range[1], n_levels), name="Intensity")
+    def generate_index(n_levels: int, x_range: list[float]) -> list[float]:
+        return list(np.linspace(x_range[0], x_range[1], n_levels))
 
 
     def generate_trials(
         n_trials: int,
-        options: pd.Index,
+        options: list[float],
         params: dict,
         n_blocks: int,
-    ) -> pd.DataFrame:
+    ) -> pl.DataFrame:
         rng = np.random.default_rng()
         out = []
         for i in range(n_blocks):
-            intensities = rng.choice(options.to_numpy(), size=n_trials)
+            intensities = rng.choice(options, size=n_trials)
             results = np.array([int(rng.random() <= psi(x, params)) for x in intensities])
-            df = pd.DataFrame({"Intensity": intensities, "Result": results})
-            df["Block"] = i
+            df = pl.DataFrame({"Intensity": intensities, "Result": results})
+            df = df.with_columns(pl.lit(i).alias("Block"))
             out.append(df)
-        return pd.concat(out, ignore_index=True)[["Block", "Intensity", "Result"]]
+        return pl.concat(out).select(["Block", "Intensity", "Result"])
 
-
-    def from_trials(trials_df: pd.DataFrame) -> pd.DataFrame:
-        points = trials_df.groupby(["Block", "Intensity"])["Result"].agg(["count", "sum"])
-        points = points.rename(columns={"count": "n trials", "sum": "Hits"})
-        points["Hit Rate"] = points["Hits"] / points["n trials"]
-        return points.reset_index()
-
-
-    def block_fit(trials_df: pd.DataFrame) -> pd.Series:
-        fit = LogisticRegression().fit(trials_df[["Intensity"]], trials_df["Result"])
-        return pd.Series(
-            {
-                "intercept": float(fit.intercept_[0]),
-                "slope": float(fit.coef_[0][0]),
-            },
+    def from_trials(trials_df: pl.DataFrame) -> pl.DataFrame:
+        points = trials_df.group_by(["Block", "Intensity"]).agg(
+            pl.len().alias("n trials"),
+            pl.sum("Result").alias("Hits"),
         )
+        points = points.with_columns(
+            (pl.col("Hits") / pl.col("n trials")).alias("Hit Rate"),
+        )
+        return points.sort(["Block", "Intensity"])
 
+    def block_fit(trials_df: pl.DataFrame) -> dict[str, float]:
+        fit = LogisticRegression().fit(
+            trials_df.select("Intensity").to_numpy(),
+            trials_df["Result"].to_numpy(),
+        )
+        return {
+            "intercept": float(fit.intercept_[0]),
+            "slope": float(fit.coef_[0][0]),
+        }
 
-    def process_upload_bytes(contents: bytes, filename: str) -> pd.DataFrame:
+    def process_upload_bytes(contents: bytes, filename: str) -> pl.DataFrame:
         if "zip" in filename:
             with zipfile.ZipFile(io.BytesIO(contents)) as z:
-                return pd.read_csv(z.open("trials.csv"))
-        return pd.read_csv(io.BytesIO(contents.decode("utf-8")))
+                return pl.read_csv(z.open("trials.csv"))
+        return pl.read_csv(io.BytesIO(contents))
     return (
         block_fit,
         expit,
@@ -91,7 +92,7 @@ def _():
         logit,
         mo,
         np,
-        pd,
+        pl,
         process_upload_bytes,
         px,
         to_intercept,
@@ -201,20 +202,25 @@ def _(max_x, min_x, mo):
 
 
 @app.cell
-def _(pd):
+def _(pl):
     from pathlib import Path as _Path
 
-    def load_sample_trials() -> pd.DataFrame:
+    def load_sample_trials() -> pl.DataFrame:
         """Load sample experimental data from data/trials.csv."""
         sample_path = _Path(__file__).parent / "data" / "trials.csv"
-        df = pd.read_csv(sample_path)
+        df = pl.read_csv(sample_path)
         # Transform to expected format: Block, Intensity, Result
-        # Use Date as Block identifier, Amp1 as Intensity
-        # Result: 1 = hit, 0/2/3 = miss (binary classification)
-        df["Block"] = pd.factorize(df["Date"].astype(str) + "_" + df["Amp2"].astype(str))[0]
-        df["Intensity"] = df["Amp1"]
-        df["Result"] = (df["Result"] == 1).astype(int)
-        return df[["Block", "Intensity", "Result"]]
+        df = df.with_columns(
+            (pl.col("Date").cast(pl.Utf8) + "_" + pl.col("Amp2").cast(pl.Utf8)).alias(
+                "block_key"
+            ),
+        )
+        df = df.with_columns(
+            pl.col("block_key").rank("dense").cast(pl.Int64).alias("Block") - 1,
+        )
+        df = df.with_columns(pl.col("Amp1").alias("Intensity"))
+        df = df.with_columns((pl.col("Result") == 1).cast(pl.Int64).alias("Result"))
+        return df.select(["Block", "Intensity", "Result"])
 
     return (load_sample_trials,)
 
@@ -257,7 +263,7 @@ def _(
             params={"x_0": x_0, "k": k, "gamma": 0.0, "lambda": 0.0},
             n_blocks=n_blocks,
         )
-    trials_df["Intensity"] = trials_df["Intensity"].astype(float)
+    trials_df = trials_df.with_columns(pl.col("Intensity").cast(pl.Float64))
     return (trials_df,)
 
 
@@ -280,29 +286,37 @@ def _(mo, trials_df):
 def _(trial_crop_slider, trials_df):
     # Apply trial crop
     crop_at = trial_crop_slider.value
-    trials_cropped_df = trials_df.iloc[:crop_at].copy()
+    trials_cropped_df = trials_df.head(crop_at)
     return (trials_cropped_df,)
 
 
 @app.cell
-def _(block_fit, from_trials, trials_cropped_df):
+def _(block_fit, from_trials, pl, trials_cropped_df):
     # Points and blocks from cropped trials
     points_df = from_trials(trials_cropped_df)
-    blocks_df = trials_cropped_df.groupby("Block").apply(block_fit).reset_index()
-    blocks_df["gamma"] = 0.0
-    blocks_df["lambda"] = 0.0
+    blocks_list = []
+    for block_id in trials_cropped_df["Block"].unique().to_list():
+        block_trials = trials_cropped_df.filter(pl.col("Block") == block_id)
+        fit_result = block_fit(block_trials)
+        fit_result["Block"] = block_id
+        fit_result["gamma"] = 0.0
+        fit_result["lambda"] = 0.0
+        blocks_list.append(fit_result)
+    blocks_df = pl.from_dicts(blocks_list)
     return blocks_df, points_df
 
 
 @app.cell
-def _(blocks_df, blocks_table, k, pd, x_0):
+def _(blocks_df, blocks_table, k, pl, x_0):
     # Selected block rows for plot (include Model)
     if blocks_table.value is not None and hasattr(blocks_table.value, "__len__"):
         try:
             selected_blocks_df = (
                 blocks_table.value
-                if isinstance(blocks_table.value, pd.DataFrame)
-                else pd.DataFrame(blocks_table.value)
+                if isinstance(blocks_table.value, pl.DataFrame)
+                else pl.from_dicts(blocks_table.value)
+                if blocks_table.value
+                else blocks_df
             )
         except Exception:
             selected_blocks_df = blocks_df
@@ -312,17 +326,17 @@ def _(blocks_df, blocks_table, k, pd, x_0):
     model_intercept = -x_0 / k
     model_slope = 1 / k
     block_rows = []
-    if isinstance(selected_blocks_df, pd.DataFrame) and len(selected_blocks_df) > 0:
-        for _, row in selected_blocks_df.iterrows():
+    if isinstance(selected_blocks_df, pl.DataFrame) and len(selected_blocks_df) > 0:
+        for row in selected_blocks_df.iter_rows(named=True):
             block_rows.append(
                 {
-                    "Block": str(row.get("Block", row.name)),
+                    "Block": str(row.get("Block", "")),
                     "intercept": row.get("intercept", 0),
                     "slope": row.get("slope", 1),
                 },
             )
     else:
-        for _, row in blocks_df.iterrows():
+        for row in blocks_df.iter_rows(named=True):
             block_rows.append(
                 {
                     "Block": str(row["Block"]),
@@ -337,18 +351,20 @@ def _(blocks_df, blocks_table, k, pd, x_0):
 
 
 @app.cell
-def _(blocks_table, pd, points_df):
+def _(blocks_table, pl, points_df):
     # Filter points by selected blocks
     if blocks_table.value is not None:
         try:
             sel = (
                 blocks_table.value
-                if isinstance(blocks_table.value, pd.DataFrame)
-                else pd.DataFrame(blocks_table.value)
+                if isinstance(blocks_table.value, pl.DataFrame)
+                else pl.from_dicts(blocks_table.value)
+                if blocks_table.value
+                else None
             )
-            if len(sel) > 0 and "Block" in sel.columns:
-                block_ids = sel["Block"].tolist()
-                points_filtered_df = points_df[points_df["Block"].isin(block_ids)]
+            if sel is not None and len(sel) > 0 and "Block" in sel.columns:
+                block_ids = sel["Block"].to_list()
+                points_filtered_df = points_df.filter(pl.col("Block").is_in(block_ids))
             else:
                 points_filtered_df = points_df
         except Exception:
@@ -362,7 +378,7 @@ def _(blocks_table, pd, points_df):
 def _(mo, points_filtered_df):
     # Points table
     points_table = mo.ui.table(
-        points_filtered_df,
+        points_filtered_df.to_pandas(),
         pagination=True,
         page_size=10,
         label="Points",
@@ -378,7 +394,7 @@ def _(mo, points_filtered_df):
 def _(blocks_df, mo):
     # Blocks table with multi-selection
     blocks_table = mo.ui.table(
-        blocks_df,
+        blocks_df.to_pandas(),
         selection="multi",
         initial_selection=[0, 2] if len(blocks_df) > 2 else list(range(len(blocks_df))),
         label="Blocks",
@@ -391,33 +407,32 @@ def _(blocks_df, mo):
 
 
 @app.cell
-def _(block_rows, expit, max_x, min_x, mo, np, pd, points_filtered_df, px):
+def _(block_rows, expit, max_x, min_x, mo, np, pl, points_filtered_df, px):
     # Plot: scatter points + logistic curves
     x = np.linspace(min_x, max_x, 100)
     fits_list = []
     for blk in block_rows:
         y = expit(x * blk["slope"] + blk["intercept"])
         fits_list.append(
-            pd.DataFrame(
+            pl.DataFrame(
                 {
                     "Intensity": x,
                     "Hit Rate": y,
-                    "Block": blk["Block"],
+                    "Block": [blk["Block"]] * len(x),
                 },
             ),
         )
-    fits_df = pd.concat(fits_list, ignore_index=True)
-    points_plot_df = points_filtered_df.copy()
-    points_plot_df["Block"] = points_plot_df["Block"].astype(str)
-    fits_df["Block"] = fits_df["Block"].astype(str)
+    fits_df = pl.concat(fits_list)
+    points_plot_df = points_filtered_df.with_columns(pl.col("Block").cast(pl.Utf8))
+    fits_df = fits_df.with_columns(pl.col("Block").cast(pl.Utf8))
     fig = px.line(
-        fits_df,
+        fits_df.to_pandas(),
         x="Intensity",
         y="Hit Rate",
         color="Block",
     )
     results_fig = px.scatter(
-        points_plot_df,
+        points_plot_df.to_pandas(),
         x="Intensity",
         y="Hit Rate",
         size="n trials",

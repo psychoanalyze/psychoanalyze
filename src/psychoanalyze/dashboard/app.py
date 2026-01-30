@@ -27,9 +27,9 @@ from typing import Any
 
 import duckdb
 import numpy as np
-import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import polars as pl
 import pytz
 from dash import (
     ALL,
@@ -84,22 +84,27 @@ def update_trials(
     param: list[float],
 ) -> tuple[Records, float, float]:
     """Update points table."""
-    n_params = pd.Series(n_param, index=["n_levels", "n_trials", "n_blocks"])
-    params = pd.Series([*param, 0.0, 0.0], index=["x_0", "k", "gamma", "lambda"])
-    params["intercept"] = to_intercept(params["x_0"], params["k"])
-    params["slope"] = to_slope(params["k"])
-    min_x = (logit(0.01) - params["intercept"]) / params["slope"]
-    max_x = (logit(0.99) - params["intercept"]) / params["slope"]
+    n_params = pl.DataFrame(
+        {"name": ["n_levels", "n_trials", "n_blocks"], "value": n_param}
+    )
+    params_dict = dict(zip(["x_0", "k", "gamma", "lambda"], [*param, 0.0, 0.0]))
+    params_dict["intercept"] = to_intercept(params_dict["x_0"], params_dict["k"])
+    params_dict["slope"] = to_slope(params_dict["k"])
+    min_x = (logit(0.01) - params_dict["intercept"]) / params_dict["slope"]
+    max_x = (logit(0.99) - params_dict["intercept"]) / params_dict["slope"]
     if callback_context.triggered_id == "upload":
         trials = process_upload(contents, filename)
     else:
+        n_levels = n_params.filter(pl.col("name") == "n_levels")["value"][0]
+        n_trials = n_params.filter(pl.col("name") == "n_trials")["value"][0]
+        n_blocks = n_params.filter(pl.col("name") == "n_blocks")["value"][0]
         trials = generate(
-            n_trials=n_params["n_trials"],
-            options=generate_index(n_params["n_levels"], [min_x, max_x]),
-            params=params.to_dict(),
-            n_blocks=n_params["n_blocks"],
+            n_trials=n_trials,
+            options=generate_index(n_levels, [min_x, max_x]),
+            params=params_dict,
+            n_blocks=n_blocks,
         )
-    return trials.to_dict("records"), min_x, max_x
+    return trials.to_dicts(), min_x, max_x
 
 
 @callback(
@@ -108,10 +113,10 @@ def update_trials(
 )
 def update_points_table(trials: Records) -> Records:
     """Update points table."""
-    trials_df = pd.DataFrame.from_records(trials)
-    trials_df["Intensity"] = trials_df["Intensity"].astype(float)
+    trials_df = pl.from_dicts(trials)
+    trials_df = trials_df.with_columns(pl.col("Intensity").cast(pl.Float64))
     points = pa_points.from_trials(trials_df)
-    return points.to_dict("records")
+    return points.to_dicts()
 
 
 @callback(
@@ -120,12 +125,17 @@ def update_points_table(trials: Records) -> Records:
 )
 def update_blocks_table(trials: Records) -> Records:
     """Update blocks table."""
-    trials_df = pd.DataFrame.from_records(trials)
+    trials_df = pl.from_dicts(trials)
 
-    blocks = trials_df.groupby("Block").apply(pa_blocks.fit).reset_index()
-    blocks["gamma"] = 0.0
-    blocks["lambda"] = 0.0
-    return blocks.to_dict("records")
+    blocks_list = []
+    for block_id in trials_df["Block"].unique().to_list():
+        block_trials = trials_df.filter(pl.col("Block") == block_id)
+        fit_result = pa_blocks.fit(block_trials)
+        fit_result["Block"] = block_id
+        fit_result["gamma"] = 0.0
+        fit_result["lambda"] = 0.0
+        blocks_list.append(fit_result)
+    return blocks_list
 
 
 @callback(
@@ -138,12 +148,10 @@ def filter_points(
     points: Records,
 ) -> Records:
     """Filter points table."""
-    points_df = pd.DataFrame.from_records(points)
-    return (
-        points_df[points_df["Block"].isin(selected_rows)].to_dict("records")
-        if selected_rows
-        else points_df.to_dict("records")
-    )
+    points_df = pl.from_dicts(points)
+    if selected_rows:
+        return points_df.filter(pl.col("Block").is_in(selected_rows)).to_dicts()
+    return points_df.to_dicts()
 
 
 @callback(
@@ -155,7 +163,7 @@ def filter_points(
     State({"type": "x-param", "name": "min"}, "value"),
     State({"type": "x-param", "name": "max"}, "value"),
 )
-def update_fig(  # noqa: PLR0913
+def update_fig(
     param: list[float],
     points: Records,
     blocks: Records,
@@ -165,38 +173,35 @@ def update_fig(  # noqa: PLR0913
 ) -> go.Figure:
     """Update plot and tables based on data store and selected view."""
     param = [*param, 0.0, 0.0]
-    params = pd.Series(param, index=["x_0", "k", "gamma", "lambda"])
-    params["intercept"] = -params["x_0"] / params["k"]
-    params["slope"] = 1 / params["k"]
+    params_dict = dict(zip(["x_0", "k", "gamma", "lambda"], param))
+    params_dict["intercept"] = -params_dict["x_0"] / params_dict["k"]
+    params_dict["slope"] = 1 / params_dict["k"]
     blocks = [blocks[i] for i in selected_rows] + [
-        {"Block": "Model"} | params.to_dict(),
+        {"Block": "Model"} | params_dict,
     ]
-    x = pd.Index(
-        np.linspace(min_x, max_x, 100),
-        name="Intensity",
-    )
-    fits = pd.concat(
-        {
-            block["Block"]: pd.Series(
-                expit(x.to_numpy() * block["slope"] + block["intercept"]),
-                name="Hit Rate",
-                index=x,
-            )
-            for block in blocks
-        },
-        names=["Block"],
-    ).reset_index()
-    fits["Block"] = fits["Block"].astype(str)
-    points_df = pd.DataFrame.from_records(points)
-    points_df["Block"] = points_df["Block"].astype(str)
+    x = np.linspace(min_x, max_x, 100)
+    fits_list = []
+    for block in blocks:
+        y = expit(x * block["slope"] + block["intercept"])
+        fits_list.append(
+            pl.DataFrame(
+                {
+                    "Intensity": x,
+                    "Hit Rate": y,
+                    "Block": [str(block["Block"])] * len(x),
+                }
+            ),
+        )
+    fits = pl.concat(fits_list)
+    points_df = pl.from_dicts(points).with_columns(pl.col("Block").cast(pl.Utf8))
     fits_fig = px.line(
-        fits,
+        fits.to_pandas(),
         x="Intensity",
         y="Hit Rate",
         color="Block",
     )
     results_fig = px.scatter(
-        points_df,
+        points_df.to_pandas(),
         x="Intensity",
         y="Hit Rate",
         size="n trials",
@@ -213,7 +218,7 @@ def update_fig(  # noqa: PLR0913
     prevent_initial_call=True,
 )
 def export_image(
-    export_clicked: int,  # noqa: ARG001
+    export_clicked: int,
     fig: go.Figure,
 ) -> dict[str, str | bool | bytes]:
     """Export image."""
@@ -238,16 +243,16 @@ def export_image(
     prevent_initial_call=True,
 )
 def export_data(
-    export_clicked: int,  # noqa: ARG001
+    export_clicked: int,
     points: Records,
     blocks: Records,
     trials: Records,
 ) -> dict[str, Any | None]:
     """Export image."""
     format_suffix = callback_context.triggered_id["name"]
-    points_df = pd.DataFrame.from_records(points)
-    blocks_df = pd.DataFrame.from_records(blocks)
-    trials_df = pd.DataFrame.from_records(trials)
+    points_df = pl.from_dicts(points)
+    blocks_df = pl.from_dicts(blocks)
+    trials_df = pl.from_dicts(trials)
     if format_suffix == "csv":
         zip_buffer = io.BytesIO()
 
@@ -258,9 +263,9 @@ def export_data(
             allowZip64=False,
         ) as zip_file:
 
-            def write_file(df: pd.DataFrame, name: str) -> None:
+            def write_file(df: pl.DataFrame, name: str) -> None:
                 buffer = io.StringIO()
-                df.to_csv(buffer, index=False)
+                df.write_csv(buffer)
                 zip_file.writestr(name, buffer.getvalue())
 
             data = {
@@ -268,8 +273,8 @@ def export_data(
                 "blocks": blocks_df,
                 "trials": trials_df,
             }
-            for level, points_df in data.items():
-                write_file(points_df, f"{level}.csv")
+            for level, level_df in data.items():
+                write_file(level_df, f"{level}.csv")
 
         zip_buffer.seek(0)
         zip_bytes = zip_buffer.read()
@@ -286,9 +291,9 @@ def export_data(
         }
 
     elif format_suffix == "json":
-        download = dcc.send_data_frame(points_df.to_json, "data.json")
+        download = dcc.send_data_frame(points_df.to_pandas().to_json, "data.json")
     elif format_suffix == "parquet":
-        download = dcc.send_data_frame(points_df.to_parquet, "data.parquet")
+        download = dcc.send_data_frame(points_df.to_pandas().to_parquet, "data.parquet")
     elif format_suffix == "duckdb":
         connection = duckdb.connect("psychoanalyze.duckdb")
         connection.sql("CREATE TABLE points AS SELECT * FROM _data")
@@ -334,7 +339,7 @@ def toggle_eqn(n_clicks: int) -> tuple[bool, str, str]:
     Input({"type": "free", "name": MATCH}, "value"),
     prevent_initial_call=True,
 )
-def toggle_param(free: bool) -> bool:  # noqa: FBT001
+def toggle_param(free: bool) -> bool:
     """Toggle parameter."""
     return not free
 

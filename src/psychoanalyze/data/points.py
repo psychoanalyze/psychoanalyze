@@ -8,155 +8,164 @@ stimulus intensity levels would have 8 corresponding points.
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
 import plotly.express as px
-from dash import dash_table
-from pandera import check_io, check_output
+import polars as pl
 from plotly import graph_objects as go
 from scipy.special import expit, logit
 from scipy.stats import logistic
 
 from psychoanalyze.data import trials as pa_trials
-from psychoanalyze.data import types
 
 index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
-@check_io(trials=types.trials, out=types.points)
-def from_trials(trials: pd.DataFrame) -> pd.DataFrame:
+
+
+def from_trials(trials: pl.DataFrame) -> pl.DataFrame:
     """Aggregate point-level measures from trial data."""
-    points = trials.groupby(["Block", "Intensity"])["Result"].agg(["count", "sum"])
-    points = points.rename(columns={"count": "n trials", "sum": "Hits"})
-    points["Hit Rate"] = points["Hits"] / points["n trials"]
-    points["logit(Hit Rate)"] = logit(points["Hit Rate"])
-    return points.reset_index()
-@check_output(types.points)
-def load(data_path: Path) -> pd.DataFrame:
+    points = trials.group_by(["Block", "Intensity"]).agg(
+        pl.len().alias("n trials"),
+        pl.sum("Result").alias("Hits"),
+    )
+    points = points.with_columns(
+        (pl.col("Hits") / pl.col("n trials")).alias("Hit Rate"),
+    )
+    points = points.with_columns(
+        pl.col("Hit Rate")
+        .map_elements(
+            lambda x: logit(x) if 0 < x < 1 else None,
+            return_dtype=pl.Float64,
+        )
+        .alias("logit(Hit Rate)"),
+    )
+    return points.sort(["Block", "Intensity"])
+
+
+def load(data_path: Path) -> pl.DataFrame:
     """Load points data from csv."""
     trials = pa_trials.load(data_path)
     return from_trials(trials)
-def prep_fit(points: pd.DataFrame, dimension: str = "Amp1") -> dict:
+
+
+def prep_fit(points: pl.DataFrame, dimension: str = "Amp1") -> dict:
     """Transform points data for numpy-related fitting procedures."""
-    points = points.reset_index()
     return {
         "X": len(points),
         "x": points[f"{dimension}"].to_numpy(),
         "N": points["n"].to_numpy(),
         "hits": points["Hits"].to_numpy(),
     }
+
+
 def hits(
-    n: pd.Series,
+    n: pl.DataFrame,
     params: dict[str, float],
-) -> pd.Series:
+) -> pl.DataFrame:
     """Sample list of n hits from a list of intensity values."""
-    p = logistic.cdf(n.index.to_numpy(), params["Threshold"], params["Slope"])
+    intensities = n["Intensity"].to_numpy()
+    n_trials = n["n"].to_numpy()
+    p = logistic.cdf(intensities, params["Threshold"], params["Slope"])
     psi = params["Guess Rate"] + (1.0 - params["Guess Rate"] - params["Lapse Rate"]) * p
-    return pd.Series(
-        np.random.default_rng().binomial(
-            n,
-            psi,
-            len(n),
-        ),
-        index=n.index,
-        name="Hits",
+    hit_values = np.random.default_rng().binomial(n_trials, psi, len(n_trials))
+    return pl.DataFrame(
+        {
+            "Intensity": intensities,
+            "Hits": hit_values,
+        }
     )
+
+
 def generate(
     n_trials: int,
-    options: pd.Index,
+    options: list[float],
     params: dict[str, float],
-) -> pd.DataFrame:
+) -> pl.DataFrame:
     """Generate points-level data."""
-    n = generate_n(n_trials, options)
-    _hits = hits(
-        n,
-        params,
+    n_df = generate_n(n_trials, options)
+    _hits = hits(n_df, params)
+    points = n_df.join(_hits, on="Intensity")
+    hit_rate = points["Hits"] / points["n"]
+    points = points.with_columns(hit_rate.alias("Hit Rate"))
+    logit_hit_rate = hit_rate.map_elements(
+        lambda x: logit(x) if 0 < x < 1 else None,
+        return_dtype=pl.Float64,
     )
-    points = pd.concat([n, _hits], axis=1)
-    _hit_rate = hit_rate(points)
-    logit_hit_rate = pd.Series(
-        logit(_hit_rate),
-        name="logit(Hit Rate)",
-        index=n.index,
-    )
-    return pd.concat([points, _hit_rate, logit_hit_rate], axis=1)
+    points = points.with_columns(logit_hit_rate.alias("logit(Hit Rate)"))
+    return points
+
+
 def generate_point(n: int, p: float) -> int:
     """Sample n hits from n trials and probability p from binomial dist."""
     return np.random.default_rng().binomial(n, p)
-def datatable(data: pd.DataFrame) -> dash_table.DataTable:
+
+
+def datatable_data(data: pl.DataFrame) -> list[dict]:
     """Convert dataframe to Dash DataTable-friendly format."""
-    return dash_table.DataTable(
-        data.reset_index()[["Amp1", "Hit Rate", "n"]].to_dict("records"),
-        columns=[
-            {
-                "id": "Amp1",
-                "name": "Amp1",
-                "type": "numeric",
-                "format": dash_table.Format.Format(
-                    precision=2,
-                    scheme=dash_table.Format.Scheme.fixed,
-                ),
-            },
-            {
-                "id": "Hit Rate",
-                "name": "Hit Rate",
-                "type": "numeric",
-                "format": dash_table.Format.Format(
-                    precision=2,
-                    scheme=dash_table.Format.Scheme.fixed,
-                ),
-            },
-            {
-                "id": "n",
-                "name": "n",
-                "type": "numeric",
-            },
-        ],
-        id="experiment-psych-table",
-    )
-def from_store(store_data: str) -> pd.DataFrame:
+    return data.select(["Amp1", "Hit Rate", "n"]).to_dicts()
+
+
+def from_store(store_data: str) -> pl.DataFrame:
     """Get points-level measures from trials-level data store."""
     trials = pa_trials.from_store(store_data)
     return from_trials(trials)
+
+
 def combine_plots(fig1: go.Figure, fig2: go.Figure) -> go.Figure:
     """Combine two points-level plots. Possible duplicate."""
     return go.Figure(data=fig1.data + fig2.data)
-def n(trials: pd.Index) -> pd.Index:
+
+
+def n(trials: list[float]) -> pl.DataFrame:
     """Count trials at each point."""
-    return pd.Series(trials.value_counts(), name="n")
-def generate_n(n_trials: int, options: pd.Index) -> pd.Series:
+    df = pl.DataFrame({"Intensity": trials})
+    return df.group_by("Intensity").agg(pl.len().alias("n"))
+
+
+def generate_n(n_trials: int, options: list[float]) -> pl.DataFrame:
     """Simulate how many trials were performed per intensity level."""
-    return pd.Series(n(pa_trials.generate_trial_index(n_trials, options)))
-def to_block(points: pd.DataFrame) -> pd.DataFrame:
+    trials_ix = pa_trials.generate_trial_index(n_trials, options)
+    return n(trials_ix)
+
+
+def to_block(points: pl.DataFrame) -> pl.DataFrame:
     """Aggregate to block-level measures from points-level data."""
-    return points.groupby(level="Block").sum()
+    return points.group_by("Block").agg(pl.sum("n trials"), pl.sum("Hits"))
+
+
 def psi(
-    x: pd.Index,
+    x: list[float],
     params: dict[str, float],
-) -> pd.Series:
+) -> pl.DataFrame:
     """Calculate psi for an array of intensity levels x."""
-    return pd.Series(
-        params["gamma"]
-        + (1 - params["gamma"] - params["lambda"])
-        * expit(params["x_0"] + params["k"] * x),
-        index=x,
-        name="p(x)",
+    x_arr = np.array(x)
+    y = params["gamma"] + (1 - params["gamma"] - params["lambda"]) * expit(
+        params["x_0"] + params["k"] * x_arr,
     )
-def plot(points: pd.DataFrame, y: str) -> go.Figure:
+    return pl.DataFrame({"Intensity": x, "p(x)": y})
+
+
+def plot(points: pl.DataFrame, y: str) -> go.Figure:
     """Plot the psychometric function."""
     return px.scatter(
-        points.reset_index(),
+        points.to_pandas(),
         x="Intensity",
         y=y,
         size="n",
         color="Block",
         template="plotly_white",
     )
-def hit_rate(df: pd.DataFrame) -> pd.Series:
+
+
+def hit_rate(df: pl.DataFrame) -> pl.Series:
     """Calculate hit rate from hits and number of trials."""
-    return pd.Series(df["Hits"] / df["n"], name="Hit Rate")
+    return df["Hits"] / df["n"]
+
+
 def transform(hit_rate: float, y: str) -> float:
     """Logit transform hit rate."""
     return logit(hit_rate) if y == "alpha" else hit_rate
-def generate_index(n_levels: int, x_range: list[float]) -> pd.Index:
+
+
+def generate_index(n_levels: int, x_range: list[float]) -> list[float]:
     """Generate evenly-spaced values along the modulated stimulus dimension."""
     min_x = x_range[0]
     max_x = x_range[1]
-    return pd.Index(np.linspace(min_x, max_x, n_levels), name="Intensity")
+    return list(np.linspace(min_x, max_x, n_levels))

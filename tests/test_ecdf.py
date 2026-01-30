@@ -1,14 +1,18 @@
 
-import pandas as pd
+import polars as pl
 
 from psychoanalyze.analysis import ecdf
+
+
 def test_ecdf_location_no_data():
-    blocks = pd.DataFrame({"location": []})
+    blocks = pl.DataFrame({"location": []}).cast({"location": pl.Float64})
     ecdf_fig = ecdf.plot(blocks, "location")
 
     assert ecdf_fig.layout.xaxis.title.text == "location"
+
+
 def test_ecdf_width_no_data():
-    blocks = pd.DataFrame({"width": []})
+    blocks = pl.DataFrame({"width": []}).cast({"width": pl.Float64})
     ecdf_fig = ecdf.plot(blocks, "width")
 
     assert ecdf_fig.layout.xaxis.title.text == "width"
