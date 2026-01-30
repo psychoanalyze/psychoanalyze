@@ -1,4 +1,3 @@
-
 """PsychoAnalyze dashboard as a marimo notebook.
 
 Interactive data simulation & analysis for psychophysics.
@@ -7,8 +6,10 @@ Replaces the former Dash dashboard (removed).
 
 import marimo
 
-__generated_with = "0.19.7"
+__generated_with = "0.19.2"
 app = marimo.App(width="full", app_title="PsychoAnalyze")
+
+
 @app.cell
 def _():
     import io
@@ -20,18 +21,28 @@ def _():
     import plotly.express as px
     from scipy.special import expit, logit
     from sklearn.linear_model import LogisticRegression
+
+
     def to_intercept(location: float, scale: float) -> float:
         return -location / scale
+
+
     def to_slope(scale: float) -> float:
         return 1 / scale
+
+
     def psi(intensity: float, params: dict) -> float:
         gamma = params.get("gamma", 0.0)
         lambda_ = params.get("lambda", 0.0)
         k = params["k"]
         x_0 = params["x_0"]
         return gamma + (1 - gamma - lambda_) * (1 / (1 + np.exp(-k * (intensity - x_0))))
+
+
     def generate_index(n_levels: int, x_range: list[float]) -> pd.Index:
         return pd.Index(np.linspace(x_range[0], x_range[1], n_levels), name="Intensity")
+
+
     def generate_trials(
         n_trials: int,
         options: pd.Index,
@@ -47,11 +58,15 @@ def _():
             df["Block"] = i
             out.append(df)
         return pd.concat(out, ignore_index=True)[["Block", "Intensity", "Result"]]
+
+
     def from_trials(trials_df: pd.DataFrame) -> pd.DataFrame:
         points = trials_df.groupby(["Block", "Intensity"])["Result"].agg(["count", "sum"])
         points = points.rename(columns={"count": "n trials", "sum": "Hits"})
         points["Hit Rate"] = points["Hits"] / points["n trials"]
         return points.reset_index()
+
+
     def block_fit(trials_df: pd.DataFrame) -> pd.Series:
         fit = LogisticRegression().fit(trials_df[["Intensity"]], trials_df["Result"])
         return pd.Series(
@@ -60,12 +75,13 @@ def _():
                 "slope": float(fit.coef_[0][0]),
             },
         )
+
+
     def process_upload_bytes(contents: bytes, filename: str) -> pd.DataFrame:
         if "zip" in filename:
             with zipfile.ZipFile(io.BytesIO(contents)) as z:
                 return pd.read_csv(z.open("trials.csv"))
         return pd.read_csv(io.BytesIO(contents.decode("utf-8")))
-
     return (
         block_fit,
         expit,
@@ -81,6 +97,8 @@ def _():
         to_intercept,
         to_slope,
     )
+
+
 @app.cell
 def _(mo):
     # Header
@@ -91,6 +109,7 @@ def _(mo):
     [Notebooks](https://nb.psychoanalyze.io) · [GitHub](https://github.com/psychoanalyze/psychoanalyze) · [Docs](https://docs.psychoanalyze.io)
     """)
 
+
 @app.cell
 def _(mo):
     # File upload
@@ -99,8 +118,15 @@ def _(mo):
         kind="area",
         label="Upload CSV/parquet with columns: **Block, Intensity, Result.** Your data stays in the browser.",
     )
-
     return (file_upload,)
+
+
+@app.cell
+def _(mo):
+    load_sample_button = mo.ui.run_button(label="Load Sample Data")
+    return (load_sample_button,)
+
+
 @app.cell
 def _(mo):
     # Input form using mo.ui.batch
@@ -129,24 +155,34 @@ def _(mo):
                 label="Preset",
             ),
             n_levels=mo.ui.number(value=7, start=2, stop=50, step=1, label="n levels"),
-            n_trials=mo.ui.number(value=100, start=1, stop=10000, step=1, label="trials/block"),
+            n_trials=mo.ui.number(
+                value=100, start=1, stop=10000, step=1, label="trials/block",
+            ),
             n_blocks=mo.ui.number(value=5, start=1, stop=100, step=1, label="blocks"),
         )
         .form(submit_button_label="Generate")
     )
-
     return (input_form,)
+
+
 @app.cell
 def _(input_form):
     # Extract values from form (with defaults before submission)
     form_values = input_form.value if input_form.value is not None else {}
     x_0 = float(form_values.get("x_0") if form_values.get("x_0") is not None else 0.0)
     k = float(form_values.get("k") if form_values.get("k") is not None else 1.0)
-    n_levels = int(form_values.get("n_levels") if form_values.get("n_levels") is not None else 7)
-    n_trials = int(form_values.get("n_trials") if form_values.get("n_trials") is not None else 100)
-    n_blocks = int(form_values.get("n_blocks") if form_values.get("n_blocks") is not None else 5)
-
+    n_levels = int(
+        form_values.get("n_levels") if form_values.get("n_levels") is not None else 7,
+    )
+    n_trials = int(
+        form_values.get("n_trials") if form_values.get("n_trials") is not None else 100,
+    )
+    n_blocks = int(
+        form_values.get("n_blocks") if form_values.get("n_blocks") is not None else 5,
+    )
     return k, n_blocks, n_levels, n_trials, x_0
+
+
 @app.cell
 def _(k, logit, to_intercept, to_slope, x_0):
     # Compute stimulus range from model parameters
@@ -154,20 +190,43 @@ def _(k, logit, to_intercept, to_slope, x_0):
     slope = to_slope(k)
     min_x = (logit(0.01) - intercept) / slope
     max_x = (logit(0.99) - intercept) / slope
-
     return max_x, min_x
+
+
 @app.cell
 def _(max_x, min_x, mo):
     # Stimulus range info for display in left column
     stimulus_info = mo.md(f"**Stimulus range:** {min_x:.2f} to {max_x:.2f}")
-
     return (stimulus_info,)
+
+
+@app.cell
+def _(pd):
+    from pathlib import Path as _Path
+
+    def load_sample_trials() -> pd.DataFrame:
+        """Load sample experimental data from data/trials.csv."""
+        sample_path = _Path(__file__).parent / "data" / "trials.csv"
+        df = pd.read_csv(sample_path)
+        # Transform to expected format: Block, Intensity, Result
+        # Use Date as Block identifier, Amp1 as Intensity
+        # Result: 1 = hit, 0/2/3 = miss (binary classification)
+        df["Block"] = pd.factorize(df["Date"].astype(str) + "_" + df["Amp2"].astype(str))[0]
+        df["Intensity"] = df["Amp1"]
+        df["Result"] = (df["Result"] == 1).astype(int)
+        return df[["Block", "Intensity", "Result"]]
+
+    return (load_sample_trials,)
+
+
 @app.cell
 def _(
     file_upload,
     generate_index,
     generate_trials,
     k,
+    load_sample_button,
+    load_sample_trials,
     max_x,
     min_x,
     n_blocks,
@@ -176,8 +235,10 @@ def _(
     process_upload_bytes,
     x_0,
 ):
-    # Trials: from upload or generate
-    if file_upload.value and len(file_upload.value) > 0:
+    # Trials: from sample button, upload, or generate
+    if load_sample_button.value:
+        trials_df = load_sample_trials()
+    elif file_upload.value and len(file_upload.value) > 0:
         raw = file_upload.contents(0)
         fname = file_upload.name(0) or ""
         if raw is not None:
@@ -197,8 +258,9 @@ def _(
             n_blocks=n_blocks,
         )
     trials_df["Intensity"] = trials_df["Intensity"].astype(float)
-
     return (trials_df,)
+
+
 @app.cell
 def _(mo, trials_df):
     # Slider to crop dataset at a specific trial number
@@ -212,12 +274,16 @@ def _(mo, trials_df):
         show_value=True,
     )
     return (trial_crop_slider,)
+
+
 @app.cell
 def _(trial_crop_slider, trials_df):
     # Apply trial crop
     crop_at = trial_crop_slider.value
     trials_cropped_df = trials_df.iloc[:crop_at].copy()
     return (trials_cropped_df,)
+
+
 @app.cell
 def _(block_fit, from_trials, trials_cropped_df):
     # Points and blocks from cropped trials
@@ -225,8 +291,9 @@ def _(block_fit, from_trials, trials_cropped_df):
     blocks_df = trials_cropped_df.groupby("Block").apply(block_fit).reset_index()
     blocks_df["gamma"] = 0.0
     blocks_df["lambda"] = 0.0
-
     return blocks_df, points_df
+
+
 @app.cell
 def _(blocks_df, blocks_table, k, pd, x_0):
     # Selected block rows for plot (include Model)
@@ -266,8 +333,9 @@ def _(blocks_df, blocks_table, k, pd, x_0):
     block_rows.append(
         {"Block": "Model", "intercept": model_intercept, "slope": model_slope},
     )
-
     return (block_rows,)
+
+
 @app.cell
 def _(blocks_table, pd, points_df):
     # Filter points by selected blocks
@@ -287,8 +355,9 @@ def _(blocks_table, pd, points_df):
             points_filtered_df = points_df
     else:
         points_filtered_df = points_df
-
     return (points_filtered_df,)
+
+
 @app.cell
 def _(mo, points_filtered_df):
     # Points table
@@ -302,8 +371,9 @@ def _(mo, points_filtered_df):
             "Hit Rate": "{:.2f}".format,
         },
     )
-
     return (points_table,)
+
+
 @app.cell
 def _(blocks_df, mo):
     # Blocks table with multi-selection
@@ -317,8 +387,9 @@ def _(blocks_df, mo):
             "slope": "{:.2f}".format,
         },
     )
-
     return (blocks_table,)
+
+
 @app.cell
 def _(block_rows, expit, max_x, min_x, mo, np, pd, points_filtered_df, px):
     # Plot: scatter points + logistic curves
@@ -356,16 +427,19 @@ def _(block_rows, expit, max_x, min_x, mo, np, pd, points_filtered_df, px):
     for trace in results_fig.data:
         fig.add_trace(trace)
     plot_ui = mo.ui.plotly(fig)
-
     return (plot_ui,)
+
+
 @app.cell
-def _(file_upload, input_form, mo, stimulus_info):
+def _(file_upload, input_form, load_sample_button, mo, stimulus_info):
     # Build tab content based on selected mode
     batch_content = mo.vstack(
         [
             mo.md("### Batch Mode"),
-            mo.md("Upload your experimental data for analysis."),
+            mo.md("Upload your experimental data or load sample data."),
             file_upload,
+            mo.md("**Or try with sample experimental data:**"),
+            load_sample_button,
         ],
         gap=1,
     )
@@ -387,10 +461,10 @@ def _(file_upload, input_form, mo, stimulus_info):
                 "for real-time psychophysics experiments.",
             ),
             mo.md("""
-**Planned features:**
-- WebSocket connection to experiment hardware
-- Real-time threshold estimation
-- Adaptive staircase procedures
+    **Planned features:**
+    - WebSocket connection to experiment hardware
+    - Real-time threshold estimation
+    - Adaptive staircase procedures
             """),
         ],
         gap=1,
@@ -403,16 +477,11 @@ def _(file_upload, input_form, mo, stimulus_info):
             "Online": online_content,
         },
     )
-    return (input_tabs, online_content)
+    return (input_tabs,)
+
+
 @app.cell
-def _(
-    blocks_table,
-    input_tabs,
-    mo,
-    plot_ui,
-    points_table,
-    trial_crop_slider,
-):
+def _(blocks_table, input_tabs, mo, plot_ui, points_table, trial_crop_slider):
     # 3-column layout: Input | Visualization | Output
     left_column = mo.vstack(
         [
@@ -478,6 +547,7 @@ def _(
         widths=[1, 2, 1],
         gap=2,
     )
+
 
 if __name__ == "__main__":
     app.run()
