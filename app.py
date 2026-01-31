@@ -159,19 +159,19 @@ def _(mo):
 
 @app.cell
 def _(mo, preset_dropdown):
-    presets = {
+    _presets = {
         "standard": [0.0, 1.0, 0.0, 0.0],
         "non-standard": [10.0, 2.0, 0.2, 0.1],
         "2AFC": [0.0, 1.0, 0.5, 0.0],
     }
-    preset_free = {
+    _preset_free = {
         "standard": [True, True, True, True],
         "non-standard": [True, True, True, True],
         "2AFC": [True, True, False, True],
     }
-    preset_key = preset_dropdown.value or "standard"
-    preset_values = presets.get(preset_key, presets["standard"])
-    preset_free_values = preset_free.get(preset_key, preset_free["standard"])
+    _preset_key = preset_dropdown.value or "standard"
+    _preset_values = _presets.get(_preset_key, _presets["standard"])
+    _preset_free_values = _preset_free.get(_preset_key, _preset_free["standard"])
 
     # Input form using mo.ui.batch
     input_form = (
@@ -258,20 +258,20 @@ def _(input_form, preset_dropdown):
     preset_values = presets.get(preset_key, presets["standard"])
     preset_free_values = preset_free.get(preset_key, preset_free["standard"])
 
-    x_0_free = to_bool(form_values, "x_0_free", preset_free_values[0])
-    k_free = to_bool(form_values, "k_free", preset_free_values[1])
-    gamma_free = to_bool(form_values, "gamma_free", preset_free_values[2])
-    lambda_free = to_bool(form_values, "lambda_free", preset_free_values[3])
+    x_0_free = to_bool(form_values, "x_0_free", _preset_free_values[0])
+    k_free = to_bool(form_values, "k_free", _preset_free_values[1])
+    gamma_free = to_bool(form_values, "gamma_free", _preset_free_values[2])
+    lambda_free = to_bool(form_values, "lambda_free", _preset_free_values[3])
 
-    x_0_value = to_float(form_values, "x_0", preset_values[0])
-    k_value = to_float(form_values, "k", preset_values[1])
-    gamma_value = to_float(form_values, "gamma", preset_values[2])
-    lambda_value = to_float(form_values, "lambda_", preset_values[3])
+    x_0_value = to_float(form_values, "x_0", _preset_values[0])
+    k_value = to_float(form_values, "k", _preset_values[1])
+    gamma_value = to_float(form_values, "gamma", _preset_values[2])
+    lambda_value = to_float(form_values, "lambda_", _preset_values[3])
 
-    x_0 = x_0_value if x_0_free else preset_values[0]
-    k = k_value if k_free else preset_values[1]
-    gamma = gamma_value if gamma_free else preset_values[2]
-    lambda_ = lambda_value if lambda_free else preset_values[3]
+    x_0 = x_0_value if x_0_free else _preset_values[0]
+    k = k_value if k_free else _preset_values[1]
+    gamma = gamma_value if gamma_free else _preset_values[2]
+    lambda_ = lambda_value if lambda_free else _preset_values[3]
 
     n_levels = to_int(form_values, "n_levels", 7)
     n_trials = to_int(form_values, "n_trials", 100)
@@ -569,10 +569,11 @@ def _(block_rows, link_fn, max_x, min_x, mo, np, pl, points_filtered_df, px):
 
 @app.cell
 def _(blocks_df, mo, plot_fig, points_filtered_df, trials_cropped_df, pl):
-    import io
+    import io as _io
     import tempfile
-    import zipfile
+    import zipfile as _zipfile
     from datetime import datetime
+    from pathlib import Path
 
     import duckdb
 
@@ -581,11 +582,11 @@ def _(blocks_df, mo, plot_fig, points_filtered_df, trials_cropped_df, pl):
         blocks_df: pl.DataFrame,
         trials_df: pl.DataFrame,
     ) -> bytes:
-        zip_buffer = io.BytesIO()
-        with zipfile.ZipFile(
+        zip_buffer = _io.BytesIO()
+        with _zipfile.ZipFile(
             zip_buffer,
             mode="a",
-            compression=zipfile.ZIP_DEFLATED,
+            compression=_zipfile.ZIP_DEFLATED,
             allowZip64=False,
         ) as zip_file:
             for level, level_df in {
@@ -593,7 +594,7 @@ def _(blocks_df, mo, plot_fig, points_filtered_df, trials_cropped_df, pl):
                 "blocks": blocks_df,
                 "trials": trials_df,
             }.items():
-                csv_buffer = io.StringIO()
+                csv_buffer = _io.StringIO()
                 level_df.write_csv(csv_buffer)
                 zip_file.writestr(f"{level}.csv", csv_buffer.getvalue())
         zip_buffer.seek(0)
@@ -603,19 +604,19 @@ def _(blocks_df, mo, plot_fig, points_filtered_df, trials_cropped_df, pl):
         return points_df.to_pandas().to_json().encode("utf-8")
 
     def build_parquet(points_df: pl.DataFrame) -> bytes:
-        buffer = io.BytesIO()
+        buffer = _io.BytesIO()
         points_df.write_parquet(buffer)
         buffer.seek(0)
         return buffer.read()
 
     def build_duckdb(points_df: pl.DataFrame) -> bytes:
-        with tempfile.NamedTemporaryFile(suffix=".duckdb") as temp_file:
-            connection = duckdb.connect(temp_file.name)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            db_path = Path(temp_dir) / "psychoanalyze.duckdb"
+            connection = duckdb.connect(str(db_path))
             connection.register("points_df", points_df.to_pandas())
             connection.execute("CREATE TABLE points AS SELECT * FROM points_df")
             connection.close()
-            temp_file.seek(0)
-            return temp_file.read()
+            return db_path.read_bytes()
 
     timestamp = datetime.now().astimezone().strftime("%Y-%m-%d_%H%M")
     csv_zip = build_csv_zip(points_filtered_df, blocks_df, trials_cropped_df)
