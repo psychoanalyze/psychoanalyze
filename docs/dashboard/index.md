@@ -6,7 +6,7 @@ The PsychoAnalyze dashboard is linked to via the :material-chart-bell-curve-cumu
 
 ## Introduction
 
-Our dashboard is a *[marimo](https://marimo.io/)* notebook (`app.py` at the project root). marimo is a reactive Python notebook that runs in the browser.
+Our dashboard is a *[marimo](https://marimo.io/)* notebook (`app.py` at the project root). marimo is a reactive Python notebook that runs in the browser, with Bayesian fit results cached locally on disk to speed repeated runs.
 
 While Python developers may be interested in examining or contributing to the code that powers the dashboard, use of the dashboard on our site requires no coding knowledge and aims to be useful to people of all backgrounds.
 

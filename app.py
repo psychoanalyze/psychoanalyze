@@ -12,8 +12,11 @@ app = marimo.App(width="full", app_title="PsychoAnalyze")
 
 @app.cell
 def _():
+    import hashlib
     import io
+    import json
     import zipfile
+    from pathlib import Path
 
     import altair as alt
     import arviz as az
@@ -28,10 +31,13 @@ def _():
     from psychoanalyze.data import trials as pa_trials
     from psychoanalyze.data.logistic import to_intercept, to_slope
     return (
+        Path,
         alt,
         az,
         expit,
+        hashlib,
         io,
+        json,
         logit,
         mo,
         np,
@@ -47,7 +53,70 @@ def _():
 
 
 @app.cell
-def _(az, io, pa_blocks, pa_points, pa_trials, pl, subject_utils, zipfile):
+def _(Path, az, hashlib, io, json, mo, pa_blocks, pl):
+    cache_root = Path("__marimo__") / "cache" / "psychoanalyze"
+    cache_root.mkdir(parents=True, exist_ok=True)
+
+    def normalize_trials_for_hash(trials_df: pl.DataFrame) -> pl.DataFrame:
+        preferred_cols = [
+            col
+            for col in ["Subject", "Block", "Intensity", "Result"]
+            if col in trials_df.columns
+        ]
+        cols = preferred_cols if preferred_cols else trials_df.columns
+        return trials_df.select(cols).sort(cols)
+
+    def trials_cache_key(
+        trials_df: pl.DataFrame,
+        fit_params: dict[str, float | int],
+    ) -> str:
+        normalized = normalize_trials_for_hash(trials_df)
+        buffer = io.BytesIO()
+        normalized.write_csv(buffer)
+        digest = hashlib.sha256()
+        digest.update(buffer.getvalue())
+        digest.update(json.dumps(fit_params, sort_keys=True).encode())
+        return digest.hexdigest()
+
+    def idata_cache_path(cache_key: str) -> Path:
+        return cache_root / f"idata-{cache_key}.nc"
+
+    @mo.cache
+    def cached_block_fit(
+        trials_df: pl.DataFrame,
+        cache_key: str,
+        fit_params: dict[str, float | int],
+    ) -> tuple[dict[str, float], az.InferenceData]:
+        cache_path = idata_cache_path(cache_key)
+        if cache_path.exists():
+            idata = az.from_netcdf(cache_path)
+        else:
+            idata = pa_blocks.fit(trials_df, **fit_params)
+            idata.to_netcdf(cache_path)
+        summary = pa_blocks.summarize_fit(idata)
+        return (
+            {
+                "intercept": summary["intercept"],
+                "slope": summary["slope"],
+            },
+            idata,
+        )
+
+    return cached_block_fit, trials_cache_key
+
+
+@app.cell
+def _(
+    az,
+    cached_block_fit,
+    io,
+    pa_points,
+    pa_trials,
+    pl,
+    subject_utils,
+    trials_cache_key,
+    zipfile,
+):
     generate_index = pa_points.generate_index
 
     def generate_trials(
@@ -64,7 +133,6 @@ def _(az, io, pa_blocks, pa_points, pa_trials, pl, subject_utils, zipfile):
         )
         return subject_utils.ensure_subject_column(trials_df)
 
-
     def from_trials(trials_df: pl.DataFrame) -> pl.DataFrame:
         trials_df = subject_utils.ensure_subject_column(trials_df)
         return pa_points.from_trials(trials_df)
@@ -72,14 +140,14 @@ def _(az, io, pa_blocks, pa_points, pa_trials, pl, subject_utils, zipfile):
     def block_fit(
         trials_df: pl.DataFrame,
     ) -> tuple[dict[str, float], az.InferenceData]:
-        fit_idata = pa_blocks.fit(
-            trials_df,
-            draws=300,
-            tune=300,
-            chains=1,
-            target_accept=0.9,
-        )
-        summary = pa_blocks.summarize_fit(fit_idata)
+        fit_params: dict[str, float | int] = {
+            "draws": 300,
+            "tune": 300,
+            "chains": 1,
+            "target_accept": 0.9,
+        }
+        cache_key = trials_cache_key(trials_df, fit_params)
+        summary, fit_idata = cached_block_fit(trials_df, cache_key, fit_params)
         return (
             {
                 "intercept": summary["intercept"],
@@ -122,7 +190,7 @@ def _(mo):
     file_upload = mo.ui.file(
         filetypes=[".csv", ".zip", ".parquet", ".pq"],
         kind="area",
-        label="Upload CSV/parquet with columns: **Block, Intensity, Result** (optional: **Subject**). Your data stays in the browser.",
+        label="Upload CSV/parquet with columns: **Block, Intensity, Result** (optional: **Subject**). Data stays on this machine.",
     )
     return (file_upload,)
 
@@ -409,12 +477,14 @@ def _(
     # Build list of block dicts for curves: selected blocks + Model
     model_intercept = -x_0.value / k.value
     model_slope = 1 / k.value
+
     def block_label(row: dict) -> str:
         subject = row.get("Subject")
         block = row.get("Block")
         if subject is None or subject == "":
             return str(block)
         return f"{subject}-{block}"
+
 
     block_rows = []
     if isinstance(selected_blocks_df, pl.DataFrame) and len(selected_blocks_df) > 0:
@@ -562,11 +632,9 @@ def _(
         else pl.DataFrame({"Intensity": [], "lower": [], "upper": [], "Series": []})
     )
     points_plot_df = points_filtered_df.with_columns(
-        (
-            pl.col("Subject").cast(pl.Utf8)
-            + "-"
-            + pl.col("Block").cast(pl.Utf8)
-        ).alias("Series"),
+        (pl.col("Subject").cast(pl.Utf8) + "-" + pl.col("Block").cast(pl.Utf8)).alias(
+            "Series",
+        ),
     )
     fits_df = fits_df.with_columns(pl.col("Series").cast(pl.Utf8))
     fits_pd = fits_df.to_pandas()
@@ -613,10 +681,9 @@ def _(
 @app.cell
 def _(blocks_df, mo, pl, points_filtered_df, trials_cropped_df):
     import io as _io
-    import tempfile
     import zipfile as _zipfile
     from datetime import datetime
-    from pathlib import Path
+    from pathlib import Path as _Path
 
     import duckdb
 
@@ -657,8 +724,10 @@ def _(blocks_df, mo, pl, points_filtered_df, trials_cropped_df):
 
 
     def build_duckdb(points_df: pl.DataFrame) -> bytes:
+        import tempfile
+
         with tempfile.TemporaryDirectory() as temp_dir:
-            db_path = Path(temp_dir) / "psychoanalyze.duckdb"
+            db_path = _Path(temp_dir) / "psychoanalyze.duckdb"
             connection = duckdb.connect(str(db_path))
             connection.register("points_df", points_df.to_pandas())
             connection.execute("CREATE TABLE points AS SELECT * FROM points_df")

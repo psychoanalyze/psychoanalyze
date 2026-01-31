@@ -162,3 +162,4 @@ docs/notebooks/tutorial_files/**/*.css
 docs/notebooks/tutorial/*.html
 
 _site
+__marimo__

@@ -37,7 +37,9 @@ $$
 
 #### Model Parameters
 
-You may adjust the parameters $x_0$, $k$, $\gamma$, and $\lambda$ for model simulations using the sliders and input boxes in the panel. Free/fixed toggles let you lock parameters to preset values while continuing to edit the others. The simulation is completely regenerated in the browser's memory each time any parameter in the Input Panel is adjusted.
+You may adjust the parameters $x_0$, $k$, $\gamma$, and $\lambda$ for model simulations using the sliders and input boxes in the panel. Free/fixed toggles let you lock parameters to preset values while continuing to edit the others. The simulation is regenerated in memory each time any parameter in the Input Panel is adjusted, while Bayesian fit results are cached locally on disk to speed repeated runs.
+
+Cached fit artifacts are stored under `__marimo__/cache/psychoanalyze` in the project directory.
 
 !!! abstract "On our roadmap:"
 
