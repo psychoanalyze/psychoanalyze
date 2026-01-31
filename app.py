@@ -16,6 +16,7 @@ def _():
     import zipfile
 
     import altair as alt
+    import arviz as az
     import marimo as mo
     import numpy as np
     import polars as pl
@@ -27,10 +28,11 @@ def _():
     from psychoanalyze.data import trials as pa_trials
     from psychoanalyze.data.logistic import to_intercept, to_slope
     return (
+        alt,
+        az,
         expit,
         io,
         logit,
-        alt,
         mo,
         np,
         pa_blocks,
@@ -45,7 +47,7 @@ def _():
 
 
 @app.cell
-def _(io, pa_points, pa_trials, pl, subject_utils, zipfile):
+def _(az, io, pa_blocks, pa_points, pa_trials, pl, subject_utils, zipfile):
     generate_index = pa_points.generate_index
 
     def generate_trials(
@@ -67,20 +69,24 @@ def _(io, pa_points, pa_trials, pl, subject_utils, zipfile):
         trials_df = subject_utils.ensure_subject_column(trials_df)
         return pa_points.from_trials(trials_df)
 
-
-    def block_fit(trials_df: pl.DataFrame) -> dict[str, float]:
-        idata = pa_blocks.fit(
+    def block_fit(
+        trials_df: pl.DataFrame,
+    ) -> tuple[dict[str, float], az.InferenceData]:
+        fit_idata = pa_blocks.fit(
             trials_df,
             draws=300,
             tune=300,
             chains=1,
             target_accept=0.9,
         )
-        summary = pa_blocks.summarize_fit(idata)
-        return {
-            "intercept": summary["intercept"],
-            "slope": summary["slope"],
-        }
+        summary = pa_blocks.summarize_fit(fit_idata)
+        return (
+            {
+                "intercept": summary["intercept"],
+                "slope": summary["slope"],
+            },
+            fit_idata,
+        )
 
 
     def process_upload_bytes(contents: bytes, filename: str) -> pl.DataFrame:
@@ -358,6 +364,7 @@ def _(block_fit, from_trials, pl, trials_cropped_df):
     # Points and blocks from cropped trials
     points_df = from_trials(trials_cropped_df)
     blocks_list = []
+    block_fit_map: dict[tuple[str, int], object] = {}
     block_keys = trials_cropped_df.select(["Subject", "Block"]).unique()
     for block_key_row in block_keys.iter_rows(named=True):
         block_id = block_key_row["Block"]
@@ -365,18 +372,26 @@ def _(block_fit, from_trials, pl, trials_cropped_df):
         block_trials = trials_cropped_df.filter(
             (pl.col("Block") == block_id) & (pl.col("Subject") == subject_id),
         )
-        fit_result = block_fit(block_trials)
-        fit_result["Block"] = block_id
-        fit_result["Subject"] = subject_id
-        fit_result["gamma"] = 0.0
-        fit_result["lambda"] = 0.0
-        blocks_list.append(fit_result)
+        fit_summary, _block_idata = block_fit(block_trials)
+        fit_summary["Block"] = block_id
+        fit_summary["Subject"] = subject_id
+        fit_summary["gamma"] = 0.0
+        fit_summary["lambda"] = 0.0
+        block_fit_map[(str(subject_id), int(block_id))] = _block_idata
+        blocks_list.append(fit_summary)
     blocks_df = pl.from_dicts(blocks_list)
-    return blocks_df, points_df
+    return block_fit_map, blocks_df, points_df
 
 
 @app.cell
-def _(blocks_df, blocks_table, k, pl, x_0):
+def _(
+    block_fit_map: dict[tuple[str, int], object],
+    blocks_df,
+    blocks_table,
+    k,
+    pl,
+    x_0,
+):
     # Selected block rows for plot (include Model)
     if blocks_table.value is not None and hasattr(blocks_table.value, "__len__"):
         try:
@@ -404,24 +419,35 @@ def _(blocks_df, blocks_table, k, pl, x_0):
     block_rows = []
     if isinstance(selected_blocks_df, pl.DataFrame) and len(selected_blocks_df) > 0:
         for block_row in selected_blocks_df.iter_rows(named=True):
+            subject = str(block_row.get("Subject", ""))
+            block = int(block_row.get("Block", 0))
             block_rows.append(
                 {
                     "Block": block_label(block_row),
                     "intercept": block_row.get("intercept", 0),
                     "slope": block_row.get("slope", 1),
+                    "idata": block_fit_map.get((subject, block)),
                 },
             )
     else:
         for block_row in blocks_df.iter_rows(named=True):
+            subject = str(block_row.get("Subject", ""))
+            block = int(block_row.get("Block", 0))
             block_rows.append(
                 {
                     "Block": block_label(block_row),
                     "intercept": block_row["intercept"],
                     "slope": block_row["slope"],
+                    "idata": block_fit_map.get((subject, block)),
                 },
             )
     block_rows.append(
-        {"Block": "Model", "intercept": model_intercept, "slope": model_slope},
+        {
+            "Block": "Model",
+            "intercept": model_intercept,
+            "slope": model_slope,
+            "idata": None,
+        },
     )
     return (block_rows,)
 
@@ -497,10 +523,22 @@ def _(blocks_df, mo):
 
 
 @app.cell
-def _(alt, block_rows, link_fn, max_x, min_x, mo, np, pl, points_filtered_df):
+def _(
+    alt,
+    block_rows,
+    link_fn,
+    max_x,
+    min_x,
+    mo,
+    np,
+    pa_blocks,
+    pl,
+    points_filtered_df,
+):
     # Plot: scatter points + logistic curves
     x = np.linspace(min_x, max_x, 100)
     fits_list = []
+    bands_list = []
     for blk in block_rows:
         y = link_fn(x * blk["slope"] + blk["intercept"])
         fits_list.append(
@@ -512,7 +550,17 @@ def _(alt, block_rows, link_fn, max_x, min_x, mo, np, pl, points_filtered_df):
                 },
             ),
         )
+        _block_idata = blk.get("idata")
+        if _block_idata is not None and blk["Block"] != "Model":
+            band_df = pa_blocks.curve_credible_band(_block_idata, x, hdi_prob=0.9)
+            band_df = band_df.with_columns(pl.lit(blk["Block"]).alias("Series"))
+            bands_list.append(band_df)
     fits_df = pl.concat(fits_list)
+    bands_df = (
+        pl.concat(bands_list)
+        if len(bands_list) > 0
+        else pl.DataFrame({"Intensity": [], "lower": [], "upper": [], "Series": []})
+    )
     points_plot_df = points_filtered_df.with_columns(
         (
             pl.col("Subject").cast(pl.Utf8)
@@ -522,7 +570,18 @@ def _(alt, block_rows, link_fn, max_x, min_x, mo, np, pl, points_filtered_df):
     )
     fits_df = fits_df.with_columns(pl.col("Series").cast(pl.Utf8))
     fits_pd = fits_df.to_pandas()
+    bands_pd = bands_df.to_pandas()
     points_pd = points_plot_df.to_pandas()
+    band_chart = (
+        alt.Chart(bands_pd)
+        .mark_area(opacity=0.2)
+        .encode(
+            x=alt.X("Intensity:Q"),
+            y=alt.Y("lower:Q"),
+            y2=alt.Y2("upper:Q"),
+            color=alt.Color("Series:N"),
+        )
+    )
     line_chart = (
         alt.Chart(fits_pd)
         .mark_line()
@@ -543,12 +602,11 @@ def _(alt, block_rows, link_fn, max_x, min_x, mo, np, pl, points_filtered_df):
             tooltip=["Series:N", "Intensity:Q", "Hit Rate:Q", "n trials:Q"],
         )
     )
-    plot_chart = (
-        alt.layer(line_chart, points_chart)
-        .resolve_scale(color="shared")
-        .interactive()
-    )
-    plot_ui = mo.ui.altair(plot_chart)
+    plot_layers = [line_chart, points_chart]
+    if len(bands_pd) > 0:
+        plot_layers.insert(0, band_chart)
+    plot_chart = alt.layer(*plot_layers).resolve_scale(color="shared").interactive()
+    plot_ui = mo.ui.altair_chart(plot_chart)
     return (plot_ui,)
 
 

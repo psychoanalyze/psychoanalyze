@@ -8,6 +8,7 @@
 - Add plot and data downloads (SVG/PNG/PDF and CSV/JSON/Parquet/DuckDB) to the marimo dashboard.
 - Support parquet uploads and dynamic points table sizing in the marimo dashboard.
 - Add subject-aware aggregation and dashboard support via an optional `Subject` column.
+- Add Bayesian 90% credible bands to the dashboard psychometric plot.
 
 ### Changed
 

@@ -144,6 +144,24 @@ def summarize_fit(idata: az.InferenceData) -> dict[str, float]:
     }
 
 
+def curve_credible_band(
+    idata: az.InferenceData,
+    x: np.ndarray | list[float],
+    hdi_prob: float = 0.9,
+) -> pl.DataFrame:
+    """Compute a credible band for the psychometric curve."""
+    x_array = np.asarray(x, dtype=float)
+    posterior = idata.posterior
+    intercept = posterior["intercept"].stack(sample=("chain", "draw")).values
+    slope = posterior["slope"].stack(sample=("chain", "draw")).values
+    logits = intercept[:, None] + slope[:, None] * x_array[None, :]
+    probs = expit(logits)
+    alpha = (1.0 - hdi_prob) / 2.0
+    lower = np.quantile(probs, alpha, axis=0)
+    upper = np.quantile(probs, 1.0 - alpha, axis=0)
+    return pl.DataFrame({"Intensity": x_array, "lower": lower, "upper": upper})
+
+
 def generate_trials(n_trials: int, model_params: dict[str, float]) -> pl.DataFrame:
     """Generate trials for block-level context."""
     return trials.moc_sample(n_trials, model_params)
