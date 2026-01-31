@@ -21,13 +21,7 @@
           "tests"
         ],
         "python.testing.unittestEnabled": false,
-        "python.testing.pytestEnabled": true,
-        "mypy-type-checker.path": [
-          ".venv/bin/mypy"
-        ],
-        "mypy-type-checker.interpreter": [
-          ".venv/bin/python"
-        ]
+        "python.testing.pytestEnabled": true
       },
       "extensions": [
         "ms-python.python",
@@ -37,7 +31,6 @@
         "ms-azuretools.vscode-docker",
         "ivan-bocharov.stan-vscode",
         "ms-toolsai.jupyter",
-        "ms-python.mypy-type-checker",
         "GitHub.copilot",
         "GitHub.copilot-chat",
         "eamodio.gitlens",

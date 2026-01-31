@@ -52,8 +52,6 @@ psychoanalyze = "psychoanalyze.main:app"
 [dependency-groups]
 dev = [
     "marimo>=0.19.2",
-    # "pandera[mypy]>=0.15.1",
-    # "mypy>=1.4.1",
     # "ipykernel>=6.24.0",
     # "ipywidgets>=8.0.7",
     # "jupyter>=1.0.0",
@@ -108,29 +106,6 @@ allowed_tags = [
 [tool.bandit]
 targets = ["psychoanalyze/"]
 skips = ["B311", "B104"]
-
-[tool.mypy]
-exclude = ['target']
-
-[[tool.mypy.overrides]]
-module = [
-    'dash',
-    'plotly.*',
-    'dash_bootstrap_components',
-    'plotly.express',
-    'scipy.stats',
-    'scipy.special',
-    'sklearn.linear_model',
-    'dash_daq',
-    'datatest',
-    'bambi',
-    'hypothesis',
-    'statsmodels.*',
-    'pytz',
-    'arviz',
-    'pymc',
-]
-ignore_missing_imports = true
 
 [tool.ruff]
 fix = true
