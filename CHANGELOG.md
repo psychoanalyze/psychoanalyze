@@ -14,6 +14,7 @@
 - **BREAKING**: `trials.fit` and `blocks.fit` now return PyMC InferenceData instead of sklearn coefficients.
 - Use PyMC for Bayesian logistic regression fits at the trial and block levels.
 - Replace mypy with ty for type checking.
+- Use Altair for the marimo dashboard psychometric plot (app only).
 
 ### Removed
 

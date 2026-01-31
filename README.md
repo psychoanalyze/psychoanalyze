@@ -6,7 +6,7 @@ Interactive data simulation and analysis for psychophysics with PyMC-based Bayes
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/psychoanalyze/notebooks/main?urlpath=git-pull%3Frepo%3Dhttps%253A%252F%252Fgithub.com%252Fpsychoanalyze%252Fnotebooks%26urlpath%3Dlab%252Ftree%252Fnotebooks%252Ftutorial.ipynb%26branch%3Dmain)
 [![PyPI - Status](https://img.shields.io/pypi/status/psychoanalyze)](https://pypi.org/project/psychoanalyze/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/psychoanalyze)](https://pypi.org/project/psychoanalyze/)
-[![Plotly](https://img.shields.io/badge/Plotly-%233F4F75.svg?logo=plotly&logoColor=white)](https://psychoanalyze.io)
+[![Altair](https://img.shields.io/badge/Altair-visualization-4B9CD3?logo=vega&logoColor=white)](https://altair-viz.github.io/)
 [![Pandas](https://img.shields.io/badge/pandas-%23150458.svg?logo=pandas&logoColor=white)](https://pandas.pydata.org/docs/user_guide/index.html#user-guide)
 [![Linting: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)

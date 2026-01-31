@@ -15,9 +15,9 @@ def _():
     import io
     import zipfile
 
+    import altair as alt
     import marimo as mo
     import numpy as np
-    import plotly.express as px
     import polars as pl
     from scipy.special import expit, logit
 
@@ -30,13 +30,13 @@ def _():
         expit,
         io,
         logit,
+        alt,
         mo,
         np,
         pa_blocks,
         pa_points,
         pa_trials,
         pl,
-        px,
         subject_utils,
         to_intercept,
         to_slope,
@@ -497,7 +497,7 @@ def _(blocks_df, mo):
 
 
 @app.cell
-def _(block_rows, link_fn, max_x, min_x, mo, np, pl, points_filtered_df, px):
+def _(alt, block_rows, link_fn, max_x, min_x, mo, np, pl, points_filtered_df):
     # Plot: scatter points + logistic curves
     x = np.linspace(min_x, max_x, 100)
     fits_list = []
@@ -521,23 +521,34 @@ def _(block_rows, link_fn, max_x, min_x, mo, np, pl, points_filtered_df, px):
         ).alias("Series"),
     )
     fits_df = fits_df.with_columns(pl.col("Series").cast(pl.Utf8))
-    plot_fig = px.line(
-        fits_df.to_pandas(),
-        x="Intensity",
-        y="Hit Rate",
-        color="Series",
+    fits_pd = fits_df.to_pandas()
+    points_pd = points_plot_df.to_pandas()
+    line_chart = (
+        alt.Chart(fits_pd)
+        .mark_line()
+        .encode(
+            x=alt.X("Intensity:Q"),
+            y=alt.Y("Hit Rate:Q"),
+            color=alt.Color("Series:N"),
+        )
     )
-    results_fig = px.scatter(
-        points_plot_df.to_pandas(),
-        x="Intensity",
-        y="Hit Rate",
-        size="n trials",
-        color="Series",
-        template="plotly_white",
+    points_chart = (
+        alt.Chart(points_pd)
+        .mark_point(filled=True)
+        .encode(
+            x=alt.X("Intensity:Q"),
+            y=alt.Y("Hit Rate:Q"),
+            size=alt.Size("n trials:Q"),
+            color=alt.Color("Series:N"),
+            tooltip=["Series:N", "Intensity:Q", "Hit Rate:Q", "n trials:Q"],
+        )
     )
-    for trace in results_fig.data:
-        plot_fig.add_trace(trace)
-    plot_ui = mo.ui.plotly(plot_fig)
+    plot_chart = (
+        alt.layer(line_chart, points_chart)
+        .resolve_scale(color="shared")
+        .interactive()
+    )
+    plot_ui = mo.ui.altair(plot_chart)
     return (plot_ui,)
 
 

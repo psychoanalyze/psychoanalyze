@@ -13,4 +13,4 @@ The Visualization Panel is the central column of the dashboard. It contains the 
 
 The psychometric function plot is the central feature of the dashboard. It is a plot of the psychometric function, which is a function that describes the relationship between a stimulus intensity level and the probability of a correct response. The psychometric function is a model of the psychophysical process that underlies the data collected in a psychophysical experiment.
 
-The psychometric function plot is generated using the [Plotly](https://plotly.com/python/) Python library. It is an interactive plot that allows the user to zoom in and out, pan, and hover over data points to see their values. Click a legend item to toggle the visibility of the corresponding data series, or double-click a legend item to isolate the trace.
+The psychometric function plot is generated using the [Altair](https://altair-viz.github.io/) Python library. It is an interactive plot that allows the user to zoom in and out, pan, and hover over data points to see their values.
