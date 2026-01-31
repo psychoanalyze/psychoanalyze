@@ -87,6 +87,8 @@ def _():
         if "zip" in filename:
             with zipfile.ZipFile(io.BytesIO(contents)) as z:
                 return pl.read_csv(z.open("trials.csv"))
+        if "parquet" in filename or filename.endswith(".pq"):
+            return pl.read_parquet(io.BytesIO(contents))
         return pl.read_csv(io.BytesIO(contents))
     return (
         block_fit,
@@ -120,7 +122,7 @@ def _(mo):
 def _(mo):
     # File upload
     file_upload = mo.ui.file(
-        filetypes=[".csv", ".zip"],
+        filetypes=[".csv", ".zip", ".parquet", ".pq"],
         kind="area",
         label="Upload CSV/parquet with columns: **Block, Intensity, Result.** Your data stays in the browser.",
     )
@@ -135,6 +137,42 @@ def _(mo):
 
 @app.cell
 def _(mo):
+    preset_dropdown = mo.ui.dropdown(
+        options={
+            "standard": "Standard",
+            "non-standard": "Non Standard",
+            "2AFC": "2AFC",
+        },
+        value="standard",
+        label="Preset",
+    )
+    link_function = mo.ui.dropdown(
+        options={
+            "expit": "Logistic",
+        },
+        value="expit",
+        label="Link function",
+    )
+    show_equation = mo.ui.checkbox(label="Show F(x)", value=False)
+    return link_function, preset_dropdown, show_equation
+
+
+@app.cell
+def _(mo, preset_dropdown):
+    presets = {
+        "standard": [0.0, 1.0, 0.0, 0.0],
+        "non-standard": [10.0, 2.0, 0.2, 0.1],
+        "2AFC": [0.0, 1.0, 0.5, 0.0],
+    }
+    preset_free = {
+        "standard": [True, True, True, True],
+        "non-standard": [True, True, True, True],
+        "2AFC": [True, True, False, True],
+    }
+    preset_key = preset_dropdown.value or "standard"
+    preset_values = presets.get(preset_key, presets["standard"])
+    preset_free_values = preset_free.get(preset_key, preset_free["standard"])
+
     # Input form using mo.ui.batch
     input_form = (
         mo.md(r"""
@@ -142,27 +180,28 @@ def _(mo):
 
     **Link function:** $\psi(x) = \gamma + (1 - \gamma - \lambda)F(x)$
 
-    **Model** {x_0} {k} {preset}
+    **Model** {x_0_free} {x_0} {k_free} {k} {gamma_free} {gamma} {lambda_free} {lambda_}
 
     **Stimulus** {n_levels}
 
     **Simulation** {n_trials} {n_blocks}
     """)
         .batch(
-            x_0=mo.ui.number(value=0.0, step=0.1, label="x₀"),
-            k=mo.ui.number(value=1.0, step=0.1, label="k"),
-            preset=mo.ui.dropdown(
-                options={
-                    "standard": "Standard",
-                    "non-standard": "Non Standard",
-                    "2AFC": "2AFC",
-                },
-                value="standard",
-                label="Preset",
-            ),
+            x_0_free=mo.ui.checkbox(value=preset_free_values[0], label="x₀ free"),
+            x_0=mo.ui.number(value=preset_values[0], step=0.1, label="x₀"),
+            k_free=mo.ui.checkbox(value=preset_free_values[1], label="k free"),
+            k=mo.ui.number(value=preset_values[1], step=0.1, label="k"),
+            gamma_free=mo.ui.checkbox(value=preset_free_values[2], label="γ free"),
+            gamma=mo.ui.number(value=preset_values[2], step=0.01, label="γ"),
+            lambda_free=mo.ui.checkbox(value=preset_free_values[3], label="λ free"),
+            lambda_=mo.ui.number(value=preset_values[3], step=0.01, label="λ"),
             n_levels=mo.ui.number(value=7, start=2, stop=50, step=1, label="n levels"),
             n_trials=mo.ui.number(
-                value=100, start=1, stop=10000, step=1, label="trials/block",
+                value=100,
+                start=1,
+                stop=10000,
+                step=1,
+                label="trials/block",
             ),
             n_blocks=mo.ui.number(value=5, start=1, stop=100, step=1, label="blocks"),
         )
@@ -172,7 +211,7 @@ def _(mo):
 
 
 @app.cell
-def _(input_form):
+def _(input_form, preset_dropdown):
     # Extract values from form (with defaults before submission)
     form_values = input_form.value if input_form.value is not None else {}
     form_values = form_values if isinstance(form_values, dict) else {}
@@ -195,12 +234,49 @@ def _(input_form):
         except (TypeError, ValueError):
             return default
 
-    x_0 = to_float(form_values, "x_0", 0.0)
-    k = to_float(form_values, "k", 1.0)
+    def to_bool(values: dict[str, object], key: str, default: bool) -> bool:
+        value = values.get(key)
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str):
+            return value.lower() in {"true", "1", "yes", "y"}
+        if isinstance(value, (int, float)):
+            return bool(value)
+        return default
+
+    presets = {
+        "standard": [0.0, 1.0, 0.0, 0.0],
+        "non-standard": [10.0, 2.0, 0.2, 0.1],
+        "2AFC": [0.0, 1.0, 0.5, 0.0],
+    }
+    preset_free = {
+        "standard": [True, True, True, True],
+        "non-standard": [True, True, True, True],
+        "2AFC": [True, True, False, True],
+    }
+    preset_key = preset_dropdown.value or "standard"
+    preset_values = presets.get(preset_key, presets["standard"])
+    preset_free_values = preset_free.get(preset_key, preset_free["standard"])
+
+    x_0_free = to_bool(form_values, "x_0_free", preset_free_values[0])
+    k_free = to_bool(form_values, "k_free", preset_free_values[1])
+    gamma_free = to_bool(form_values, "gamma_free", preset_free_values[2])
+    lambda_free = to_bool(form_values, "lambda_free", preset_free_values[3])
+
+    x_0_value = to_float(form_values, "x_0", preset_values[0])
+    k_value = to_float(form_values, "k", preset_values[1])
+    gamma_value = to_float(form_values, "gamma", preset_values[2])
+    lambda_value = to_float(form_values, "lambda_", preset_values[3])
+
+    x_0 = x_0_value if x_0_free else preset_values[0]
+    k = k_value if k_free else preset_values[1]
+    gamma = gamma_value if gamma_free else preset_values[2]
+    lambda_ = lambda_value if lambda_free else preset_values[3]
+
     n_levels = to_int(form_values, "n_levels", 7)
     n_trials = to_int(form_values, "n_trials", 100)
     n_blocks = to_int(form_values, "n_blocks", 5)
-    return k, n_blocks, n_levels, n_trials, x_0
+    return gamma, k, lambda_, n_blocks, n_levels, n_trials, x_0
 
 
 @app.cell
@@ -218,6 +294,24 @@ def _(max_x, min_x, mo):
     # Stimulus range info for display in left column
     stimulus_info = mo.md(f"**Stimulus range:** {min_x:.2f} to {max_x:.2f}")
     return (stimulus_info,)
+
+
+@app.cell
+def _(mo, show_equation):
+    equation_abstracted = r"""
+$$
+\psi(x) = \gamma + (1 - \gamma - \lambda)F(x)
+$$
+"""
+    equation_expanded = r"""
+$$
+\psi(x) = \frac{\gamma + (1 - \gamma - \lambda)}{1 + e^{-k(x - x_0)}}
+$$
+"""
+    plot_equation = mo.md(
+        equation_expanded if show_equation.value else equation_abstracted,
+    )
+    return (plot_equation,)
 
 
 @app.cell
@@ -247,9 +341,11 @@ def _(pl):
 @app.cell
 def _(
     file_upload,
+    gamma,
     generate_index,
     generate_trials,
     k,
+    lambda_,
     load_sample_button,
     load_sample_trials,
     max_x,
@@ -273,14 +369,14 @@ def _(
             trials_df = generate_trials(
                 n_trials=n_trials,
                 options=generate_index(n_levels, [min_x, max_x]),
-                params={"x_0": x_0, "k": k, "gamma": 0.0, "lambda": 0.0},
+                params={"x_0": x_0, "k": k, "gamma": gamma, "lambda": lambda_},
                 n_blocks=n_blocks,
             )
     else:
         trials_df = generate_trials(
             n_trials=n_trials,
             options=generate_index(n_levels, [min_x, max_x]),
-            params={"x_0": x_0, "k": k, "gamma": 0.0, "lambda": 0.0},
+            params={"x_0": x_0, "k": k, "gamma": gamma, "lambda": lambda_},
             n_blocks=n_blocks,
         )
     trials_df = trials_df.with_columns(pl.col("Intensity").cast(pl.Float64))
@@ -395,12 +491,18 @@ def _(blocks_table, pl, points_df):
 
 
 @app.cell
-def _(mo, points_filtered_df):
+def _(expit, link_function):
+    link_fn = expit if link_function.value == "expit" else expit
+    return (link_fn,)
+
+
+@app.cell
+def _(mo, n_levels, points_filtered_df):
     # Points table
     points_table = mo.ui.table(
         points_filtered_df.to_pandas(),
         pagination=True,
-        page_size=10,
+        page_size=n_levels,
         label="Points",
         format_mapping={
             "Intensity": "{:.2f}".format,
@@ -427,12 +529,12 @@ def _(blocks_df, mo):
 
 
 @app.cell
-def _(block_rows, expit, max_x, min_x, mo, np, pl, points_filtered_df, px):
+def _(block_rows, link_fn, max_x, min_x, mo, np, pl, points_filtered_df, px):
     # Plot: scatter points + logistic curves
     x = np.linspace(min_x, max_x, 100)
     fits_list = []
     for blk in block_rows:
-        y = expit(x * blk["slope"] + blk["intercept"])
+        y = link_fn(x * blk["slope"] + blk["intercept"])
         fits_list.append(
             pl.DataFrame(
                 {
@@ -445,7 +547,7 @@ def _(block_rows, expit, max_x, min_x, mo, np, pl, points_filtered_df, px):
     fits_df = pl.concat(fits_list)
     points_plot_df = points_filtered_df.with_columns(pl.col("Block").cast(pl.Utf8))
     fits_df = fits_df.with_columns(pl.col("Block").cast(pl.Utf8))
-    fig = px.line(
+    plot_fig = px.line(
         fits_df.to_pandas(),
         x="Intensity",
         y="Hit Rate",
@@ -460,13 +562,114 @@ def _(block_rows, expit, max_x, min_x, mo, np, pl, points_filtered_df, px):
         template="plotly_white",
     )
     for trace in results_fig.data:
-        fig.add_trace(trace)
-    plot_ui = mo.ui.plotly(fig)
-    return (plot_ui,)
+        plot_fig.add_trace(trace)
+    plot_ui = mo.ui.plotly(plot_fig)
+    return plot_fig, plot_ui
 
 
 @app.cell
-def _(file_upload, input_form, load_sample_button, mo, stimulus_info):
+def _(blocks_df, mo, plot_fig, points_filtered_df, trials_cropped_df, pl):
+    import io
+    import tempfile
+    import zipfile
+    from datetime import datetime
+
+    import duckdb
+
+    def build_csv_zip(
+        points_df: pl.DataFrame,
+        blocks_df: pl.DataFrame,
+        trials_df: pl.DataFrame,
+    ) -> bytes:
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(
+            zip_buffer,
+            mode="a",
+            compression=zipfile.ZIP_DEFLATED,
+            allowZip64=False,
+        ) as zip_file:
+            for level, level_df in {
+                "points": points_df,
+                "blocks": blocks_df,
+                "trials": trials_df,
+            }.items():
+                csv_buffer = io.StringIO()
+                level_df.write_csv(csv_buffer)
+                zip_file.writestr(f"{level}.csv", csv_buffer.getvalue())
+        zip_buffer.seek(0)
+        return zip_buffer.read()
+
+    def build_json(points_df: pl.DataFrame) -> bytes:
+        return points_df.to_pandas().to_json().encode("utf-8")
+
+    def build_parquet(points_df: pl.DataFrame) -> bytes:
+        buffer = io.BytesIO()
+        points_df.write_parquet(buffer)
+        buffer.seek(0)
+        return buffer.read()
+
+    def build_duckdb(points_df: pl.DataFrame) -> bytes:
+        with tempfile.NamedTemporaryFile(suffix=".duckdb") as temp_file:
+            connection = duckdb.connect(temp_file.name)
+            connection.register("points_df", points_df.to_pandas())
+            connection.execute("CREATE TABLE points AS SELECT * FROM points_df")
+            connection.close()
+            temp_file.seek(0)
+            return temp_file.read()
+
+    timestamp = datetime.now().astimezone().strftime("%Y-%m-%d_%H%M")
+    csv_zip = build_csv_zip(points_filtered_df, blocks_df, trials_cropped_df)
+    json_bytes = build_json(points_filtered_df)
+    parquet_bytes = build_parquet(points_filtered_df)
+    duckdb_bytes = build_duckdb(points_filtered_df)
+
+    plot_svg = plot_fig.to_image(format="svg", width=500, height=500)
+    plot_png = plot_fig.to_image(format="png", width=500, height=500)
+    plot_pdf = plot_fig.to_image(format="pdf", width=500, height=500)
+
+    plot_downloads = mo.vstack(
+        [
+            mo.download(plot_svg, filename="fig.svg", label="Download SVG"),
+            mo.download(plot_png, filename="fig.png", label="Download PNG"),
+            mo.download(plot_pdf, filename="fig.pdf", label="Download PDF"),
+        ],
+        gap=1,
+    )
+    data_downloads = mo.vstack(
+        [
+            mo.download(
+                csv_zip,
+                filename=f"{timestamp}_psychoanalyze.zip",
+                label="Download CSV (zip)",
+            ),
+            mo.download(json_bytes, filename="data.json", label="Download JSON"),
+            mo.download(
+                parquet_bytes,
+                filename="data.parquet",
+                label="Download Parquet",
+            ),
+            mo.download(
+                duckdb_bytes,
+                filename="psychoanalyze.duckdb",
+                label="Download DuckDB",
+            ),
+        ],
+        gap=1,
+    )
+    return data_downloads, plot_downloads
+
+
+@app.cell
+def _(
+    file_upload,
+    input_form,
+    link_function,
+    load_sample_button,
+    mo,
+    preset_dropdown,
+    show_equation,
+    stimulus_info,
+):
     # Build tab content based on selected mode
     batch_content = mo.vstack(
         [
@@ -475,6 +678,13 @@ def _(file_upload, input_form, load_sample_button, mo, stimulus_info):
             file_upload,
             mo.md("**Or try with sample experimental data:**"),
             load_sample_button,
+            mo.md("### Link Function"),
+            link_function,
+            show_equation,
+            mo.md("### Model Parameters"),
+            preset_dropdown,
+            input_form,
+            stimulus_info,
         ],
         gap=1,
     )
@@ -482,6 +692,11 @@ def _(file_upload, input_form, load_sample_button, mo, stimulus_info):
     simulation_content = mo.vstack(
         [
             mo.md("### Simulation Mode"),
+            mo.md("### Link Function"),
+            link_function,
+            show_equation,
+            mo.md("### Model Parameters"),
+            preset_dropdown,
             input_form,
             stimulus_info,
         ],
@@ -516,7 +731,17 @@ def _(file_upload, input_form, load_sample_button, mo, stimulus_info):
 
 
 @app.cell
-def _(blocks_table, input_tabs, mo, plot_ui, points_table, trial_crop_slider):
+def _(
+    blocks_table,
+    data_downloads,
+    input_tabs,
+    mo,
+    plot_downloads,
+    plot_equation,
+    plot_ui,
+    points_table,
+    trial_crop_slider,
+):
     # 3-column layout: Input | Visualization | Output
     left_column = mo.vstack(
         [
@@ -532,9 +757,7 @@ def _(blocks_table, input_tabs, mo, plot_ui, points_table, trial_crop_slider):
         center_column = mo.vstack(
             [
                 mo.md("## Batch Analysis"),
-                mo.md(
-                    r"$\psi(x) = \gamma + (1 - \gamma - \lambda)F(x)$",
-                ),
+                plot_equation,
                 trial_crop_slider,
                 plot_ui,
             ],
@@ -558,9 +781,7 @@ def _(blocks_table, input_tabs, mo, plot_ui, points_table, trial_crop_slider):
         center_column = mo.vstack(
             [
                 mo.md("## Simulation Results"),
-                mo.md(
-                    r"$\psi(x) = \gamma + (1 - \gamma - \lambda)F(x)$",
-                ),
+                plot_equation,
                 trial_crop_slider,
                 plot_ui,
             ],
@@ -573,6 +794,10 @@ def _(blocks_table, input_tabs, mo, plot_ui, points_table, trial_crop_slider):
             blocks_table,
             mo.md("## Points"),
             points_table,
+            mo.md("## Download Plot"),
+            plot_downloads,
+            mo.md("## Download Data"),
+            data_downloads,
         ],
         gap=1,
     )

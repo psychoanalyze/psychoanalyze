@@ -32,16 +32,16 @@ $$
 
 #### Link Function
 
-- In an upcoming release, PsychoAnalyze will support a variety of link functions. For now, the only supported link function is the [logit function](https://en.wikipedia.org/wiki/Logit). You can toggle the visibility of the equation for the logit function by clicking the `Show/Hide` button.
+- In an upcoming release, PsychoAnalyze will support a variety of link functions. For now, the only supported link function is the [logit function](https://en.wikipedia.org/wiki/Logit). You can toggle the visibility of the equation for the logit function using the **Show F(x)** control.
 
 #### Model Parameters
 
-You may adjust the parameters $\mu$ and $\sigma$ for model simulations using the sliders and input boxes in the panel. The simulation is completely regenerated in the browser's memory each time any parameter in the Input Panel is adjusted.
+You may adjust the parameters $x_0$, $k$, $\gamma$, and $\lambda$ for model simulations using the sliders and input boxes in the panel. Free/fixed toggles let you lock parameters to preset values while continuing to edit the others. The simulation is completely regenerated in the browser's memory each time any parameter in the Input Panel is adjusted.
 
 !!! abstract "On our roadmap:"
 
     - Support for other link functions, beginning with the probit function.
-    - Support for other model parameters, such as guess rate, lapse rate, and the *beta* parameter for the [beta-binomial approach](https://doi.org/10.1016/j.visres.2016.02.002).
+    - Support for additional model parameters, such as the *beta* parameter for the [beta-binomial approach](https://doi.org/10.1016/j.visres.2016.02.002).
 
 #### Stimulus
 
