@@ -24,7 +24,7 @@ def x() -> list[int]:
 def test_normalize() -> None:
     """Given a denormalized dataframe, returns normalized data."""
     fields = {
-        "Session": ["Monkey", "Block"],
+        "Session": ["Subject", "Block"],
         "Reference Stimulus": ["Amp2", "Width2", "Freq2", "Dur2"],
         "Channel Configuration": ["Active Channels", "Return Channels"],
         "Test Stimulus": ["Amp1", "Width1", "Freq1", "Dur1"],

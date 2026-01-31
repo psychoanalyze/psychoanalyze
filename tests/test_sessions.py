@@ -13,7 +13,7 @@ from psychoanalyze.data import sessions
 @pytest.fixture
 def subjects() -> pl.DataFrame:
     """Subjects for session-level data."""
-    return pl.DataFrame({"Monkey": ["U"], "Surgery Date": ["2020-01-01"]})
+    return pl.DataFrame({"Subject": ["U"], "Surgery Date": ["2020-01-01"]})
 
 
 def test_generate_sessions() -> None:
@@ -26,18 +26,18 @@ def test_from_trials_csv(tmp_path: Path) -> None:
     csv_dir = tmp_path / "data"
     csv_dir.mkdir()
     csv_path = csv_dir / "trials.csv"
-    data: dict[str, list[Any]] = {field: [] for field in ["Monkey", "Date"]}
+    data: dict[str, list[Any]] = {field: [] for field in ["Subject", "Date"]}
     trials = pl.DataFrame(data)
     trials.write_csv(csv_path)
 
     _sessions = sessions.from_trials_csv(csv_path)
-    assert set(_sessions.columns) == {"Monkey", "Date"}
+    assert set(_sessions.columns) == {"Subject", "Date"}
 
 
 def test_day_marks_from_monkey_two_sessions(subjects: pl.DataFrame) -> None:
     """Tests calculations of days from dates for multiple subjects."""
     _sessions = pl.DataFrame(
-        {"Monkey": ["U", "U"], "Date": ["2020-01-02", "2020-01-03"]},
+        {"Subject": ["U", "U"], "Date": ["2020-01-02", "2020-01-03"]},
     )
     assert sessions.day_marks(subjects, _sessions, "U") == {
         1: "2020-01-02",
@@ -47,6 +47,6 @@ def test_day_marks_from_monkey_two_sessions(subjects: pl.DataFrame) -> None:
 
 def test_day_marks_from_monkey_one_session(subjects: pl.DataFrame) -> None:
     """Tests calculations of days from dates for single subject."""
-    _sessions = pl.DataFrame({"Monkey": ["U"], "Date": ["2020-01-02"]})
+    _sessions = pl.DataFrame({"Subject": ["U"], "Date": ["2020-01-02"]})
 
     assert sessions.day_marks(subjects, _sessions, "U") == {1: "2020-01-02"}

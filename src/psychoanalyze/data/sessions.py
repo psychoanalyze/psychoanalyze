@@ -9,8 +9,9 @@ from pathlib import Path
 import polars as pl
 
 from psychoanalyze.data import blocks
+from psychoanalyze.data import subject as subject_utils
 
-dims = ["Monkey", "Date"]
+dims = ["Subject", "Date"]
 index_levels = dims
 
 
@@ -26,14 +27,18 @@ def cache_results(sessions: pl.DataFrame) -> None:
 
 def from_trials_csv(path: Path) -> pl.DataFrame:
     """Aggregate to session level from trial-level data."""
-    return pl.read_csv(path).select(["Monkey", "Date"]).unique()
+    trials = pl.read_csv(path)
+    trials = subject_utils.ensure_subject_column(trials)
+    return trials.select(["Subject", "Date"]).unique()
 
 
 def day_marks(subjects: pl.DataFrame, sessions: pl.DataFrame, monkey: str) -> dict:
     """Calculate days since surgery date for a given subject."""
-    surgery_date_str = subjects.filter(pl.col("Monkey") == monkey)["Surgery Date"][0]
+    subjects = subject_utils.ensure_subject_column(subjects)
+    sessions = subject_utils.ensure_subject_column(sessions)
+    surgery_date_str = subjects.filter(pl.col("Subject") == monkey)["Surgery Date"][0]
     surgery_date = pl.Series([surgery_date_str]).str.to_datetime()[0]
-    sessions = sessions.filter(pl.col("Monkey") == monkey)
+    sessions = sessions.filter(pl.col("Subject") == monkey)
     sessions = sessions.with_columns(
         (pl.col("Date").str.to_datetime() - surgery_date).dt.total_days().alias("Days"),
     )
@@ -42,7 +47,9 @@ def day_marks(subjects: pl.DataFrame, sessions: pl.DataFrame, monkey: str) -> di
 
 def days(sessions: pl.DataFrame, subjects: pl.DataFrame) -> pl.Series:
     """Calculate days since surgery date."""
-    sessions_subjects = sessions.join(subjects, on="Monkey")
+    sessions = subject_utils.ensure_subject_column(sessions)
+    subjects = subject_utils.ensure_subject_column(subjects)
+    sessions_subjects = sessions.join(subjects, on="Subject")
     return (
         sessions_subjects["Date"] - sessions_subjects["Surgery Date"]
     ).dt.total_days()
@@ -50,7 +57,8 @@ def days(sessions: pl.DataFrame, subjects: pl.DataFrame) -> pl.Series:
 
 def n_trials(trials: pl.DataFrame) -> pl.DataFrame:
     """Count trials per session."""
-    return trials.group_by(["Monkey", "Date"]).agg(pl.len().alias("n_trials"))
+    trials = subject_utils.ensure_subject_column(trials)
+    return trials.group_by(["Subject", "Date"]).agg(pl.len().alias("n_trials"))
 
 
 def load(data_dir: Path) -> pl.DataFrame:

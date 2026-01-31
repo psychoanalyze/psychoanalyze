@@ -7,6 +7,7 @@
 - Restore dashboard controls in the marimo app (link-function toggle, presets, free/fixed params).
 - Add plot and data downloads (SVG/PNG/PDF and CSV/JSON/Parquet/DuckDB) to the marimo dashboard.
 - Support parquet uploads and dynamic points table sizing in the marimo dashboard.
+- Add subject-aware aggregation and dashboard support via an optional `Subject` column.
 
 ### Changed
 

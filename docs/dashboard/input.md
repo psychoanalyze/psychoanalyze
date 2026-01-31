@@ -8,13 +8,14 @@ The first component in the input panel column allows anyone to upload a dataset 
 
 | Column Name | Description | DataType |
 | ----------- | ----------- | -------- |
+| `Subject` | Optional subject identifier for multi-subject datasets. | `string` |
 | `Block` | A number representing an ID for a consecutive "block" of trials determined by the researcher. | `int` |
 | `Intensity` | A number representing the intensity of the stimulus presented in a trial. | `float` |
 | `Result` | The binary outcome of the trial, encoded as a 0 for false and a 1 for true. | `int` |
 
 !!! abstract "On our roadmap:"
 
-    - Support for multiple subjects
+    - Advanced subject filtering and grouping controls
     - Support for multi-electrode stimulus arrays
     - Support for longitudinal studies
     - Support for different sensory domains, such as audition and vision.

@@ -10,14 +10,14 @@ from psychoanalyze.analysis import strength_duration
 @pytest.fixture
 def s_d_columns() -> set:
     """Columns needed for a strength-duration dataframe."""
-    return {"Monkey", "Block", "Dimension"}
+    return {"Subject", "Block", "Dimension"}
 
 
 def test_strength_duration() -> None:
     """Test strength_duration construction."""
     blocks = pl.DataFrame(
         {
-            "Monkey": [],
+            "Subject": [],
             "Block": [],
             "Dimension": [],
             "Fixed Magnitude": [],

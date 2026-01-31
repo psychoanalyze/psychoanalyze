@@ -14,6 +14,7 @@ from plotly import graph_objects as go
 from scipy.special import expit, logit
 from scipy.stats import logistic
 
+from psychoanalyze.data import subject as subject_utils
 from psychoanalyze.data import trials as pa_trials
 
 index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
@@ -21,7 +22,8 @@ index_levels = ["Amp1", "Width1", "Freq1", "Dur1"]
 
 def from_trials(trials: pl.DataFrame) -> pl.DataFrame:
     """Aggregate point-level measures from trial data."""
-    points = trials.group_by(["Block", "Intensity"]).agg(
+    trials = subject_utils.ensure_subject_column(trials)
+    points = trials.group_by(["Subject", "Block", "Intensity"]).agg(
         pl.len().alias("n trials"),
         pl.sum("Result").alias("Hits"),
     )
@@ -36,7 +38,7 @@ def from_trials(trials: pl.DataFrame) -> pl.DataFrame:
         )
         .alias("logit(Hit Rate)"),
     )
-    return points.sort(["Block", "Intensity"])
+    return points.sort(["Subject", "Block", "Intensity"])
 
 
 def load(data_path: Path) -> pl.DataFrame:
@@ -69,7 +71,7 @@ def hits(
         {
             "Intensity": intensities,
             "Hits": hit_values,
-        }
+        },
     )
 
 
@@ -127,7 +129,11 @@ def generate_n(n_trials: int, options: list[float]) -> pl.DataFrame:
 
 def to_block(points: pl.DataFrame) -> pl.DataFrame:
     """Aggregate to block-level measures from points-level data."""
-    return points.group_by("Block").agg(pl.sum("n trials"), pl.sum("Hits"))
+    points = subject_utils.ensure_subject_column(points)
+    return points.group_by(["Subject", "Block"]).agg(
+        pl.sum("n trials"),
+        pl.sum("Hits"),
+    )
 
 
 def psi(
@@ -144,12 +150,13 @@ def psi(
 
 def plot(points: pl.DataFrame, y: str) -> go.Figure:
     """Plot the psychometric function."""
+    color = "Subject" if "Subject" in points.columns else "Block"
     return px.scatter(
         points.to_pandas(),
         x="Intensity",
         y=y,
         size="n",
-        color="Block",
+        color=color,
         template="plotly_white",
     )
 

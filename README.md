@@ -20,7 +20,7 @@ Interactive data simulation and analysis for psychophysics with PyMC-based Bayes
 View the full documentation at [https://docs.psychoanalyze.io](https://docs.psychoanalyze.io).
 
 ## Dashboard
-See what `psychoanalyze` can do by [viewing our dashboard](https://psychoanalyze.io/).
+See what `psychoanalyze` can do by [viewing our dashboard](https://psychoanalyze.io/). The dashboard accepts an optional `Subject` column for multi-subject analyses.
 
 ## Install with Python
 ```console

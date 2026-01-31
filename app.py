@@ -6,7 +6,7 @@ Replaces the former Dash dashboard (removed).
 
 import marimo
 
-__generated_with = "0.19.2"
+__generated_with = "0.19.7"
 app = marimo.App(width="full", app_title="PsychoAnalyze")
 
 
@@ -22,26 +22,31 @@ def _():
     from scipy.special import expit, logit
 
     from psychoanalyze.data import blocks as pa_blocks
+    from psychoanalyze.data import points as pa_points
+    from psychoanalyze.data import subject as subject_utils
+    from psychoanalyze.data import trials as pa_trials
+    from psychoanalyze.data.logistic import to_intercept, to_slope
+    return (
+        expit,
+        io,
+        logit,
+        mo,
+        np,
+        pa_blocks,
+        pa_points,
+        pa_trials,
+        pl,
+        px,
+        subject_utils,
+        to_intercept,
+        to_slope,
+        zipfile,
+    )
 
 
-    def to_intercept(location: float, scale: float) -> float:
-        return -location / scale
-
-
-    def to_slope(scale: float) -> float:
-        return 1 / scale
-
-
-    def psi(intensity: float, params: dict) -> float:
-        gamma = params.get("gamma", 0.0)
-        lambda_ = params.get("lambda", 0.0)
-        k = params["k"]
-        x_0 = params["x_0"]
-        return gamma + (1 - gamma - lambda_) * (1 / (1 + np.exp(-k * (intensity - x_0))))
-
-    def generate_index(n_levels: int, x_range: list[float]) -> list[float]:
-        return list(np.linspace(x_range[0], x_range[1], n_levels))
-
+@app.cell
+def _(io, pa_points, pa_trials, pl, subject_utils, zipfile):
+    generate_index = pa_points.generate_index
 
     def generate_trials(
         n_trials: int,
@@ -49,25 +54,19 @@ def _():
         params: dict,
         n_blocks: int,
     ) -> pl.DataFrame:
-        rng = np.random.default_rng()
-        out = []
-        for i in range(n_blocks):
-            intensities = rng.choice(options, size=n_trials)
-            results = np.array([int(rng.random() <= psi(x, params)) for x in intensities])
-            df = pl.DataFrame({"Intensity": intensities, "Result": results})
-            df = df.with_columns(pl.lit(i).alias("Block"))
-            out.append(df)
-        return pl.concat(out).select(["Block", "Intensity", "Result"])
+        trials_df = pa_trials.generate(
+            n_trials=n_trials,
+            options=options,
+            params=params,
+            n_blocks=n_blocks,
+        )
+        return subject_utils.ensure_subject_column(trials_df)
+
 
     def from_trials(trials_df: pl.DataFrame) -> pl.DataFrame:
-        points = trials_df.group_by(["Block", "Intensity"]).agg(
-            pl.len().alias("n trials"),
-            pl.sum("Result").alias("Hits"),
-        )
-        points = points.with_columns(
-            (pl.col("Hits") / pl.col("n trials")).alias("Hit Rate"),
-        )
-        return points.sort(["Block", "Intensity"])
+        trials_df = subject_utils.ensure_subject_column(trials_df)
+        return pa_points.from_trials(trials_df)
+
 
     def block_fit(trials_df: pl.DataFrame) -> dict[str, float]:
         idata = pa_blocks.fit(
@@ -83,6 +82,7 @@ def _():
             "slope": summary["slope"],
         }
 
+
     def process_upload_bytes(contents: bytes, filename: str) -> pl.DataFrame:
         if "zip" in filename:
             with zipfile.ZipFile(io.BytesIO(contents)) as z:
@@ -92,18 +92,10 @@ def _():
         return pl.read_csv(io.BytesIO(contents))
     return (
         block_fit,
-        expit,
         from_trials,
         generate_index,
         generate_trials,
-        logit,
-        mo,
-        np,
-        pl,
         process_upload_bytes,
-        px,
-        to_intercept,
-        to_slope,
     )
 
 
@@ -124,7 +116,7 @@ def _(mo):
     file_upload = mo.ui.file(
         filetypes=[".csv", ".zip", ".parquet", ".pq"],
         kind="area",
-        label="Upload CSV/parquet with columns: **Block, Intensity, Result.** Your data stays in the browser.",
+        label="Upload CSV/parquet with columns: **Block, Intensity, Result** (optional: **Subject**). Your data stays in the browser.",
     )
     return (file_upload,)
 
@@ -173,7 +165,24 @@ def _(mo, preset_dropdown):
     _preset_values = _presets.get(_preset_key, _presets["standard"])
     _preset_free_values = _preset_free.get(_preset_key, _preset_free["standard"])
 
-    # Input form using mo.ui.batch
+    x_0_free = mo.ui.checkbox(value=_preset_free_values[0], label="x₀ free")
+    x_0 = mo.ui.number(value=_preset_values[0], step=0.1, label="x₀")
+    k_free = mo.ui.checkbox(value=_preset_free_values[1], label="k free")
+    k = mo.ui.number(value=_preset_values[1], step=0.1, label="k")
+    gamma_free = mo.ui.checkbox(value=_preset_free_values[2], label="γ free")
+    gamma = mo.ui.number(value=_preset_values[2], step=0.01, label="γ")
+    lambda_free = mo.ui.checkbox(value=_preset_free_values[3], label="λ free")
+    lambda_ = mo.ui.number(value=_preset_values[3], step=0.01, label="λ")
+    n_levels = mo.ui.number(value=7, start=2, stop=50, step=1, label="n levels")
+    n_trials = mo.ui.number(
+        value=100,
+        start=1,
+        stop=10000,
+        step=1,
+        label="trials/block",
+    )
+    n_blocks = mo.ui.number(value=5, start=1, stop=100, step=1, label="blocks")
+
     input_form = (
         mo.md(r"""
     ## Simulation Parameters
@@ -187,103 +196,28 @@ def _(mo, preset_dropdown):
     **Simulation** {n_trials} {n_blocks}
     """)
         .batch(
-            x_0_free=mo.ui.checkbox(value=preset_free_values[0], label="x₀ free"),
-            x_0=mo.ui.number(value=preset_values[0], step=0.1, label="x₀"),
-            k_free=mo.ui.checkbox(value=preset_free_values[1], label="k free"),
-            k=mo.ui.number(value=preset_values[1], step=0.1, label="k"),
-            gamma_free=mo.ui.checkbox(value=preset_free_values[2], label="γ free"),
-            gamma=mo.ui.number(value=preset_values[2], step=0.01, label="γ"),
-            lambda_free=mo.ui.checkbox(value=preset_free_values[3], label="λ free"),
-            lambda_=mo.ui.number(value=preset_values[3], step=0.01, label="λ"),
-            n_levels=mo.ui.number(value=7, start=2, stop=50, step=1, label="n levels"),
-            n_trials=mo.ui.number(
-                value=100,
-                start=1,
-                stop=10000,
-                step=1,
-                label="trials/block",
-            ),
-            n_blocks=mo.ui.number(value=5, start=1, stop=100, step=1, label="blocks"),
+            x_0_free=x_0_free,
+            x_0=x_0,
+            k_free=k_free,
+            k=k,
+            gamma_free=gamma_free,
+            gamma=gamma,
+            lambda_free=lambda_free,
+            lambda_=lambda_,
+            n_levels=n_levels,
+            n_trials=n_trials,
+            n_blocks=n_blocks,
         )
         .form(submit_button_label="Generate")
     )
-    return (input_form,)
-
-
-@app.cell
-def _(input_form, preset_dropdown):
-    # Extract values from form (with defaults before submission)
-    form_values = input_form.value if input_form.value is not None else {}
-    form_values = form_values if isinstance(form_values, dict) else {}
-
-    def to_float(values: dict[str, object], key: str, default: float) -> float:
-        value = values.get(key)
-        if not isinstance(value, (int, float, str)):
-            return default
-        try:
-            return float(value)
-        except (TypeError, ValueError):
-            return default
-
-    def to_int(values: dict[str, object], key: str, default: int) -> int:
-        value = values.get(key)
-        if not isinstance(value, (int, float, str)):
-            return default
-        try:
-            return int(value)
-        except (TypeError, ValueError):
-            return default
-
-    def to_bool(values: dict[str, object], key: str, default: bool) -> bool:
-        value = values.get(key)
-        if isinstance(value, bool):
-            return value
-        if isinstance(value, str):
-            return value.lower() in {"true", "1", "yes", "y"}
-        if isinstance(value, (int, float)):
-            return bool(value)
-        return default
-
-    presets = {
-        "standard": [0.0, 1.0, 0.0, 0.0],
-        "non-standard": [10.0, 2.0, 0.2, 0.1],
-        "2AFC": [0.0, 1.0, 0.5, 0.0],
-    }
-    preset_free = {
-        "standard": [True, True, True, True],
-        "non-standard": [True, True, True, True],
-        "2AFC": [True, True, False, True],
-    }
-    preset_key = preset_dropdown.value or "standard"
-    preset_values = presets.get(preset_key, presets["standard"])
-    preset_free_values = preset_free.get(preset_key, preset_free["standard"])
-
-    x_0_free = to_bool(form_values, "x_0_free", _preset_free_values[0])
-    k_free = to_bool(form_values, "k_free", _preset_free_values[1])
-    gamma_free = to_bool(form_values, "gamma_free", _preset_free_values[2])
-    lambda_free = to_bool(form_values, "lambda_free", _preset_free_values[3])
-
-    x_0_value = to_float(form_values, "x_0", _preset_values[0])
-    k_value = to_float(form_values, "k", _preset_values[1])
-    gamma_value = to_float(form_values, "gamma", _preset_values[2])
-    lambda_value = to_float(form_values, "lambda_", _preset_values[3])
-
-    x_0 = x_0_value if x_0_free else _preset_values[0]
-    k = k_value if k_free else _preset_values[1]
-    gamma = gamma_value if gamma_free else _preset_values[2]
-    lambda_ = lambda_value if lambda_free else _preset_values[3]
-
-    n_levels = to_int(form_values, "n_levels", 7)
-    n_trials = to_int(form_values, "n_trials", 100)
-    n_blocks = to_int(form_values, "n_blocks", 5)
-    return gamma, k, lambda_, n_blocks, n_levels, n_trials, x_0
+    return gamma, input_form, k, lambda_, n_blocks, n_levels, n_trials, x_0
 
 
 @app.cell
 def _(k, logit, to_intercept, to_slope, x_0):
     # Compute stimulus range from model parameters
-    intercept = to_intercept(x_0, k)
-    slope = to_slope(k)
+    intercept = to_intercept(x_0.value, k.value)
+    slope = to_slope(k.value)
     min_x = (logit(0.01) - intercept) / slope
     max_x = (logit(0.99) - intercept) / slope
     return max_x, min_x
@@ -299,15 +233,15 @@ def _(max_x, min_x, mo):
 @app.cell
 def _(mo, show_equation):
     equation_abstracted = r"""
-$$
-\psi(x) = \gamma + (1 - \gamma - \lambda)F(x)
-$$
-"""
+    $$
+    \psi(x) = \gamma + (1 - \gamma - \lambda)F(x)
+    $$
+    """
     equation_expanded = r"""
-$$
-\psi(x) = \frac{\gamma + (1 - \gamma - \lambda)}{1 + e^{-k(x - x_0)}}
-$$
-"""
+    $$
+    \psi(x) = \frac{\gamma + (1 - \gamma - \lambda)}{1 + e^{-k(x - x_0)}}
+    $$
+    """
     plot_equation = mo.md(
         equation_expanded if show_equation.value else equation_abstracted,
     )
@@ -315,8 +249,9 @@ $$
 
 
 @app.cell
-def _(pl):
+def _(pl, subject_utils):
     from pathlib import Path as _Path
+
 
     def load_sample_trials() -> pl.DataFrame:
         """Load sample experimental data from data/trials.csv."""
@@ -333,8 +268,8 @@ def _(pl):
         )
         df = df.with_columns(pl.col("Amp1").alias("Intensity"))
         df = df.with_columns((pl.col("Result") == 1).cast(pl.Int64).alias("Result"))
-        return df.select(["Block", "Intensity", "Result"])
-
+        df = df.select(["Block", "Intensity", "Result"])
+        return subject_utils.ensure_subject_column(df)
     return (load_sample_trials,)
 
 
@@ -355,6 +290,7 @@ def _(
     n_trials,
     pl,
     process_upload_bytes,
+    subject_utils,
     x_0,
 ):
     # Trials: from sample button, upload, or generate
@@ -367,18 +303,29 @@ def _(
             trials_df = process_upload_bytes(raw, fname)
         else:
             trials_df = generate_trials(
-                n_trials=n_trials,
-                options=generate_index(n_levels, [min_x, max_x]),
-                params={"x_0": x_0, "k": k, "gamma": gamma, "lambda": lambda_},
-                n_blocks=n_blocks,
+                n_trials=n_trials.value,
+                options=generate_index(n_levels.value, [min_x, max_x]),
+                params={
+                    "x_0": x_0.value,
+                    "k": k.value,
+                    "gamma": gamma.value,
+                    "lambda": lambda_.value,
+                },
+                n_blocks=n_blocks.value,
             )
     else:
         trials_df = generate_trials(
-            n_trials=n_trials,
-            options=generate_index(n_levels, [min_x, max_x]),
-            params={"x_0": x_0, "k": k, "gamma": gamma, "lambda": lambda_},
-            n_blocks=n_blocks,
+            n_trials=n_trials.value,
+            options=generate_index(n_levels.value, [min_x, max_x]),
+            params={
+                "x_0": x_0.value,
+                "k": k.value,
+                "gamma": gamma.value,
+                "lambda": lambda_.value,
+            },
+            n_blocks=n_blocks.value,
         )
+    trials_df = subject_utils.ensure_subject_column(trials_df)
     trials_df = trials_df.with_columns(pl.col("Intensity").cast(pl.Float64))
     return (trials_df,)
 
@@ -411,10 +358,16 @@ def _(block_fit, from_trials, pl, trials_cropped_df):
     # Points and blocks from cropped trials
     points_df = from_trials(trials_cropped_df)
     blocks_list = []
-    for block_id in trials_cropped_df["Block"].unique().to_list():
-        block_trials = trials_cropped_df.filter(pl.col("Block") == block_id)
+    block_keys = trials_cropped_df.select(["Subject", "Block"]).unique()
+    for block_key_row in block_keys.iter_rows(named=True):
+        block_id = block_key_row["Block"]
+        subject_id = block_key_row["Subject"]
+        block_trials = trials_cropped_df.filter(
+            (pl.col("Block") == block_id) & (pl.col("Subject") == subject_id),
+        )
         fit_result = block_fit(block_trials)
         fit_result["Block"] = block_id
+        fit_result["Subject"] = subject_id
         fit_result["gamma"] = 0.0
         fit_result["lambda"] = 0.0
         blocks_list.append(fit_result)
@@ -439,25 +392,32 @@ def _(blocks_df, blocks_table, k, pl, x_0):
     else:
         selected_blocks_df = blocks_df
     # Build list of block dicts for curves: selected blocks + Model
-    model_intercept = -x_0 / k
-    model_slope = 1 / k
+    model_intercept = -x_0.value / k.value
+    model_slope = 1 / k.value
+    def block_label(row: dict) -> str:
+        subject = row.get("Subject")
+        block = row.get("Block")
+        if subject is None or subject == "":
+            return str(block)
+        return f"{subject}-{block}"
+
     block_rows = []
     if isinstance(selected_blocks_df, pl.DataFrame) and len(selected_blocks_df) > 0:
-        for row in selected_blocks_df.iter_rows(named=True):
+        for block_row in selected_blocks_df.iter_rows(named=True):
             block_rows.append(
                 {
-                    "Block": str(row.get("Block", "")),
-                    "intercept": row.get("intercept", 0),
-                    "slope": row.get("slope", 1),
+                    "Block": block_label(block_row),
+                    "intercept": block_row.get("intercept", 0),
+                    "slope": block_row.get("slope", 1),
                 },
             )
     else:
-        for row in blocks_df.iter_rows(named=True):
+        for block_row in blocks_df.iter_rows(named=True):
             block_rows.append(
                 {
-                    "Block": str(row["Block"]),
-                    "intercept": row["intercept"],
-                    "slope": row["slope"],
+                    "Block": block_label(block_row),
+                    "intercept": block_row["intercept"],
+                    "slope": block_row["slope"],
                 },
             )
     block_rows.append(
@@ -479,8 +439,16 @@ def _(blocks_table, pl, points_df):
                 else None
             )
             if sel is not None and len(sel) > 0 and "Block" in sel.columns:
-                block_ids = sel["Block"].to_list()
-                points_filtered_df = points_df.filter(pl.col("Block").is_in(block_ids))
+                if "Subject" in sel.columns:
+                    selected_pairs = sel.select(["Subject", "Block"]).to_dicts()
+                    points_filtered_df = points_df.filter(
+                        pl.struct(["Subject", "Block"]).is_in(selected_pairs),
+                    )
+                else:
+                    block_ids = sel["Block"].to_list()
+                    points_filtered_df = points_df.filter(
+                        pl.col("Block").is_in(block_ids),
+                    )
             else:
                 points_filtered_df = points_df
         except Exception:
@@ -502,7 +470,7 @@ def _(mo, n_levels, points_filtered_df):
     points_table = mo.ui.table(
         points_filtered_df.to_pandas(),
         pagination=True,
-        page_size=n_levels,
+        page_size=n_levels.value,
         label="Points",
         format_mapping={
             "Intensity": "{:.2f}".format,
@@ -540,35 +508,41 @@ def _(block_rows, link_fn, max_x, min_x, mo, np, pl, points_filtered_df, px):
                 {
                     "Intensity": x,
                     "Hit Rate": y,
-                    "Block": [blk["Block"]] * len(x),
+                    "Series": [blk["Block"]] * len(x),
                 },
             ),
         )
     fits_df = pl.concat(fits_list)
-    points_plot_df = points_filtered_df.with_columns(pl.col("Block").cast(pl.Utf8))
-    fits_df = fits_df.with_columns(pl.col("Block").cast(pl.Utf8))
+    points_plot_df = points_filtered_df.with_columns(
+        (
+            pl.col("Subject").cast(pl.Utf8)
+            + "-"
+            + pl.col("Block").cast(pl.Utf8)
+        ).alias("Series"),
+    )
+    fits_df = fits_df.with_columns(pl.col("Series").cast(pl.Utf8))
     plot_fig = px.line(
         fits_df.to_pandas(),
         x="Intensity",
         y="Hit Rate",
-        color="Block",
+        color="Series",
     )
     results_fig = px.scatter(
         points_plot_df.to_pandas(),
         x="Intensity",
         y="Hit Rate",
         size="n trials",
-        color="Block",
+        color="Series",
         template="plotly_white",
     )
     for trace in results_fig.data:
         plot_fig.add_trace(trace)
     plot_ui = mo.ui.plotly(plot_fig)
-    return plot_fig, plot_ui
+    return (plot_ui,)
 
 
 @app.cell
-def _(blocks_df, mo, plot_fig, points_filtered_df, trials_cropped_df, pl):
+def _(blocks_df, mo, pl, points_filtered_df, trials_cropped_df):
     import io as _io
     import tempfile
     import zipfile as _zipfile
@@ -576,6 +550,7 @@ def _(blocks_df, mo, plot_fig, points_filtered_df, trials_cropped_df, pl):
     from pathlib import Path
 
     import duckdb
+
 
     def build_csv_zip(
         points_df: pl.DataFrame,
@@ -600,14 +575,17 @@ def _(blocks_df, mo, plot_fig, points_filtered_df, trials_cropped_df, pl):
         zip_buffer.seek(0)
         return zip_buffer.read()
 
+
     def build_json(points_df: pl.DataFrame) -> bytes:
         return points_df.to_pandas().to_json().encode("utf-8")
+
 
     def build_parquet(points_df: pl.DataFrame) -> bytes:
         buffer = _io.BytesIO()
         points_df.write_parquet(buffer)
         buffer.seek(0)
         return buffer.read()
+
 
     def build_duckdb(points_df: pl.DataFrame) -> bytes:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -618,24 +596,13 @@ def _(blocks_df, mo, plot_fig, points_filtered_df, trials_cropped_df, pl):
             connection.close()
             return db_path.read_bytes()
 
+
     timestamp = datetime.now().astimezone().strftime("%Y-%m-%d_%H%M")
     csv_zip = build_csv_zip(points_filtered_df, blocks_df, trials_cropped_df)
     json_bytes = build_json(points_filtered_df)
     parquet_bytes = build_parquet(points_filtered_df)
     duckdb_bytes = build_duckdb(points_filtered_df)
 
-    plot_svg = plot_fig.to_image(format="svg", width=500, height=500)
-    plot_png = plot_fig.to_image(format="png", width=500, height=500)
-    plot_pdf = plot_fig.to_image(format="pdf", width=500, height=500)
-
-    plot_downloads = mo.vstack(
-        [
-            mo.download(plot_svg, filename="fig.svg", label="Download SVG"),
-            mo.download(plot_png, filename="fig.png", label="Download PNG"),
-            mo.download(plot_pdf, filename="fig.pdf", label="Download PDF"),
-        ],
-        gap=1,
-    )
     data_downloads = mo.vstack(
         [
             mo.download(
@@ -657,7 +624,7 @@ def _(blocks_df, mo, plot_fig, points_filtered_df, trials_cropped_df, pl):
         ],
         gap=1,
     )
-    return data_downloads, plot_downloads
+    return (data_downloads,)
 
 
 @app.cell
@@ -737,7 +704,6 @@ def _(
     data_downloads,
     input_tabs,
     mo,
-    plot_downloads,
     plot_equation,
     plot_ui,
     points_table,
@@ -795,8 +761,6 @@ def _(
             blocks_table,
             mo.md("## Points"),
             points_table,
-            mo.md("## Download Plot"),
-            plot_downloads,
             mo.md("## Download Data"),
             data_downloads,
         ],

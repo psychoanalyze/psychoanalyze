@@ -20,6 +20,9 @@ from scipy.special import expit
 from scipy.stats import logistic as scipy_logistic
 
 from psychoanalyze.data import (
+    subject as subject_utils,
+)
+from psychoanalyze.data import (
     subjects,
     trials,
 )
@@ -63,6 +66,8 @@ def load(data_path: Path) -> pl.DataFrame:
 
 def days(blocks: pl.DataFrame, intervention_dates: pl.DataFrame) -> pl.DataFrame:
     """Calculate days for block-level data. Possible duplicate."""
+    blocks = subject_utils.ensure_subject_column(blocks)
+    intervention_dates = subject_utils.ensure_subject_column(intervention_dates)
     blocks = blocks.join(intervention_dates, on="Subject", how="left")
     blocks = blocks.with_columns(
         (pl.col("Date") - pl.col("Surgery Date")).dt.total_days().alias("Days"),
@@ -72,7 +77,10 @@ def days(blocks: pl.DataFrame, intervention_dates: pl.DataFrame) -> pl.DataFrame
 
 def n_trials(trials: pl.DataFrame) -> pl.DataFrame:
     """Calculate n trials for each block."""
-    session_cols = ["Subject", "Date"]
+    trials = subject_utils.ensure_subject_column(trials)
+    session_cols = ["Subject"]
+    if "Date" in trials.columns:
+        session_cols.append("Date")
     ref_stim_cols = ["Amp2", "Width2", "Freq2", "Dur2"]
     channel_config = ["Active Channels", "Return Channels"]
     return trials.group_by(session_cols + ref_stim_cols + channel_config).agg(
@@ -127,7 +135,7 @@ def fit(
 def summarize_fit(idata: az.InferenceData) -> dict[str, float]:
     """Summarize posterior draws for block-level fits."""
     summary = cast(
-        "pd.DataFrame", az.summary(idata, var_names=["intercept", "slope", "threshold"])
+        "pd.DataFrame", az.summary(idata, var_names=["intercept", "slope", "threshold"]),
     )
     return {
         "intercept": float(summary.loc["intercept", "mean"]),

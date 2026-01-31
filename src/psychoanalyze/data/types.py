@@ -8,7 +8,7 @@ from datetime import datetime
 
 import patito as pt
 
-session_dims = ["Monkey", "Date"]
+session_dims = ["Subject", "Date"]
 block_stim_dims = ["Amp2", "Width2", "Freq2", "Dur2"]
 block_channel_dims = ["Active Channels", "Return Channels"]
 block_dims = block_stim_dims + block_channel_dims
@@ -21,6 +21,7 @@ points_index_levels = block_index_levels + point_dims
 class Trials(pt.Model):
     """Trial-level data schema."""
 
+    Subject: str | None = None
     Intensity: float
     Result: int
     Block: int
@@ -29,6 +30,7 @@ class Trials(pt.Model):
 class Points(pt.Model):
     """Points-level data schema."""
 
+    Subject: str | None = None
     Block: int
     Intensity: float
     n_trials: int = pt.Field(alias="n trials")
@@ -42,6 +44,7 @@ class Blocks(pt.Model):
 
     Threshold: float
     width: float | None = None
+    Subject: str | None = None
     Monkey: str | None = None
     Date: datetime | None = None
 

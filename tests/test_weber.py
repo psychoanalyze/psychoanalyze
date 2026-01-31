@@ -13,7 +13,7 @@ def test_aggregate() -> None:
     """Makes sure that thresholds at a given stimulus intensity are aggregated."""
     curve_data = pl.DataFrame(
         {
-            "Monkey": ["U", "U"],
+            "Subject": ["U", "U"],
             "Dimension": ["Amp", "Amp"],
             "Reference Charge (nC)": [0, 0],
             "Difference Threshold (nC)": [0, 2],
@@ -22,7 +22,7 @@ def test_aggregate() -> None:
     agg = weber.aggregate(curve_data)
     mean_val = curve_data["Difference Threshold (nC)"].mean()
     agg_val = agg.filter(
-        (pl.col("Monkey") == "U") & (pl.col("Dimension") == "Amp"),
+        (pl.col("Subject") == "U") & (pl.col("Dimension") == "Amp"),
     )["Difference Threshold (nC)"][0]
     assert agg_val == mean_val
 

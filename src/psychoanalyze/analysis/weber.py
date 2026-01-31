@@ -10,6 +10,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 import polars as pl
 
+from psychoanalyze.data import subject as subject_utils
+
 
 def plot(
     data: pl.DataFrame,
@@ -18,13 +20,14 @@ def plot(
 ) -> go.Figure:
     """Plot data according to Weber's Law."""
     _trendline = "ols" if trendline else None
+    subject_col = subject_utils.resolve_subject_column(data)
     return px.scatter(
         data.to_pandas(),
         x="Reference Charge (nC)",
         y="Difference Threshold (nC)",
         error_y="err+" if error_y == "error bars" else None,
         error_y_minus="err-" if error_y == "error bars" else None,
-        color="Monkey",
+        color=subject_col,
         symbol="Dimension",
         trendline=_trendline,
         template="plotly_white",
@@ -34,7 +37,9 @@ def plot(
 
 def aggregate(data: pl.DataFrame) -> pl.DataFrame:
     """Calculate agg stats for Weber data."""
-    return data.group_by(["Monkey", "Dimension", "Reference Charge (nC)"]).agg(
+    subject_col = subject_utils.resolve_subject_column(data) or "Subject"
+    data = subject_utils.ensure_subject_column(data)
+    return data.group_by([subject_col, "Dimension", "Reference Charge (nC)"]).agg(
         pl.mean("Difference Threshold (nC)").alias("Difference Threshold (nC)"),
         pl.len().alias("count"),
         pl.std("Difference Threshold (nC)").alias("std"),

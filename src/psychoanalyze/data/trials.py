@@ -12,6 +12,8 @@ import polars as pl
 import pymc as pm
 import pytensor.tensor as pt
 
+from psychoanalyze.data import subject as subject_utils
+
 data_path = Path("data/trials.csv")
 
 codes = {0: "Miss", 1: "Hit"}
@@ -70,8 +72,9 @@ def to_store(trials: pl.DataFrame) -> str:
 
 def normalize(trials: pl.DataFrame) -> dict[str, pl.DataFrame]:
     """Normalize denormalized trial data."""
+    trials = subject_utils.ensure_subject_column(trials)
     return {
-        "Session": trials.select(["Monkey", "Block"]).unique(),
+        "Session": trials.select(["Subject", "Block"]).unique(),
         "Reference Stimulus": trials.select(["Amp2", "Width2", "Freq2", "Dur2"]),
         "Channel Config": trials.select(["Active Channels", "Return Channels"]),
         "Test Stimulus": trials.select(["Amp1", "Width1", "Freq1", "Dur1"]),
