@@ -10,3 +10,14 @@ Submodules:
 - [`psychoanalyze.data.subjects`][psychoanalyze.data.subjects]
 - [`psychoanalyze.data.types`][psychoanalyze.data.types]
 """
+
+from psychoanalyze.data import blocks, points, sessions, subjects, trials, types
+
+__all__ = [
+	"blocks",
+	"points",
+	"sessions",
+	"subjects",
+	"trials",
+	"types",
+]

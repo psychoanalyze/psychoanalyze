@@ -20,7 +20,6 @@ Contains callbacks.
 import base64
 import io
 import zipfile
-from collections.abc import Hashable
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -65,7 +64,7 @@ app.title = "PsychoAnalyze"
 app.layout = layout
 server = app.server
 
-Records = list[dict[Hashable, Any]]
+Records = list[dict[str, Any]]
 
 
 @callback(

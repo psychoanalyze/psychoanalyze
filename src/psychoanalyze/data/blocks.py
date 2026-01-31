@@ -6,13 +6,16 @@ data hierarchy. They represent a specific set of experimental conditions and gen
 correspond to a single fit of the psychometric function.
 """
 from pathlib import Path
+from typing import cast
 
 import arviz as az
 import numpy as np
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import polars as pl
 import pymc as pm
+import pytensor.tensor as pt
 from scipy.special import expit
 from scipy.stats import logistic as scipy_logistic
 
@@ -104,7 +107,10 @@ def fit(
         intercept = pm.Normal("intercept", mu=0.0, sigma=2.5)
         slope = pm.Normal("slope", mu=0.0, sigma=2.5)
         pm.Bernoulli("obs", logit_p=intercept + slope * x, observed=y)
-        pm.Deterministic("threshold", -intercept / slope)
+        intercept_t = pt.as_tensor_variable(intercept)
+        slope_t = pt.as_tensor_variable(slope)
+        threshold = pt.true_div(pt.mul(intercept_t, -1), slope_t)
+        pm.Deterministic("threshold", threshold)
         idata = pm.sample(
             draws=draws,
             tune=tune,
@@ -120,7 +126,9 @@ def fit(
 
 def summarize_fit(idata: az.InferenceData) -> dict[str, float]:
     """Summarize posterior draws for block-level fits."""
-    summary = az.summary(idata, var_names=["intercept", "slope", "threshold"])
+    summary = cast(
+        "pd.DataFrame", az.summary(idata, var_names=["intercept", "slope", "threshold"])
+    )
     return {
         "intercept": float(summary.loc["intercept", "mean"]),
         "slope": float(summary.loc["slope", "mean"]),
@@ -194,7 +202,7 @@ def logistic(location: float, scale: float) -> pl.DataFrame:
     return pl.DataFrame({"Intensity": x, "Ψ(x)": y})
 
 
-def plot_logistic(location: float, scale: float) -> go.Scatter:
+def plot_logistic(location: float, scale: float) -> go.Figure:
     """Plot a logistic function.
 
     Parameters:
@@ -213,7 +221,7 @@ def plot_logistic(location: float, scale: float) -> go.Scatter:
     )
 
 
-def plot_standard_logistic() -> go.Scatter:
+def plot_standard_logistic() -> go.Figure:
     """Plot a standard logistic function."""
     df = standard_logistic()
     return px.line(

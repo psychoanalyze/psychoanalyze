@@ -3,12 +3,14 @@
 import json
 import random
 from pathlib import Path
-from typing import TypedDict
+from typing import TypedDict, cast
 
 import arviz as az
 import numpy as np
+import pandas as pd
 import polars as pl
 import pymc as pm
+import pytensor.tensor as pt
 
 data_path = Path("data/trials.csv")
 
@@ -145,7 +147,10 @@ def fit(
         intercept = pm.Normal("intercept", mu=0.0, sigma=2.5)
         slope = pm.Normal("slope", mu=0.0, sigma=2.5)
         pm.Bernoulli("obs", logit_p=intercept + slope * x, observed=y)
-        pm.Deterministic("threshold", -intercept / slope)
+        intercept_t = pt.as_tensor_variable(intercept)
+        slope_t = pt.as_tensor_variable(slope)
+        threshold = pt.true_div(pt.mul(intercept_t, -1), slope_t)
+        pm.Deterministic("threshold", threshold)
         idata = pm.sample(
             draws=draws,
             tune=tune,
@@ -161,7 +166,7 @@ def fit(
 
 def summarize_fit(idata: az.InferenceData) -> dict[str, float]:
     """Summarize posterior draws for trial-level fits."""
-    summary = az.summary(idata, var_names=["threshold", "slope"])
+    summary = cast("pd.DataFrame", az.summary(idata, var_names=["threshold", "slope"]))
     return {
         "Threshold": float(summary.loc["threshold", "mean"]),
         "Slope": float(summary.loc["slope", "mean"]),

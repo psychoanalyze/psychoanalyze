@@ -175,17 +175,31 @@ def _(mo):
 def _(input_form):
     # Extract values from form (with defaults before submission)
     form_values = input_form.value if input_form.value is not None else {}
-    x_0 = float(form_values.get("x_0") if form_values.get("x_0") is not None else 0.0)
-    k = float(form_values.get("k") if form_values.get("k") is not None else 1.0)
-    n_levels = int(
-        form_values.get("n_levels") if form_values.get("n_levels") is not None else 7,
-    )
-    n_trials = int(
-        form_values.get("n_trials") if form_values.get("n_trials") is not None else 100,
-    )
-    n_blocks = int(
-        form_values.get("n_blocks") if form_values.get("n_blocks") is not None else 5,
-    )
+    form_values = form_values if isinstance(form_values, dict) else {}
+
+    def to_float(values: dict[str, object], key: str, default: float) -> float:
+        value = values.get(key)
+        if not isinstance(value, (int, float, str)):
+            return default
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return default
+
+    def to_int(values: dict[str, object], key: str, default: int) -> int:
+        value = values.get(key)
+        if not isinstance(value, (int, float, str)):
+            return default
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return default
+
+    x_0 = to_float(form_values, "x_0", 0.0)
+    k = to_float(form_values, "k", 1.0)
+    n_levels = to_int(form_values, "n_levels", 7)
+    n_trials = to_int(form_values, "n_trials", 100)
+    n_blocks = to_int(form_values, "n_blocks", 5)
     return k, n_blocks, n_levels, n_trials, x_0
 
 
@@ -243,6 +257,7 @@ def _(
     n_blocks,
     n_levels,
     n_trials,
+    pl,
     process_upload_bytes,
     x_0,
 ):
