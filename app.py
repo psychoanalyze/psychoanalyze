@@ -20,7 +20,8 @@ def _():
     import plotly.express as px
     import polars as pl
     from scipy.special import expit, logit
-    from sklearn.linear_model import LogisticRegression
+
+    from psychoanalyze.data import blocks as pa_blocks
 
 
     def to_intercept(location: float, scale: float) -> float:
@@ -69,13 +70,17 @@ def _():
         return points.sort(["Block", "Intensity"])
 
     def block_fit(trials_df: pl.DataFrame) -> dict[str, float]:
-        fit = LogisticRegression().fit(
-            trials_df.select("Intensity").to_numpy(),
-            trials_df["Result"].to_numpy(),
+        idata = pa_blocks.fit(
+            trials_df,
+            draws=300,
+            tune=300,
+            chains=1,
+            target_accept=0.9,
         )
+        summary = pa_blocks.summarize_fit(idata)
         return {
-            "intercept": float(fit.intercept_[0]),
-            "slope": float(fit.coef_[0][0]),
+            "intercept": summary["intercept"],
+            "slope": summary["slope"],
         }
 
     def process_upload_bytes(contents: bytes, filename: str) -> pl.DataFrame:
@@ -212,7 +217,7 @@ def _(pl):
         # Transform to expected format: Block, Intensity, Result
         df = df.with_columns(
             (pl.col("Date").cast(pl.Utf8) + "_" + pl.col("Amp2").cast(pl.Utf8)).alias(
-                "block_key"
+                "block_key",
             ),
         )
         df = df.with_columns(

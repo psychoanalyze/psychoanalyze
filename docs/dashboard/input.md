@@ -21,7 +21,7 @@ The first component in the input panel column allows anyone to upload a dataset 
 
 ### Simulate data
 
-By default, the dashboard displays the results from a simulation of a hypothetical yes-no experiment. A sequence of randomly-sampled trial outcomes are generated, processed, fit the the psychometric function, and visualized, with assistance from PsychoAnalyze's [API functions](../api.md). The simulation estimates the psychometric function's *location* and *scale* parameters according to the chosen [link function](#link-function) $F(x)$, which is the *logistic equation* by default.:
+By default, the dashboard displays the results from a simulation of a hypothetical yes-no experiment. A sequence of randomly-sampled trial outcomes are generated, processed, fit to the psychometric function using PyMC-based Bayesian logistic regression, and visualized, with assistance from PsychoAnalyze's [API functions](../api.md). The simulation estimates the psychometric function's *location* and *scale* parameters according to the chosen [link function](#link-function) $F(x)$, which is the *logistic equation* by default.:
 
 $$
 \psi(x) = F(x) = \frac{1}{1 + e^{-\frac{x - \mu}{\sigma}}}
@@ -60,5 +60,5 @@ The simulation generates balanced blocks, with a randomly selected stimulus inte
 
     - Support for unbalanced blocks.
     - Simulation animations
-    - Bayesian inferencing methods via PyMC
+    - Faster Bayesian inference options for large datasets
     - Simulations for model comparisons

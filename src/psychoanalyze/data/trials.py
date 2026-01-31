@@ -5,9 +5,10 @@ import random
 from pathlib import Path
 from typing import TypedDict
 
+import arviz as az
 import numpy as np
 import polars as pl
-from sklearn.linear_model import LogisticRegression
+import pymc as pm
 
 data_path = Path("data/trials.csv")
 
@@ -128,10 +129,40 @@ def moc_sample(n_trials: int, model_params: dict[str, float]) -> pl.DataFrame:
     return pl.DataFrame({"Intensity": intensities, "Result": results})
 
 
-def fit(trials: pl.DataFrame) -> dict[str, float]:
-    """Fit trial data using logistic regression."""
-    fits = LogisticRegression().fit(
-        trials.select("Intensity").to_numpy(),
-        trials["Result"].to_numpy(),
-    )
-    return {"Threshold": -fits.intercept_[0], "Slope": fits.coef_[0][0]}
+def fit(
+    trials: pl.DataFrame,
+    draws: int = 1000,
+    tune: int = 1000,
+    chains: int = 2,
+    target_accept: float = 0.9,
+    random_seed: int | None = None,
+) -> az.InferenceData:
+    """Fit trial data using a Bayesian logistic regression."""
+    x = trials["Intensity"].to_numpy()
+    y = trials["Result"].to_numpy()
+
+    with pm.Model():
+        intercept = pm.Normal("intercept", mu=0.0, sigma=2.5)
+        slope = pm.Normal("slope", mu=0.0, sigma=2.5)
+        pm.Bernoulli("obs", logit_p=intercept + slope * x, observed=y)
+        pm.Deterministic("threshold", -intercept / slope)
+        idata = pm.sample(
+            draws=draws,
+            tune=tune,
+            chains=chains,
+            cores=1,
+            target_accept=target_accept,
+            random_seed=random_seed,
+            progressbar=False,
+            return_inferencedata=True,
+        )
+    return idata
+
+
+def summarize_fit(idata: az.InferenceData) -> dict[str, float]:
+    """Summarize posterior draws for trial-level fits."""
+    summary = az.summary(idata, var_names=["threshold", "slope"])
+    return {
+        "Threshold": float(summary.loc["threshold", "mean"]),
+        "Slope": float(summary.loc["slope", "mean"]),
+    }

@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## Unreleased
+
+### Changed
+
+- **BREAKING**: `trials.fit` and `blocks.fit` now return PyMC InferenceData instead of sklearn coefficients.
+- Use PyMC for Bayesian logistic regression fits at the trial and block levels.
+
+### Removed
+
+- Remove sklearn-based logistic regression fitting from trial/block utilities.
+
 
 
 ## v1.0.0-alpha.1 (2023-08-04)

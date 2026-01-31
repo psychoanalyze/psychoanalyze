@@ -7,13 +7,14 @@ correspond to a single fit of the psychometric function.
 """
 from pathlib import Path
 
+import arviz as az
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 import polars as pl
+import pymc as pm
 from scipy.special import expit
 from scipy.stats import logistic as scipy_logistic
-from sklearn.linear_model import LogisticRegression
 
 from psychoanalyze.data import (
     subjects,
@@ -87,15 +88,44 @@ def subject_counts(data: pl.DataFrame) -> pl.DataFrame:
     return data.group_by("Subject").agg(pl.len().alias("Total Blocks"))
 
 
-def fit(trials: pl.DataFrame) -> dict[str, float]:
-    """Fit logistic regression to trial data."""
-    fit = LogisticRegression().fit(
-        trials.select("Intensity").to_numpy(),
-        trials["Result"].to_numpy(),
-    )
-    intercept = fit.intercept_[0]
-    slope = fit.coef_[0][0]
-    return {"intercept": intercept, "slope": slope}
+def fit(
+    trials: pl.DataFrame,
+    draws: int = 1000,
+    tune: int = 1000,
+    chains: int = 2,
+    target_accept: float = 0.9,
+    random_seed: int | None = None,
+) -> az.InferenceData:
+    """Fit logistic regression to trial data using PyMC."""
+    x = trials["Intensity"].to_numpy()
+    y = trials["Result"].to_numpy()
+
+    with pm.Model():
+        intercept = pm.Normal("intercept", mu=0.0, sigma=2.5)
+        slope = pm.Normal("slope", mu=0.0, sigma=2.5)
+        pm.Bernoulli("obs", logit_p=intercept + slope * x, observed=y)
+        pm.Deterministic("threshold", -intercept / slope)
+        idata = pm.sample(
+            draws=draws,
+            tune=tune,
+            chains=chains,
+            cores=1,
+            target_accept=target_accept,
+            random_seed=random_seed,
+            progressbar=False,
+            return_inferencedata=True,
+        )
+    return idata
+
+
+def summarize_fit(idata: az.InferenceData) -> dict[str, float]:
+    """Summarize posterior draws for block-level fits."""
+    summary = az.summary(idata, var_names=["intercept", "slope", "threshold"])
+    return {
+        "intercept": float(summary.loc["intercept", "mean"]),
+        "slope": float(summary.loc["slope", "mean"]),
+        "threshold": float(summary.loc["threshold", "mean"]),
+    }
 
 
 def generate_trials(n_trials: int, model_params: dict[str, float]) -> pl.DataFrame:

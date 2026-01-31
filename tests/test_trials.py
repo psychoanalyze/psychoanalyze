@@ -49,3 +49,16 @@ def test_normalize() -> None:
 def test_labels() -> None:
     """Given trial result integers, translates to labels."""
     assert trials.labels([0, 1]) == ["Miss", "Hit"]
+
+
+def test_fit_returns_inferencedata() -> None:
+    """Fit returns posterior draws for trial data."""
+    trials_df = pl.DataFrame(
+        {
+            "Intensity": [0.0, 1.0, 2.0, 3.0],
+            "Result": [0, 0, 1, 1],
+        },
+    )
+    idata = trials.fit(trials_df, draws=50, tune=50, chains=1, random_seed=1)
+    summary = trials.summarize_fit(idata)
+    assert set(summary) == {"Threshold", "Slope"}

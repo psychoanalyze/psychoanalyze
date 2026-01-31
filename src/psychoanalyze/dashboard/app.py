@@ -85,7 +85,7 @@ def update_trials(
 ) -> tuple[Records, float, float]:
     """Update points table."""
     n_params = pl.DataFrame(
-        {"name": ["n_levels", "n_trials", "n_blocks"], "value": n_param}
+        {"name": ["n_levels", "n_trials", "n_blocks"], "value": n_param},
     )
     params_dict = dict(zip(["x_0", "k", "gamma", "lambda"], [*param, 0.0, 0.0]))
     params_dict["intercept"] = to_intercept(params_dict["x_0"], params_dict["k"])
@@ -130,11 +130,18 @@ def update_blocks_table(trials: Records) -> Records:
     blocks_list = []
     for block_id in trials_df["Block"].unique().to_list():
         block_trials = trials_df.filter(pl.col("Block") == block_id)
-        fit_result = pa_blocks.fit(block_trials)
-        fit_result["Block"] = block_id
-        fit_result["gamma"] = 0.0
-        fit_result["lambda"] = 0.0
-        blocks_list.append(fit_result)
+        fit_result = pa_blocks.fit(
+            block_trials,
+            draws=500,
+            tune=500,
+            chains=1,
+            target_accept=0.9,
+        )
+        summary = pa_blocks.summarize_fit(fit_result)
+        summary["Block"] = block_id
+        summary["gamma"] = 0.0
+        summary["lambda"] = 0.0
+        blocks_list.append(summary)
     return blocks_list
 
 
@@ -189,7 +196,7 @@ def update_fig(
                     "Intensity": x,
                     "Hit Rate": y,
                     "Block": [str(block["Block"])] * len(x),
-                }
+                },
             ),
         )
     fits = pl.concat(fits_list)
