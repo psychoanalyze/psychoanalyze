@@ -43,7 +43,16 @@ def aggregate(data: pl.DataFrame) -> pl.DataFrame:
 
 def load(path: Path) -> pl.DataFrame:
     """Load weber file from a csv."""
-    weber = pl.read_csv(path).with_columns(pl.col("Date").str.to_datetime())
+    weber = pl.read_csv(path)
+    if len(weber) == 0:
+        return weber
+    weber = weber.with_columns(pl.col("Date").str.to_datetime())
+    weber = weber.with_columns(
+        pl.col("location_CI_5").cast(pl.Float64),
+        pl.col("location_CI_95").cast(pl.Float64),
+        pl.col("Fixed_Param_Value").cast(pl.Float64),
+        pl.col("Threshold_Charge_nC").cast(pl.Float64),
+    )
     weber = weber.with_columns(
         (
             pl.col("location_CI_5") * pl.col("Fixed_Param_Value") / 1000

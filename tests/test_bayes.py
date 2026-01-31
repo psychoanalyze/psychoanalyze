@@ -14,8 +14,8 @@ def test_bayes():
     )
     estimated = pl.DataFrame(
         {
-            "Hit Rate": [-4, -2, 0, 2, 4],
-            "value": [0.011, 0.2, 0.56, 0.80, 0.98],
+            "x": [-4, -2, 0, 2, 4],
+            "Hit Rate": [0.011, 0.2, 0.56, 0.80, 0.98],
         },
     )
     fig = pa_bayes.plot(simulated, estimated)

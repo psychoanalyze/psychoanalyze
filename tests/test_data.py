@@ -18,11 +18,11 @@ def subjects() -> list[str]:
 
 def test_params():
     x = []
-    fits = pl.DataFrame({"5%": [], "50%": [], "95%": []}).cast(
+    fits = pl.DataFrame({"index": [], "5%": [], "50%": [], "95%": []}).cast(
         {"5%": pl.Float64, "50%": pl.Float64, "95%": pl.Float64},
     )
     reshaped = data.blocks.reshape_fit_results(fits=fits, x=x, y="p")
-    assert set(reshaped.columns) <= {"err+", "err-", "p", "x"}
+    assert set(reshaped.columns) <= {"err+", "err-", "p", "Intensity"}
 
 
 finite = floats(allow_nan=False, allow_infinity=False)

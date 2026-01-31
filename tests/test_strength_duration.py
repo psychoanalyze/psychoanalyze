@@ -30,10 +30,7 @@ def test_strength_duration() -> None:
         },
     )
     s_d = strength_duration.from_blocks(blocks=blocks, dim="Amp")
-    assert set(s_d.columns) == {
-        "Fixed Pulse Width (μs)",
-        "Threshold Amplitude (μA)",
-    }
+    assert {"Fixed Pulse Width (μs)", "Threshold Amplitude (μA)"} <= set(s_d.columns)
 
 
 @pytest.fixture

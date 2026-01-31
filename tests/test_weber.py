@@ -30,11 +30,20 @@ def test_aggregate() -> None:
 def test_load(tmp_path: Path) -> None:
     """Given weber_curves.csv, loads dataframe."""
     cols = {level_name: [] for level_name in types.block_index_levels} | {
+        "Date": [],
         "Reference Charge (nC)": [],
         "location_CI_5": [],
         "location_CI_95": [],
         "Fixed_Param_Value": [],
         "Threshold_Charge_nC": [],
     }
-    pl.DataFrame(cols).write_csv(tmp_path / "weber_curves.csv")
+    df = pl.DataFrame(cols).cast(
+        {
+            "location_CI_5": pl.Float64,
+            "location_CI_95": pl.Float64,
+            "Fixed_Param_Value": pl.Float64,
+            "Threshold_Charge_nC": pl.Float64,
+        },
+    )
+    df.write_csv(tmp_path / "weber_curves.csv")
     assert len(weber.load(tmp_path / "weber_curves.csv")) == 0

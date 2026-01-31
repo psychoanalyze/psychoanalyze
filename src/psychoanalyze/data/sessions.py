@@ -31,8 +31,9 @@ def from_trials_csv(path: Path) -> pl.DataFrame:
 
 def day_marks(subjects: pl.DataFrame, sessions: pl.DataFrame, monkey: str) -> dict:
     """Calculate days since surgery date for a given subject."""
-    surgery_date = subjects.filter(pl.col("Monkey") == monkey)["Surgery Date"][0]
-    sessions = sessions.filter(pl.col("Monkey") == "U")
+    surgery_date_str = subjects.filter(pl.col("Monkey") == monkey)["Surgery Date"][0]
+    surgery_date = pl.Series([surgery_date_str]).str.to_datetime()[0]
+    sessions = sessions.filter(pl.col("Monkey") == monkey)
     sessions = sessions.with_columns(
         (pl.col("Date").str.to_datetime() - surgery_date).dt.total_days().alias("Days"),
     )
