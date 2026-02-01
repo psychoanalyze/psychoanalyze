@@ -1,0 +1,249 @@
+direction: down
+
+# PsychoAnalyze Analysis Workflow
+# Shows the complete flow from input data to results
+
+title: "PsychoAnalyze Analysis Workflow" {
+  near: top-center
+  shape: text
+  style: {
+    font-size: 24
+    bold: true
+  }
+}
+
+# Input stage
+input: {
+  label: "Input Data"
+  style.fill: "#f0f0f0"
+  
+  raw: {
+    label: "Raw Data\n━━━━━━━━\nCSV / Excel\nStimulus trials"
+    shape: document
+    style: {
+      fill: "#ffffff"
+      stroke: "#666"
+      stroke-width: 2
+    }
+  }
+}
+
+# Preprocessing stage
+preprocess: {
+  label: "Data Preprocessing"
+  style: {
+    fill: "#e8f4f8"
+    stroke: "#2c5aa0"
+    stroke-width: 2
+  }
+  
+  validate: {
+    label: "Schema Validation\n━━━━━━━━\nPandera checks:\n• Column types\n• Value ranges\n• Required fields"
+    shape: rectangle
+    style.fill: "#d4e9f2"
+  }
+  
+  aggregate: {
+    label: "Aggregate to Points\n━━━━━━━━\nGroup by intensity:\n• Count trials\n• Sum hits\n• Calculate hit rate"
+    shape: rectangle
+    style.fill: "#b8dcea"
+  }
+}
+
+# Model fitting stage
+fitting: {
+  label: "Model Fitting"
+  style: {
+    fill: "#e6f3ff"
+    stroke: "#2c5aa0"
+    stroke-width: 2
+  }
+  
+  logistic: {
+    label: "Logistic Regression\n━━━━━━━━\nFit psychometric curve:\n• Threshold (x₀)\n• Slope (k)\n• R² goodness-of-fit"
+    shape: rectangle
+    style.fill: "#c3e0f7"
+  }
+  
+  bayesian: {
+    label: "Bayesian Fitting\n━━━━━━━━\nPyMC/Stan:\n• Posterior distributions\n• Credible intervals\n• Model comparison"
+    shape: rectangle
+    style.fill: "#a8d0ef"
+  }
+}
+
+# Analysis stage
+analysis: {
+  label: "Statistical Analysis"
+  style: {
+    fill: "#fff4e6"
+    stroke: "#d68910"
+    stroke-width: 2
+  }
+  
+  ecdf: {
+    label: "ECDF Analysis\n━━━━━━━━\nEmpirical cumulative\ndistribution function"
+    shape: rectangle
+    style.fill: "#ffe6b3"
+  }
+  
+  weber: {
+    label: "Weber Law Analysis\n━━━━━━━━\nJust-noticeable\ndifference analysis"
+    shape: rectangle
+    style.fill: "#ffe6b3"
+  }
+  
+  strength_duration: {
+    label: "Strength-Duration\n━━━━━━━━\nTemporal integration\ncurve analysis"
+    shape: rectangle
+    style.fill: "#ffe6b3"
+  }
+}
+
+# Visualization stage
+visualization: {
+  label: "Visualization & Reporting"
+  style: {
+    fill: "#e6ffe6"
+    stroke: "#4daf4a"
+    stroke-width: 2
+  }
+  
+  dashboard: {
+    label: "Marimo Dashboard\n━━━━━━━━\nInteractive plots:\n• Psychometric curves\n• Subject comparisons\n• Temporal trends"
+    shape: hexagon
+    style: {
+      fill: "#b3e6b3"
+      stroke: "#2d7a2d"
+      stroke-width: 3
+    }
+  }
+  
+  plots: {
+    label: "Plotly Figures\n━━━━━━━━\nCustomizable:\n• Themes\n• Colors\n• Export to PNG/SVG"
+    shape: rectangle
+    style.fill: "#ccf0cc"
+  }
+}
+
+# Output stage
+output: {
+  label: "Output & Results"
+  style.fill: "#ffe6e6"
+  
+  results: {
+    label: "Analysis Results\n━━━━━━━━\n• Thresholds\n• Slopes\n• Statistics\n• Confidence intervals"
+    shape: document
+    style: {
+      fill: "#ffcccc"
+      stroke: "#c44"
+      stroke-width: 2
+    }
+  }
+}
+
+# Main workflow connections
+input.raw -> preprocess.validate: "1" {
+  style: {
+    stroke: "#4a7ba7"
+    stroke-width: 3
+  }
+}
+
+preprocess.validate -> preprocess.aggregate: "2" {
+  style: {
+    stroke: "#4a7ba7"
+    stroke-width: 3
+  }
+}
+
+preprocess.aggregate -> fitting.logistic: "3a" {
+  style: {
+    stroke: "#4a7ba7"
+    stroke-width: 3
+  }
+}
+
+preprocess.aggregate -> fitting.bayesian: "3b" {
+  style: {
+    stroke: "#4a7ba7"
+    stroke-width: 3
+    stroke-dash: 3
+  }
+}
+
+fitting.logistic -> analysis.ecdf: "4a" {
+  style.stroke: "#d68910"
+  style.stroke-width: 2
+}
+
+fitting.logistic -> analysis.weber: "4b" {
+  style.stroke: "#d68910"
+  style.stroke-width: 2
+}
+
+fitting.logistic -> analysis.strength_duration: "4c" {
+  style.stroke: "#d68910"
+  style.stroke-width: 2
+}
+
+fitting.bayesian -> analysis.ecdf: "4a'" {
+  style: {
+    stroke: "#d68910"
+    stroke-width: 2
+    stroke-dash: 3
+  }
+}
+
+fitting.bayesian -> analysis.weber: "4b'" {
+  style: {
+    stroke: "#d68910"
+    stroke-width: 2
+    stroke-dash: 3
+  }
+}
+
+fitting.bayesian -> analysis.strength_duration: "4c'" {
+  style: {
+    stroke: "#d68910"
+    stroke-width: 2
+    stroke-dash: 3
+  }
+}
+
+fitting -> visualization.plots: "5a" {
+  style.stroke: "#4daf4a"
+  style.stroke-width: 2
+}
+
+analysis -> visualization.dashboard: "5b" {
+  style.stroke: "#4daf4a"
+  style.stroke-width: 3
+}
+
+visualization.dashboard -> output.results: "6" {
+  style: {
+    stroke: "#c44"
+    stroke-width: 3
+  }
+}
+
+visualization.plots -> output.results: "6" {
+  style: {
+    stroke: "#c44"
+    stroke-width: 2
+  }
+}
+
+# Side notes
+notes: {
+  near: bottom-right
+  shape: rectangle
+  label: "Processing Notes\n━━━━━━━━\n━ Solid lines: Primary path\n┄ Dashed lines: Optional/Advanced\n\nTypical processing time:\n• Validation: <1s\n• Logistic fit: <1s\n• Bayesian fit: 10-60s"
+  style: {
+    fill: "#f9f9f9"
+    stroke: "#999"
+    stroke-dash: 3
+    font-size: 11
+  }
+}

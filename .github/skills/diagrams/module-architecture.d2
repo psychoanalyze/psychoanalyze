@@ -1,0 +1,185 @@
+direction: right
+
+# PsychoAnalyze Module Architecture
+# Shows the relationships between key modules
+
+title: "PsychoAnalyze Module Architecture" {
+  near: top-center
+  shape: text
+  style: {
+    font-size: 24
+    bold: true
+  }
+}
+
+# Data layer
+data: {
+  label: "data/"
+  style: {
+    fill: "#f0f0f0"
+    stroke: "#666"
+    stroke-width: 2
+  }
+  
+  trials: {
+    label: "trials.py\n━━━━━━━━\nRaw trial data\nIndividual responses"
+    shape: rectangle
+    style.fill: "#e8f4f8"
+  }
+  
+  points: {
+    label: "points.py\n━━━━━━━━\nAggregated data\nHit rates"
+    shape: rectangle
+    style.fill: "#e8f4f8"
+  }
+  
+  blocks: {
+    label: "blocks.py\n━━━━━━━━\nFitted curves\nThreshold + slope"
+    shape: rectangle
+    style.fill: "#e8f4f8"
+  }
+  
+  sessions: {
+    label: "sessions.py\n━━━━━━━━\nLongitudinal\ngroupings"
+    shape: rectangle
+    style.fill: "#e8f4f8"
+  }
+  
+  types: {
+    label: "types.py\n━━━━━━━━\nPandera schemas\nValidation"
+    shape: rectangle
+    style.fill: "#d4e9f2"
+  }
+  
+  logistic: {
+    label: "logistic.py\n━━━━━━━━\nLogistic fitting\nRegression"
+    shape: rectangle
+    style.fill: "#d4e9f2"
+  }
+}
+
+# Analysis layer
+analysis: {
+  label: "analysis/"
+  style: {
+    fill: "#e8f4f8"
+    stroke: "#2c5aa0"
+    stroke-width: 2
+  }
+  
+  bayes: {
+    label: "bayes.py\n━━━━━━━━\nBayesian fitting\nPyMC integration"
+    shape: rectangle
+    style.fill: "#b8dcea"
+  }
+  
+  ecdf: {
+    label: "ecdf.py\n━━━━━━━━\nEmpirical CDF\nanalysis"
+    shape: rectangle
+    style.fill: "#b8dcea"
+  }
+  
+  weber: {
+    label: "weber.py\n━━━━━━━━\nWeber's Law\nanalysis"
+    shape: rectangle
+    style.fill: "#b8dcea"
+  }
+  
+  strength_duration: {
+    label: "strength_duration.py\n━━━━━━━━\nStrength-Duration\ncurve analysis"
+    shape: rectangle
+    style.fill: "#b8dcea"
+  }
+}
+
+# Core modules
+core: {
+  label: "Core Modules"
+  style: {
+    fill: "#fff4e6"
+    stroke: "#d68910"
+    stroke-width: 2
+  }
+  
+  sigmoids: {
+    label: "sigmoids.py\n━━━━━━━━\nLink functions:\n• Weibull\n• Gumbel\n• Quick"
+    shape: rectangle
+    style.fill: "#ffe6b3"
+  }
+  
+  plot: {
+    label: "plot.py\n━━━━━━━━\nPlotly template\nVisualization settings"
+    shape: rectangle
+    style.fill: "#ffe6b3"
+  }
+  
+  params: {
+    label: "params.py\n━━━━━━━━\nParameter\nmanagement"
+    shape: rectangle
+    style.fill: "#ffe6b3"
+  }
+}
+
+# Application layer
+app: {
+  label: "app.py\n━━━━━━━━\nMarimo Dashboard\nInteractive Interface"
+  shape: hexagon
+  style: {
+    fill: "#e6f3ff"
+    stroke: "#2c5aa0"
+    stroke-width: 3
+    font-size: 16
+    bold: true
+  }
+}
+
+# Models
+models: {
+  label: "models/\n━━━━━━━━\n• dbt SQL models\n• Stan models"
+  shape: document
+  style: {
+    fill: "#e6ffe6"
+    stroke: "#4daf4a"
+    stroke-width: 2
+  }
+}
+
+# Relationships within data layer
+data.trials -> data.points: "aggregate"
+data.points -> data.blocks: "fit"
+data.blocks -> data.sessions: "group"
+data.logistic -> data.blocks: "uses"
+data.types -> data.trials: "validates"
+data.types -> data.points: "validates"
+data.types -> data.blocks: "validates"
+
+# Core to data relationships
+core.sigmoids -> data.blocks: "link\nfunctions"
+core.sigmoids -> analysis.bayes: "provides"
+
+# Analysis relationships
+analysis.bayes -> data.blocks: "advanced\nfitting"
+analysis.ecdf -> data.blocks: "analyzes"
+analysis.weber -> data.blocks: "analyzes"
+analysis.strength_duration -> data.blocks: "analyzes"
+
+# Integration with app
+data -> app: "data\npipeline"
+analysis -> app: "statistical\nanalysis"
+core.plot -> app: "visualization\ntemplate"
+models -> app: "advanced\nmodeling"
+
+# External connections
+models -> analysis.bayes: "Stan\nmodels"
+
+legend: {
+  near: bottom-left
+  shape: rectangle
+  label: "Legend\n━━━━━━\n■ Data layer\n■ Analysis layer\n■ Core utilities\n■ Application\n■ Models"
+  style: {
+    fill: "#ffffff"
+    stroke: "#999"
+    stroke-dash: 3
+    font-size: 11
+  }
+}

@@ -80,3 +80,18 @@ threshold = -intercept / slope  # x₀ = -b₀/b₁
 min_x = (logit(0.01) - intercept) / slope
 max_x = (logit(0.99) - intercept) / slope
 ```
+
+## Copilot Skills
+
+### D2 Diagram Generation
+The project includes a Copilot skill for generating D2 diagrams. See `.github/skills/` for details.
+
+Available diagram types:
+- **Data Hierarchy**: Shows Trials → Points → Blocks → Sessions transformation
+- **Module Architecture**: Component relationships and interactions
+- **Analysis Workflow**: Data flow through processing and analysis pipelines
+- **Psychometric Function**: Formula components and computation steps
+
+Example usage: "Generate a D2 diagram of the data hierarchy" or "Show me an architecture diagram in D2"
+
+Example diagrams are available in `.github/skills/diagrams/`

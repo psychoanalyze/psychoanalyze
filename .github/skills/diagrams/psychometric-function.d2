@@ -1,0 +1,249 @@
+# Psychometric Function Components
+# Visual representation of ψ(x) = γ + (1 - γ - λ) × F(x; x₀, k)
+
+title: "Psychometric Function: ψ(x) = γ + (1 - γ - λ) × F(x; x₀, k)" {
+  near: top-center
+  shape: text
+  style: {
+    font-size: 20
+    bold: true
+  }
+}
+
+# Parameter components
+components: {
+  label: "Function Parameters"
+  style: {
+    fill: "#f9f9f9"
+    stroke: "#666"
+    stroke-width: 2
+  }
+  
+  x: {
+    label: "x\n━━━━━━━━\nStimulus\nIntensity\n(independent\nvariable)"
+    shape: oval
+    style: {
+      fill: "#e8f4f8"
+      stroke: "#2c5aa0"
+      stroke-width: 2
+    }
+  }
+  
+  x0: {
+    label: "x₀\n━━━━━━━━\nThreshold\n50% detection\npoint"
+    shape: oval
+    style: {
+      fill: "#fff4e6"
+      stroke: "#d68910"
+      stroke-width: 2
+    }
+  }
+  
+  k: {
+    label: "k\n━━━━━━━━\nSlope\nSteepness of\nthe curve"
+    shape: oval
+    style: {
+      fill: "#fff4e6"
+      stroke: "#d68910"
+      stroke-width: 2
+    }
+  }
+  
+  gamma: {
+    label: "γ\n━━━━━━━━\nGuess Rate\nLower\nasymptote"
+    shape: oval
+    style: {
+      fill: "#ffe6e6"
+      stroke: "#c44"
+      stroke-width: 2
+    }
+  }
+  
+  lambda: {
+    label: "λ\n━━━━━━━━\nLapse Rate\nUpper\nasymptote"
+    shape: oval
+    style: {
+      fill: "#ffe6e6"
+      stroke: "#c44"
+      stroke-width: 2
+    }
+  }
+  
+  F: {
+    label: "F\n━━━━━━━━\nLink Function\nlogistic | Weibull\nGumbel | Quick"
+    shape: diamond
+    style: {
+      fill: "#e6ffe6"
+      stroke: "#4daf4a"
+      stroke-width: 2
+    }
+  }
+}
+
+# Computation flow
+computation: {
+  label: "Computation Steps"
+  style: {
+    fill: "#ffffff"
+    stroke: "#999"
+    stroke-width: 2
+  }
+  
+  input: {
+    label: "Input\n━━━━━━━━\nx, x₀, k"
+    shape: parallelogram
+    style: {
+      fill: "#e8f4f8"
+      stroke: "#2c5aa0"
+    }
+  }
+  
+  link: {
+    label: "Step 1: Link Transform\n━━━━━━━━\nF(x; x₀, k)\nSigmoid transformation\nMaps x → [0, 1]"
+    shape: rectangle
+    style: {
+      fill: "#e6ffe6"
+      stroke: "#4daf4a"
+      stroke-width: 2
+    }
+  }
+  
+  scale: {
+    label: "Step 2: Scale\n━━━━━━━━\n(1 - γ - λ) × F(x; x₀, k)\nAdjust range between\nasymptotes"
+    shape: rectangle
+    style: {
+      fill: "#fff4e6"
+      stroke: "#d68910"
+      stroke-width: 2
+    }
+  }
+  
+  shift: {
+    label: "Step 3: Shift\n━━━━━━━━\nγ + (1 - γ - λ) × F(x; x₀, k)\nAdd lower asymptote"
+    shape: rectangle
+    style: {
+      fill: "#ffe6e6"
+      stroke: "#c44"
+      stroke-width: 2
+    }
+  }
+  
+  output: {
+    label: "Output: ψ(x)\n━━━━━━━━\nDetection\nProbability\n∈ [γ, 1-λ]"
+    shape: parallelogram
+    style: {
+      fill: "#e8f4f8"
+      stroke: "#2c5aa0"
+      stroke-width: 3
+    }
+  }
+}
+
+# Parameter to computation connections
+components.x -> computation.input: {
+  style: {
+    stroke: "#2c5aa0"
+    stroke-width: 2
+  }
+}
+
+components.x0 -> computation.input: {
+  style: {
+    stroke: "#d68910"
+    stroke-width: 2
+  }
+}
+
+components.k -> computation.input: {
+  style: {
+    stroke: "#d68910"
+    stroke-width: 2
+  }
+}
+
+# Computation flow
+computation.input -> computation.link: "Apply\nsigmoid" {
+  style: {
+    stroke: "#4a7ba7"
+    stroke-width: 3
+  }
+}
+
+components.F -> computation.link: "uses" {
+  style: {
+    stroke: "#4daf4a"
+    stroke-width: 2
+    stroke-dash: 3
+  }
+}
+
+computation.link -> computation.scale: "Constrain\nrange" {
+  style: {
+    stroke: "#4a7ba7"
+    stroke-width: 3
+  }
+}
+
+components.gamma -> computation.scale: "lower\nbound" {
+  style: {
+    stroke: "#c44"
+    stroke-width: 2
+    stroke-dash: 3
+  }
+}
+
+components.lambda -> computation.scale: "upper\nbound" {
+  style: {
+    stroke: "#c44"
+    stroke-width: 2
+    stroke-dash: 3
+  }
+}
+
+computation.scale -> computation.shift: "Add\noffset" {
+  style: {
+    stroke: "#4a7ba7"
+    stroke-width: 3
+  }
+}
+
+components.gamma -> computation.shift: "adds" {
+  style: {
+    stroke: "#c44"
+    stroke-width: 2
+    stroke-dash: 3
+  }
+}
+
+computation.shift -> computation.output: "Final\nresult" {
+  style: {
+    stroke: "#4a7ba7"
+    stroke-width: 3
+  }
+}
+
+# Example values
+example: {
+  near: bottom-right
+  shape: rectangle
+  label: "Example Values\n━━━━━━━━\nTypical parameters:\n• x₀ = 10 (threshold at 10 units)\n• k = 0.5 (moderate slope)\n• γ = 0.0 (no guessing)\n• λ = 0.02 (2% lapse rate)\n• F = logistic\n\nResult: ψ(10) = 0.5\n        ψ(5) ≈ 0.01\n        ψ(15) ≈ 0.98"
+  style: {
+    fill: "#f9f9f9"
+    stroke: "#999"
+    stroke-dash: 3
+    font-size: 11
+  }
+}
+
+# Formula note
+formula_note: {
+  near: bottom-left
+  shape: rectangle
+  label: "Common Link Functions\n━━━━━━━━\n• Logistic: 1/(1+exp(-(x-x₀)/k))\n• Weibull: 1-exp(-(x/x₀)^k)\n• Gumbel: 1-exp(-exp((x-x₀)/k))\n• Quick: 1-2^(-(x/x₀)^k)"
+  style: {
+    fill: "#f9f9f9"
+    stroke: "#999"
+    stroke-dash: 3
+    font-size: 11
+  }
+}

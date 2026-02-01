@@ -1,0 +1,98 @@
+direction: down
+
+# PsychoAnalyze Data Hierarchy
+# Shows the core data model from individual trials to aggregated sessions
+
+title: "PsychoAnalyze Data Hierarchy" {
+  near: top-center
+  shape: text
+  style: {
+    font-size: 24
+    bold: true
+  }
+}
+
+# Level 1: Individual Trials
+Trials: {
+  shape: cylinder
+  label: "Trials\n━━━━━━━━\nIndividual stimulus presentations\n\nColumns:\n• Intensity (stimulus level)\n• Result (0 or 1)\n• Block (grouping ID)"
+  style: {
+    fill: "#e8f4f8"
+    stroke: "#2c5aa0"
+    stroke-width: 2
+  }
+}
+
+# Level 2: Aggregated Points
+Points: {
+  shape: cylinder
+  label: "Points\n━━━━━━━━\nAggregated trial counts\nat each intensity\n\nColumns:\n• Intensity (unique levels)\n• Hits (sum of successes)\n• n trials (count)\n• Hit Rate = Hits / n trials"
+  style: {
+    fill: "#d4e9f2"
+    stroke: "#2c5aa0"
+    stroke-width: 2
+  }
+}
+
+# Level 3: Fitted Blocks
+Blocks: {
+  shape: cylinder
+  label: "Blocks\n━━━━━━━━\nFitted psychometric curves\nfrom logistic regression\n\nParameters:\n• threshold (x₀)\n• slope (k)\n• R² (goodness of fit)"
+  style: {
+    fill: "#b8dcea"
+    stroke: "#2c5aa0"
+    stroke-width: 2
+  }
+}
+
+# Level 4: Sessions/Subjects
+Sessions: {
+  shape: cylinder
+  label: "Sessions/Subjects\n━━━━━━━━━━━━━━━\nLongitudinal groupings\nfor temporal analysis\n\nGrouping:\n• By time (sessions)\n• By subject\n• Multi-index support"
+  style: {
+    fill: "#9dcfe2"
+    stroke: "#2c5aa0"
+    stroke-width: 2
+  }
+}
+
+# Transformations
+Trials -> Points: {
+  label: "aggregate\nby intensity"
+  style: {
+    stroke: "#4a7ba7"
+    stroke-width: 3
+    font-size: 14
+  }
+}
+
+Points -> Blocks: {
+  label: "fit psychometric\ncurve (logistic)"
+  style: {
+    stroke: "#4a7ba7"
+    stroke-width: 3
+    font-size: 14
+  }
+}
+
+Blocks -> Sessions: {
+  label: "group by\ntime/subject"
+  style: {
+    stroke: "#4a7ba7"
+    stroke-width: 3
+    font-size: 14
+  }
+}
+
+# Side note about modules
+modules: {
+  near: bottom-right
+  shape: rectangle
+  label: "Implemented in:\n\nsrc/psychoanalyze/data/\n  • trials.py\n  • points.py\n  • blocks.py\n  • sessions.py"
+  style: {
+    fill: "#f9f9f9"
+    stroke: "#999"
+    stroke-dash: 3
+    font-size: 12
+  }
+}

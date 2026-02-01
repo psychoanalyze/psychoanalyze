@@ -1,0 +1,92 @@
+{
+  "name": "d2-diagram",
+  "version": "1.0.0",
+  "description": "Generate D2 diagrams relevant to the PsychoAnalyze project architecture, data hierarchy, and workflows",
+  "author": "PsychoAnalyze Team",
+  "tags": ["visualization", "architecture", "diagrams", "d2"],
+  "capabilities": {
+    "diagrams": [
+      "data-hierarchy",
+      "module-architecture",
+      "analysis-workflow",
+      "psychometric-function"
+    ]
+  },
+  "instructions": "This skill generates D2 (declarative diagramming language) diagrams that illustrate various aspects of the PsychoAnalyze project. Use this skill to create visual representations of:\n\n1. **Data Hierarchy**: The core data model showing the relationship between Trials → Points → Blocks → Sessions/Subjects\n2. **Module Architecture**: Component relationships showing how src/psychoanalyze modules interact\n3. **Analysis Workflow**: The flow of data through analysis pipelines (Bayesian, ECDF, Weber, strength-duration)\n4. **Psychometric Function**: Visual representation of the psychometric function formula and its components\n\nThe diagrams use D2 syntax, which can be rendered using the d2 CLI tool or online at https://play.d2lang.com/",
+  "examples": [
+    {
+      "name": "Data Hierarchy Diagram",
+      "description": "Shows the hierarchical data model from trials to sessions",
+      "prompt": "Generate a D2 diagram showing the PsychoAnalyze data hierarchy",
+      "output": "direction: down\n\nTrials: {\n  shape: cylinder\n  label: \"Trials\\n(Intensity, Result)\"\n  style: {\n    fill: \"#e8f4f8\"\n  }\n}\n\nPoints: {\n  shape: cylinder\n  label: \"Points\\n(Hit Rate = Hits / n trials)\"\n  style: {\n    fill: \"#d4e9f2\"\n  }\n}\n\nBlocks: {\n  shape: cylinder\n  label: \"Blocks\\n(threshold + slope from logistic)\"\n  style: {\n    fill: \"#b8dcea\"\n  }\n}\n\nSessions: {\n  shape: cylinder\n  label: \"Sessions/Subjects\\n(Longitudinal groupings)\"\n  style: {\n    fill: \"#9dcfe2\"\n  }\n}\n\nTrials -> Points: \"aggregate\\nby intensity\"\nPoints -> Blocks: \"fit\\nlogistic\"\nBlocks -> Sessions: \"group\\nby time/subject\""
+    },
+    {
+      "name": "Module Architecture Diagram",
+      "description": "Shows the relationships between key modules in src/psychoanalyze",
+      "prompt": "Generate a D2 diagram showing the PsychoAnalyze module architecture",
+      "output": "direction: right\n\ndata: {\n  label: \"data/\"\n  style.fill: \"#f0f0f0\"\n  \n  trials: {label: \"trials.py\"}\n  points: {label: \"points.py\"}\n  blocks: {label: \"blocks.py\"}\n  sessions: {label: \"sessions.py\"}\n  types: {label: \"types.py\\n(Pandera schemas)\"}\n  logistic: {label: \"logistic.py\"}\n}\n\nanalysis: {\n  label: \"analysis/\"\n  style.fill: \"#e8f4f8\"\n  \n  bayes: {label: \"bayes.py\\n(PyMC)\"}\n  ecdf: {label: \"ecdf.py\"}\n  weber: {label: \"weber.py\"}\n  strength_duration: {label: \"strength_duration.py\"}\n}\n\ncore: {\n  label: \"Core Modules\"\n  style.fill: \"#fff4e6\"\n  \n  sigmoids: {label: \"sigmoids.py\\n(Weibull, Gumbel, Quick)\"}\n  plot: {label: \"plot.py\\n(Plotly template)\"}\n  params: {label: \"params.py\"}\n}\n\napp: {\n  label: \"app.py\\n(Marimo Dashboard)\"\n  shape: hexagon\n  style.fill: \"#e6f3ff\"\n}\n\ndata.trials -> data.points: \"aggregate\"\ndata.points -> data.blocks: \"fit\"\ndata.blocks -> data.sessions: \"group\"\ndata.logistic -> data.blocks: \"uses\"\ncore.sigmoids -> data.blocks: \"link functions\"\nanalysis.bayes -> data.blocks: \"advanced fitting\"\ncore.plot -> app: \"visualization\"\ndata -> app: \"data pipeline\"\nanalysis -> app: \"statistical analysis\""
+    },
+    {
+      "name": "Psychometric Function Diagram",
+      "description": "Illustrates the psychometric function formula and its components",
+      "prompt": "Generate a D2 diagram showing the psychometric function components",
+      "output": "title: \"Psychometric Function: ψ(x) = γ + (1 - γ - λ) × F(x; x₀, k)\"\n\ncomponents: {\n  label: \"Function Components\"\n  style.fill: \"#f9f9f9\"\n  \n  x: {\n    label: \"x\\nStimulus Intensity\"\n    shape: oval\n    style.fill: \"#e8f4f8\"\n  }\n  \n  x0: {\n    label: \"x₀\\nThreshold\\n(50% point)\"\n    shape: oval\n    style.fill: \"#fff4e6\"\n  }\n  \n  k: {\n    label: \"k\\nSlope\\n(steepness)\"\n    shape: oval\n    style.fill: \"#fff4e6\"\n  }\n  \n  gamma: {\n    label: \"γ\\nGuess Rate\\n(lower asymptote)\"\n    shape: oval\n    style.fill: \"#ffe6e6\"\n  }\n  \n  lambda: {\n    label: \"λ\\nLapse Rate\\n(upper asymptote)\"\n    shape: oval\n    style.fill: \"#ffe6e6\"\n  }\n  \n  F: {\n    label: \"F\\nLink Function\\n(logistic, Weibull, etc.)\"\n    shape: diamond\n    style.fill: \"#e6ffe6\"\n  }\n}\n\ncomputation: {\n  label: \"Computation Flow\"\n  style.fill: \"#ffffff\"\n  \n  input: {\n    label: \"Input: x, x₀, k\"\n    shape: parallelogram\n  }\n  \n  link: {\n    label: \"F(x; x₀, k)\\nSigmoid Transform\"\n    shape: rectangle\n    style.fill: \"#e6ffe6\"\n  }\n  \n  scale: {\n    label: \"Scale by\\n(1 - γ - λ)\"\n    shape: rectangle\n    style.fill: \"#fff4e6\"\n  }\n  \n  shift: {\n    label: \"Shift by γ\"\n    shape: rectangle\n    style.fill: \"#ffe6e6\"\n  }\n  \n  output: {\n    label: \"Output: ψ(x)\\nDetection Probability\"\n    shape: parallelogram\n    style.fill: \"#e8f4f8\"\n  }\n}\n\ncomponents.x -> computation.input\ncomponents.x0 -> computation.input\ncomponents.k -> computation.input\ncomputation.input -> computation.link\ncomponents.F -> computation.link: \"uses\"\ncomputation.link -> computation.scale\ncomponents.gamma -> computation.scale: \"constrains\"\ncomponents.lambda -> computation.scale: \"constrains\"\ncomputation.scale -> computation.shift\ncomponents.gamma -> computation.shift: \"adds\"\ncomputation.shift -> computation.output"
+    },
+    {
+      "name": "Analysis Workflow Diagram",
+      "description": "Shows the flow of data through analysis pipelines",
+      "prompt": "Generate a D2 diagram showing the PsychoAnalyze analysis workflow",
+      "output": "direction: down\n\ninput: {\n  label: \"Input Data\"\n  raw: {\n    label: \"CSV/Excel\\nStimulus trials\"\n    shape: document\n    style.fill: \"#f0f0f0\"\n  }\n}\n\npreprocess: {\n  label: \"Data Preprocessing\"\n  style.fill: \"#e8f4f8\"\n  \n  validate: {\n    label: \"Schema Validation\\n(Pandera)\"\n    shape: rectangle\n  }\n  \n  aggregate: {\n    label: \"Aggregate to Points\\n(Hit Rate by Intensity)\"\n    shape: rectangle\n  }\n}\n\nfitting: {\n  label: \"Model Fitting\"\n  style.fill: \"#e6f3ff\"\n  \n  logistic: {\n    label: \"Logistic Regression\\n(threshold, slope)\"\n    shape: rectangle\n  }\n  \n  bayesian: {\n    label: \"Bayesian Fitting\\n(PyMC/Stan)\"\n    shape: rectangle\n  }\n}\n\nanalysis: {\n  label: \"Statistical Analysis\"\n  style.fill: \"#fff4e6\"\n  \n  ecdf: {\n    label: \"ECDF Analysis\"\n    shape: rectangle\n  }\n  \n  weber: {\n    label: \"Weber Law\\nAnalysis\"\n    shape: rectangle\n  }\n  \n  strength_duration: {\n    label: \"Strength-Duration\\nAnalysis\"\n    shape: rectangle\n  }\n}\n\nvisualization: {\n  label: \"Visualization\"\n  dashboard: {\n    label: \"Marimo Dashboard\\n(Interactive Plots)\"\n    shape: hexagon\n    style.fill: \"#e6ffe6\"\n  }\n  \n  plots: {\n    label: \"Plotly Figures\\n(Psychometric curves)\"\n    shape: rectangle\n    style.fill: \"#e6ffe6\"\n  }\n}\n\noutput: {\n  label: \"Output\"\n  results: {\n    label: \"Thresholds\\nSlopes\\nStatistics\"\n    shape: document\n    style.fill: \"#ffe6e6\"\n  }\n}\n\ninput.raw -> preprocess.validate\npreprocess.validate -> preprocess.aggregate\npreprocess.aggregate -> fitting.logistic\npreprocess.aggregate -> fitting.bayesian\nfitting.logistic -> analysis.ecdf\nfitting.logistic -> analysis.weber\nfitting.logistic -> analysis.strength_duration\nfitting.bayesian -> analysis.ecdf\nfitting.bayesian -> analysis.weber\nfitting.bayesian -> analysis.strength_duration\nfitting -> visualization.plots\nanalysis -> visualization.dashboard\nvisualization.dashboard -> output.results\nvisualization.plots -> output.results"
+    }
+  ],
+  "schema": {
+    "input": {
+      "diagram_type": {
+        "type": "string",
+        "enum": ["data-hierarchy", "module-architecture", "analysis-workflow", "psychometric-function", "custom"],
+        "description": "Type of diagram to generate"
+      },
+      "format": {
+        "type": "string",
+        "enum": ["d2", "svg", "png"],
+        "default": "d2",
+        "description": "Output format (d2 source code, or rendered SVG/PNG if d2 CLI is available)"
+      },
+      "theme": {
+        "type": "string",
+        "enum": ["default", "dark", "light"],
+        "default": "default",
+        "description": "Visual theme for the diagram"
+      }
+    },
+    "output": {
+      "diagram": {
+        "type": "string",
+        "description": "The generated D2 diagram source code or rendered output"
+      },
+      "preview_url": {
+        "type": "string",
+        "description": "URL to view the diagram at https://play.d2lang.com/"
+      }
+    }
+  },
+  "usage": {
+    "command": "Use this skill by asking for a D2 diagram of any aspect of the PsychoAnalyze project",
+    "examples": [
+      "Show me a D2 diagram of the data hierarchy",
+      "Generate an architecture diagram using D2",
+      "Create a D2 diagram showing the analysis workflow",
+      "Draw a diagram of the psychometric function components"
+    ]
+  },
+  "requirements": {
+    "optional": [
+      "d2 CLI tool for rendering diagrams (can be installed from https://d2lang.com/)"
+    ],
+    "notes": [
+      "D2 source code can be viewed and rendered at https://play.d2lang.com/ even without local installation",
+      "Diagrams are declarative and version-control friendly",
+      "D2 supports layouts, themes, and advanced styling options"
+    ]
+  }
+}
