@@ -27,104 +27,17 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
-      - name: Create output directories
+      - name: Run PyMC sampling tests with pytest
         run: |
-          mkdir -p pymc-outputs/netcdf
-          mkdir -p pymc-outputs/plots
-
-      - name: Run PyMC sampling tests and save outputs
-        run: |
-          uv run python -c "
-          import arviz as az
-          import polars as pl
-          import matplotlib
-          matplotlib.use('Agg')
-          import matplotlib.pyplot as plt
-          from pathlib import Path
-          from psychoanalyze.data import blocks, trials
-          
-          # Create output directories
-          netcdf_dir = Path('pymc-outputs/netcdf')
-          plots_dir = Path('pymc-outputs/plots')
-          
-          print('Running blocks.fit()...')
-          # Test blocks fitting
-          blocks_trials_df = pl.DataFrame({
-              'Intensity': [0.0, 1.0, 2.0, 3.0, 4.0] * 4,
-              'Result': [0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1],
-          })
-          blocks_idata = blocks.fit(blocks_trials_df, draws=500, tune=500, chains=2, random_seed=42)
-          
-          # Save netCDF
-          blocks_nc_path = netcdf_dir / 'blocks_fit.nc'
-          blocks_idata.to_netcdf(blocks_nc_path)
-          print(f'Saved blocks netCDF to {blocks_nc_path}')
-          
-          # Generate ArviZ plots for blocks
-          print('Generating ArviZ plots for blocks...')
-          
-          # Trace plot
-          ax = az.plot_trace(blocks_idata, var_names=['intercept', 'slope', 'threshold'])
-          plt.savefig(plots_dir / 'blocks_trace.png', dpi=150, bbox_inches='tight')
-          plt.close('all')
-          
-          # Posterior plot
-          ax = az.plot_posterior(blocks_idata, var_names=['intercept', 'slope', 'threshold'])
-          plt.savefig(plots_dir / 'blocks_posterior.png', dpi=150, bbox_inches='tight')
-          plt.close('all')
-          
-          # Pair plot
-          ax = az.plot_pair(blocks_idata, var_names=['intercept', 'slope'], divergences=True)
-          plt.savefig(plots_dir / 'blocks_pair.png', dpi=150, bbox_inches='tight')
-          plt.close('all')
-          
-          # Forest plot
-          ax = az.plot_forest(blocks_idata, var_names=['intercept', 'slope', 'threshold'])
-          plt.savefig(plots_dir / 'blocks_forest.png', dpi=150, bbox_inches='tight')
-          plt.close('all')
-          
-          print('Running trials.fit()...')
-          # Test trials fitting
-          trials_trials_df = pl.DataFrame({
-              'Intensity': [0.0, 1.0, 2.0, 3.0, 4.0] * 4,
-              'Result': [0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1],
-          })
-          trials_idata = trials.fit(trials_trials_df, draws=500, tune=500, chains=2, random_seed=42)
-          
-          # Save netCDF
-          trials_nc_path = netcdf_dir / 'trials_fit.nc'
-          trials_idata.to_netcdf(trials_nc_path)
-          print(f'Saved trials netCDF to {trials_nc_path}')
-          
-          # Generate ArviZ plots for trials
-          print('Generating ArviZ plots for trials...')
-          
-          # Trace plot
-          ax = az.plot_trace(trials_idata)
-          plt.savefig(plots_dir / 'trials_trace.png', dpi=150, bbox_inches='tight')
-          plt.close('all')
-          
-          # Posterior plot
-          ax = az.plot_posterior(trials_idata)
-          plt.savefig(plots_dir / 'trials_posterior.png', dpi=150, bbox_inches='tight')
-          plt.close('all')
-          
-          # Forest plot
-          ax = az.plot_forest(trials_idata)
-          plt.savefig(plots_dir / 'trials_forest.png', dpi=150, bbox_inches='tight')
-          plt.close('all')
-          
-          print('All outputs generated successfully!')
-          print(f'NetCDF files: {list(netcdf_dir.glob(\"*.nc\"))}')
-          print(f'Plot files: {list(plots_dir.glob(\"*.png\"))}')
-          "
+          # Run pytest and capture the basetemp directory
+          uv run pytest tests/test_pymc_artifacts.py -v --basetemp=pymc-outputs
 
       - name: Upload netCDF files
         uses: actions/upload-artifact@v6
         if: always()
         with:
           name: pymc-netcdf-files
-          path: pymc-outputs/netcdf/*.nc
+          path: pymc-outputs/*/netcdf/*.nc
           retention-days: 30
 
       - name: Upload ArviZ visualization plots
@@ -132,7 +45,7 @@ jobs:
         if: always()
         with:
           name: arviz-visualizations
-          path: pymc-outputs/plots/*.png
+          path: pymc-outputs/*/plots/*.png
           retention-days: 30
 
       - name: Create summary
@@ -141,7 +54,7 @@ jobs:
           echo "## PyMC Sampling Artifacts Generated" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### NetCDF Files" >> $GITHUB_STEP_SUMMARY
-          ls -lh pymc-outputs/netcdf/*.nc 2>/dev/null | tail -n +1 >> $GITHUB_STEP_SUMMARY || echo "No netCDF files found" >> $GITHUB_STEP_SUMMARY
+          find pymc-outputs -name "*.nc" -exec ls -lh {} \; 2>/dev/null >> $GITHUB_STEP_SUMMARY || echo "No netCDF files found" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### ArviZ Visualization Plots" >> $GITHUB_STEP_SUMMARY
-          ls -lh pymc-outputs/plots/*.png 2>/dev/null | tail -n +1 >> $GITHUB_STEP_SUMMARY || echo "No plot files found" >> $GITHUB_STEP_SUMMARY
+          find pymc-outputs -name "*.png" -exec ls -lh {} \; 2>/dev/null >> $GITHUB_STEP_SUMMARY || echo "No plot files found" >> $GITHUB_STEP_SUMMARY
