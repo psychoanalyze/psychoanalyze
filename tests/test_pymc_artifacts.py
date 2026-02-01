@@ -156,7 +156,6 @@ def test_trials_fit_artifacts(
         idata,
         plots_dir,
         prefix="trials",
-        var_names=None,  # Use all variables
         include_pair=False,
     )
 
