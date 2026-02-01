@@ -173,7 +173,7 @@ def _(Path, az, cache_root, hashlib, io, json, mo, np, pa_hierarchical, pl):
 
 
 @app.cell
-def _(io, pa_points, pa_trials, pl, subject_utils, zipfile):
+def _(io, np, pa_points, pa_trials, pl, subject_utils, zipfile):
     generate_index = pa_points.generate_index
 
     def generate_trials(
@@ -182,21 +182,31 @@ def _(io, pa_points, pa_trials, pl, subject_utils, zipfile):
         params: dict,
         n_blocks: int,
         n_subjects: int = 1,
-    ) -> pl.DataFrame:
+    ) -> tuple[pl.DataFrame, dict[str, dict]]:
+        """Generate trials and return both data and subject-specific parameters."""
         frames = []
+        subject_params_map = {}
         for subject_idx in range(n_subjects):
             subject_id = (
                 chr(ord("A") + subject_idx) if subject_idx < 26 else f"S{subject_idx}"
             )
+            # Each subject gets their own x_0 drawn from standard normal
+            subject_params = params.copy()
+            subject_params["x_0"] = np.random.randn()
+            subject_params_map[subject_id] = subject_params
+
             trials_df = pa_trials.generate(
                 n_trials=n_trials,
                 options=options,
-                params=params,
+                params=subject_params,
                 n_blocks=n_blocks,
             )
             trials_df = trials_df.with_columns(pl.lit(subject_id).alias("Subject"))
             frames.append(trials_df)
-        return pl.concat(frames) if frames else pl.DataFrame()
+        return (
+            pl.concat(frames) if frames else pl.DataFrame(),
+            subject_params_map,
+        )
 
     def from_trials(trials_df: pl.DataFrame) -> pl.DataFrame:
         trials_df = subject_utils.ensure_subject_column(trials_df)
@@ -474,13 +484,14 @@ def _(
     x_0,
 ):
     # Trials: upload if provided, otherwise default to sample in Batch/Online
+    subject_ground_truth_params = {}
     if file_upload.value and len(file_upload.value) > 0:
         raw = file_upload.contents(0)
         fname = file_upload.name(0) or ""
         if raw is not None:
             trials_df = process_upload_bytes(raw, fname)
         else:
-            trials_df = generate_trials(
+            trials_df, subject_ground_truth_params = generate_trials(
                 n_trials=n_trials.value,
                 options=generate_index(n_levels.value, [min_x, max_x]),
                 params={
@@ -493,7 +504,7 @@ def _(
                 n_subjects=n_subjects.value,
             )
     elif input_tabs.value == "Simulation":
-        trials_df = generate_trials(
+        trials_df, subject_ground_truth_params = generate_trials(
             n_trials=n_trials.value,
             options=generate_index(n_levels.value, [min_x, max_x]),
             params={
@@ -509,7 +520,7 @@ def _(
         trials_df = load_sample_trials()
     trials_df = subject_utils.ensure_subject_column(trials_df)
     trials_df = trials_df.with_columns(pl.col("Intensity").cast(pl.Float64))
-    return (trials_df,)
+    return subject_ground_truth_params, trials_df
 
 
 @app.cell
@@ -621,9 +632,10 @@ def _(
     blocks_table,
     k,
     pl,
+    subject_ground_truth_params,
     x_0,
 ):
-    # Selected block rows for plot (include Model)
+    # Selected block rows for plot (include ground truth per subject)
     if blocks_table.value is not None and hasattr(blocks_table.value, "__len__"):
         try:
             selected_blocks_df = (
@@ -659,6 +671,7 @@ def _(
                     "intercept": block_row.get("intercept", 0),
                     "slope": block_row.get("slope", 1),
                     "block_idx": block_idx_by_subject_block.get((subject, block)),
+                    "is_ground_truth": False,
                 },
             )
     else:
@@ -671,18 +684,25 @@ def _(
                     "intercept": block_row["intercept"],
                     "slope": block_row["slope"],
                     "block_idx": block_idx_by_subject_block.get((subject, block)),
+                    "is_ground_truth": False,
                 },
             )
-    # Only append Model curve if we have fitted data
-    if len(blocks_df) > 0:
-        block_rows.append(
-            {
-                "Block": "Model",
-                "intercept": model_intercept,
-                "slope": model_slope,
-                "block_idx": None,
-            },
-        )
+    # Add ground truth curves for each subject (if in simulation mode)
+    if len(subject_ground_truth_params) > 0:
+        for subject_id, params in subject_ground_truth_params.items():
+            gt_x_0 = params["x_0"]
+            gt_k = params["k"]
+            gt_intercept = -gt_x_0 / gt_k
+            gt_slope = 1 / gt_k
+            block_rows.append(
+                {
+                    "Block": f"{subject_id} (GT)",
+                    "intercept": gt_intercept,
+                    "slope": gt_slope,
+                    "block_idx": None,
+                    "is_ground_truth": True,
+                },
+            )
     return (block_rows,)
 
 
@@ -791,6 +811,7 @@ def _(
                     "Intensity": x,
                     "Hit Rate": y,
                     "Series": [blk["Block"]] * len(x),
+                    "Type": ["Ground Truth" if blk.get("is_ground_truth", False) else "Fitted"] * len(x),
                 },
             ),
         )
@@ -798,7 +819,7 @@ def _(
         if (
             fit_idata is not None
             and block_idx_val is not None
-            and blk["Block"] != "Model"
+            and not blk.get("is_ground_truth", False)
         ):
             band_df = pa_hierarchical.curve_credible_band(
                 fit_idata,
@@ -811,7 +832,7 @@ def _(
     fits_df = (
         pl.concat(fits_list)
         if len(fits_list) > 0
-        else pl.DataFrame({"Intensity": [], "Hit Rate": [], "Series": []})
+        else pl.DataFrame({"Intensity": [], "Hit Rate": [], "Series": [], "Type": []})
     )
     bands_df = (
         pl.concat(bands_list)
@@ -824,7 +845,11 @@ def _(
         ),
     )
     fits_df = fits_df.with_columns(pl.col("Series").cast(pl.Utf8))
-    fits_pd = fits_df.to_pandas()
+    # Separate ground truth vs fitted curves for different styling
+    ground_truth_df = fits_df.filter(pl.col("Type") == "Ground Truth")
+    fitted_df = fits_df.filter(pl.col("Type") == "Fitted")
+    fitted_pd = fitted_df.to_pandas()
+    ground_truth_pd = ground_truth_df.to_pandas()
     bands_pd = bands_df.to_pandas()
     points_pd = points_plot_df.to_pandas()
     band_chart = (
@@ -837,9 +862,18 @@ def _(
             color=alt.Color("Series:N"),
         )
     )
-    line_chart = (
-        alt.Chart(fits_pd)
+    fitted_line_chart = (
+        alt.Chart(fitted_pd)
         .mark_line()
+        .encode(
+            x=alt.X("Intensity:Q"),
+            y=alt.Y("Hit Rate:Q"),
+            color=alt.Color("Series:N"),
+        )
+    )
+    ground_truth_line_chart = (
+        alt.Chart(ground_truth_pd)
+        .mark_line(strokeDash=[5, 5], strokeWidth=2)
         .encode(
             x=alt.X("Intensity:Q"),
             y=alt.Y("Hit Rate:Q"),
@@ -857,7 +891,9 @@ def _(
             tooltip=["Series:N", "Intensity:Q", "Hit Rate:Q", "n trials:Q"],
         )
     )
-    plot_layers = [line_chart, points_chart]
+    plot_layers = [fitted_line_chart, points_chart]
+    if len(ground_truth_pd) > 0:
+        plot_layers.insert(0, ground_truth_line_chart)
     if len(bands_pd) > 0:
         plot_layers.insert(0, band_chart)
     plot_chart = alt.layer(*plot_layers).resolve_scale(color="shared")
