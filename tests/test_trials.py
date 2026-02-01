@@ -62,3 +62,22 @@ def test_fit_returns_inferencedata() -> None:
     idata = trials.fit(trials_df, draws=50, tune=50, chains=1, random_seed=1)
     summary = trials.summarize_fit(idata)
     assert set(summary) == {"Threshold", "Slope"}
+
+
+def test_load_preserves_subject_column() -> None:
+    """Loading sample data should preserve Subject column with actual subject IDs."""
+    from pathlib import Path
+
+    data_path = Path(__file__).parent.parent / "data" / "trials.csv"
+    if not data_path.exists():
+        pytest.skip("Sample data not available")
+
+    trials_df = trials.load(data_path)
+    assert "Subject" in trials_df.columns, (
+        "Subject column should be present in loaded data"
+    )
+    unique_subjects = trials_df["Subject"].unique().to_list()
+    assert "Y" in unique_subjects or "U" in unique_subjects, (
+        f"Expected subjects like 'Y' or 'U', got {unique_subjects}"
+    )
+    assert "All" not in unique_subjects, "Subject should not be default 'All' value"

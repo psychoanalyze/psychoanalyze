@@ -136,7 +136,6 @@ def _(mo):
 
     [Notebooks](https://nb.psychoanalyze.io) · [GitHub](https://github.com/psychoanalyze/psychoanalyze) · [Docs](https://docs.psychoanalyze.io)
     """)
-    return
 
 
 @app.cell
@@ -332,14 +331,14 @@ def _(mo, show_equation):
 
 
 @app.cell
-def _(pl, subject_utils):
+def _(pl):
     from pathlib import Path as _Path
 
     def load_sample_trials() -> pl.DataFrame:
         """Load sample experimental data from data/trials.csv."""
         sample_path = _Path(__file__).parent / "data" / "trials.csv"
         df = pl.read_csv(sample_path)
-        # Transform to expected format: Block, Intensity, Result
+        # Transform to expected format: Subject, Block, Intensity, Result
         df = df.with_columns(
             (pl.col("Date").cast(pl.Utf8) + "_" + pl.col("Amp2").cast(pl.Utf8)).alias(
                 "block_key",
@@ -350,8 +349,8 @@ def _(pl, subject_utils):
         )
         df = df.with_columns(pl.col("Amp1").alias("Intensity"))
         df = df.with_columns((pl.col("Result") == 1).cast(pl.Int64).alias("Result"))
-        df = df.select(["Block", "Intensity", "Result"])
-        return subject_utils.ensure_subject_column(df)
+        df = df.select(["Subject", "Block", "Intensity", "Result"])
+        return df
     return (load_sample_trials,)
 
 
@@ -361,9 +360,9 @@ def _(
     gamma,
     generate_index,
     generate_trials,
+    input_tabs,
     k,
     lambda_,
-    load_sample_button,
     load_sample_trials,
     max_x,
     min_x,
@@ -375,10 +374,8 @@ def _(
     subject_utils,
     x_0,
 ):
-    # Trials: from sample button, upload, or generate
-    if load_sample_button.value:
-        trials_df = load_sample_trials()
-    elif file_upload.value and len(file_upload.value) > 0:
+    # Trials: upload if provided, otherwise default to sample in Batch/Online
+    if file_upload.value and len(file_upload.value) > 0:
         raw = file_upload.contents(0)
         fname = file_upload.name(0) or ""
         if raw is not None:
@@ -395,7 +392,7 @@ def _(
                 },
                 n_blocks=n_blocks.value,
             )
-    else:
+    elif input_tabs.value == "Simulation":
         trials_df = generate_trials(
             n_trials=n_trials.value,
             options=generate_index(n_levels.value, [min_x, max_x]),
@@ -407,6 +404,8 @@ def _(
             },
             n_blocks=n_blocks.value,
         )
+    else:
+        trials_df = load_sample_trials()
     trials_df = subject_utils.ensure_subject_column(trials_df)
     trials_df = trials_df.with_columns(pl.col("Intensity").cast(pl.Float64))
     return (trials_df,)
@@ -957,7 +956,6 @@ def _(
         widths=[1, 2, 1],
         gap=2,
     )
-    return
 
 
 if __name__ == "__main__":
