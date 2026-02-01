@@ -25,13 +25,11 @@ def _():
     import polars as pl
     from scipy.special import expit, logit
 
-    from psychoanalyze.data import blocks as pa_blocks
     from psychoanalyze.data import hierarchical as pa_hierarchical
     from psychoanalyze.data import points as pa_points
     from psychoanalyze.data import subject as subject_utils
     from psychoanalyze.data import trials as pa_trials
     from psychoanalyze.data.logistic import to_intercept, to_slope
-
     return (
         Path,
         alt,
@@ -43,7 +41,6 @@ def _():
         logit,
         mo,
         np,
-        pa_blocks,
         pa_hierarchical,
         pa_points,
         pa_trials,
@@ -56,10 +53,7 @@ def _():
 
 
 @app.cell
-def _(Path, az, hashlib, io, json, mo, np, pa_hierarchical, pl):
-    cache_root = Path("__marimo__") / "cache" / "psychoanalyze"
-    cache_root.mkdir(parents=True, exist_ok=True)
-
+def _(Path, az, cache_root, hashlib, io, json, mo, np, pa_hierarchical, pl):
     def normalize_trials_for_hash(trials_df: pl.DataFrame) -> pl.DataFrame:
         preferred_cols = [
             col
@@ -98,7 +92,6 @@ def _(Path, az, hashlib, io, json, mo, np, pa_hierarchical, pl):
             idata.to_netcdf(cache_path)
         summary = pa_hierarchical.summarize_fit(idata)
         return summary, idata
-
     return cached_hierarchical_fit, trials_cache_key
 
 
@@ -131,7 +124,6 @@ def _(io, pa_points, pa_trials, pl, subject_utils, zipfile):
         if "parquet" in filename or filename.endswith(".pq"):
             return pl.read_parquet(io.BytesIO(contents))
         return pl.read_csv(io.BytesIO(contents))
-
     return from_trials, generate_index, generate_trials, process_upload_bytes
 
 
@@ -144,6 +136,7 @@ def _(mo):
 
     [Notebooks](https://nb.psychoanalyze.io) · [GitHub](https://github.com/psychoanalyze/psychoanalyze) · [Docs](https://docs.psychoanalyze.io)
     """)
+    return
 
 
 @app.cell
@@ -154,14 +147,12 @@ def _(mo):
         kind="area",
         label="Upload CSV/parquet with columns: **Block, Intensity, Result** (optional: **Subject**). Data stays on this machine.",
     )
-
     return (file_upload,)
 
 
 @app.cell
 def _(mo):
     load_sample_button = mo.ui.run_button(label="Load Sample Data")
-
     return (load_sample_button,)
 
 
@@ -184,7 +175,6 @@ def _(mo):
         label="Link function",
     )
     show_equation = mo.ui.checkbox(label="Show F(x)", value=False)
-
     return link_function, preset_dropdown, show_equation
 
 
@@ -219,7 +209,6 @@ def _(mo):
         ],
         gap=1,
     )
-
     return (
         fit_chains,
         fit_draws,
@@ -291,7 +280,6 @@ def _(mo, preset_dropdown):
         )
         .form(submit_button_label="Generate")
     )
-
     return gamma, input_form, k, lambda_, n_blocks, n_levels, n_trials, x_0
 
 
@@ -305,7 +293,6 @@ def _(fit_chains, fit_draws, fit_random_seed, fit_target_accept, fit_tune):
         "target_accept": float(fit_target_accept.value),
         "random_seed": None if random_seed <= 0 else random_seed,
     }
-
     return (fit_params,)
 
 
@@ -316,7 +303,6 @@ def _(k, logit, to_intercept, to_slope, x_0):
     slope = to_slope(k.value)
     min_x = (logit(0.01) - intercept) / slope
     max_x = (logit(0.99) - intercept) / slope
-
     return max_x, min_x
 
 
@@ -324,7 +310,6 @@ def _(k, logit, to_intercept, to_slope, x_0):
 def _(max_x, min_x, mo):
     # Stimulus range info for display in left column
     stimulus_info = mo.md(f"**Stimulus range:** {min_x:.2f} to {max_x:.2f}")
-
     return (stimulus_info,)
 
 
@@ -343,14 +328,12 @@ def _(mo, show_equation):
     plot_equation = mo.md(
         equation_expanded if show_equation.value else equation_abstracted,
     )
-
     return (plot_equation,)
 
 
 @app.cell
 def _(pl, subject_utils):
     from pathlib import Path as _Path
-
 
     def load_sample_trials() -> pl.DataFrame:
         """Load sample experimental data from data/trials.csv."""
@@ -369,7 +352,6 @@ def _(pl, subject_utils):
         df = df.with_columns((pl.col("Result") == 1).cast(pl.Int64).alias("Result"))
         df = df.select(["Block", "Intensity", "Result"])
         return subject_utils.ensure_subject_column(df)
-
     return (load_sample_trials,)
 
 
@@ -427,7 +409,6 @@ def _(
         )
     trials_df = subject_utils.ensure_subject_column(trials_df)
     trials_df = trials_df.with_columns(pl.col("Intensity").cast(pl.Float64))
-
     return (trials_df,)
 
 
@@ -443,7 +424,6 @@ def _(mo, trials_df):
         label="Crop at trial",
         show_value=True,
     )
-
     return (trial_crop_slider,)
 
 
@@ -452,14 +432,20 @@ def _(trial_crop_slider, trials_df):
     # Apply trial crop
     crop_at = trial_crop_slider.value
     trials_cropped_df = trials_df.head(crop_at)
-
     return (trials_cropped_df,)
+
+
+@app.cell
+def _(Path):
+    cache_root = Path("__marimo__") / "cache" / "psychoanalyze"
+    cache_root.mkdir(parents=True, exist_ok=True)
+    return (cache_root,)
 
 
 @app.cell
 def _(
     cached_hierarchical_fit,
-    fit_params,
+    fit_params: dict[str, float | int | None],
     from_trials,
     pl,
     trials_cache_key,
@@ -502,7 +488,6 @@ def _(
             },
         )
     blocks_df = pl.from_dicts(blocks_list)
-
     return block_idx_by_subject_block, blocks_df, fit_idata, points_df
 
 
@@ -540,7 +525,6 @@ def _(
             return str(block)
         return f"{subject}-{block}"
 
-
     block_rows = []
     if isinstance(selected_blocks_df, pl.DataFrame) and len(selected_blocks_df) > 0:
         for block_row in selected_blocks_df.iter_rows(named=True):
@@ -574,7 +558,6 @@ def _(
             "block_idx": None,
         },
     )
-
     return (block_rows,)
 
 
@@ -607,14 +590,12 @@ def _(blocks_table, pl, points_df):
             points_filtered_df = points_df
     else:
         points_filtered_df = points_df
-
     return (points_filtered_df,)
 
 
 @app.cell
 def _(expit, link_function):
     link_fn = expit if link_function.value == "expit" else expit
-
     return (link_fn,)
 
 
@@ -631,7 +612,6 @@ def _(mo, n_levels, points_filtered_df):
             "Hit Rate": "{:.2f}".format,
         },
     )
-
     return (points_table,)
 
 
@@ -648,7 +628,6 @@ def _(blocks_df, mo):
             "slope": "{:.2f}".format,
         },
     )
-
     return (blocks_table,)
 
 
@@ -681,12 +660,16 @@ def _(
                 },
             ),
         )
-        block_idx = blk.get("block_idx")
-        if fit_idata is not None and block_idx is not None and blk["Block"] != "Model":
+        block_idx_val = blk.get("block_idx")
+        if (
+            fit_idata is not None
+            and block_idx_val is not None
+            and blk["Block"] != "Model"
+        ):
             band_df = pa_hierarchical.curve_credible_band(
                 fit_idata,
                 x,
-                block_idx=block_idx,
+                block_idx=block_idx_val,
                 hdi_prob=0.9,
             )
             band_df = band_df.with_columns(pl.lit(blk["Block"]).alias("Series"))
@@ -741,7 +724,6 @@ def _(
         plot_layers.insert(0, band_chart)
     plot_chart = alt.layer(*plot_layers).resolve_scale(color="shared")
     plot_ui = mo.ui.altair_chart(plot_chart)
-
     return (plot_ui,)
 
 
@@ -753,7 +735,6 @@ def _(blocks_df, mo, pl, points_filtered_df, trials_cropped_df):
     from pathlib import Path as _Path
 
     import duckdb
-
 
     def build_csv_zip(
         points_df: pl.DataFrame,
@@ -778,17 +759,14 @@ def _(blocks_df, mo, pl, points_filtered_df, trials_cropped_df):
         zip_buffer.seek(0)
         return zip_buffer.read()
 
-
     def build_json(points_df: pl.DataFrame) -> bytes:
         return points_df.to_pandas().to_json().encode("utf-8")
-
 
     def build_parquet(points_df: pl.DataFrame) -> bytes:
         buffer = _io.BytesIO()
         points_df.write_parquet(buffer)
         buffer.seek(0)
         return buffer.read()
-
 
     def build_duckdb(points_df: pl.DataFrame) -> bytes:
         import tempfile
@@ -800,7 +778,6 @@ def _(blocks_df, mo, pl, points_filtered_df, trials_cropped_df):
             connection.execute("CREATE TABLE points AS SELECT * FROM points_df")
             connection.close()
             return db_path.read_bytes()
-
 
     timestamp = datetime.now().astimezone().strftime("%Y-%m-%d_%H%M")
     csv_zip = build_csv_zip(points_filtered_df, blocks_df, trials_cropped_df)
@@ -829,7 +806,6 @@ def _(blocks_df, mo, pl, points_filtered_df, trials_cropped_df):
         ],
         gap=1,
     )
-
     return (data_downloads,)
 
 
@@ -904,7 +880,6 @@ def _(
             "Online": online_content,
         },
     )
-
     return (input_tabs,)
 
 
@@ -982,7 +957,7 @@ def _(
         widths=[1, 2, 1],
         gap=2,
     )
-
+    return
 
 
 if __name__ == "__main__":
