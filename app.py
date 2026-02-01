@@ -528,6 +528,15 @@ def _(mo, trials_df):
 
 
 @app.cell
+def _(mo):
+    fit_button = mo.ui.run_button(
+        label="Fit Model",
+        kind="success",
+    )
+    return (fit_button,)
+
+
+@app.cell
 def _(trial_crop_slider, trials_df):
     # Apply trial crop
     crop_at = trial_crop_slider.value
@@ -543,51 +552,65 @@ def _(Path):
 
 
 @app.cell
+def _(fit_button, input_tabs):
+    should_fit = fit_button.value or input_tabs.value == "Simulation"
+    return (should_fit,)
+
+
+@app.cell
 def _(
     cached_hierarchical_fit,
     fit_params: dict[str, float | int | None],
     from_trials,
     pl,
+    should_fit,
     trials_cache_key,
     trials_cropped_df,
 ):
-    # Points and blocks from cropped trials
+    # Points always computed from trials
     points_df = from_trials(trials_cropped_df)
-    composite_block = (
-        pl.col("Subject").cast(pl.Utf8) + "__" + pl.col("Block").cast(pl.Utf8)
-    )
-    fit_trials_df = trials_cropped_df.with_columns(composite_block.alias("Block"))
-    cache_key = trials_cache_key(trials_cropped_df, fit_params)
-    fit_summary, fit_idata = cached_hierarchical_fit(
-        fit_trials_df,
-        cache_key,
-        fit_params,
-    )
-    fit_blocks = fit_trials_df["Block"].unique().sort().to_list()
-    block_idx_by_key = {block: idx for idx, block in enumerate(fit_blocks)}
 
-    blocks_list = []
-    block_idx_by_subject_block: dict[tuple[str, int], int] = {}
-    block_keys = trials_cropped_df.select(["Subject", "Block"]).unique()
-    for block_key_row in block_keys.iter_rows(named=True):
-        subject_id = str(block_key_row["Subject"])
-        block_id = int(block_key_row["Block"])
-        block_key = f"{subject_id}__{block_id}"
-        block_idx = block_idx_by_key.get(block_key)
-        if block_idx is None:
-            continue
-        block_idx_by_subject_block[(subject_id, block_id)] = block_idx
-        blocks_list.append(
-            {
-                "Block": block_id,
-                "Subject": subject_id,
-                "intercept": float(fit_summary["intercept"][block_idx]),
-                "slope": float(fit_summary["slope"][block_idx]),
-                "gamma": 0.0,
-                "lambda": 0.0,
-            },
+    # Only run fitting if button clicked or on Simulation tab
+    if should_fit:
+        composite_block = (
+            pl.col("Subject").cast(pl.Utf8) + "__" + pl.col("Block").cast(pl.Utf8)
         )
-    blocks_df = pl.from_dicts(blocks_list)
+        fit_trials_df = trials_cropped_df.with_columns(composite_block.alias("Block"))
+        cache_key = trials_cache_key(trials_cropped_df, fit_params)
+        fit_summary, fit_idata = cached_hierarchical_fit(
+            fit_trials_df,
+            cache_key,
+            fit_params,
+        )
+        fit_blocks = fit_trials_df["Block"].unique().sort().to_list()
+        block_idx_by_key = {block: idx for idx, block in enumerate(fit_blocks)}
+
+        blocks_list = []
+        block_idx_by_subject_block: dict[tuple[str, int], int] = {}
+        block_keys = trials_cropped_df.select(["Subject", "Block"]).unique()
+        for block_key_row in block_keys.iter_rows(named=True):
+            subject_id = str(block_key_row["Subject"])
+            block_id = int(block_key_row["Block"])
+            block_key = f"{subject_id}__{block_id}"
+            block_idx = block_idx_by_key.get(block_key)
+            if block_idx is None:
+                continue
+            block_idx_by_subject_block[(subject_id, block_id)] = block_idx
+            blocks_list.append(
+                {
+                    "Block": block_id,
+                    "Subject": subject_id,
+                    "intercept": float(fit_summary["intercept"][block_idx]),
+                    "slope": float(fit_summary["slope"][block_idx]),
+                    "gamma": 0.0,
+                    "lambda": 0.0,
+                },
+            )
+        blocks_df = pl.from_dicts(blocks_list)
+    else:
+        fit_idata = None
+        block_idx_by_subject_block = {}
+        blocks_df = pl.DataFrame()
     return block_idx_by_subject_block, blocks_df, fit_idata, points_df
 
 
@@ -650,14 +673,16 @@ def _(
                     "block_idx": block_idx_by_subject_block.get((subject, block)),
                 },
             )
-    block_rows.append(
-        {
-            "Block": "Model",
-            "intercept": model_intercept,
-            "slope": model_slope,
-            "block_idx": None,
-        },
-    )
+    # Only append Model curve if we have fitted data
+    if len(blocks_df) > 0:
+        block_rows.append(
+            {
+                "Block": "Model",
+                "intercept": model_intercept,
+                "slope": model_slope,
+                "block_idx": None,
+            },
+        )
     return (block_rows,)
 
 
@@ -718,16 +743,25 @@ def _(mo, n_levels, points_filtered_df):
 @app.cell
 def _(blocks_df, mo):
     # Blocks table with multi-selection
-    blocks_table = mo.ui.table(
-        blocks_df.to_pandas(),
-        selection="multi",
-        initial_selection=[0, 2] if len(blocks_df) > 2 else list(range(len(blocks_df))),
-        label="Blocks",
-        format_mapping={
-            "intercept": "{:.2f}".format,
-            "slope": "{:.2f}".format,
-        },
-    )
+    if len(blocks_df) > 0:
+        blocks_table = mo.ui.table(
+            blocks_df.to_pandas(),
+            selection="multi",
+            initial_selection=[0, 2]
+            if len(blocks_df) > 2
+            else list(range(len(blocks_df))),
+            label="Blocks",
+            format_mapping={
+                "intercept": "{:.2f}".format,
+                "slope": "{:.2f}".format,
+            },
+        )
+    else:
+        blocks_table = mo.ui.table(
+            [],
+            selection="multi",
+            label="Blocks",
+        )
     return (blocks_table,)
 
 
@@ -774,7 +808,11 @@ def _(
             )
             band_df = band_df.with_columns(pl.lit(blk["Block"]).alias("Series"))
             bands_list.append(band_df)
-    fits_df = pl.concat(fits_list)
+    fits_df = (
+        pl.concat(fits_list)
+        if len(fits_list) > 0
+        else pl.DataFrame({"Intensity": [], "Hit Rate": [], "Series": []})
+    )
     bands_df = (
         pl.concat(bands_list)
         if len(bands_list) > 0
@@ -912,6 +950,7 @@ def _(blocks_df, mo, pl, points_filtered_df, trials_cropped_df):
 @app.cell
 def _(
     file_upload,
+    fit_button,
     fit_settings,
     input_form,
     link_function,
@@ -937,6 +976,7 @@ def _(
             input_form,
             fit_settings,
             stimulus_info,
+            fit_button,
         ],
         gap=1,
     )
