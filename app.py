@@ -1004,6 +1004,10 @@ def _(
         ),
     )
     fits_df = fits_df.with_columns(pl.col("Series").cast(pl.Utf8))
+    # Extract base block name (without " (GT)" suffix) for consistent coloring
+    fits_df = fits_df.with_columns(
+        pl.col("Series").str.replace(r" \(GT\)$", "").alias("BlockGroup"),
+    )
     # Separate ground truth vs fitted curves for different styling
     ground_truth_df = fits_df.filter(pl.col("Type") == "Ground Truth")
     fitted_df = fits_df.filter(pl.col("Type") == "Fitted")
@@ -1027,7 +1031,7 @@ def _(
         .encode(
             x=alt.X("Intensity:Q"),
             y=alt.Y("Hit Rate:Q"),
-            color=alt.Color("Series:N"),
+            color=alt.Color("BlockGroup:N"),
         )
     )
     ground_truth_line_chart = (
@@ -1036,7 +1040,7 @@ def _(
         .encode(
             x=alt.X("Intensity:Q"),
             y=alt.Y("Hit Rate:Q"),
-            color=alt.Color("Series:N"),
+            color=alt.Color("BlockGroup:N"),
         )
     )
     points_chart = (
