@@ -186,3 +186,58 @@ def test_hierarchical_vs_independent_fits() -> None:
     # Group-level parameters should capture overall pattern
     assert isinstance(summary["mu_intercept"], float)
     assert isinstance(summary["sigma_intercept"], float)
+
+
+def test_standardization_parameters_stored() -> None:
+    """Fit should store standardization parameters in idata.attrs."""
+    trials_df = pl.DataFrame(
+        {
+            "Intensity": [10.0, 20.0, 30.0, 10.0, 20.0, 30.0],
+            "Result": [0, 0, 1, 0, 1, 1],
+            "Block": [0, 0, 0, 1, 1, 1],
+        },
+    )
+    idata = hierarchical.fit(
+        trials_df,
+        draws=50,
+        tune=50,
+        chains=1,
+        random_seed=42,
+    )
+
+    # Standardization parameters should be stored
+    assert "x_mean" in idata.attrs
+    assert "x_std" in idata.attrs
+    assert idata.attrs["x_mean"] == pytest.approx(20.0, rel=0.01)
+    assert idata.attrs["x_std"] > 0
+
+
+def test_threshold_in_original_scale() -> None:
+    """Summarized threshold should be in original intensity scale."""
+    # Create data with known threshold around x=100
+    np.random.seed(42)
+    x = np.array([90.0, 95.0, 100.0, 105.0, 110.0] * 10)
+    # Simulate with threshold at 100
+    probs = 1 / (1 + np.exp(-(x - 100) / 2))
+    y = (np.random.random(len(x)) < probs).astype(int)
+
+    trials_df = pl.DataFrame(
+        {
+            "Intensity": x,
+            "Result": y,
+            "Block": [0] * len(x),
+        },
+    )
+
+    idata = hierarchical.fit(
+        trials_df,
+        draws=200,
+        tune=200,
+        chains=1,
+        random_seed=42,
+    )
+    summary = hierarchical.summarize_fit(idata)
+
+    # Threshold should be close to 100 (the true value), not near 0
+    assert summary["threshold"][0] > 90
+    assert summary["threshold"][0] < 110

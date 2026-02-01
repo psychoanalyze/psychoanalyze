@@ -42,6 +42,10 @@ def fit(
     distributions. This allows information sharing across blocks and provides better
     estimates for blocks with limited data.
     
+    Data is standardized (mean-centered and scaled by std) before fitting to improve
+    MCMC sampling efficiency. The standardization parameters are stored in the
+    InferenceData attrs for unstandardization during analysis.
+    
     Args:
         trials: DataFrame with columns 'Intensity', 'Result', and 'Block'
         draws: Number of posterior samples per chain
@@ -57,6 +61,10 @@ def fit(
             - intercept: Block-specific intercepts (shape: [n_blocks])
             - slope: Block-specific slopes (shape: [n_blocks])
             - threshold: Block-specific thresholds (shape: [n_blocks])
+        
+        Standardization parameters are stored in idata.attrs:
+            - x_mean: Mean of Intensity used for standardization
+            - x_std: Std of Intensity used for standardization
     
     Example:
         >>> trials_df = pl.DataFrame({
@@ -67,30 +75,32 @@ def fit(
         >>> idata = fit(trials_df, draws=100, tune=100, chains=1)
         >>> summary = summarize_fit(idata)
     """
-    # Prepare data
     if "Block" not in trials.columns:
         msg = "trials DataFrame must contain a 'Block' column"
         raise ValueError(msg)
     
-    # Get unique blocks and create block index
     blocks = trials["Block"].unique().sort()
     n_blocks = len(blocks)
     block_idx_map = {block: idx for idx, block in enumerate(blocks.to_list())}
     
-    # Create block indices for each trial
     block_idx = np.array([block_idx_map[b] for b in trials["Block"].to_list()])
-    x = trials["Intensity"].to_numpy()
+    x_raw = trials["Intensity"].to_numpy()
     y = trials["Result"].to_numpy()
     
+    # Standardize intensity for better MCMC sampling
+    x_mean = float(np.mean(x_raw))
+    x_std = float(np.std(x_raw))
+    if x_std == 0:
+        x_std = 1.0
+    x = (x_raw - x_mean) / x_std
+    
     with pm.Model():
-        # Hyperpriors (group-level parameters)
         mu_intercept = pm.Normal("mu_intercept", mu=0.0, sigma=2.5)
         sigma_intercept = pm.HalfNormal("sigma_intercept", sigma=2.5)
         
         mu_slope = pm.Normal("mu_slope", mu=0.0, sigma=2.5)
         sigma_slope = pm.HalfNormal("sigma_slope", sigma=2.5)
         
-        # Block-level parameters (drawn from group distribution)
         intercept = pm.Normal(
             "intercept",
             mu=mu_intercept,
@@ -104,14 +114,11 @@ def fit(
             shape=n_blocks,
         )
         
-        # Likelihood (trial-level)
         logit_p = intercept[block_idx] + slope[block_idx] * x
         pm.Bernoulli("obs", logit_p=logit_p, observed=y)
         
-        # Derived quantities
         threshold = pm.Deterministic("threshold", -intercept / slope)
         
-        # Sample posterior
         idata = pm.sample(
             draws=draws,
             tune=tune,
@@ -123,16 +130,22 @@ def fit(
             return_inferencedata=True,
         )
         
-        # Add block identifiers to inference data
         idata.posterior = idata.posterior.assign_coords(
             block=("intercept_dim_0", blocks.to_list()),
         )
+    
+    # Store standardization parameters for later unstandardization
+    idata.attrs["x_mean"] = x_mean
+    idata.attrs["x_std"] = x_std
     
     return idata
 
 
 def summarize_fit(idata: az.InferenceData) -> dict[str, float | np.ndarray]:
     """Summarize posterior draws from hierarchical fit.
+    
+    Parameters are unstandardized back to the original intensity scale using
+    the x_mean and x_std stored in idata.attrs.
     
     Args:
         idata: InferenceData from hierarchical fit
@@ -141,9 +154,9 @@ def summarize_fit(idata: az.InferenceData) -> dict[str, float | np.ndarray]:
         Dictionary with keys:
             - mu_intercept, sigma_intercept: Group-level intercept parameters
             - mu_slope, sigma_slope: Group-level slope parameters
-            - intercept: Array of block-specific intercepts
-            - slope: Array of block-specific slopes
-            - threshold: Array of block-specific thresholds
+            - intercept: Array of block-specific intercepts (original scale)
+            - slope: Array of block-specific slopes (original scale)
+            - threshold: Array of block-specific thresholds (original scale)
     """
     var_names = [
         "mu_intercept",
@@ -156,21 +169,40 @@ def summarize_fit(idata: az.InferenceData) -> dict[str, float | np.ndarray]:
     ]
     summary = cast(pd.DataFrame, az.summary(idata, var_names=var_names))
     
+    # Get standardization parameters
+    x_mean = idata.attrs.get("x_mean", 0.0)
+    x_std = idata.attrs.get("x_std", 1.0)
+    
     result = {}
     
-    # Extract scalar group-level parameters
+    # Extract scalar group-level parameters (keep in standardized space for now)
     for param in ["mu_intercept", "sigma_intercept", "mu_slope", "sigma_slope"]:
         result[param] = float(summary.loc[param, "mean"])
     
-    # Extract block-level arrays
+    # Extract block-level arrays and unstandardize
     n_blocks = len([idx for idx in summary.index if idx.startswith("intercept[")])
     
-    for param in ["intercept", "slope", "threshold"]:
-        values = []
-        for i in range(n_blocks):
-            row_name = f"{param}[{i}]"
-            values.append(float(summary.loc[row_name, "mean"]))
-        result[param] = np.array(values)
+    intercepts_std = []
+    slopes_std = []
+    for i in range(n_blocks):
+        intercepts_std.append(float(summary.loc[f"intercept[{i}]", "mean"]))
+        slopes_std.append(float(summary.loc[f"slope[{i}]", "mean"]))
+    
+    intercepts_std = np.array(intercepts_std)
+    slopes_std = np.array(slopes_std)
+    
+    # Unstandardize: slope_orig = slope_std / x_std
+    #                intercept_orig = intercept_std - slope_std * x_mean / x_std
+    slopes_orig = slopes_std / x_std
+    intercepts_orig = intercepts_std - slopes_std * x_mean / x_std
+    
+    # Threshold in original scale: threshold_orig = threshold_std * x_std + x_mean
+    thresholds_std = -intercepts_std / slopes_std
+    thresholds_orig = thresholds_std * x_std + x_mean
+    
+    result["intercept"] = intercepts_orig
+    result["slope"] = slopes_orig
+    result["threshold"] = thresholds_orig
     
     return result
 
@@ -183,9 +215,13 @@ def curve_credible_band(
 ) -> pl.DataFrame:
     """Compute credible band for psychometric curve of a specific block.
     
+    The intensity values (x) should be in the original scale. They are
+    standardized internally using the parameters stored in idata.attrs
+    before computing probabilities with the standardized model parameters.
+    
     Args:
         idata: InferenceData from hierarchical fit
-        x: Array of intensity values to evaluate curve at
+        x: Array of intensity values in original scale
         block_idx: Index of the block to compute curve for
         hdi_prob: Probability mass for credible interval
         
@@ -195,7 +231,14 @@ def curve_credible_band(
     x_array = np.asarray(x, dtype=float)
     posterior = idata.posterior
     
-    # Extract posterior samples for the specific block
+    # Get standardization parameters
+    x_mean = idata.attrs.get("x_mean", 0.0)
+    x_std = idata.attrs.get("x_std", 1.0)
+    
+    # Standardize input x values
+    x_std_array = (x_array - x_mean) / x_std
+    
+    # Extract posterior samples for the specific block (in standardized space)
     intercept = posterior["intercept"].isel(intercept_dim_0=block_idx)
     slope = posterior["slope"].isel(slope_dim_0=block_idx)
     
@@ -203,8 +246,8 @@ def curve_credible_band(
     intercept = intercept.stack(sample=("chain", "draw")).values
     slope = slope.stack(sample=("chain", "draw")).values
     
-    # Compute curve for all posterior samples
-    logits = intercept[:, None] + slope[:, None] * x_array[None, :]
+    # Compute curve for all posterior samples using standardized x
+    logits = intercept[:, None] + slope[:, None] * x_std_array[None, :]
     probs = expit(logits)
     
     # Compute credible intervals
@@ -212,6 +255,7 @@ def curve_credible_band(
     lower = np.quantile(probs, alpha, axis=0)
     upper = np.quantile(probs, 1.0 - alpha, axis=0)
     
+    # Return with original x values
     return pl.DataFrame({"Intensity": x_array, "lower": lower, "upper": upper})
 
 
@@ -229,6 +273,10 @@ def from_points(
     data (aggregated hit counts) rather than trial-level data. Internally converts
     to binomial likelihood.
     
+    Data is standardized (mean-centered and scaled by std) before fitting to improve
+    MCMC sampling efficiency. The standardization parameters are stored in the
+    InferenceData attrs for unstandardization during analysis.
+    
     Args:
         points: DataFrame with 'Intensity', 'Hits', 'n trials', and 'Block'
         draws: Number of posterior samples per chain
@@ -240,7 +288,6 @@ def from_points(
     Returns:
         InferenceData object with hierarchical posterior samples
     """
-    # Prepare data
     if not {"Block", "Intensity", "Hits", "n trials"}.issubset(points.columns):
         msg = "points DataFrame must contain 'Block', 'Intensity', 'Hits', 'n trials'"
         raise ValueError(msg)
@@ -250,19 +297,24 @@ def from_points(
     block_idx_map = {block: idx for idx, block in enumerate(blocks.to_list())}
     
     block_idx = np.array([block_idx_map[b] for b in points["Block"].to_list()])
-    x = points["Intensity"].to_numpy()
+    x_raw = points["Intensity"].to_numpy()
     hits = points["Hits"].to_numpy()
     n_trials = points["n trials"].to_numpy()
     
+    # Standardize intensity for better MCMC sampling
+    x_mean = float(np.mean(x_raw))
+    x_std = float(np.std(x_raw))
+    if x_std == 0:
+        x_std = 1.0
+    x = (x_raw - x_mean) / x_std
+    
     with pm.Model():
-        # Hyperpriors
         mu_intercept = pm.Normal("mu_intercept", mu=0.0, sigma=2.5)
         sigma_intercept = pm.HalfNormal("sigma_intercept", sigma=2.5)
         
         mu_slope = pm.Normal("mu_slope", mu=0.0, sigma=2.5)
         sigma_slope = pm.HalfNormal("sigma_slope", sigma=2.5)
         
-        # Block-level parameters
         intercept = pm.Normal(
             "intercept",
             mu=mu_intercept,
@@ -276,14 +328,11 @@ def from_points(
             shape=n_blocks,
         )
         
-        # Likelihood (binomial for aggregated data)
         logit_p = intercept[block_idx] + slope[block_idx] * x
         pm.Binomial("obs", n=n_trials, logit_p=logit_p, observed=hits)
         
-        # Derived quantities
         threshold = pm.Deterministic("threshold", -intercept / slope)
         
-        # Sample
         idata = pm.sample(
             draws=draws,
             tune=tune,
@@ -298,5 +347,9 @@ def from_points(
         idata.posterior = idata.posterior.assign_coords(
             block=("intercept_dim_0", blocks.to_list()),
         )
+    
+    # Store standardization parameters for later unstandardization
+    idata.attrs["x_mean"] = x_mean
+    idata.attrs["x_std"] = x_std
     
     return idata

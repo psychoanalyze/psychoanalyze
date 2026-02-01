@@ -11,6 +11,83 @@ app = marimo.App(width="full", app_title="PsychoAnalyze")
 
 
 @app.cell
+def _(
+    blocks_table,
+    data_downloads,
+    input_tabs,
+    mo,
+    plot_equation,
+    plot_ui,
+    points_table,
+    trial_crop_slider,
+):
+    # 3-column layout: Input | Visualization | Output
+    left_column = mo.vstack(
+        [
+            input_tabs,
+        ],
+        gap=1,
+    )
+
+    # Center content varies by selected mode
+    selected_mode = input_tabs.value
+
+    if selected_mode == "Batch":
+        center_column = mo.vstack(
+            [
+                mo.md("## Batch Analysis"),
+                plot_equation,
+                trial_crop_slider,
+                plot_ui,
+            ],
+            gap=1,
+        )
+    elif selected_mode == "Online":
+        center_column = mo.vstack(
+            [
+                mo.md("## Online Mode"),
+                mo.md(
+                    "Real-time visualization will appear here "
+                    "when connected to an experiment.",
+                ),
+                mo.md(
+                    "*Select Batch or Simulation mode to view data.*",
+                ),
+            ],
+            gap=1,
+        )
+    else:  # Simulation (default)
+        center_column = mo.vstack(
+            [
+                mo.md("## Simulation Results"),
+                plot_equation,
+                trial_crop_slider,
+                plot_ui,
+            ],
+            gap=1,
+        )
+
+    right_column = mo.vstack(
+        [
+            mo.md("## Blocks"),
+            blocks_table,
+            mo.md("## Points"),
+            points_table,
+            mo.md("## Download Data"),
+            data_downloads,
+        ],
+        gap=1,
+    )
+
+    mo.hstack(
+        [left_column, center_column, right_column],
+        widths=[1, 2, 1],
+        gap=2,
+    )
+    return
+
+
+@app.cell
 def _():
     import hashlib
     import io
@@ -136,6 +213,7 @@ def _(mo):
 
     [Notebooks](https://nb.psychoanalyze.io) · [GitHub](https://github.com/psychoanalyze/psychoanalyze) · [Docs](https://docs.psychoanalyze.io)
     """)
+    return
 
 
 @app.cell
@@ -880,82 +958,6 @@ def _(
         },
     )
     return (input_tabs,)
-
-
-@app.cell
-def _(
-    blocks_table,
-    data_downloads,
-    input_tabs,
-    mo,
-    plot_equation,
-    plot_ui,
-    points_table,
-    trial_crop_slider,
-):
-    # 3-column layout: Input | Visualization | Output
-    left_column = mo.vstack(
-        [
-            input_tabs,
-        ],
-        gap=1,
-    )
-
-    # Center content varies by selected mode
-    selected_mode = input_tabs.value
-
-    if selected_mode == "Batch":
-        center_column = mo.vstack(
-            [
-                mo.md("## Batch Analysis"),
-                plot_equation,
-                trial_crop_slider,
-                plot_ui,
-            ],
-            gap=1,
-        )
-    elif selected_mode == "Online":
-        center_column = mo.vstack(
-            [
-                mo.md("## Online Mode"),
-                mo.md(
-                    "Real-time visualization will appear here "
-                    "when connected to an experiment.",
-                ),
-                mo.md(
-                    "*Select Batch or Simulation mode to view data.*",
-                ),
-            ],
-            gap=1,
-        )
-    else:  # Simulation (default)
-        center_column = mo.vstack(
-            [
-                mo.md("## Simulation Results"),
-                plot_equation,
-                trial_crop_slider,
-                plot_ui,
-            ],
-            gap=1,
-        )
-
-    right_column = mo.vstack(
-        [
-            mo.md("## Blocks"),
-            blocks_table,
-            mo.md("## Points"),
-            points_table,
-            mo.md("## Download Data"),
-            data_downloads,
-        ],
-        gap=1,
-    )
-
-    mo.hstack(
-        [left_column, center_column, right_column],
-        widths=[1, 2, 1],
-        gap=2,
-    )
 
 
 if __name__ == "__main__":
