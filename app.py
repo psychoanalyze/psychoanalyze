@@ -84,7 +84,6 @@ def _(
         widths=[1, 2, 1],
         gap=2,
     )
-    return
 
 
 @app.cell
@@ -176,36 +175,96 @@ def _(Path, az, cache_root, hashlib, io, json, mo, np, pa_hierarchical, pl):
 def _(io, np, pa_points, pa_trials, pl, subject_utils, zipfile):
     generate_index = pa_points.generate_index
 
+    def sample_params_from_priors(random_seed: int | None = None) -> dict[str, float]:
+        """Sample parameters from hierarchical model priors.
+
+        Returns a dict with keys: x_0, k, gamma, lambda
+        """
+        rng = np.random.default_rng(random_seed)
+
+        # Sample hyperparameters
+        mu_intercept = rng.normal(0.0, 2.5)
+        sigma_intercept = np.abs(rng.normal(0.0, 2.5))
+        mu_slope = rng.normal(0.0, 2.5)
+        sigma_slope = np.abs(rng.normal(0.0, 2.5))
+
+        # Sample block-level params from hyperpriors
+        intercept = rng.normal(mu_intercept, sigma_intercept)
+        slope = rng.normal(mu_slope, sigma_slope)
+
+        # Sample gamma and lambda from Beta(1, 19) - mode near 0.05
+        gamma = rng.beta(1.0, 19.0)
+        lambda_ = rng.beta(1.0, 19.0)
+
+        # Convert intercept/slope to x_0/k parameterization
+        # threshold x_0 = -intercept / slope
+        # k = slope (steepness)
+        k = slope
+        x_0 = -intercept / slope if slope != 0 else 0.0
+
+        return {
+            "x_0": x_0,
+            "k": k,
+            "gamma": gamma,
+            "lambda": lambda_,
+        }
+
     def generate_trials(
         n_trials: int,
         options: list[float],
         params: dict,
         n_blocks: int,
         n_subjects: int = 1,
-    ) -> tuple[pl.DataFrame, dict[str, dict]]:
-        """Generate trials and return both data and subject-specific parameters."""
+        use_random_params: bool = False,
+        random_seed: int | None = None,
+    ) -> tuple[pl.DataFrame, dict[tuple[str, int], dict]]:
+        """Generate trials and return both data and block-specific parameters.
+
+        Args:
+            use_random_params: If True, ignore params and generate from priors
+            random_seed: Random seed for parameter generation
+
+        Returns:
+            (trials_df, ground_truth_params_map)
+            where ground_truth_params_map keys are (subject_id, block_id) tuples
+        """
         frames = []
-        subject_params_map = {}
+        ground_truth_params_map = {}
+        rng = np.random.default_rng(random_seed)
+
         for subject_idx in range(n_subjects):
             subject_id = (
                 chr(ord("A") + subject_idx) if subject_idx < 26 else f"S{subject_idx}"
             )
-            # Each subject gets their own x_0 drawn from standard normal
-            subject_params = params.copy()
-            subject_params["x_0"] = np.random.randn()
-            subject_params_map[subject_id] = subject_params
 
-            trials_df = pa_trials.generate(
-                n_trials=n_trials,
-                options=options,
-                params=subject_params,
-                n_blocks=n_blocks,
-            )
-            trials_df = trials_df.with_columns(pl.lit(subject_id).alias("Subject"))
-            frames.append(trials_df)
+            for block_id in range(n_blocks):
+                # Generate parameters for this block
+                if use_random_params:
+                    block_seed = None if random_seed is None else (random_seed + subject_idx * 1000 + block_id)
+                    block_params = sample_params_from_priors(block_seed)
+                else:
+                    # Use provided params with random variation per block
+                    block_params = params.copy()
+                    block_params["x_0"] = params["x_0"] + rng.normal(0, 0.5)
+
+                ground_truth_params_map[(subject_id, block_id)] = block_params
+
+                # Generate trials for this block
+                block_trials = pa_trials.generate(
+                    n_trials=n_trials,
+                    options=options,
+                    params=block_params,
+                    n_blocks=1,
+                )
+                block_trials = block_trials.with_columns(
+                    pl.lit(subject_id).alias("Subject"),
+                    pl.lit(block_id).alias("Block"),
+                )
+                frames.append(block_trials)
+
         return (
             pl.concat(frames) if frames else pl.DataFrame(),
-            subject_params_map,
+            ground_truth_params_map,
         )
 
     def from_trials(trials_df: pl.DataFrame) -> pl.DataFrame:
@@ -231,7 +290,6 @@ def _(mo):
 
     [Notebooks](https://nb.psychoanalyze.io) · [GitHub](https://github.com/psychoanalyze/psychoanalyze) · [Docs](https://docs.psychoanalyze.io)
     """)
-    return
 
 
 @app.cell
@@ -465,6 +523,7 @@ def _(pl):
 @app.cell
 def _(
     file_upload,
+    fit_random_seed,
     gamma,
     generate_index,
     generate_trials,
@@ -484,14 +543,16 @@ def _(
     x_0,
 ):
     # Trials: upload if provided, otherwise default to sample in Batch/Online
-    subject_ground_truth_params = {}
+    ground_truth_params = {}
+    use_random_params = input_tabs.value == "Simulation"
+
     if file_upload.value and len(file_upload.value) > 0:
         raw = file_upload.contents(0)
         fname = file_upload.name(0) or ""
         if raw is not None:
             trials_df = process_upload_bytes(raw, fname)
         else:
-            trials_df, subject_ground_truth_params = generate_trials(
+            trials_df, ground_truth_params = generate_trials(
                 n_trials=n_trials.value,
                 options=generate_index(n_levels.value, [min_x, max_x]),
                 params={
@@ -502,9 +563,11 @@ def _(
                 },
                 n_blocks=n_blocks.value,
                 n_subjects=n_subjects.value,
+                use_random_params=use_random_params,
+                random_seed=int(fit_random_seed.value) if fit_random_seed.value > 0 else None,
             )
     elif input_tabs.value == "Simulation":
-        trials_df, subject_ground_truth_params = generate_trials(
+        trials_df, ground_truth_params = generate_trials(
             n_trials=n_trials.value,
             options=generate_index(n_levels.value, [min_x, max_x]),
             params={
@@ -515,12 +578,14 @@ def _(
             },
             n_blocks=n_blocks.value,
             n_subjects=n_subjects.value,
+            use_random_params=use_random_params,
+            random_seed=int(fit_random_seed.value) if fit_random_seed.value > 0 else None,
         )
     else:
         trials_df = load_sample_trials()
     trials_df = subject_utils.ensure_subject_column(trials_df)
     trials_df = trials_df.with_columns(pl.col("Intensity").cast(pl.Float64))
-    return subject_ground_truth_params, trials_df
+    return ground_truth_params, trials_df
 
 
 @app.cell
@@ -573,6 +638,7 @@ def _(
     cached_hierarchical_fit,
     fit_params: dict[str, float | int | None],
     from_trials,
+    ground_truth_params,
     pl,
     should_fit,
     trials_cache_key,
@@ -607,16 +673,43 @@ def _(
             if block_idx is None:
                 continue
             block_idx_by_subject_block[(subject_id, block_id)] = block_idx
-            blocks_list.append(
-                {
-                    "Block": block_id,
-                    "Subject": subject_id,
-                    "intercept": float(fit_summary["intercept"][block_idx]),
-                    "slope": float(fit_summary["slope"][block_idx]),
-                    "gamma": 0.0,
-                    "lambda": 0.0,
-                },
-            )
+
+            # Get ground truth params for this block if available
+            _gt_params = ground_truth_params.get((subject_id, block_id))
+
+            # Estimated parameters from fit
+            _est_intercept = float(fit_summary["intercept"][block_idx])
+            _est_slope = float(fit_summary["slope"][block_idx])
+            _est_gamma = float(fit_summary["gamma"][block_idx])
+            _est_lambda = float(fit_summary["lam"][block_idx])
+            _est_x_0 = -_est_intercept / _est_slope if _est_slope != 0 else 0.0
+            _est_k = _est_slope
+
+            _block_dict = {
+                "Block": block_id,
+                "Subject": subject_id,
+                "intercept": _est_intercept,
+                "slope": _est_slope,
+                "gamma": _est_gamma,
+                "lambda": _est_lambda,
+                "x_0 (est)": _est_x_0,
+                "k (est)": _est_k,
+            }
+
+            # Add ground truth columns if available
+            if _gt_params is not None:
+                _gt_intercept = -_gt_params["x_0"] / _gt_params["k"] if _gt_params["k"] != 0 else 0.0
+                _gt_slope = _gt_params["k"]
+                _block_dict.update({
+                    "x_0 (actual)": _gt_params["x_0"],
+                    "k (actual)": _gt_params["k"],
+                    "gamma (actual)": _gt_params["gamma"],
+                    "lambda (actual)": _gt_params["lambda"],
+                    "intercept (actual)": _gt_intercept,
+                    "slope (actual)": _gt_slope,
+                })
+
+            blocks_list.append(_block_dict)
         blocks_df = pl.from_dicts(blocks_list)
     else:
         fit_idata = None
@@ -627,15 +720,15 @@ def _(
 
 @app.cell
 def _(
+    block,
     block_idx_by_subject_block: dict[tuple[str, int], int],
     blocks_df,
     blocks_table,
-    k,
+    ground_truth_params,
     pl,
-    subject_ground_truth_params,
-    x_0,
+    subject,
 ):
-    # Selected block rows for plot (include ground truth per subject)
+    # Selected block rows for plot (include ground truth per block)
     if blocks_table.value is not None and hasattr(blocks_table.value, "__len__"):
         try:
             selected_blocks_df = (
@@ -649,9 +742,6 @@ def _(
             selected_blocks_df = blocks_df
     else:
         selected_blocks_df = blocks_df
-    # Build list of block dicts for curves: selected blocks + Model
-    model_intercept = -x_0.value / k.value
-    model_slope = 1 / k.value
 
     def block_label(row: dict) -> str:
         subject = row.get("Subject")
@@ -663,46 +753,77 @@ def _(
     block_rows = []
     if isinstance(selected_blocks_df, pl.DataFrame) and len(selected_blocks_df) > 0:
         for block_row in selected_blocks_df.iter_rows(named=True):
-            subject = str(block_row.get("Subject", ""))
-            block = int(block_row.get("Block", 0))
+            _subject = str(block_row.get("Subject", ""))
+            _block = int(block_row.get("Block", 0))
+
+            # Add estimated curve
             block_rows.append(
                 {
                     "Block": block_label(block_row),
                     "intercept": block_row.get("intercept", 0),
                     "slope": block_row.get("slope", 1),
-                    "block_idx": block_idx_by_subject_block.get((subject, block)),
+                    "block_idx": block_idx_by_subject_block.get((_subject, _block)),
                     "is_ground_truth": False,
                 },
             )
+
+            # Add ground truth curve if available
+            _gt_params = ground_truth_params.get((_subject, _block))
+            if _gt_params is not None:
+                _gt_intercept = -_gt_params["x_0"] / _gt_params["k"] if _gt_params["k"] != 0 else 0.0
+                _gt_slope = _gt_params["k"]
+                block_rows.append(
+                    {
+                        "Block": f"{_subject}-{_block} (GT)",
+                        "intercept": _gt_intercept,
+                        "slope": _gt_slope,
+                        "block_idx": None,
+                        "is_ground_truth": True,
+                    },
+                )
     else:
         for block_row in blocks_df.iter_rows(named=True):
-            subject = str(block_row.get("Subject", ""))
-            block = int(block_row.get("Block", 0))
+            _subject = str(block_row.get("Subject", ""))
+            _block = int(block_row.get("Block", 0))
+
+            # Add estimated curve
             block_rows.append(
                 {
                     "Block": block_label(block_row),
                     "intercept": block_row["intercept"],
                     "slope": block_row["slope"],
-                    "block_idx": block_idx_by_subject_block.get((subject, block)),
+                    "block_idx": block_idx_by_subject_block.get((_subject, _block)),
                     "is_ground_truth": False,
                 },
             )
-    # Add ground truth curves for each subject (if in simulation mode)
-    if len(subject_ground_truth_params) > 0:
-        for subject_id, params in subject_ground_truth_params.items():
-            gt_x_0 = params["x_0"]
-            gt_k = params["k"]
-            gt_intercept = -gt_x_0 / gt_k
-            gt_slope = 1 / gt_k
-            block_rows.append(
-                {
-                    "Block": f"{subject_id} (GT)",
-                    "intercept": gt_intercept,
-                    "slope": gt_slope,
-                    "block_idx": None,
-                    "is_ground_truth": True,
-                },
-            )
+
+            # Add ground truth curve if available
+            _gt_params = ground_truth_params.get((_subject, _block))
+            if _gt_params is not None:
+                _gt_intercept = -_gt_params["x_0"] / _gt_params["k"] if _gt_params["k"] != 0 else 0.0
+                _gt_slope = _gt_params["k"]
+                block_rows.append(
+                    {
+                        "Block": f"{_subject}-{_block} (GT)",
+                        "intercept": _gt_intercept,
+                        "slope": _gt_slope,
+                        "block_idx": None,
+                        "is_ground_truth": True,
+                    },
+                )
+            gt_params = ground_truth_params.get((subject, block))
+            if gt_params is not None:
+                gt_intercept = -gt_params["x_0"] / gt_params["k"] if gt_params["k"] != 0 else 0.0
+                gt_slope = gt_params["k"]
+                block_rows.append(
+                    {
+                        "Block": f"{subject}-{block} (GT)",
+                        "intercept": gt_intercept,
+                        "slope": gt_slope,
+                        "block_idx": None,
+                        "is_ground_truth": True,
+                    },
+                )
     return (block_rows,)
 
 
@@ -764,17 +885,44 @@ def _(mo, n_levels, points_filtered_df):
 def _(blocks_df, mo):
     # Blocks table with multi-selection
     if len(blocks_df) > 0:
+        # Reorder columns to show actual vs estimated side by side for display
+        col_order = ["Subject", "Block"]
+        param_cols = ["x_0", "k", "gamma", "lambda"]
+        for param in param_cols:
+            if f"{param} (actual)" in blocks_df.columns:
+                col_order.append(f"{param} (actual)")
+            if f"{param} (est)" in blocks_df.columns:
+                col_order.append(f"{param} (est)")
+        # Add remaining columns that aren't already included
+        for col in blocks_df.columns:
+            if col not in col_order:
+                col_order.append(col)
+
+        display_df = blocks_df.select([c for c in col_order if c in blocks_df.columns])
+
+        format_mapping = {
+            "intercept": "{:.3f}".format,
+            "slope": "{:.3f}".format,
+            "intercept (actual)": "{:.3f}".format,
+            "slope (actual)": "{:.3f}".format,
+            "x_0 (actual)": "{:.3f}".format,
+            "x_0 (est)": "{:.3f}".format,
+            "k (actual)": "{:.3f}".format,
+            "k (est)": "{:.3f}".format,
+            "gamma": "{:.3f}".format,
+            "lambda": "{:.3f}".format,
+            "gamma (actual)": "{:.3f}".format,
+            "lambda (actual)": "{:.3f}".format,
+        }
+
         blocks_table = mo.ui.table(
-            blocks_df.to_pandas(),
+            display_df.to_pandas(),
             selection="multi",
-            initial_selection=[0, 2]
-            if len(blocks_df) > 2
-            else list(range(len(blocks_df))),
+            initial_selection=[0, 1]
+            if len(display_df) > 1
+            else list(range(len(display_df))),
             label="Blocks",
-            format_mapping={
-                "intercept": "{:.2f}".format,
-                "slope": "{:.2f}".format,
-            },
+            format_mapping=format_mapping,
         )
     else:
         blocks_table = mo.ui.table(
