@@ -1,0 +1,60 @@
+name: PyMC Sampling Artifacts
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  pymc-sampling:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run PyMC sampling tests with pytest
+        run: |
+          # Run pytest and capture the basetemp directory
+          uv run pytest tests/test_pymc_artifacts.py -v --basetemp=pymc-outputs
+
+      - name: Upload netCDF files
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: pymc-netcdf-files
+          path: pymc-outputs/*/netcdf/*.nc
+          retention-days: 30
+
+      - name: Upload ArviZ visualization plots
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: arviz-visualizations
+          path: pymc-outputs/*/plots/*.png
+          retention-days: 30
+
+      - name: Create summary
+        if: always()
+        run: |
+          echo "## PyMC Sampling Artifacts Generated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### NetCDF Files" >> $GITHUB_STEP_SUMMARY
+          find pymc-outputs -name "*.nc" -exec ls -lh {} \; 2>/dev/null >> $GITHUB_STEP_SUMMARY || echo "No netCDF files found" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ArviZ Visualization Plots" >> $GITHUB_STEP_SUMMARY
+          find pymc-outputs -name "*.png" -exec ls -lh {} \; 2>/dev/null >> $GITHUB_STEP_SUMMARY || echo "No plot files found" >> $GITHUB_STEP_SUMMARY
