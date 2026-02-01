@@ -4,14 +4,32 @@ This document describes the hierarchical Bayesian model for fitting psychometric
 
 ## Overview
 
-The hierarchical model provides a unified framework for fitting psychometric functions that shares information across blocks through group-level (population) parameters. This approach is particularly beneficial when:
+The hierarchical model provides a unified framework for fitting psychometric functions that shares information across blocks through group-level (population) parameters. The model uses the full psychometric function with **guess rate (γ)** and **lapse rate (λ)** parameters:
+
+$$\psi(x) = \gamma + (1 - \gamma - \lambda) \cdot F(x; \text{intercept}, \text{slope})$$
+
+where $F$ is the logistic function. For aggregated data, the model uses a **beta-binomial** likelihood to account for overdispersion.
+
+This approach is particularly beneficial when:
 
 1. You have multiple blocks of data from the same subject or experimental condition
 2. Some blocks have sparse data (few trials)
 3. You want to estimate both individual block parameters and population-level parameters
 4. You want to leverage information sharing (also called "shrinkage" or "partial pooling")
+5. You need to account for guess rates and lapse rates in psychophysics experiments
 
 ## Mathematical Formulation
+
+### Psychometric Function
+
+The full psychometric function is:
+
+$$\psi(x) = \gamma + (1 - \gamma - \lambda) \cdot \sigma(\text{intercept} + \text{slope} \cdot x)$$
+
+where:
+- $\gamma$ (gamma) = **guess rate** - baseline probability of correct response due to guessing
+- $\lambda$ (lambda) = **lapse rate** - probability of incorrect response even at high intensities
+- $\sigma$ = logistic sigmoid function
 
 ### Hierarchical Structure
 
@@ -22,17 +40,25 @@ The model has three levels:
    - σ_intercept ~ HalfNormal(2.5)
    - μ_slope ~ Normal(0, 2.5)
    - σ_slope ~ HalfNormal(2.5)
+   - μ_gamma ~ Beta(1, 19) *(prior mode near 5%)*
+   - κ_gamma ~ Gamma(2, 0.1) *(concentration)*
+   - μ_lambda ~ Beta(1, 19) *(prior mode near 5%)*
+   - κ_lambda ~ Gamma(2, 0.1) *(concentration)*
 
 2. **Block level**:
    - intercept[b] ~ Normal(μ_intercept, σ_intercept) for each block b
    - slope[b] ~ Normal(μ_slope, σ_slope)
-   - threshold[b] = -intercept[b] / slope[b]
+   - gamma[b] ~ Beta(μ_gamma × κ_gamma, (1 - μ_gamma) × κ_gamma)
+   - lambda[b] ~ Beta(μ_lambda × κ_lambda, (1 - μ_lambda) × κ_lambda)
+   - threshold[b] = solution to ψ(x) = 0.5
 
 3. **Trial level** (likelihood):
-   - Result ~ Bernoulli(logit_p = intercept[block] + slope[block] * Intensity)
+   - p = γ + (1 - γ - λ) × sigmoid(intercept + slope × Intensity)
+   - Result ~ Bernoulli(p)
 
-Alternatively, for aggregated points data:
-   - Hits ~ Binomial(n_trials, logit_p = intercept[block] + slope[block] * Intensity)
+For aggregated points data (beta-binomial for overdispersion):
+   - κ_obs ~ Gamma(2, 0.1) *(overdispersion concentration)*
+   - Hits ~ BetaBinomial(n_trials, p × κ_obs, (1 - p) × κ_obs)
 
 ### Key Differences from Independent Fits
 
@@ -182,11 +208,15 @@ Extract point estimates from posterior.
 **Returns:** Dictionary with:
 - `mu_intercept`, `sigma_intercept`: Group-level intercept parameters
 - `mu_slope`, `sigma_slope`: Group-level slope parameters
+- `mu_gamma`, `kappa_gamma`: Group-level guess rate parameters
+- `mu_lambda`, `kappa_lambda`: Group-level lapse rate parameters
 - `intercept`, `slope`, `threshold`: Arrays of block-specific parameters
+- `gamma`: Array of block-specific guess rates
+- `lam`: Array of block-specific lapse rates
 
 ### `hierarchical.curve_credible_band()`
 
-Compute credible interval for psychometric curve.
+Compute credible interval for full psychometric curve (including γ and λ).
 
 **Parameters:**
 - `idata`: InferenceData from fitting
@@ -195,6 +225,8 @@ Compute credible interval for psychometric curve.
 - `hdi_prob`: Probability mass for interval (default: 0.9)
 
 **Returns:** DataFrame with 'Intensity', 'lower', 'upper' columns
+
+The credible band properly accounts for uncertainty in all parameters (intercept, slope, gamma, lambda).
 
 ## Implementation Details
 
@@ -212,7 +244,7 @@ The hierarchical model is implemented using PyMC, which provides:
   - Number of blocks (linear)
   - Number of trials (linear)
   - Number of chains × (draws + tune)
-  
+
 - **Memory usage** is proportional to:
   - Number of posterior samples stored
   - Number of blocks × parameters

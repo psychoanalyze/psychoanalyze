@@ -29,12 +29,20 @@ def test_fit_with_multiple_blocks() -> None:
     assert "sigma_intercept" in idata.posterior
     assert "mu_slope" in idata.posterior
     assert "sigma_slope" in idata.posterior
+    assert "mu_gamma" in idata.posterior
+    assert "kappa_gamma" in idata.posterior
+    assert "mu_lambda" in idata.posterior
+    assert "kappa_lambda" in idata.posterior
 
     # Check that block-level parameters exist with correct shape
     assert "intercept" in idata.posterior
     assert "slope" in idata.posterior
+    assert "gamma" in idata.posterior
+    assert "lam" in idata.posterior
     assert "threshold" in idata.posterior
     assert idata.posterior["intercept"].shape[-1] == 2  # 2 blocks
+    assert idata.posterior["gamma"].shape[-1] == 2  # 2 blocks
+    assert idata.posterior["lam"].shape[-1] == 2  # 2 blocks
 
 
 def test_fit_requires_block_column() -> None:
@@ -72,13 +80,26 @@ def test_summarize_fit() -> None:
     assert "sigma_intercept" in summary
     assert "mu_slope" in summary
     assert "sigma_slope" in summary
+    assert "mu_gamma" in summary
+    assert "kappa_gamma" in summary
+    assert "mu_lambda" in summary
+    assert "kappa_lambda" in summary
 
     # Check block-level arrays
     assert "intercept" in summary
     assert "slope" in summary
+    assert "gamma" in summary
+    assert "lam" in summary
     assert "threshold" in summary
     assert isinstance(summary["intercept"], np.ndarray)
+    assert isinstance(summary["gamma"], np.ndarray)
+    assert isinstance(summary["lam"], np.ndarray)
     assert len(summary["intercept"]) == 2  # 2 blocks
+    assert len(summary["gamma"]) == 2  # 2 blocks
+
+    # Gamma and lambda should be in valid range [0, 1]
+    assert all(0 <= g <= 1 for g in summary["gamma"])
+    assert all(0 <= l <= 1 for l in summary["lam"])
 
 
 def test_curve_credible_band() -> None:
@@ -107,7 +128,7 @@ def test_curve_credible_band() -> None:
 
 
 def test_from_points_with_aggregated_data() -> None:
-    """Should fit hierarchical model using points-level data."""
+    """Should fit hierarchical beta-binomial model using points-level data."""
     points_df = pl.DataFrame(
         {
             "Intensity": [0.0, 1.0, 2.0, 0.0, 1.0, 2.0],
@@ -127,7 +148,11 @@ def test_from_points_with_aggregated_data() -> None:
     # Should have same structure as trial-level fit
     assert "mu_intercept" in idata.posterior
     assert "intercept" in idata.posterior
+    assert "gamma" in idata.posterior
+    assert "lam" in idata.posterior
+    assert "kappa_obs" in idata.posterior  # Overdispersion parameter
     assert idata.posterior["intercept"].shape[-1] == 2
+    assert idata.posterior["gamma"].shape[-1] == 2
 
 
 def test_from_points_requires_correct_columns() -> None:
@@ -178,7 +203,6 @@ def test_hierarchical_vs_independent_fits() -> None:
     summary = hierarchical.summarize_fit(idata)
 
     # The hierarchical model should provide reasonable estimates for both blocks
-    # Even though block 1 has sparse data
     assert len(summary["threshold"]) == 2
     assert not np.isnan(summary["threshold"]).any()
     assert not np.isinf(summary["threshold"]).any()
@@ -186,6 +210,12 @@ def test_hierarchical_vs_independent_fits() -> None:
     # Group-level parameters should capture overall pattern
     assert isinstance(summary["mu_intercept"], float)
     assert isinstance(summary["sigma_intercept"], float)
+
+    # Gamma and lambda should be present and reasonable
+    assert len(summary["gamma"]) == 2
+    assert len(summary["lam"]) == 2
+    assert all(0 <= g <= 1 for g in summary["gamma"])
+    assert all(0 <= l <= 1 for l in summary["lam"])
 
 
 def test_standardization_parameters_stored() -> None:

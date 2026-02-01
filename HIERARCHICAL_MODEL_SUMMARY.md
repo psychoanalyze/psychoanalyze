@@ -18,32 +18,42 @@ This implementation consolidates the previous separate "block fit" and "points f
 
 ### Hierarchical Model Architecture
 
+The model uses the full psychometric function with guess rate (γ) and lapse rate (λ):
+
+```
+ψ(x) = γ + (1 - γ - λ) × sigmoid(intercept + slope × x)
+```
+
 ```
 Population Level (Hyperpriors)
 ├── μ_intercept ~ Normal(0, 2.5)
 ├── σ_intercept ~ HalfNormal(2.5)
 ├── μ_slope ~ Normal(0, 2.5)
-└── σ_slope ~ HalfNormal(2.5)
+├── σ_slope ~ HalfNormal(2.5)
+├── μ_gamma ~ Beta(1, 19)        # Guess rate prior (mode ~5%)
+├── κ_gamma ~ Gamma(2, 0.1)       # Concentration
+├── μ_lambda ~ Beta(1, 19)       # Lapse rate prior (mode ~5%)
+└── κ_lambda ~ Gamma(2, 0.1)      # Concentration
      │
      ├─> Block Level (Individual Parameters)
-     │   ├── intercept[0] ~ Normal(μ_intercept, σ_intercept)
-     │   ├── intercept[1] ~ Normal(μ_intercept, σ_intercept)
-     │   └── ... (one per block)
-     │   ├── slope[0] ~ Normal(μ_slope, σ_slope)
-     │   ├── slope[1] ~ Normal(μ_slope, σ_slope)
-     │   └── ... (one per block)
+     │   ├── intercept[b] ~ Normal(μ_intercept, σ_intercept)
+     │   ├── slope[b] ~ Normal(μ_slope, σ_slope)
+     │   ├── gamma[b] ~ Beta(μ_gamma × κ_gamma, (1-μ_gamma) × κ_gamma)
+     │   └── lambda[b] ~ Beta(μ_lambda × κ_lambda, (1-μ_lambda) × κ_lambda)
      │
      └─> Trial Level (Likelihood)
-         └── Result ~ Bernoulli(logit_p = intercept[block] + slope[block] * Intensity)
+         ├── p = γ + (1 - γ - λ) × sigmoid(intercept + slope × x)
+         ├── Result ~ Bernoulli(p)           # For trial data
+         └── Hits ~ BetaBinomial(n, p, κ_obs) # For points data (overdispersion)
 ```
 
 ### Implementation Components
 
-1. **`src/psychoanalyze/data/hierarchical.py`** (310 lines)
-   - `fit()`: Fit from trial-level data (Bernoulli likelihood)
-   - `from_points()`: Fit from aggregated data (Binomial likelihood)
-   - `summarize_fit()`: Extract parameter estimates
-   - `curve_credible_band()`: Compute credible intervals for curves
+1. **`src/psychoanalyze/data/hierarchical.py`** (~350 lines)
+   - `fit()`: Fit from trial-level data (Bernoulli likelihood with γ/λ)
+   - `from_points()`: Fit from aggregated data (Beta-Binomial likelihood)
+   - `summarize_fit()`: Extract parameter estimates including γ and λ
+   - `curve_credible_band()`: Compute credible intervals for full psychometric curve
 
 2. **`tests/test_hierarchical.py`** (7 tests, all passing)
    - Multi-block fitting
@@ -127,17 +137,19 @@ Hierarchical credible intervals account for:
 ### Model Specification
 
 **Parameters**:
-- 4 hyperparameters (μ_intercept, σ_intercept, μ_slope, σ_slope)
-- 2 × n_blocks individual parameters (intercept[b], slope[b])
-- Derived: threshold[b] = -intercept[b] / slope[b]
+- 8 hyperparameters (μ_intercept, σ_intercept, μ_slope, σ_slope, μ_gamma, κ_gamma, μ_lambda, κ_lambda)
+- 4 × n_blocks individual parameters (intercept[b], slope[b], gamma[b], lambda[b])
+- Derived: threshold[b] = intensity where ψ(x) = 0.5
 
 **Priors**:
 - Weakly informative Normal(0, 2.5) for location parameters
 - HalfNormal(2.5) for scale parameters (ensures positive)
+- Beta(1, 19) for guess/lapse rates (mode ~5%, appropriate for psychophysics)
+- Gamma(2, 0.1) for concentration parameters
 
 **Likelihood**:
-- Bernoulli for trial data: P(Y=1|X) = logit^-1(intercept + slope × X)
-- Binomial for points data: Hits ~ Binomial(n, logit^-1(intercept + slope × X))
+- Bernoulli for trial data: P(Y=1|X) = γ + (1-γ-λ) × logit⁻¹(intercept + slope × X)
+- BetaBinomial for points data: Hits ~ BetaBinomial(n, α=p×κ, β=(1-p)×κ)
 
 ### Performance Characteristics
 
