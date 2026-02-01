@@ -673,7 +673,7 @@ def _(
     plot_layers = [line_chart, points_chart]
     if len(bands_pd) > 0:
         plot_layers.insert(0, band_chart)
-    plot_chart = alt.layer(*plot_layers).resolve_scale(color="shared").interactive()
+    plot_chart = alt.layer(*plot_layers).resolve_scale(color="shared")
     plot_ui = mo.ui.altair_chart(plot_chart)
     return (plot_ui,)
 

@@ -41,7 +41,7 @@ dependencies = [
     # "typer[all]>=0.9.0",
     # "kaleido==0.2.1",
     "ty>=0.0.14",
-    "marimo[mcp]>=0.19.2",
+    "marimo[mcp]>=0.19.7",
     "pyzmq>=27.1.0",
     "google-genai>=1.61.0",
     "pydantic-ai>=1.50.0",
@@ -54,7 +54,7 @@ psychoanalyze = "psychoanalyze.main:app"
 
 [dependency-groups]
 dev = [
-    "marimo>=0.19.2",
+    "marimo>=0.19.7",
     # "ipykernel>=6.24.0",
     # "ipywidgets>=8.0.7",
     # "jupyter>=1.0.0",
