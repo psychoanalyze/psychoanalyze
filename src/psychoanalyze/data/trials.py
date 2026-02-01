@@ -142,35 +142,69 @@ def fit(
     target_accept: float = 0.9,
     random_seed: int | None = None,
 ) -> az.InferenceData:
-    """Fit trial data using a Bayesian logistic regression."""
-    x = trials["Intensity"].to_numpy()
-    y = trials["Result"].to_numpy()
-
-    with pm.Model():
-        intercept = pm.Normal("intercept", mu=0.0, sigma=2.5)
-        slope = pm.Normal("slope", mu=0.0, sigma=2.5)
-        pm.Bernoulli("obs", logit_p=intercept + slope * x, observed=y)
-        intercept_t = pt.as_tensor_variable(intercept)
-        slope_t = pt.as_tensor_variable(slope)
-        threshold = pt.true_div(pt.mul(intercept_t, -1), slope_t)
-        pm.Deterministic("threshold", threshold)
-        idata = pm.sample(
-            draws=draws,
-            tune=tune,
-            chains=chains,
-            cores=1,
-            target_accept=target_accept,
-            random_seed=random_seed,
-            progressbar=False,
-            return_inferencedata=True,
-        )
-    return idata
+    """Fit trial data using hierarchical Bayesian logistic regression.
+    
+    This function now uses the hierarchical model by default, which provides
+    better estimates especially for sparse data. For backward compatibility,
+    if no 'Block' column is present, a default block is created.
+    
+    Args:
+        trials: DataFrame with 'Intensity' and 'Result' columns.
+                Optionally includes 'Block' for multi-block hierarchical fitting.
+        draws: Number of posterior samples per chain
+        tune: Number of tuning samples
+        chains: Number of MCMC chains
+        target_accept: Target acceptance probability for NUTS sampler
+        random_seed: Random seed for reproducibility
+        
+    Returns:
+        InferenceData object with posterior samples.
+    """
+    from psychoanalyze.data import hierarchical
+    
+    # Ensure Block column exists for hierarchical model
+    if "Block" not in trials.columns:
+        trials = trials.with_columns(pl.lit(0).alias("Block"))
+    
+    # Use hierarchical model
+    return hierarchical.fit(
+        trials=trials,
+        draws=draws,
+        tune=tune,
+        chains=chains,
+        target_accept=target_accept,
+        random_seed=random_seed,
+    )
 
 
 def summarize_fit(idata: az.InferenceData) -> dict[str, float]:
-    """Summarize posterior draws for trial-level fits."""
-    summary = cast("pd.DataFrame", az.summary(idata, var_names=["threshold", "slope"]))
-    return {
-        "Threshold": float(summary.loc["threshold", "mean"]),
-        "Slope": float(summary.loc["slope", "mean"]),
-    }
+    """Summarize posterior draws for trial-level fits.
+    
+    For hierarchical models (multi-block), returns the first block's parameters
+    for backward compatibility. Uses different key names ('Threshold', 'Slope')
+    than blocks.summarize_fit for historical reasons.
+    
+    Args:
+        idata: InferenceData from fit()
+        
+    Returns:
+        Dictionary with 'Threshold' and 'Slope' for the first block.
+    """
+    from psychoanalyze.data import hierarchical
+    
+    # Get hierarchical summary
+    hier_summary = hierarchical.summarize_fit(idata)
+    
+    # Check if this is a multi-block fit
+    if isinstance(hier_summary.get("threshold"), np.ndarray):
+        # Multi-block: return first block for backward compatibility
+        return {
+            "Threshold": float(hier_summary["threshold"][0]),
+            "Slope": float(hier_summary["slope"][0]),
+        }
+    else:
+        # Should not happen with current implementation, but handle gracefully
+        return {
+            "Threshold": float(hier_summary["threshold"]),
+            "Slope": float(hier_summary["slope"]),
+        }

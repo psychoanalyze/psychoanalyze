@@ -4,6 +4,11 @@
 **Blocks** are the most analytically significant objects in the PsychoAnalyze
 data hierarchy. They represent a specific set of experimental conditions and generally
 correspond to a single fit of the psychometric function.
+
+Note: As of the hierarchical model update, `blocks.fit()` now uses hierarchical
+Bayesian modeling by default, which provides better estimates through information
+sharing across blocks. For full control over hierarchical parameters, use
+`psychoanalyze.data.hierarchical.fit()` directly.
 """
 from pathlib import Path
 from typing import cast
@@ -107,41 +112,76 @@ def fit(
     target_accept: float = 0.9,
     random_seed: int | None = None,
 ) -> az.InferenceData:
-    """Fit logistic regression to trial data using PyMC."""
-    x = trials["Intensity"].to_numpy()
-    y = trials["Result"].to_numpy()
-
-    with pm.Model():
-        intercept = pm.Normal("intercept", mu=0.0, sigma=2.5)
-        slope = pm.Normal("slope", mu=0.0, sigma=2.5)
-        pm.Bernoulli("obs", logit_p=intercept + slope * x, observed=y)
-        intercept_t = pt.as_tensor_variable(intercept)
-        slope_t = pt.as_tensor_variable(slope)
-        threshold = pt.true_div(pt.mul(intercept_t, -1), slope_t)
-        pm.Deterministic("threshold", threshold)
-        idata = pm.sample(
-            draws=draws,
-            tune=tune,
-            chains=chains,
-            cores=1,
-            target_accept=target_accept,
-            random_seed=random_seed,
-            progressbar=False,
-            return_inferencedata=True,
-        )
-    return idata
+    """Fit logistic regression to trial data using hierarchical PyMC model.
+    
+    This function now uses the hierarchical model by default, which provides
+    better estimates especially for sparse data. For backward compatibility,
+    if no 'Block' column is present, a default block is created.
+    
+    Args:
+        trials: DataFrame with 'Intensity' and 'Result' columns. 
+                Optionally includes 'Block' for multi-block hierarchical fitting.
+        draws: Number of posterior samples per chain
+        tune: Number of tuning samples
+        chains: Number of MCMC chains
+        target_accept: Target acceptance probability for NUTS sampler
+        random_seed: Random seed for reproducibility
+        
+    Returns:
+        InferenceData object with posterior samples. For single-block data,
+        returns parameters for that block. For multi-block data, returns
+        hierarchical parameters for all blocks.
+    """
+    from psychoanalyze.data import hierarchical
+    
+    # Ensure Block column exists for hierarchical model
+    if "Block" not in trials.columns:
+        trials = trials.with_columns(pl.lit(0).alias("Block"))
+    
+    # Use hierarchical model
+    return hierarchical.fit(
+        trials=trials,
+        draws=draws,
+        tune=tune,
+        chains=chains,
+        target_accept=target_accept,
+        random_seed=random_seed,
+    )
 
 
 def summarize_fit(idata: az.InferenceData) -> dict[str, float]:
-    """Summarize posterior draws for block-level fits."""
-    summary = cast(
-        "pd.DataFrame", az.summary(idata, var_names=["intercept", "slope", "threshold"]),
-    )
-    return {
-        "intercept": float(summary.loc["intercept", "mean"]),
-        "slope": float(summary.loc["slope", "mean"]),
-        "threshold": float(summary.loc["threshold", "mean"]),
-    }
+    """Summarize posterior draws for block-level fits.
+    
+    For hierarchical models (multi-block), returns the first block's parameters
+    for backward compatibility. For full hierarchical summary including all blocks,
+    use hierarchical.summarize_fit() directly.
+    
+    Args:
+        idata: InferenceData from fit()
+        
+    Returns:
+        Dictionary with 'intercept', 'slope', and 'threshold' for the first block.
+    """
+    from psychoanalyze.data import hierarchical
+    
+    # Get hierarchical summary
+    hier_summary = hierarchical.summarize_fit(idata)
+    
+    # Check if this is a multi-block fit
+    if isinstance(hier_summary.get("intercept"), np.ndarray):
+        # Multi-block: return first block for backward compatibility
+        return {
+            "intercept": float(hier_summary["intercept"][0]),
+            "slope": float(hier_summary["slope"][0]),
+            "threshold": float(hier_summary["threshold"][0]),
+        }
+    else:
+        # Should not happen with current implementation, but handle gracefully
+        return {
+            "intercept": float(hier_summary["intercept"]),
+            "slope": float(hier_summary["slope"]),
+            "threshold": float(hier_summary["threshold"]),
+        }
 
 
 def curve_credible_band(
@@ -149,17 +189,29 @@ def curve_credible_band(
     x: np.ndarray | list[float],
     hdi_prob: float = 0.9,
 ) -> pl.DataFrame:
-    """Compute a credible band for the psychometric curve."""
-    x_array = np.asarray(x, dtype=float)
-    posterior = idata.posterior
-    intercept = posterior["intercept"].stack(sample=("chain", "draw")).values
-    slope = posterior["slope"].stack(sample=("chain", "draw")).values
-    logits = intercept[:, None] + slope[:, None] * x_array[None, :]
-    probs = expit(logits)
-    alpha = (1.0 - hdi_prob) / 2.0
-    lower = np.quantile(probs, alpha, axis=0)
-    upper = np.quantile(probs, 1.0 - alpha, axis=0)
-    return pl.DataFrame({"Intensity": x_array, "lower": lower, "upper": upper})
+    """Compute a credible band for the psychometric curve.
+    
+    Delegates to hierarchical.curve_credible_band for the first block.
+    For multi-block credible bands, use hierarchical.curve_credible_band directly.
+    
+    Args:
+        idata: InferenceData from fit()
+        x: Array of intensity values to evaluate curve at
+        hdi_prob: Probability mass for credible interval
+        
+    Returns:
+        DataFrame with columns 'Intensity', 'lower', 'upper'
+    """
+    from psychoanalyze.data import hierarchical
+    
+    # Use hierarchical version for first block
+    return hierarchical.curve_credible_band(
+        idata=idata,
+        x=x,
+        block_idx=0,
+        hdi_prob=hdi_prob,
+    )
+
 
 
 def generate_trials(n_trials: int, model_params: dict[str, float]) -> pl.DataFrame:
