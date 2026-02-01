@@ -101,6 +101,9 @@ def test_summarize_fit() -> None:
     assert all(0 <= g <= 1 for g in summary["gamma"])
     assert all(0 <= l <= 1 for l in summary["lam"])
 
+    # Slope should be positive
+    assert all(s > 0 for s in summary["slope"])
+
 
 def test_curve_credible_band() -> None:
     """Credible band should be computed for specific block."""
@@ -271,3 +274,35 @@ def test_threshold_in_original_scale() -> None:
     # Threshold should be close to 100 (the true value), not near 0
     assert summary["threshold"][0] > 90
     assert summary["threshold"][0] < 110
+
+
+def test_slope_always_positive() -> None:
+    """Slope parameter should always be constrained to be positive."""
+    trials_df = pl.DataFrame(
+        {
+            "Intensity": [0.0, 1.0, 2.0, 3.0, 0.0, 1.0, 2.0, 3.0],
+            "Result": [0, 0, 1, 1, 0, 0, 1, 1],
+            "Block": [0, 0, 0, 0, 1, 1, 1, 1],
+        },
+    )
+    idata = hierarchical.fit(
+        trials_df,
+        draws=100,
+        tune=100,
+        chains=1,
+        random_seed=42,
+    )
+
+    # All slope samples should be positive
+    slope_samples = idata.posterior["slope"].values
+    assert np.all(slope_samples > 0), "All slope samples should be positive"
+
+    # mu_slope hyperprior should also be positive
+    mu_slope_samples = idata.posterior["mu_slope"].values
+    assert np.all(mu_slope_samples > 0), "All mu_slope samples should be positive"
+
+    # Summary should show positive slopes
+    summary = hierarchical.summarize_fit(idata)
+    assert all(s > 0 for s in summary["slope"]), (
+        "All summarized slopes should be positive"
+    )

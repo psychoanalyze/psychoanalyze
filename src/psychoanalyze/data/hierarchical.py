@@ -18,7 +18,7 @@ The hierarchical structure is:
     - Group level: μ_intercept, σ_intercept, μ_slope, σ_slope (hyperparameters)
                    μ_gamma, κ_gamma, μ_lambda, κ_lambda (hyperparameters for rates)
     - Block level: intercept[b] ~ Normal(μ_intercept, σ_intercept)
-                   slope[b] ~ Normal(μ_slope, σ_slope)
+                   slope[b] ~ HalfNormal(σ_combined) where σ_combined² = μ_slope² + σ_slope²
                    gamma[b] ~ Beta(μ_gamma * κ_gamma, (1 - μ_gamma) * κ_gamma)
                    lambda[b] ~ Beta(μ_lambda * κ_lambda, (1 - μ_lambda) * κ_lambda)
     - Trial level: p = γ + (1 - γ - λ) * logistic(intercept + slope * Intensity)
@@ -71,11 +71,11 @@ def fit(
     Returns:
         InferenceData object containing posterior samples for:
             - mu_intercept, sigma_intercept: Group-level intercept hyperparameters
-            - mu_slope, sigma_slope: Group-level slope hyperparameters
+            - mu_slope, sigma_slope: Group-level slope hyperparameters (slope is constrained positive)
             - mu_gamma, kappa_gamma: Group-level guess rate hyperparameters
             - mu_lambda, kappa_lambda: Group-level lapse rate hyperparameters
             - intercept: Block-specific intercepts (shape: [n_blocks])
-            - slope: Block-specific slopes (shape: [n_blocks])
+            - slope: Block-specific slopes, always positive (shape: [n_blocks])
             - gamma: Block-specific guess rates (shape: [n_blocks])
             - lam: Block-specific lapse rates (shape: [n_blocks])
             - threshold: Block-specific thresholds (shape: [n_blocks])
@@ -117,7 +117,7 @@ def fit(
         mu_intercept = pm.Normal("mu_intercept", mu=0.0, sigma=2.5)
         sigma_intercept = pm.HalfNormal("sigma_intercept", sigma=2.5)
 
-        mu_slope = pm.Normal("mu_slope", mu=0.0, sigma=2.5)
+        mu_slope = pm.HalfNormal("mu_slope", sigma=2.5)
         sigma_slope = pm.HalfNormal("sigma_slope", sigma=2.5)
 
         # Guess rate (γ) hyperpriors - typically small (0-10%)
@@ -135,10 +135,9 @@ def fit(
             sigma=sigma_intercept,
             shape=n_blocks,
         )
-        slope = pm.Normal(
+        slope = pm.HalfNormal(
             "slope",
-            mu=mu_slope,
-            sigma=sigma_slope,
+            sigma=pt.sqrt(mu_slope**2 + sigma_slope**2),
             shape=n_blocks,
         )
 
@@ -412,7 +411,7 @@ def from_points(
         mu_intercept = pm.Normal("mu_intercept", mu=0.0, sigma=2.5)
         sigma_intercept = pm.HalfNormal("sigma_intercept", sigma=2.5)
 
-        mu_slope = pm.Normal("mu_slope", mu=0.0, sigma=2.5)
+        mu_slope = pm.HalfNormal("mu_slope", sigma=2.5)
         sigma_slope = pm.HalfNormal("sigma_slope", sigma=2.5)
 
         # Guess rate (γ) hyperpriors
@@ -433,10 +432,9 @@ def from_points(
             sigma=sigma_intercept,
             shape=n_blocks,
         )
-        slope = pm.Normal(
+        slope = pm.HalfNormal(
             "slope",
-            mu=mu_slope,
-            sigma=sigma_slope,
+            sigma=pt.sqrt(mu_slope**2 + sigma_slope**2),
             shape=n_blocks,
         )
 
@@ -463,7 +461,11 @@ def from_points(
         alpha_obs = p * kappa_obs
         beta_obs = (1 - p) * kappa_obs
         pm.BetaBinomial(
-            "obs", alpha=alpha_obs, beta=beta_obs, n=n_trials, observed=hits
+            "obs",
+            alpha=alpha_obs,
+            beta=beta_obs,
+            n=n_trials,
+            observed=hits,
         )
 
         # Threshold calculation
