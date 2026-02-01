@@ -385,14 +385,6 @@ def _(mo, preset_dropdown):
     _preset_values = _presets.get(_preset_key, _presets["standard"])
     _preset_free_values = _preset_free.get(_preset_key, _preset_free["standard"])
 
-    x_0_free = mo.ui.checkbox(value=_preset_free_values[0], label="x₀ free")
-    x_0 = mo.ui.number(value=_preset_values[0], step=0.1, label="x₀")
-    k_free = mo.ui.checkbox(value=_preset_free_values[1], label="k free")
-    k = mo.ui.number(value=_preset_values[1], step=0.1, label="k")
-    gamma_free = mo.ui.checkbox(value=_preset_free_values[2], label="γ free")
-    gamma = mo.ui.number(value=_preset_values[2], step=0.01, label="γ")
-    lambda_free = mo.ui.checkbox(value=_preset_free_values[3], label="λ free")
-    lambda_ = mo.ui.number(value=_preset_values[3], step=0.01, label="λ")
     n_levels = mo.ui.number(value=7, start=2, stop=50, step=1, label="n levels")
     n_trials = mo.ui.number(
         value=100,
@@ -410,21 +402,13 @@ def _(mo, preset_dropdown):
 
     **Link function:** $\psi(x) = \gamma + (1 - \gamma - \lambda)F(x)$
 
-    **Model** {x_0_free} {x_0} {k_free} {k} {gamma_free} {gamma} {lambda_free} {lambda_}
+    *Parameters (x₀, k, γ, λ) are randomly sampled from hierarchical priors*
 
     **Stimulus** {n_levels}
 
     **Simulation** {n_trials} {n_blocks} {n_subjects}
     """)
         .batch(
-            x_0_free=x_0_free,
-            x_0=x_0,
-            k_free=k_free,
-            k=k,
-            gamma_free=gamma_free,
-            gamma=gamma,
-            lambda_free=lambda_free,
-            lambda_=lambda_,
             n_levels=n_levels,
             n_trials=n_trials,
             n_blocks=n_blocks,
@@ -433,15 +417,11 @@ def _(mo, preset_dropdown):
         .form(submit_button_label="Generate")
     )
     return (
-        gamma,
         input_form,
-        k,
-        lambda_,
         n_blocks,
         n_levels,
         n_subjects,
         n_trials,
-        x_0,
     )
 
 
@@ -459,12 +439,11 @@ def _(fit_chains, fit_draws, fit_random_seed, fit_target_accept, fit_tune):
 
 
 @app.cell
-def _(k, logit, to_intercept, to_slope, x_0):
-    # Compute stimulus range from model parameters
-    intercept = to_intercept(x_0.value, k.value)
-    slope = to_slope(k.value)
-    min_x = (logit(0.01) - intercept) / slope
-    max_x = (logit(0.99) - intercept) / slope
+def _(logit):
+    # Default stimulus range for random parameter generation
+    # Using reasonable defaults: x_0=0, k=1 as baseline
+    min_x = logit(0.01)
+    max_x = logit(0.99)
     return max_x, min_x
 
 
@@ -521,12 +500,9 @@ def _(pl):
 def _(
     file_upload,
     fit_random_seed,
-    gamma,
     generate_index,
     generate_trials,
     input_tabs,
-    k,
-    lambda_,
     load_sample_trials,
     max_x,
     min_x,
@@ -537,7 +513,6 @@ def _(
     pl,
     process_upload_bytes,
     subject_utils,
-    x_0,
 ):
     # Trials: upload if provided, otherwise default to sample in Batch/Online
     ground_truth_params = {}
@@ -552,31 +527,25 @@ def _(
             trials_df, ground_truth_params = generate_trials(
                 n_trials=n_trials.value,
                 options=generate_index(n_levels.value, [min_x, max_x]),
-                params={
-                    "x_0": x_0.value,
-                    "k": k.value,
-                    "gamma": gamma.value,
-                    "lambda": lambda_.value,
-                },
+                params={},
                 n_blocks=n_blocks.value,
                 n_subjects=n_subjects.value,
                 use_random_params=use_random_params,
-                random_seed=int(fit_random_seed.value) if fit_random_seed.value > 0 else None,
+                random_seed=int(fit_random_seed.value)
+                if fit_random_seed.value > 0
+                else None,
             )
     elif input_tabs.value == "Simulation":
         trials_df, ground_truth_params = generate_trials(
             n_trials=n_trials.value,
             options=generate_index(n_levels.value, [min_x, max_x]),
-            params={
-                "x_0": x_0.value,
-                "k": k.value,
-                "gamma": gamma.value,
-                "lambda": lambda_.value,
-            },
+            params={},
             n_blocks=n_blocks.value,
             n_subjects=n_subjects.value,
             use_random_params=use_random_params,
-            random_seed=int(fit_random_seed.value) if fit_random_seed.value > 0 else None,
+            random_seed=int(fit_random_seed.value)
+            if fit_random_seed.value > 0
+            else None,
         )
     else:
         trials_df = load_sample_trials()
@@ -682,6 +651,22 @@ def _(
             _est_x_0 = -_est_intercept / _est_slope if _est_slope != 0 else 0.0
             _est_k = _est_slope
 
+            # Calculate confidence intervals from posterior
+            _x_0_ci_lower = _est_x_0
+            _x_0_ci_upper = _est_x_0
+            try:
+                posterior = fit_idata.posterior
+                threshold_samples = (
+                    posterior["threshold"]
+                    .isel(threshold_dim_0=block_idx)
+                    .stack(sample=("chain", "draw"))
+                    .values
+                )
+                _x_0_ci_lower = float(__import__("numpy").quantile(threshold_samples, 0.05))
+                _x_0_ci_upper = float(__import__("numpy").quantile(threshold_samples, 0.95))
+            except (KeyError, IndexError, ValueError, AttributeError):
+                pass
+
             _block_dict = {
                 "Block": block_id,
                 "Subject": subject_id,
@@ -691,6 +676,8 @@ def _(
                 "lambda": _est_lambda,
                 "x_0 (est)": _est_x_0,
                 "k (est)": _est_k,
+                "x_0_ci_lower": _x_0_ci_lower,
+                "x_0_ci_upper": _x_0_ci_upper,
             }
 
             # Add ground truth columns if available
@@ -869,31 +856,89 @@ def _(expit, link_function):
 
 @app.cell
 def _(alt, blocks_df, mo, pl):
-    # Blocks chart with multi-selection
+    # Blocks chart: Actual vs Estimated with confidence intervals (scatter plot)
     if len(blocks_df) > 0 and "x_0 (est)" in blocks_df.columns:
-        chart_df = blocks_df.select(["Subject", "Block", "x_0 (est)"]).with_columns(
-            (
-                pl.col("Subject").cast(pl.Utf8) + "-" + pl.col("Block").cast(pl.Utf8)
-            ).alias("Block Label"),
-        )
-        chart_pd = chart_df.to_pandas()
-        selection = alt.selection_point(fields=["Subject", "Block"], toggle=True)
-        chart = (
-            alt.Chart(chart_pd)
-            .mark_bar()
-            .encode(
-                x=alt.X("Block Label:N", title="Block", sort=None),
-                y=alt.Y("x_0 (est):Q", title="x_0 (est)"),
-                color=alt.condition(
-                    selection,
-                    alt.Color("Subject:N"),
-                    alt.value("#c9c9c9"),
-                ),
-                tooltip=["Subject:N", "Block:Q", "x_0 (est):Q"],
+        # Prepare data for scatter plot: actual vs estimated
+        chart_rows = []
+
+        for row in blocks_df.iter_rows(named=True):
+            subject = str(row["Subject"])
+            block = int(row["Block"])
+            x_est = float(row["x_0 (est)"])
+
+            # Get confidence interval if available
+            conf_low = x_est
+            conf_high = x_est
+            if "x_0_ci_lower" in row and row["x_0_ci_lower"] is not None:
+                conf_low = float(row["x_0_ci_lower"])
+            if "x_0_ci_upper" in row and row["x_0_ci_upper"] is not None:
+                conf_high = float(row["x_0_ci_upper"])
+
+            chart_rows.append(
+                {
+                    "Subject": subject,
+                    "Block": block,
+                    "Type": "Estimated",
+                    "Threshold": x_est,
+                    "Conf_Low": conf_low,
+                    "Conf_High": conf_high,
+                },
             )
-            .add_params(selection)
-        )
-        blocks_chart = mo.ui.altair_chart(chart)
+
+            # Add actual threshold if available (ground truth)
+            if "x_0 (actual)" in row and row["x_0 (actual)"] is not None:
+                x_actual = float(row["x_0 (actual)"])
+                chart_rows.append(
+                    {
+                        "Subject": subject,
+                        "Block": block,
+                        "Type": "Actual",
+                        "Threshold": x_actual,
+                        "Conf_Low": x_actual,
+                        "Conf_High": x_actual,
+                    },
+                )
+
+        if chart_rows:
+            chart_df = pl.from_dicts(chart_rows)
+            chart_pd = chart_df.to_pandas()
+
+            # Create scatter plot with error bars
+            selection = alt.selection_point(fields=["Subject", "Block"], toggle=True)
+
+            # Points
+            points = (
+                alt.Chart(chart_pd)
+                .mark_point(filled=True, size=100)
+                .encode(
+                    x=alt.X("Threshold:Q", title="Threshold (x₀)"),
+                    y=alt.Y("Type:N", title=""),
+                    color=alt.condition(
+                        selection,
+                        alt.Color("Subject:N", scale=alt.Scale(scheme="category10")),
+                        alt.value("#d3d3d3"),
+                    ),
+                    tooltip=["Subject:N", "Block:Q", "Type:N", "Threshold:Q"],
+                )
+                .add_params(selection)
+            )
+
+            # Error bars for estimated (confidence intervals)
+            error_bars = (
+                alt.Chart(chart_pd[chart_pd["Type"] == "Estimated"])
+                .mark_errorbar(extent="ci")
+                .encode(
+                    x=alt.X("Conf_Low:Q"),
+                    x2=alt.X2("Conf_High:Q"),
+                    y=alt.Y("Type:N"),
+                    color=alt.Color("Subject:N", scale=alt.Scale(scheme="category10")),
+                )
+            )
+
+            chart = (error_bars + points).properties(height=200, width=400).resolve_scale(color="shared")
+            blocks_chart = mo.ui.altair_chart(chart)
+        else:
+            blocks_chart = mo.md("No block data to display.")
     else:
         blocks_chart = mo.md("No block fits available yet.")
     return (blocks_chart,)
@@ -1108,7 +1153,6 @@ def _(
     mo,
     preset_dropdown,
     show_equation,
-    stimulus_info,
 ):
     # Build tab content based on selected mode
     batch_content = mo.vstack(
@@ -1125,7 +1169,6 @@ def _(
             preset_dropdown,
             input_form,
             fit_settings,
-            stimulus_info,
             fit_button,
         ],
         gap=1,
@@ -1137,11 +1180,8 @@ def _(
             mo.md("### Link Function"),
             link_function,
             show_equation,
-            mo.md("### Model Parameters"),
-            preset_dropdown,
             input_form,
             fit_settings,
-            stimulus_info,
         ],
         gap=1,
     )
