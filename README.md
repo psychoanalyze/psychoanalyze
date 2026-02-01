@@ -2,6 +2,13 @@
 
 Interactive data simulation and analysis for psychophysics with PyMC-based Bayesian fitting.
 
+## Features
+
+- **Bayesian Fitting**: PyMC-based MCMC sampling for psychometric curve estimation
+- **Animated Sampling**: Visualize MCMC sampling evolution with pause/rewind capabilities
+- **Interactive Dashboard**: Marimo-based web interface for data exploration
+- **Multi-Subject Analysis**: Support for analyzing multiple subjects simultaneously
+
 [![GitHub Discussions](https://img.shields.io/github/discussions/psychoanalyze/psychoanalyze)](https://github.com/orgs/psychoanalyze/discussions)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/psychoanalyze/notebooks/main?urlpath=git-pull%3Frepo%3Dhttps%253A%252F%252Fgithub.com%252Fpsychoanalyze%252Fnotebooks%26urlpath%3Dlab%252Ftree%252Fnotebooks%252Ftutorial.ipynb%26branch%3Dmain)
 [![PyPI - Status](https://img.shields.io/pypi/status/psychoanalyze)](https://pypi.org/project/psychoanalyze/)
@@ -21,6 +28,18 @@ View the full documentation at [https://docs.psychoanalyze.io](https://docs.psyc
 
 ## Dashboard
 See what `psychoanalyze` can do by [viewing our dashboard](https://psychoanalyze.io/). The dashboard accepts an optional `Subject` column for multi-subject analyses.
+
+## Animated Sampling
+Visualize the evolution of PyMC MCMC sampling with pause and rewind capabilities. See the [animation documentation](docs/animation.md) and try the [example notebook](examples/sampling_animation_demo.py).
+
+```python
+from psychoanalyze.animation import AnimatedSampler
+from psychoanalyze.animation.plot import plot_sampling_dashboard
+
+sampler = AnimatedSampler(trials=trials_df, draws=500, tune=500, chains=2)
+idata, snapshots = sampler.sample_with_snapshots(snapshot_interval=25)
+fig = plot_sampling_dashboard(sampler, trials=trials_df, up_to_draw=250)
+```
 
 ## Install with Python
 ```console
