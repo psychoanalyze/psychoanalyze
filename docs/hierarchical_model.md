@@ -303,14 +303,14 @@ idata_1 = blocks.fit(block_1)
 # Each fit is independent, no information sharing
 ```
 
-### Legacy `points.prep_fit()` (Stan preparation)
+### Legacy `points.prep_fit()` (Incomplete PyMC approach)
 
 ```python
-# Old approach - prepare for Stan (not fully implemented)
+# Old approach - prepare data for external fitting (not fully implemented)
 from psychoanalyze.data import points
 
 points_data = points.prep_fit(points_df)
-# Returns dict for Stan, but Stan model was commented out
+# This was a preparation step that wasn't connected to any fitting
 ```
 
 ### New `hierarchical.fit()` (Unified)
@@ -360,9 +360,9 @@ for i, block_id in enumerate(trials_df["Block"].unique().sort()):
 ```python
 from psychoanalyze.data import points
 
-# Prepare data for Stan (not used)
-stan_data = points.prep_fit(points_df)
-# Stan model was commented out, so this wasn't functional
+# Prepare data for external fitting (not used)
+data_dict = points.prep_fit(points_df)
+# This wasn't connected to any actual fitting implementation
 ```
 
 **After:**

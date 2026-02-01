@@ -10,7 +10,7 @@ This implementation consolidates the previous separate "block fit" and "points f
 
 **Previous Approaches**:
 1. **Block fit** (`blocks.fit()`): Independent PyMC Bernoulli fits per block
-2. **Points fit** (`points.prep_fit()`): Preparation for Stan (largely unused, Stan code commented out)
+2. **Points fit** (`points.prep_fit()`): Data preparation function (largely unused, not connected to fitting)
 
 **Problem**: No information sharing between blocks, poor estimates for sparse data
 
@@ -184,14 +184,14 @@ for i, block_id in enumerate(block_ids):
     # ...
 ```
 
-### From `points.prep_fit()` (Stan preparation)
+### From `points.prep_fit()` (Data preparation)
 
 **Before**:
 ```python
 from psychoanalyze.data import points
 
-# Prepared data for Stan but model was commented out
-stan_data = points.prep_fit(points_df)
+# Prepared data but not connected to any fitting implementation
+data_dict = points.prep_fit(points_df)
 # Not functional
 ```
 
@@ -233,10 +233,10 @@ Code quality:
    - `plot_shrinkage()`: Visualize regularization effects
    - `plot_posterior_comparison()`: Compare independent vs hierarchical
 
-3. **Stan Model Update**
-   - Enable commented-out hierarchical code in `models/binomial_regression.stan`
-   - Match PyMC implementation
-   - Provide CmdStan interface as alternative
+3. **Extended PyMC Models**
+   - Add guess rate (γ) and lapse rate (λ) parameters
+   - Support for different link functions (Weibull, Gumbel)
+   - Time-varying parameters for longitudinal studies
 
 4. **Performance Optimization**
    - GPU acceleration via PyMC/JAX
