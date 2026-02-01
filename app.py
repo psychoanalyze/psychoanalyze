@@ -12,13 +12,12 @@ app = marimo.App(width="full", app_title="PsychoAnalyze")
 
 @app.cell
 def _(
-    blocks_table,
+    blocks_chart,
     data_downloads,
     input_tabs,
     mo,
     plot_equation,
     plot_ui,
-    points_table,
     trial_crop_slider,
 ):
     # 3-column layout: Input | Visualization | Output
@@ -70,9 +69,7 @@ def _(
     right_column = mo.vstack(
         [
             mo.md("## Blocks"),
-            blocks_table,
-            mo.md("## Points"),
-            points_table,
+            blocks_chart,
             mo.md("## Download Data"),
             data_downloads,
         ],
@@ -719,28 +716,45 @@ def _(
 
 
 @app.cell
+def _(pl):
+    def selection_to_pl(selection: object) -> pl.DataFrame | None:
+        if selection is None:
+            return None
+        if isinstance(selection, pl.DataFrame):
+            return selection
+        if isinstance(selection, dict):
+            return pl.from_dicts([selection])
+        if isinstance(selection, list):
+            return pl.from_dicts(selection) if selection else None
+        if hasattr(selection, "to_dict"):
+            try:
+                return pl.from_dicts(selection.to_dict("records"))
+            except Exception:
+                return None
+        if hasattr(selection, "to_dicts"):
+            try:
+                return pl.from_dicts(selection.to_dicts())
+            except Exception:
+                return None
+        return None
+
+    return (selection_to_pl,)
+
+
+@app.cell
 def _(
     block,
     block_idx_by_subject_block: dict[tuple[str, int], int],
     blocks_df,
-    blocks_table,
+    blocks_chart,
     ground_truth_params,
     pl,
+    selection_to_pl,
     subject,
 ):
     # Selected block rows for plot (include ground truth per block)
-    if blocks_table.value is not None and hasattr(blocks_table.value, "__len__"):
-        try:
-            selected_blocks_df = (
-                blocks_table.value
-                if isinstance(blocks_table.value, pl.DataFrame)
-                else pl.from_dicts(blocks_table.value)
-                if blocks_table.value
-                else blocks_df
-            )
-        except Exception:
-            selected_blocks_df = blocks_df
-    else:
+    selected_blocks_df = selection_to_pl(getattr(blocks_chart, "value", None))
+    if selected_blocks_df is None or len(selected_blocks_df) == 0:
         selected_blocks_df = blocks_df
 
     def block_label(row: dict) -> str:
@@ -828,32 +842,20 @@ def _(
 
 
 @app.cell
-def _(blocks_table, pl, points_df):
+def _(blocks_chart, pl, points_df, selection_to_pl):
     # Filter points by selected blocks
-    if blocks_table.value is not None:
-        try:
-            sel = (
-                blocks_table.value
-                if isinstance(blocks_table.value, pl.DataFrame)
-                else pl.from_dicts(blocks_table.value)
-                if blocks_table.value
-                else None
+    sel = selection_to_pl(getattr(blocks_chart, "value", None))
+    if sel is not None and len(sel) > 0 and "Block" in sel.columns:
+        if "Subject" in sel.columns:
+            selected_pairs = sel.select(["Subject", "Block"]).to_dicts()
+            points_filtered_df = points_df.filter(
+                pl.struct(["Subject", "Block"]).is_in(selected_pairs),
             )
-            if sel is not None and len(sel) > 0 and "Block" in sel.columns:
-                if "Subject" in sel.columns:
-                    selected_pairs = sel.select(["Subject", "Block"]).to_dicts()
-                    points_filtered_df = points_df.filter(
-                        pl.struct(["Subject", "Block"]).is_in(selected_pairs),
-                    )
-                else:
-                    block_ids = sel["Block"].to_list()
-                    points_filtered_df = points_df.filter(
-                        pl.col("Block").is_in(block_ids),
-                    )
-            else:
-                points_filtered_df = points_df
-        except Exception:
-            points_filtered_df = points_df
+        else:
+            block_ids = sel["Block"].to_list()
+            points_filtered_df = points_df.filter(
+                pl.col("Block").is_in(block_ids),
+            )
     else:
         points_filtered_df = points_df
     return (points_filtered_df,)
@@ -866,71 +868,35 @@ def _(expit, link_function):
 
 
 @app.cell
-def _(mo, n_levels, points_filtered_df):
-    # Points table
-    points_table = mo.ui.table(
-        points_filtered_df.to_pandas(),
-        pagination=True,
-        page_size=n_levels.value,
-        label="Points",
-        format_mapping={
-            "Intensity": "{:.2f}".format,
-            "Hit Rate": "{:.2f}".format,
-        },
-    )
-    return (points_table,)
-
-
-@app.cell
-def _(blocks_df, mo):
-    # Blocks table with multi-selection
-    if len(blocks_df) > 0:
-        # Reorder columns to show actual vs estimated side by side for display
-        col_order = ["Subject", "Block"]
-        param_cols = ["x_0", "k", "gamma", "lambda"]
-        for param in param_cols:
-            if f"{param} (actual)" in blocks_df.columns:
-                col_order.append(f"{param} (actual)")
-            if f"{param} (est)" in blocks_df.columns:
-                col_order.append(f"{param} (est)")
-        # Add remaining columns that aren't already included
-        for col in blocks_df.columns:
-            if col not in col_order:
-                col_order.append(col)
-
-        display_df = blocks_df.select([c for c in col_order if c in blocks_df.columns])
-
-        format_mapping = {
-            "intercept": "{:.3f}".format,
-            "slope": "{:.3f}".format,
-            "intercept (actual)": "{:.3f}".format,
-            "slope (actual)": "{:.3f}".format,
-            "x_0 (actual)": "{:.3f}".format,
-            "x_0 (est)": "{:.3f}".format,
-            "k (actual)": "{:.3f}".format,
-            "k (est)": "{:.3f}".format,
-            "gamma": "{:.3f}".format,
-            "lambda": "{:.3f}".format,
-            "gamma (actual)": "{:.3f}".format,
-            "lambda (actual)": "{:.3f}".format,
-        }
-
-        blocks_table = mo.ui.table(
-            display_df.to_pandas(),
-            selection="multi",
-            initial_selection=[0, 1]
-            if len(display_df) > 1
-            else list(range(len(display_df))),
-            label="Blocks",
-            format_mapping=format_mapping,
+def _(alt, blocks_df, mo, pl):
+    # Blocks chart with multi-selection
+    if len(blocks_df) > 0 and "x_0 (est)" in blocks_df.columns:
+        chart_df = blocks_df.select(["Subject", "Block", "x_0 (est)"]).with_columns(
+            (
+                pl.col("Subject").cast(pl.Utf8) + "-" + pl.col("Block").cast(pl.Utf8)
+            ).alias("Block Label"),
         )
+        chart_pd = chart_df.to_pandas()
+        selection = alt.selection_point(fields=["Subject", "Block"], toggle=True)
+        chart = (
+            alt.Chart(chart_pd)
+            .mark_bar()
+            .encode(
+                x=alt.X("Block Label:N", title="Block", sort=None),
+                y=alt.Y("x_0 (est):Q", title="x_0 (est)"),
+                color=alt.condition(
+                    selection,
+                    alt.Color("Subject:N"),
+                    alt.value("#c9c9c9"),
+                ),
+                tooltip=["Subject:N", "Block:Q", "x_0 (est):Q"],
+            )
+            .add_params(selection)
+        )
+        blocks_chart = mo.ui.altair_chart(chart)
     else:
-        blocks_table = mo.ui.table(
-            [],
-            selection="multi",
-            label="Blocks",
-        )
-    return (blocks_table,)
+        blocks_chart = mo.md("No block fits available yet.")
+    return (blocks_chart,)
 
 
 @app.cell

@@ -10,7 +10,7 @@ Our dashboard is a *[marimo](https://marimo.io/)* notebook (`app.py` at the proj
 
 While Python developers may be interested in examining or contributing to the code that powers the dashboard, use of the dashboard on our site requires no coding knowledge and aims to be useful to people of all backgrounds.
 
-The dashboard is intended to be viewed on a full-sized laptop or desktop monitor and consists of three main panels (input, plot, and data tables):
+The dashboard is intended to be viewed on a full-sized laptop or desktop monitor and consists of three main panels (input, plot, and output):
 
 - [Input Panel](input.md)
 - [Visualization Panel](viz.md)

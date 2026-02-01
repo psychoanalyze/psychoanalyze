@@ -4,11 +4,7 @@ The Output Panel summarizes fitted psychometric curves and the aggregated trial 
 
 ### Blocks
 
-The Blocks table lists per-block logistic fit parameters (intercept and slope). Select one or more blocks to filter the points table and the plotted fits.
-
-### Points
-
-The Points table aggregates trials by intensity level, showing trial counts, hits, and hit rates.
+The Blocks chart summarizes per-block threshold estimates ($x_0$). Select one or more bars to filter the plotted fits and the aggregated points used in the visualization.
 
 ### Downloads
 
