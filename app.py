@@ -26,6 +26,7 @@ def _():
     from scipy.special import expit, logit
 
     from psychoanalyze.data import blocks as pa_blocks
+    from psychoanalyze.data import hierarchical as pa_hierarchical
     from psychoanalyze.data import points as pa_points
     from psychoanalyze.data import subject as subject_utils
     from psychoanalyze.data import trials as pa_trials
@@ -43,6 +44,7 @@ def _():
         mo,
         np,
         pa_blocks,
+        pa_hierarchical,
         pa_points,
         pa_trials,
         pl,
@@ -54,7 +56,7 @@ def _():
 
 
 @app.cell
-def _(Path, az, hashlib, io, json, mo, pa_blocks, pl):
+def _(Path, az, hashlib, io, json, mo, np, pa_hierarchical, pl):
     cache_root = Path("__marimo__") / "cache" / "psychoanalyze"
     cache_root.mkdir(parents=True, exist_ok=True)
 
@@ -69,7 +71,7 @@ def _(Path, az, hashlib, io, json, mo, pa_blocks, pl):
 
     def trials_cache_key(
         trials_df: pl.DataFrame,
-        fit_params: dict[str, float | int],
+        fit_params: dict[str, float | int | None],
     ) -> str:
         normalized = normalize_trials_for_hash(trials_df)
         buffer = io.BytesIO()
@@ -83,41 +85,25 @@ def _(Path, az, hashlib, io, json, mo, pa_blocks, pl):
         return cache_root / f"idata-{cache_key}.nc"
 
     @mo.cache
-    def cached_block_fit(
+    def cached_hierarchical_fit(
         trials_df: pl.DataFrame,
         cache_key: str,
-        fit_params: dict[str, float | int],
-    ) -> tuple[dict[str, float], az.InferenceData]:
+        fit_params: dict[str, float | int | None],
+    ) -> tuple[dict[str, float | np.ndarray], az.InferenceData]:
         cache_path = idata_cache_path(cache_key)
         if cache_path.exists():
             idata = az.from_netcdf(cache_path)
         else:
-            idata = pa_blocks.fit(trials_df, **fit_params)
+            idata = pa_hierarchical.fit(trials_df, **fit_params)
             idata.to_netcdf(cache_path)
-        summary = pa_blocks.summarize_fit(idata)
-        return (
-            {
-                "intercept": summary["intercept"],
-                "slope": summary["slope"],
-            },
-            idata,
-        )
+        summary = pa_hierarchical.summarize_fit(idata)
+        return summary, idata
 
-    return cached_block_fit, trials_cache_key
+    return cached_hierarchical_fit, trials_cache_key
 
 
 @app.cell
-def _(
-    az,
-    cached_block_fit,
-    io,
-    pa_points,
-    pa_trials,
-    pl,
-    subject_utils,
-    trials_cache_key,
-    zipfile,
-):
+def _(io, pa_points, pa_trials, pl, subject_utils, zipfile):
     generate_index = pa_points.generate_index
 
     def generate_trials(
@@ -138,26 +124,6 @@ def _(
         trials_df = subject_utils.ensure_subject_column(trials_df)
         return pa_points.from_trials(trials_df)
 
-    def block_fit(
-        trials_df: pl.DataFrame,
-    ) -> tuple[dict[str, float], az.InferenceData]:
-        fit_params: dict[str, float | int] = {
-            "draws": 300,
-            "tune": 300,
-            "chains": 1,
-            "target_accept": 0.9,
-        }
-        cache_key = trials_cache_key(trials_df, fit_params)
-        summary, fit_idata = cached_block_fit(trials_df, cache_key, fit_params)
-        return (
-            {
-                "intercept": summary["intercept"],
-                "slope": summary["slope"],
-            },
-            fit_idata,
-        )
-
-
     def process_upload_bytes(contents: bytes, filename: str) -> pl.DataFrame:
         if "zip" in filename:
             with zipfile.ZipFile(io.BytesIO(contents)) as z:
@@ -166,13 +132,7 @@ def _(
             return pl.read_parquet(io.BytesIO(contents))
         return pl.read_csv(io.BytesIO(contents))
 
-    return (
-        block_fit,
-        from_trials,
-        generate_index,
-        generate_trials,
-        process_upload_bytes,
-    )
+    return from_trials, generate_index, generate_trials, process_upload_bytes
 
 
 @app.cell
@@ -184,8 +144,6 @@ def _(mo):
 
     [Notebooks](https://nb.psychoanalyze.io) · [GitHub](https://github.com/psychoanalyze/psychoanalyze) · [Docs](https://docs.psychoanalyze.io)
     """)
-
-    return
 
 
 @app.cell
@@ -228,6 +186,48 @@ def _(mo):
     show_equation = mo.ui.checkbox(label="Show F(x)", value=False)
 
     return link_function, preset_dropdown, show_equation
+
+
+@app.cell
+def _(mo):
+    fit_draws = mo.ui.number(value=300, start=50, stop=5000, step=50, label="draws")
+    fit_tune = mo.ui.number(value=300, start=50, stop=5000, step=50, label="tune")
+    fit_chains = mo.ui.number(value=1, start=1, stop=4, step=1, label="chains")
+    fit_target_accept = mo.ui.number(
+        value=0.9,
+        start=0.5,
+        stop=0.99,
+        step=0.01,
+        label="target_accept",
+    )
+    fit_random_seed = mo.ui.number(
+        value=0,
+        start=0,
+        stop=99999,
+        step=1,
+        label="random seed (0 = random)",
+    )
+
+    fit_settings = mo.vstack(
+        [
+            mo.md("### Advanced Fitting"),
+            fit_draws,
+            fit_tune,
+            fit_chains,
+            fit_target_accept,
+            fit_random_seed,
+        ],
+        gap=1,
+    )
+
+    return (
+        fit_chains,
+        fit_draws,
+        fit_random_seed,
+        fit_settings,
+        fit_target_accept,
+        fit_tune,
+    )
 
 
 @app.cell
@@ -293,6 +293,20 @@ def _(mo, preset_dropdown):
     )
 
     return gamma, input_form, k, lambda_, n_blocks, n_levels, n_trials, x_0
+
+
+@app.cell
+def _(fit_chains, fit_draws, fit_random_seed, fit_target_accept, fit_tune):
+    random_seed = int(fit_random_seed.value)
+    fit_params: dict[str, float | int | None] = {
+        "draws": int(fit_draws.value),
+        "tune": int(fit_tune.value),
+        "chains": int(fit_chains.value),
+        "target_accept": float(fit_target_accept.value),
+        "random_seed": None if random_seed <= 0 else random_seed,
+    }
+
+    return (fit_params,)
 
 
 @app.cell
@@ -443,33 +457,58 @@ def _(trial_crop_slider, trials_df):
 
 
 @app.cell
-def _(block_fit, from_trials, pl, trials_cropped_df):
+def _(
+    cached_hierarchical_fit,
+    fit_params,
+    from_trials,
+    pl,
+    trials_cache_key,
+    trials_cropped_df,
+):
     # Points and blocks from cropped trials
     points_df = from_trials(trials_cropped_df)
+    composite_block = (
+        pl.col("Subject").cast(pl.Utf8) + "__" + pl.col("Block").cast(pl.Utf8)
+    )
+    fit_trials_df = trials_cropped_df.with_columns(composite_block.alias("Block"))
+    cache_key = trials_cache_key(trials_cropped_df, fit_params)
+    fit_summary, fit_idata = cached_hierarchical_fit(
+        fit_trials_df,
+        cache_key,
+        fit_params,
+    )
+    fit_blocks = fit_trials_df["Block"].unique().sort().to_list()
+    block_idx_by_key = {block: idx for idx, block in enumerate(fit_blocks)}
+
     blocks_list = []
-    block_fit_map: dict[tuple[str, int], object] = {}
+    block_idx_by_subject_block: dict[tuple[str, int], int] = {}
     block_keys = trials_cropped_df.select(["Subject", "Block"]).unique()
     for block_key_row in block_keys.iter_rows(named=True):
-        block_id = block_key_row["Block"]
-        subject_id = block_key_row["Subject"]
-        block_trials = trials_cropped_df.filter(
-            (pl.col("Block") == block_id) & (pl.col("Subject") == subject_id),
+        subject_id = str(block_key_row["Subject"])
+        block_id = int(block_key_row["Block"])
+        block_key = f"{subject_id}__{block_id}"
+        block_idx = block_idx_by_key.get(block_key)
+        if block_idx is None:
+            continue
+        block_idx_by_subject_block[(subject_id, block_id)] = block_idx
+        blocks_list.append(
+            {
+                "Block": block_id,
+                "Subject": subject_id,
+                "intercept": float(fit_summary["intercept"][block_idx]),
+                "slope": float(fit_summary["slope"][block_idx]),
+                "gamma": 0.0,
+                "lambda": 0.0,
+            },
         )
-        fit_summary, _block_idata = block_fit(block_trials)
-        fit_summary["Block"] = block_id
-        fit_summary["Subject"] = subject_id
-        fit_summary["gamma"] = 0.0
-        fit_summary["lambda"] = 0.0
-        block_fit_map[(str(subject_id), int(block_id))] = _block_idata
-        blocks_list.append(fit_summary)
     blocks_df = pl.from_dicts(blocks_list)
 
-    return block_fit_map, blocks_df, points_df
+    return block_idx_by_subject_block, blocks_df, fit_idata, points_df
 
 
 @app.cell
 def _(
-    block_fit_map: dict[tuple[str, int], object],
+    block_idx_by_subject_block: dict[tuple[str, int], int],
     blocks_df,
     blocks_table,
     k,
@@ -512,7 +551,7 @@ def _(
                     "Block": block_label(block_row),
                     "intercept": block_row.get("intercept", 0),
                     "slope": block_row.get("slope", 1),
-                    "idata": block_fit_map.get((subject, block)),
+                    "block_idx": block_idx_by_subject_block.get((subject, block)),
                 },
             )
     else:
@@ -524,7 +563,7 @@ def _(
                     "Block": block_label(block_row),
                     "intercept": block_row["intercept"],
                     "slope": block_row["slope"],
-                    "idata": block_fit_map.get((subject, block)),
+                    "block_idx": block_idx_by_subject_block.get((subject, block)),
                 },
             )
     block_rows.append(
@@ -532,7 +571,7 @@ def _(
             "Block": "Model",
             "intercept": model_intercept,
             "slope": model_slope,
-            "idata": None,
+            "block_idx": None,
         },
     )
 
@@ -617,12 +656,13 @@ def _(blocks_df, mo):
 def _(
     alt,
     block_rows,
+    fit_idata,
     link_fn,
     max_x,
     min_x,
     mo,
     np,
-    pa_blocks,
+    pa_hierarchical,
     pl,
     points_filtered_df,
 ):
@@ -641,9 +681,14 @@ def _(
                 },
             ),
         )
-        _block_idata = blk.get("idata")
-        if _block_idata is not None and blk["Block"] != "Model":
-            band_df = pa_blocks.curve_credible_band(_block_idata, x, hdi_prob=0.9)
+        block_idx = blk.get("block_idx")
+        if fit_idata is not None and block_idx is not None and blk["Block"] != "Model":
+            band_df = pa_hierarchical.curve_credible_band(
+                fit_idata,
+                x,
+                block_idx=block_idx,
+                hdi_prob=0.9,
+            )
             band_df = band_df.with_columns(pl.lit(blk["Block"]).alias("Series"))
             bands_list.append(band_df)
     fits_df = pl.concat(fits_list)
@@ -791,6 +836,7 @@ def _(blocks_df, mo, pl, points_filtered_df, trials_cropped_df):
 @app.cell
 def _(
     file_upload,
+    fit_settings,
     input_form,
     link_function,
     load_sample_button,
@@ -813,6 +859,7 @@ def _(
             mo.md("### Model Parameters"),
             preset_dropdown,
             input_form,
+            fit_settings,
             stimulus_info,
         ],
         gap=1,
@@ -827,6 +874,7 @@ def _(
             mo.md("### Model Parameters"),
             preset_dropdown,
             input_form,
+            fit_settings,
             stimulus_info,
         ],
         gap=1,
@@ -935,7 +983,6 @@ def _(
         gap=2,
     )
 
-    return
 
 
 if __name__ == "__main__":
