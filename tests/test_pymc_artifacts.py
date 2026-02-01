@@ -36,6 +36,71 @@ def sample_trials_data() -> pl.DataFrame:
     })
 
 
+def save_netcdf(idata: az.InferenceData, path: Path, name: str) -> None:
+    """Save InferenceData to netCDF file.
+    
+    Args:
+        idata: ArviZ InferenceData object to save
+        path: Directory to save the file
+        name: Base name for the file (without extension)
+    """
+    nc_path = path / f"{name}.nc"
+    idata.to_netcdf(nc_path)
+    print(f"Saved {name} netCDF to {nc_path}")
+    assert nc_path.exists()
+
+
+def save_plot(path: Path, name: str) -> None:
+    """Save current matplotlib figure to PNG file.
+    
+    Args:
+        path: Directory to save the file
+        name: Base name for the file (without extension)
+    """
+    plot_path = path / f"{name}.png"
+    plt.savefig(plot_path, dpi=150, bbox_inches="tight")
+    plt.close("all")
+    assert plot_path.exists()
+
+
+def generate_arviz_plots(
+    idata: az.InferenceData,
+    plots_dir: Path,
+    prefix: str,
+    var_names: list[str] | None = None,
+    include_pair: bool = False,
+) -> None:
+    """Generate standard ArviZ diagnostic plots.
+    
+    Args:
+        idata: ArviZ InferenceData object
+        plots_dir: Directory to save plots
+        prefix: Prefix for plot filenames
+        var_names: List of variable names to plot (None for all)
+        include_pair: Whether to include pair plot
+    """
+    print(f"Generating ArviZ plots for {prefix}...")
+    
+    # Trace plot
+    az.plot_trace(idata, var_names=var_names)
+    save_plot(plots_dir, f"{prefix}_trace")
+    
+    # Posterior plot
+    az.plot_posterior(idata, var_names=var_names)
+    save_plot(plots_dir, f"{prefix}_posterior")
+    
+    # Forest plot
+    az.plot_forest(idata, var_names=var_names)
+    save_plot(plots_dir, f"{prefix}_forest")
+    
+    # Pair plot (optional)
+    if include_pair and var_names and len(var_names) >= 2:
+        # Only use first two variables for pair plot
+        pair_vars = var_names[:2]
+        az.plot_pair(idata, var_names=pair_vars, divergences=True)
+        save_plot(plots_dir, f"{prefix}_pair")
+
+
 def test_blocks_fit_artifacts(
     sample_trials_data: pl.DataFrame,
     output_dirs: dict[str, Path],
@@ -54,39 +119,16 @@ def test_blocks_fit_artifacts(
     )
 
     # Save netCDF
-    nc_path = netcdf_dir / "blocks_fit.nc"
-    idata.to_netcdf(nc_path)
-    print(f"Saved blocks netCDF to {nc_path}")
-    assert nc_path.exists()
+    save_netcdf(idata, netcdf_dir, "blocks_fit")
 
     # Generate ArviZ plots
-    print("Generating ArviZ plots for blocks...")
-
-    # Trace plot
-    az.plot_trace(idata, var_names=["intercept", "slope", "threshold"])
-    plt.savefig(plots_dir / "blocks_trace.png", dpi=150, bbox_inches="tight")
-    plt.close("all")
-
-    # Posterior plot
-    az.plot_posterior(idata, var_names=["intercept", "slope", "threshold"])
-    plt.savefig(plots_dir / "blocks_posterior.png", dpi=150, bbox_inches="tight")
-    plt.close("all")
-
-    # Pair plot
-    az.plot_pair(idata, var_names=["intercept", "slope"], divergences=True)
-    plt.savefig(plots_dir / "blocks_pair.png", dpi=150, bbox_inches="tight")
-    plt.close("all")
-
-    # Forest plot
-    az.plot_forest(idata, var_names=["intercept", "slope", "threshold"])
-    plt.savefig(plots_dir / "blocks_forest.png", dpi=150, bbox_inches="tight")
-    plt.close("all")
-
-    # Verify plots were created
-    assert (plots_dir / "blocks_trace.png").exists()
-    assert (plots_dir / "blocks_posterior.png").exists()
-    assert (plots_dir / "blocks_pair.png").exists()
-    assert (plots_dir / "blocks_forest.png").exists()
+    generate_arviz_plots(
+        idata,
+        plots_dir,
+        prefix="blocks",
+        var_names=["intercept", "slope", "threshold"],
+        include_pair=True,
+    )
 
 
 def test_trials_fit_artifacts(
@@ -107,32 +149,15 @@ def test_trials_fit_artifacts(
     )
 
     # Save netCDF
-    nc_path = netcdf_dir / "trials_fit.nc"
-    idata.to_netcdf(nc_path)
-    print(f"Saved trials netCDF to {nc_path}")
-    assert nc_path.exists()
+    save_netcdf(idata, netcdf_dir, "trials_fit")
 
     # Generate ArviZ plots
-    print("Generating ArviZ plots for trials...")
-
-    # Trace plot
-    az.plot_trace(idata)
-    plt.savefig(plots_dir / "trials_trace.png", dpi=150, bbox_inches="tight")
-    plt.close("all")
-
-    # Posterior plot
-    az.plot_posterior(idata)
-    plt.savefig(plots_dir / "trials_posterior.png", dpi=150, bbox_inches="tight")
-    plt.close("all")
-
-    # Forest plot
-    az.plot_forest(idata)
-    plt.savefig(plots_dir / "trials_forest.png", dpi=150, bbox_inches="tight")
-    plt.close("all")
-
-    # Verify plots were created
-    assert (plots_dir / "trials_trace.png").exists()
-    assert (plots_dir / "trials_posterior.png").exists()
-    assert (plots_dir / "trials_forest.png").exists()
+    generate_arviz_plots(
+        idata,
+        plots_dir,
+        prefix="trials",
+        var_names=None,  # Use all variables
+        include_pair=False,
+    )
 
     print("All outputs generated successfully!")
