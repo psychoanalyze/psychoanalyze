@@ -20,6 +20,7 @@ from typing import cast
 
 import arviz as az
 import numpy as np
+import pandas as pd
 import polars as pl
 import pymc as pm
 import pytensor.tensor as pt
@@ -153,7 +154,7 @@ def summarize_fit(idata: az.InferenceData) -> dict[str, float | np.ndarray]:
         "slope",
         "threshold",
     ]
-    summary = cast("pd.DataFrame", az.summary(idata, var_names=var_names))
+    summary = cast(pd.DataFrame, az.summary(idata, var_names=var_names))
     
     result = {}
     
