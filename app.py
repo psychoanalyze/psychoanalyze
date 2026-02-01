@@ -30,6 +30,7 @@ def _():
     from psychoanalyze.data import subject as subject_utils
     from psychoanalyze.data import trials as pa_trials
     from psychoanalyze.data.logistic import to_intercept, to_slope
+
     return (
         Path,
         alt,
@@ -164,6 +165,7 @@ def _(
         if "parquet" in filename or filename.endswith(".pq"):
             return pl.read_parquet(io.BytesIO(contents))
         return pl.read_csv(io.BytesIO(contents))
+
     return (
         block_fit,
         from_trials,
@@ -183,6 +185,8 @@ def _(mo):
     [Notebooks](https://nb.psychoanalyze.io) · [GitHub](https://github.com/psychoanalyze/psychoanalyze) · [Docs](https://docs.psychoanalyze.io)
     """)
 
+    return
+
 
 @app.cell
 def _(mo):
@@ -192,12 +196,14 @@ def _(mo):
         kind="area",
         label="Upload CSV/parquet with columns: **Block, Intensity, Result** (optional: **Subject**). Data stays on this machine.",
     )
+
     return (file_upload,)
 
 
 @app.cell
 def _(mo):
     load_sample_button = mo.ui.run_button(label="Load Sample Data")
+
     return (load_sample_button,)
 
 
@@ -220,6 +226,7 @@ def _(mo):
         label="Link function",
     )
     show_equation = mo.ui.checkbox(label="Show F(x)", value=False)
+
     return link_function, preset_dropdown, show_equation
 
 
@@ -284,6 +291,7 @@ def _(mo, preset_dropdown):
         )
         .form(submit_button_label="Generate")
     )
+
     return gamma, input_form, k, lambda_, n_blocks, n_levels, n_trials, x_0
 
 
@@ -294,6 +302,7 @@ def _(k, logit, to_intercept, to_slope, x_0):
     slope = to_slope(k.value)
     min_x = (logit(0.01) - intercept) / slope
     max_x = (logit(0.99) - intercept) / slope
+
     return max_x, min_x
 
 
@@ -301,6 +310,7 @@ def _(k, logit, to_intercept, to_slope, x_0):
 def _(max_x, min_x, mo):
     # Stimulus range info for display in left column
     stimulus_info = mo.md(f"**Stimulus range:** {min_x:.2f} to {max_x:.2f}")
+
     return (stimulus_info,)
 
 
@@ -319,6 +329,7 @@ def _(mo, show_equation):
     plot_equation = mo.md(
         equation_expanded if show_equation.value else equation_abstracted,
     )
+
     return (plot_equation,)
 
 
@@ -344,6 +355,7 @@ def _(pl, subject_utils):
         df = df.with_columns((pl.col("Result") == 1).cast(pl.Int64).alias("Result"))
         df = df.select(["Block", "Intensity", "Result"])
         return subject_utils.ensure_subject_column(df)
+
     return (load_sample_trials,)
 
 
@@ -401,6 +413,7 @@ def _(
         )
     trials_df = subject_utils.ensure_subject_column(trials_df)
     trials_df = trials_df.with_columns(pl.col("Intensity").cast(pl.Float64))
+
     return (trials_df,)
 
 
@@ -416,6 +429,7 @@ def _(mo, trials_df):
         label="Crop at trial",
         show_value=True,
     )
+
     return (trial_crop_slider,)
 
 
@@ -424,6 +438,7 @@ def _(trial_crop_slider, trials_df):
     # Apply trial crop
     crop_at = trial_crop_slider.value
     trials_cropped_df = trials_df.head(crop_at)
+
     return (trials_cropped_df,)
 
 
@@ -448,6 +463,7 @@ def _(block_fit, from_trials, pl, trials_cropped_df):
         block_fit_map[(str(subject_id), int(block_id))] = _block_idata
         blocks_list.append(fit_summary)
     blocks_df = pl.from_dicts(blocks_list)
+
     return block_fit_map, blocks_df, points_df
 
 
@@ -519,6 +535,7 @@ def _(
             "idata": None,
         },
     )
+
     return (block_rows,)
 
 
@@ -551,12 +568,14 @@ def _(blocks_table, pl, points_df):
             points_filtered_df = points_df
     else:
         points_filtered_df = points_df
+
     return (points_filtered_df,)
 
 
 @app.cell
 def _(expit, link_function):
     link_fn = expit if link_function.value == "expit" else expit
+
     return (link_fn,)
 
 
@@ -573,6 +592,7 @@ def _(mo, n_levels, points_filtered_df):
             "Hit Rate": "{:.2f}".format,
         },
     )
+
     return (points_table,)
 
 
@@ -589,6 +609,7 @@ def _(blocks_df, mo):
             "slope": "{:.2f}".format,
         },
     )
+
     return (blocks_table,)
 
 
@@ -675,6 +696,7 @@ def _(
         plot_layers.insert(0, band_chart)
     plot_chart = alt.layer(*plot_layers).resolve_scale(color="shared")
     plot_ui = mo.ui.altair_chart(plot_chart)
+
     return (plot_ui,)
 
 
@@ -762,6 +784,7 @@ def _(blocks_df, mo, pl, points_filtered_df, trials_cropped_df):
         ],
         gap=1,
     )
+
     return (data_downloads,)
 
 
@@ -833,6 +856,7 @@ def _(
             "Online": online_content,
         },
     )
+
     return (input_tabs,)
 
 
@@ -910,6 +934,8 @@ def _(
         widths=[1, 2, 1],
         gap=2,
     )
+
+    return
 
 
 if __name__ == "__main__":
