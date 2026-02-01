@@ -181,14 +181,22 @@ def _(io, pa_points, pa_trials, pl, subject_utils, zipfile):
         options: list[float],
         params: dict,
         n_blocks: int,
+        n_subjects: int = 1,
     ) -> pl.DataFrame:
-        trials_df = pa_trials.generate(
-            n_trials=n_trials,
-            options=options,
-            params=params,
-            n_blocks=n_blocks,
-        )
-        return subject_utils.ensure_subject_column(trials_df)
+        frames = []
+        for subject_idx in range(n_subjects):
+            subject_id = (
+                chr(ord("A") + subject_idx) if subject_idx < 26 else f"S{subject_idx}"
+            )
+            trials_df = pa_trials.generate(
+                n_trials=n_trials,
+                options=options,
+                params=params,
+                n_blocks=n_blocks,
+            )
+            trials_df = trials_df.with_columns(pl.lit(subject_id).alias("Subject"))
+            frames.append(trials_df)
+        return pl.concat(frames) if frames else pl.DataFrame()
 
     def from_trials(trials_df: pl.DataFrame) -> pl.DataFrame:
         trials_df = subject_utils.ensure_subject_column(trials_df)
@@ -259,7 +267,7 @@ def _(mo):
 def _(mo):
     fit_draws = mo.ui.number(value=300, start=50, stop=5000, step=50, label="draws")
     fit_tune = mo.ui.number(value=300, start=50, stop=5000, step=50, label="tune")
-    fit_chains = mo.ui.number(value=1, start=1, stop=4, step=1, label="chains")
+    fit_chains = mo.ui.number(value=4, start=1, stop=4, step=1, label="chains")
     fit_target_accept = mo.ui.number(
         value=0.9,
         start=0.5,
@@ -329,6 +337,7 @@ def _(mo, preset_dropdown):
         label="trials/block",
     )
     n_blocks = mo.ui.number(value=5, start=1, stop=100, step=1, label="blocks")
+    n_subjects = mo.ui.number(value=2, start=1, stop=50, step=1, label="subjects")
 
     input_form = (
         mo.md(r"""
@@ -340,7 +349,7 @@ def _(mo, preset_dropdown):
 
     **Stimulus** {n_levels}
 
-    **Simulation** {n_trials} {n_blocks}
+    **Simulation** {n_trials} {n_blocks} {n_subjects}
     """)
         .batch(
             x_0_free=x_0_free,
@@ -354,10 +363,21 @@ def _(mo, preset_dropdown):
             n_levels=n_levels,
             n_trials=n_trials,
             n_blocks=n_blocks,
+            n_subjects=n_subjects,
         )
         .form(submit_button_label="Generate")
     )
-    return gamma, input_form, k, lambda_, n_blocks, n_levels, n_trials, x_0
+    return (
+        gamma,
+        input_form,
+        k,
+        lambda_,
+        n_blocks,
+        n_levels,
+        n_subjects,
+        n_trials,
+        x_0,
+    )
 
 
 @app.cell
@@ -446,6 +466,7 @@ def _(
     min_x,
     n_blocks,
     n_levels,
+    n_subjects,
     n_trials,
     pl,
     process_upload_bytes,
@@ -469,6 +490,7 @@ def _(
                     "lambda": lambda_.value,
                 },
                 n_blocks=n_blocks.value,
+                n_subjects=n_subjects.value,
             )
     elif input_tabs.value == "Simulation":
         trials_df = generate_trials(
@@ -481,6 +503,7 @@ def _(
                 "lambda": lambda_.value,
             },
             n_blocks=n_blocks.value,
+            n_subjects=n_subjects.value,
         )
     else:
         trials_df = load_sample_trials()
