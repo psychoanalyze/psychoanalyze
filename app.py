@@ -401,7 +401,7 @@ def _(mo, preset_dropdown):
         step=1,
         label="trials/block",
     )
-    n_blocks = mo.ui.number(value=5, start=1, stop=100, step=1, label="blocks")
+    n_blocks = mo.ui.number(value=2, start=1, stop=100, step=1, label="blocks")
     n_subjects = mo.ui.number(value=2, start=1, stop=50, step=1, label="subjects")
 
     input_form = (
@@ -1165,8 +1165,8 @@ def _(
 
     input_tabs = mo.ui.tabs(
         {
-            "Batch": batch_content,
             "Simulation": simulation_content,
+            "Batch": batch_content,
             "Online": online_content,
         },
     )
