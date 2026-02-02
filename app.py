@@ -18,6 +18,9 @@ def _(
     mo,
     plot_equation,
     plot_ui,
+    step_chart,
+    step_info,
+    step_mode_toggle,
 ):
     # 3-column layout: Input | Visualization | Output
     left_column = mo.vstack(
@@ -54,14 +57,26 @@ def _(
             gap=1,
         )
     else:  # Simulation (default)
-        center_column = mo.vstack(
-            [
-                mo.md("## Simulation Results"),
-                plot_equation,
-                plot_ui,
-            ],
-            gap=1,
-        )
+        # Show step-by-step view or regular view based on toggle
+        if step_mode_toggle.value and step_chart is not None:
+            center_column = mo.vstack(
+                [
+                    mo.md("## Step-by-Step Simulation"),
+                    step_info,
+                    step_chart,
+                    plot_equation,
+                ],
+                gap=1,
+            )
+        else:
+            center_column = mo.vstack(
+                [
+                    mo.md("## Simulation Results"),
+                    plot_equation,
+                    plot_ui,
+                ],
+                gap=1,
+            )
 
     right_column = mo.vstack(
         [
@@ -384,6 +399,227 @@ def _(mo):
         label="Sampling Method",
     )
     return (sampling_method_dropdown,)
+
+
+@app.cell
+def _(mo):
+    # Step-by-step visualization controls
+    step_mode_toggle = mo.ui.checkbox(label="Step-by-step mode", value=False)
+    return (step_mode_toggle,)
+
+
+@app.cell
+def _(mo, n_trials, step_mode_toggle):
+    # Trial step slider - only active when step mode is enabled
+    max_trials = n_trials.value if hasattr(n_trials, 'value') else 100
+    trial_step_slider = mo.ui.slider(
+        start=1,
+        stop=max(max_trials, 1),
+        step=1,
+        value=max(max_trials, 1),
+        label="Trial",
+        show_value=True,
+    )
+    # Auto-play button for animation
+    auto_play_button = mo.ui.run_button(label="▶ Play", kind="neutral")
+    return auto_play_button, trial_step_slider
+
+
+@app.cell
+def _(
+    alt,
+    expit,
+    generate_index,
+    ground_truth_params,
+    max_x,
+    min_x,
+    mo,
+    n_levels,
+    np,
+    pl,
+    step_mode_toggle,
+    trial_step_slider,
+    trials_df,
+):
+    """Create step-by-step visualization showing trials accumulating one at a time."""
+    
+    # Only compute if step mode is enabled and we're in simulation mode
+    if not step_mode_toggle.value or "Trial" not in trials_df.columns:
+        step_chart = None
+        step_info = mo.md("")
+    else:
+        current_step = trial_step_slider.value
+        
+        # Get first block's data for step-by-step view
+        first_subject = trials_df["Subject"].unique().to_list()[0]
+        first_block = trials_df.filter(pl.col("Subject") == first_subject)["Block"].unique().to_list()[0]
+        block_trials = trials_df.filter(
+            (pl.col("Subject") == first_subject) & (pl.col("Block") == first_block)
+        ).sort("Trial")
+        
+        # Filter to trials up to current step
+        trials_up_to_step = block_trials.filter(pl.col("Trial") < current_step)
+        current_trial = block_trials.filter(pl.col("Trial") == current_step - 1)
+        
+        # Get all intensity options for the histogram
+        all_options = generate_index(n_levels.value, [min_x, max_x])
+        
+        # Compute cumulative hit rates at each intensity
+        if len(trials_up_to_step) > 0:
+            points_cumulative = trials_up_to_step.group_by("Intensity").agg([
+                pl.mean("Result").alias("Hit Rate"),
+                pl.len().alias("n_trials"),
+            ]).sort("Intensity")
+            
+            # Create sampling distribution for histogram (include all options)
+            sampling_counts = trials_up_to_step.group_by("Intensity").len()
+            # Merge with all options to show zeros
+            all_options_df = pl.DataFrame({"Intensity": all_options})
+            sampling_dist = all_options_df.join(
+                sampling_counts, on="Intensity", how="left"
+            ).with_columns(
+                pl.col("len").fill_null(0).alias("Count")
+            ).select(["Intensity", "Count"]).sort("Intensity")
+        else:
+            points_cumulative = pl.DataFrame({
+                "Intensity": [],
+                "Hit Rate": [],
+                "n_trials": [],
+            })
+            sampling_dist = pl.DataFrame({
+                "Intensity": all_options,
+                "Count": [0] * len(all_options),
+            })
+        
+        # Get ground truth parameters for this block
+        gt_params = ground_truth_params.get((first_subject, first_block))
+        
+        # Create x values for fitted curve
+        x_curve = np.linspace(min_x, max_x, 100)
+        
+        # === MAIN PSYCHOMETRIC CHART ===
+        chart_layers = []
+        
+        # Ground truth curve (dashed)
+        if gt_params is not None:
+            gt_intercept = -gt_params["x_0"] * gt_params["k"]
+            gt_slope = gt_params["k"]
+            y_gt = expit(gt_slope * x_curve + gt_intercept)
+            gt_df = pl.DataFrame({
+                "Intensity": x_curve,
+                "Hit Rate": y_gt,
+                "Type": ["Ground Truth"] * len(x_curve),
+            }).to_pandas()
+            gt_line = alt.Chart(gt_df).mark_line(
+                strokeDash=[5, 5],
+                color="gray",
+                strokeWidth=2,
+            ).encode(
+                x=alt.X("Intensity:Q", title="Intensity"),
+                y=alt.Y("Hit Rate:Q", title="Hit Rate", scale=alt.Scale(domain=[0, 1])),
+            )
+            chart_layers.append(gt_line)
+        
+        # Cumulative points (sized by n_trials)
+        if len(points_cumulative) > 0:
+            points_pd = points_cumulative.to_pandas()
+            points_scatter = alt.Chart(points_pd).mark_point(
+                filled=True,
+                color="steelblue",
+            ).encode(
+                x=alt.X("Intensity:Q"),
+                y=alt.Y("Hit Rate:Q"),
+                size=alt.Size("n_trials:Q", scale=alt.Scale(range=[50, 300]), title="Trials"),
+                tooltip=["Intensity:Q", "Hit Rate:Q", "n_trials:Q"],
+            )
+            chart_layers.append(points_scatter)
+        
+        # Current trial highlight (large marker with different color)
+        if len(current_trial) > 0:
+            current_intensity = float(current_trial["Intensity"][0])
+            current_result = int(current_trial["Result"][0])
+            current_pd = pl.DataFrame({
+                "Intensity": [current_intensity],
+                "Result": [current_result],
+                "label": [f"Trial {current_step}: {'Hit' if current_result else 'Miss'}"],
+            }).to_pandas()
+            
+            # Vertical line at current intensity
+            vline = alt.Chart(current_pd).mark_rule(
+                color="red",
+                strokeWidth=2,
+                strokeDash=[4, 4],
+            ).encode(
+                x=alt.X("Intensity:Q"),
+            )
+            chart_layers.append(vline)
+            
+            # Current trial marker
+            current_marker = alt.Chart(current_pd).mark_point(
+                filled=True,
+                size=200,
+                color="red",
+                shape="diamond",
+            ).encode(
+                x=alt.X("Intensity:Q"),
+                y=alt.Y("Result:Q", scale=alt.Scale(domain=[0, 1])),
+                tooltip=["label:N", "Intensity:Q"],
+            )
+            chart_layers.append(current_marker)
+        
+        # === SAMPLING DISTRIBUTION HISTOGRAM ===
+        sampling_pd = sampling_dist.to_pandas()
+        # Highlight current intensity in histogram
+        if len(current_trial) > 0:
+            current_intensity = float(current_trial["Intensity"][0])
+            sampling_pd["is_current"] = sampling_pd["Intensity"].apply(
+                lambda x: abs(x - current_intensity) < 0.01
+            )
+        else:
+            sampling_pd["is_current"] = False
+        
+        histogram = alt.Chart(sampling_pd).mark_bar().encode(
+            x=alt.X("Intensity:Q", title="Intensity"),
+            y=alt.Y("Count:Q", title="Samples"),
+            color=alt.condition(
+                alt.datum.is_current,
+                alt.value("red"),
+                alt.value("steelblue"),
+            ),
+            tooltip=["Intensity:Q", "Count:Q"],
+        ).properties(
+            width=500,
+            height=100,
+            title="Sampling Distribution",
+        )
+        
+        # Combine all layers for main chart
+        if chart_layers:
+            main_chart = alt.layer(*chart_layers).properties(
+                width=500,
+                height=250,
+                title=f"Trial {current_step} of {len(block_trials)}",
+            )
+            # Stack main chart and histogram vertically
+            combined_chart = alt.vconcat(main_chart, histogram).resolve_scale(
+                x="shared"
+            )
+            step_chart = mo.ui.altair_chart(combined_chart)
+        else:
+            step_chart = mo.ui.altair_chart(histogram)
+        
+        # Info about current trial
+        if len(current_trial) > 0:
+            current_intensity = float(current_trial["Intensity"][0])
+            current_result = "Hit ✓" if int(current_trial["Result"][0]) else "Miss ✗"
+            step_info = mo.callout(
+                mo.md(f"**Trial {current_step}**: Intensity = {current_intensity:.2f} → {current_result}"),
+                kind="success" if "Hit" in current_result else "warn",
+            )
+        else:
+            step_info = mo.md("")
+    
+    return step_chart, step_info
 
 
 @app.cell
@@ -1178,6 +1414,7 @@ def _(blocks_df, format_dropdown, mo, pl, points_filtered_df, trials_df: object)
 
 @app.cell
 def _(
+    auto_play_button,
     file_upload,
     fit_button,
     fit_settings,
@@ -1188,6 +1425,8 @@ def _(
     preset_dropdown,
     sampling_method_dropdown,
     show_equation,
+    step_mode_toggle,
+    trial_step_slider,
 ):
     # Build tab content based on selected mode
     batch_content = mo.vstack(
@@ -1221,12 +1460,23 @@ def _(
         kind="info",
     )
 
+    # Step-by-step controls
+    step_controls = mo.vstack(
+        [
+            mo.md("### Step-by-Step Visualization"),
+            step_mode_toggle,
+            mo.hstack([trial_step_slider, auto_play_button], gap=1) if step_mode_toggle.value else mo.md(""),
+        ],
+        gap=1,
+    )
+
     simulation_content = mo.vstack(
         [
             mo.md("### Simulation Mode"),
             mo.md("### Sampling Method"),
             sampling_method_dropdown,
             sampling_method_info,
+            step_controls,
             mo.md("### Link Function"),
             link_function,
             show_equation,

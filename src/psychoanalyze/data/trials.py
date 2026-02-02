@@ -28,7 +28,11 @@ def generate_trial_index(n_trials: int, options: list[float]) -> list[float]:
 def sample_trials(trials_ix: list[float], params: dict[str, float]) -> pl.DataFrame:
     """Sample trials from a given index."""
     results = [int(random.random() <= psi(x, params)) for x in trials_ix]
-    return pl.DataFrame({"Intensity": trials_ix, "Result": results})
+    return pl.DataFrame({
+        "Trial": list(range(len(trials_ix))),
+        "Intensity": trials_ix,
+        "Result": results,
+    })
 
 
 def generate(
@@ -53,7 +57,8 @@ def generate(
         random_seed: Random seed for reproducibility
         
     Returns:
-        DataFrame with Block, Intensity, and Result columns
+        DataFrame with Trial, Block, Intensity, and Result columns.
+        Trial column preserves the order in which samples were taken within each block.
     """
     frames = []
     for i in range(n_blocks):
@@ -82,7 +87,7 @@ def generate(
             df = sample_trials(trials_ix, params)
         df = df.with_columns(pl.lit(i).alias("Block"))
         frames.append(df)
-    return pl.concat(frames).select(["Block", "Intensity", "Result"])
+    return pl.concat(frames).select(["Trial", "Block", "Intensity", "Result"])
 
 
 def load(data_path: Path) -> pl.DataFrame:
@@ -472,7 +477,11 @@ def quest_sample(
         intensities.append(intensity)
         results.append(result)
     
-    return pl.DataFrame({"Intensity": intensities, "Result": results})
+    return pl.DataFrame({
+        "Trial": list(range(len(intensities))),
+        "Intensity": intensities,
+        "Result": results,
+    })
 
 
 def adaptive_sample(
@@ -594,7 +603,11 @@ def adaptive_sample(
         intensities.append(next_intensity)
         results.append(next_result)
     
-    return pl.DataFrame({"Intensity": intensities, "Result": results})
+    return pl.DataFrame({
+        "Trial": list(range(len(intensities))),
+        "Intensity": intensities,
+        "Result": results,
+    })
 
 
 def fit(
