@@ -492,25 +492,25 @@ def _(
             })
         
         # Get ground truth parameters for this block
-        gt_params = ground_truth_params.get((first_subject, first_block))
+        _gt_params = ground_truth_params.get((first_subject, first_block))
         
         # Create x values for fitted curve
-        x_curve = np.linspace(min_x, max_x, 100)
+        _x_curve = np.linspace(min_x, max_x, 100)
         
         # === MAIN PSYCHOMETRIC CHART ===
-        chart_layers = []
+        _chart_layers = []
         
         # Ground truth curve (dashed)
-        if gt_params is not None:
-            gt_intercept = -gt_params["x_0"] * gt_params["k"]
-            gt_slope = gt_params["k"]
-            y_gt = expit(gt_slope * x_curve + gt_intercept)
-            gt_df = pl.DataFrame({
-                "Intensity": x_curve,
-                "Hit Rate": y_gt,
-                "Type": ["Ground Truth"] * len(x_curve),
+        if _gt_params is not None:
+            _gt_intercept = -_gt_params["x_0"] * _gt_params["k"]
+            _gt_slope = _gt_params["k"]
+            _y_gt = expit(_gt_slope * _x_curve + _gt_intercept)
+            _gt_df = pl.DataFrame({
+                "Intensity": _x_curve,
+                "Hit Rate": _y_gt,
+                "Type": ["Ground Truth"] * len(_x_curve),
             }).to_pandas()
-            gt_line = alt.Chart(gt_df).mark_line(
+            _gt_line = alt.Chart(_gt_df).mark_line(
                 strokeDash=[5, 5],
                 color="gray",
                 strokeWidth=2,
@@ -518,12 +518,12 @@ def _(
                 x=alt.X("Intensity:Q", title="Intensity"),
                 y=alt.Y("Hit Rate:Q", title="Hit Rate", scale=alt.Scale(domain=[0, 1])),
             )
-            chart_layers.append(gt_line)
+            _chart_layers.append(_gt_line)
         
         # Cumulative points (sized by n_trials)
         if len(points_cumulative) > 0:
-            points_pd = points_cumulative.to_pandas()
-            points_scatter = alt.Chart(points_pd).mark_point(
+            _points_pd = points_cumulative.to_pandas()
+            _points_scatter = alt.Chart(_points_pd).mark_point(
                 filled=True,
                 color="steelblue",
             ).encode(
@@ -532,30 +532,30 @@ def _(
                 size=alt.Size("n_trials:Q", scale=alt.Scale(range=[50, 300]), title="Trials"),
                 tooltip=["Intensity:Q", "Hit Rate:Q", "n_trials:Q"],
             )
-            chart_layers.append(points_scatter)
+            _chart_layers.append(_points_scatter)
         
         # Current trial highlight (large marker with different color)
         if len(current_trial) > 0:
-            current_intensity = float(current_trial["Intensity"][0])
-            current_result = int(current_trial["Result"][0])
-            current_pd = pl.DataFrame({
-                "Intensity": [current_intensity],
-                "Result": [current_result],
-                "label": [f"Trial {current_step}: {'Hit' if current_result else 'Miss'}"],
+            _current_intensity = float(current_trial["Intensity"][0])
+            _current_result = int(current_trial["Result"][0])
+            _current_pd = pl.DataFrame({
+                "Intensity": [_current_intensity],
+                "Result": [_current_result],
+                "label": [f"Trial {current_step}: {'Hit' if _current_result else 'Miss'}"],
             }).to_pandas()
             
             # Vertical line at current intensity
-            vline = alt.Chart(current_pd).mark_rule(
+            _vline = alt.Chart(_current_pd).mark_rule(
                 color="red",
                 strokeWidth=2,
                 strokeDash=[4, 4],
             ).encode(
                 x=alt.X("Intensity:Q"),
             )
-            chart_layers.append(vline)
+            _chart_layers.append(_vline)
             
             # Current trial marker
-            current_marker = alt.Chart(current_pd).mark_point(
+            _current_marker = alt.Chart(_current_pd).mark_point(
                 filled=True,
                 size=200,
                 color="red",
@@ -565,21 +565,21 @@ def _(
                 y=alt.Y("Result:Q", scale=alt.Scale(domain=[0, 1])),
                 tooltip=["label:N", "Intensity:Q"],
             )
-            chart_layers.append(current_marker)
+            _chart_layers.append(_current_marker)
         
         # === SAMPLING DISTRIBUTION HISTOGRAM ===
-        sampling_pd = sampling_dist.to_pandas()
+        _sampling_pd = sampling_dist.to_pandas()
         # Highlight current intensity in histogram
         if len(current_trial) > 0:
-            current_intensity = float(current_trial["Intensity"][0])
-            sampling_pd["is_current"] = sampling_pd["Intensity"].apply(
-                lambda x: abs(x - current_intensity) < 0.01
+            _current_intensity = float(current_trial["Intensity"][0])
+            _sampling_pd["is_current"] = _sampling_pd["Intensity"].apply(
+                lambda x: abs(x - _current_intensity) < 0.01
             )
         else:
-            sampling_pd["is_current"] = False
+            _sampling_pd["is_current"] = False
         
-        histogram = alt.Chart(sampling_pd).mark_bar().encode(
-            x=alt.X("Intensity:Q", title="Intensity"),
+        _histogram = alt.Chart(_sampling_pd).mark_bar().encode(
+            x=alt.X("Intensity:Q", title="Intensity", scale=alt.Scale(domain=[min_x, max_x])),
             y=alt.Y("Count:Q", title="Samples"),
             color=alt.condition(
                 alt.datum.is_current,
@@ -593,28 +593,28 @@ def _(
             title="Sampling Distribution",
         )
         
-        # Combine all layers for main chart
-        if chart_layers:
-            main_chart = alt.layer(*chart_layers).properties(
+        # Create main chart from layers
+        if _chart_layers:
+            _main_chart = alt.layer(*_chart_layers).properties(
                 width=500,
                 height=250,
                 title=f"Trial {current_step} of {len(block_trials)}",
             )
-            # Stack main chart and histogram vertically
-            combined_chart = alt.vconcat(main_chart, histogram).resolve_scale(
-                x="shared"
-            )
-            step_chart = mo.ui.altair_chart(combined_chart)
+            # Display charts separately using mo.vstack to avoid Vega signal conflicts
+            step_chart = mo.vstack([
+                mo.as_html(_main_chart),
+                mo.as_html(_histogram),
+            ], gap=0)
         else:
-            step_chart = mo.ui.altair_chart(histogram)
+            step_chart = mo.as_html(_histogram)
         
         # Info about current trial
         if len(current_trial) > 0:
-            current_intensity = float(current_trial["Intensity"][0])
-            current_result = "Hit ✓" if int(current_trial["Result"][0]) else "Miss ✗"
+            _info_intensity = float(current_trial["Intensity"][0])
+            _info_result = "Hit ✓" if int(current_trial["Result"][0]) else "Miss ✗"
             step_info = mo.callout(
-                mo.md(f"**Trial {current_step}**: Intensity = {current_intensity:.2f} → {current_result}"),
-                kind="success" if "Hit" in current_result else "warn",
+                mo.md(f"**Trial {current_step}**: Intensity = {_info_intensity:.2f} → {_info_result}"),
+                kind="success" if "Hit" in _info_result else "warn",
             )
         else:
             step_info = mo.md("")
@@ -1043,19 +1043,6 @@ def _(
                         "Block": f"{_subject}-{_block} (GT)",
                         "intercept": _gt_intercept,
                         "slope": _gt_slope,
-                        "block_idx": None,
-                        "is_ground_truth": True,
-                    },
-                )
-            gt_params = ground_truth_params.get((subject, block))
-            if gt_params is not None:
-                gt_intercept = -gt_params["x_0"] / gt_params["k"] if gt_params["k"] != 0 else 0.0
-                gt_slope = gt_params["k"]
-                block_rows.append(
-                    {
-                        "Block": f"{subject}-{block} (GT)",
-                        "intercept": gt_intercept,
-                        "slope": gt_slope,
                         "block_idx": None,
                         "is_ground_truth": True,
                     },
