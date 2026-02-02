@@ -831,9 +831,8 @@ def _(expit, link_function):
 
 @app.cell
 def _(alt, blocks_df, mo, pl):
-    # Blocks chart: Actual vs Estimated with confidence intervals (scatter plot)
+    # Blocks chart: Actual vs Estimated overlaid, x = blocks grouped by subject
     if len(blocks_df) > 0 and "x_0 (est)" in blocks_df.columns:
-        # Prepare data for scatter plot: actual vs estimated
         chart_rows = []
 
         for row in blocks_df.iter_rows(named=True):
@@ -841,7 +840,6 @@ def _(alt, blocks_df, mo, pl):
             block = int(row["Block"])
             x_est = float(row["x_0 (est)"])
 
-            # Get confidence interval if available
             conf_low = x_est
             conf_high = x_est
             if "x_0_ci_lower" in row and row["x_0_ci_lower"] is not None:
@@ -860,7 +858,6 @@ def _(alt, blocks_df, mo, pl):
                 },
             )
 
-            # Add actual threshold if available (ground truth)
             if "x_0 (actual)" in row and row["x_0 (actual)"] is not None:
                 x_actual = float(row["x_0 (actual)"])
                 chart_rows.append(
@@ -876,18 +873,35 @@ def _(alt, blocks_df, mo, pl):
 
         if chart_rows:
             chart_df = pl.from_dicts(chart_rows)
+            # Block label for x-axis: blocks grouped by subject (Subject · Block N)
+            chart_df = chart_df.with_columns(
+                (pl.col("Subject").cast(pl.Utf8) + " · Block " + pl.col("Block").cast(pl.Utf8)).alias("BlockLabel"),
+            )
+            # Sort order: by subject then block so x-axis groups blocks by subject
+            block_order = (
+                chart_df.unique(["Subject", "Block"])
+                .sort(["Subject", "Block"])
+                .with_columns(
+                    (pl.col("Subject").cast(pl.Utf8) + " · Block " + pl.col("Block").cast(pl.Utf8)).alias("BlockLabel"),
+                )["BlockLabel"]
+                .to_list()
+            )
             chart_pd = chart_df.to_pandas()
 
-            # Create scatter plot with error bars
             selection = alt.selection_point(fields=["Subject", "Block"], toggle=True)
 
-            # Points
+            # Points: overlay Actual vs Estimated with different marker shapes
             points = (
                 alt.Chart(chart_pd)
-                .mark_point(filled=True, size=100)
+                .mark_point(filled=True, size=80)
                 .encode(
-                    x=alt.X("Threshold:Q", title="Threshold (x₀)"),
-                    y=alt.Y("Type:N", title=""),
+                    x=alt.X(
+                        "BlockLabel:N",
+                        sort=block_order,
+                        title="Block (by subject)",
+                    ),
+                    y=alt.Y("Threshold:Q", title="Threshold (x₀)"),
+                    shape=alt.Shape("Type:N", title="", legend=alt.Legend(orient="top")),
                     color=alt.condition(
                         selection,
                         alt.Color("Subject:N", scale=alt.Scale(scheme="category10")),
@@ -898,19 +912,23 @@ def _(alt, blocks_df, mo, pl):
                 .add_params(selection)
             )
 
-            # Error bars for estimated (confidence intervals)
+            # Vertical error bars for estimated (confidence intervals), using rule for pre-computed bounds
+            estimated_pd = chart_pd[chart_pd["Type"] == "Estimated"]
             error_bars = (
-                alt.Chart(chart_pd[chart_pd["Type"] == "Estimated"])
-                .mark_errorbar(extent="ci")
+                alt.Chart(estimated_pd)
+                .mark_rule()
                 .encode(
-                    x=alt.X("Conf_Low:Q"),
-                    x2=alt.X2("Conf_High:Q"),
-                    y=alt.Y("Type:N"),
+                    x=alt.X("BlockLabel:N", sort=block_order),
+                    y=alt.Y("Conf_Low:Q"),
+                    y2=alt.Y2("Conf_High:Q"),
                     color=alt.Color("Subject:N", scale=alt.Scale(scheme="category10")),
                 )
             )
 
-            chart = (error_bars + points).properties(height=200, width=400).resolve_scale(color="shared")
+            chart = (error_bars + points).properties(
+                height=220,
+                width=max(400, len(block_order) * 28),
+            ).resolve_scale(color="shared")
             blocks_chart = mo.ui.altair_chart(chart)
         else:
             blocks_chart = mo.md("No block data to display.")
@@ -1040,7 +1058,22 @@ def _(
 
 
 @app.cell
-def _(blocks_df, mo, pl, points_filtered_df, trials_df: object):
+def _(mo):
+    format_dropdown = mo.ui.dropdown(
+        options={
+            "csv_zip": "CSV (zip)",
+            "json": "JSON",
+            "parquet": "Parquet",
+            "duckdb": "DuckDB",
+        },
+        value="csv_zip",
+        label="Format",
+    )
+    return (format_dropdown,)
+
+
+@app.cell
+def _(blocks_df, format_dropdown, mo, pl, points_filtered_df, trials_df: object):
     import io as _io
     import zipfile as _zipfile
     from datetime import datetime
@@ -1097,25 +1130,23 @@ def _(blocks_df, mo, pl, points_filtered_df, trials_df: object):
     parquet_bytes = build_parquet(points_filtered_df)
     duckdb_bytes = build_duckdb(points_filtered_df)
 
+    format_to_content: dict[str, tuple[bytes, str]] = {
+        "csv_zip": (csv_zip, f"{timestamp}_psychoanalyze.zip"),
+        "json": (json_bytes, "data.json"),
+        "parquet": (parquet_bytes, "data.parquet"),
+        "duckdb": (duckdb_bytes, "psychoanalyze.duckdb"),
+    }
+    _selected_key = format_dropdown.selected_key or format_dropdown.value or "csv_zip"
+    _selected_bytes, _selected_filename = format_to_content.get(
+        _selected_key, format_to_content["csv_zip"]
+    )
+    download_button = mo.download(
+        _selected_bytes,
+        filename=_selected_filename,
+        label="Download",
+    )
     data_downloads = mo.vstack(
-        [
-            mo.download(
-                csv_zip,
-                filename=f"{timestamp}_psychoanalyze.zip",
-                label="Download CSV (zip)",
-            ),
-            mo.download(json_bytes, filename="data.json", label="Download JSON"),
-            mo.download(
-                parquet_bytes,
-                filename="data.parquet",
-                label="Download Parquet",
-            ),
-            mo.download(
-                duckdb_bytes,
-                filename="psychoanalyze.duckdb",
-                label="Download DuckDB",
-            ),
-        ],
+        [format_dropdown, download_button],
         gap=1,
     )
     return (data_downloads,)
