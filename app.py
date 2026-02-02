@@ -93,6 +93,7 @@ def main_layout(
         widths=[1, 2, 1],
         gap=2,
     )
+    return
 
 
 @app.cell
@@ -108,7 +109,7 @@ def imports():
     import numpy as np
     import polars as pl
     from scipy.special import expit, logit
-    from wigglystuff import HTMLRefreshWidget
+    from wigglystuff import HTMLRefreshWidget, TangleSlider
     from wigglystuff.utils import altair2svg, refresh_altair
 
     from psychoanalyze.data import export as pa_export
@@ -119,7 +120,9 @@ def imports():
     from psychoanalyze.data import trials as pa_trials
     from psychoanalyze.data.logistic import to_intercept, to_slope
     return (
+        HTMLRefreshWidget,
         Path,
+        TangleSlider,
         alt,
         altair2svg,
         az,
@@ -138,14 +141,22 @@ def imports():
         pl,
         refresh_altair,
         subject_utils,
-        to_intercept,
-        to_slope,
-        HTMLRefreshWidget,
     )
 
 
 @app.cell
-def cache_helpers(Path, az, cache_root, hashlib, io, json, mo, np, pa_hierarchical, pl):
+def cache_helpers(
+    Path,
+    az,
+    cache_root,
+    hashlib,
+    io,
+    json,
+    mo,
+    np,
+    pa_hierarchical,
+    pl,
+):
     def normalize_trials_for_hash(trials_df: pl.DataFrame) -> pl.DataFrame:
         preferred_cols = [
             col
@@ -154,6 +165,7 @@ def cache_helpers(Path, az, cache_root, hashlib, io, json, mo, np, pa_hierarchic
         ]
         cols = preferred_cols if preferred_cols else trials_df.columns
         return trials_df.select(cols).sort(cols)
+
 
     def trials_cache_key(
         trials_df: pl.DataFrame,
@@ -167,8 +179,10 @@ def cache_helpers(Path, az, cache_root, hashlib, io, json, mo, np, pa_hierarchic
         digest.update(json.dumps(fit_params, sort_keys=True).encode())
         return digest.hexdigest()
 
+
     def idata_cache_path(cache_key: str) -> Path:
         return cache_root / f"idata-{cache_key}.nc"
+
 
     @mo.cache
     def cached_hierarchical_fit(
@@ -194,10 +208,10 @@ def data_helpers(pa_io, pa_points, pa_trials, pl, subject_utils):
     generate_trials = pa_trials.generate_multi_subject
     process_upload_bytes = pa_io.read_from_bytes
 
+
     def from_trials(trials_df: pl.DataFrame) -> pl.DataFrame:
         trials_df = subject_utils.ensure_subject_column(trials_df)
         return pa_points.from_trials(trials_df)
-
     return from_trials, generate_index, generate_trials, process_upload_bytes
 
 
@@ -210,6 +224,7 @@ def header(mo):
 
     [Notebooks](https://nb.psychoanalyze.io) · [GitHub](https://github.com/psychoanalyze/psychoanalyze) · [Docs](https://docs.psychoanalyze.io)
     """)
+    return
 
 
 @app.cell
@@ -314,16 +329,51 @@ def step_mode_toggle(mo):
 
 
 @app.cell
-def trial_step_controls(mo, n_trials, step_mode_toggle):
+def step_block_selection(mo, n_blocks, n_subjects):
+    """Subject and block selection for step-by-step view (fixed to one subject+block).
+    
+    Uses simulation parameters to generate subject/block options to avoid circular deps.
+    """
+    # Generate subject options from n_subjects parameter
+    _n_subj = n_subjects.value if hasattr(n_subjects, "value") else 2
+    subjects = [f"S{i+1}" for i in range(_n_subj)]
+    subject_options = {s: s for s in subjects}
+    step_subject_dropdown = mo.ui.dropdown(
+        options=subject_options,
+        value=subjects[0] if subjects else None,
+        label="Subject",
+    )
+
+    # Generate block options from n_blocks parameter
+    _n_blk = n_blocks.value if hasattr(n_blocks, "value") else 2
+    blocks = list(range(_n_blk))
+    block_options = {str(b): f"Block {b}" for b in blocks}
+    step_block_dropdown = mo.ui.dropdown(
+        options=block_options,
+        value=str(blocks[0]) if blocks else None,
+        label="Block",
+    )
+
+    return step_block_dropdown, step_subject_dropdown
+
+
+@app.cell
+def trial_step_controls(TangleSlider, mo, n_trials):
     # Trial step slider - only active when step mode is enabled
-    max_trials = n_trials.value if hasattr(n_trials, 'value') else 100
-    trial_step_slider = mo.ui.slider(
-        start=1,
-        stop=max(max_trials, 1),
-        step=1,
-        value=max(max_trials, 1),
-        label="Trial",
-        show_value=True,
+    # Uses wigglystuff TangleSlider for interactive inline control
+    max_trials = n_trials.value if hasattr(n_trials, "value") else 100
+
+    # Create TangleSlider wrapped in mo.ui.anywidget for marimo compatibility
+    # Starts at trial 1 and goes up to max trial number
+    trial_step_slider = mo.ui.anywidget(
+        TangleSlider(
+            value=1,
+            min_val=1,
+            max_val=max(max_trials, 1),
+            step=1,
+            prefix="Trial ",
+            suffix=f" of {max_trials}",
+        )
     )
     # Auto-play button for animation
     auto_play_button = mo.ui.run_button(label="▶ Play", kind="neutral")
@@ -332,148 +382,189 @@ def trial_step_controls(mo, n_trials, step_mode_toggle):
 
 @app.cell
 def step_chart(
+    HTMLRefreshWidget,
     alt,
     altair2svg,
     expit,
     generate_index,
     ground_truth_params,
-    HTMLRefreshWidget,
     max_x,
     min_x,
     mo,
     n_levels,
     np,
     pl,
+    step_block_dropdown,
     step_mode_toggle,
+    step_subject_dropdown,
     trial_step_slider,
     trials_df,
 ):
-    """Create step-by-step visualization showing trials accumulating one at a time."""
+    """Create step-by-step visualization showing trials accumulating one at a time.
     
+    Fixed to a single subject + block selected via dropdowns.
+    """
+
     # Only compute if step mode is enabled and we're in simulation mode
     if not step_mode_toggle.value or "Trial" not in trials_df.columns:
         step_chart = None
         step_info = mo.md("")
     else:
         current_step = trial_step_slider.value
+
+        # Use selected subject and block from dropdowns
+        selected_subject = step_subject_dropdown.value
+        selected_block = int(step_block_dropdown.value) if step_block_dropdown.value else 0
         
-        # Get first block's data for step-by-step view
-        first_subject = trials_df["Subject"].unique().to_list()[0]
-        first_block = trials_df.filter(pl.col("Subject") == first_subject)["Block"].unique().to_list()[0]
         block_trials = trials_df.filter(
-            (pl.col("Subject") == first_subject) & (pl.col("Block") == first_block)
+            (pl.col("Subject") == selected_subject) & (pl.col("Block") == selected_block)
         ).sort("Trial")
-        
+
         # Filter to trials up to current step
         trials_up_to_step = block_trials.filter(pl.col("Trial") < current_step)
         current_trial = block_trials.filter(pl.col("Trial") == current_step - 1)
-        
+
         # Get all intensity options for the histogram
         all_options = generate_index(n_levels.value, [min_x, max_x])
-        
+
         # Compute cumulative hit rates at each intensity
         if len(trials_up_to_step) > 0:
-            points_cumulative = trials_up_to_step.group_by("Intensity").agg([
-                pl.mean("Result").alias("Hit Rate"),
-                pl.len().alias("n_trials"),
-            ]).sort("Intensity")
-            
+            points_cumulative = (
+                trials_up_to_step.group_by("Intensity")
+                .agg(
+                    [
+                        pl.mean("Result").alias("Hit Rate"),
+                        pl.len().alias("n_trials"),
+                    ]
+                )
+                .sort("Intensity")
+            )
+
             # Create sampling distribution for histogram (include all options)
             sampling_counts = trials_up_to_step.group_by("Intensity").len()
             # Merge with all options to show zeros
             all_options_df = pl.DataFrame({"Intensity": all_options})
-            sampling_dist = all_options_df.join(
-                sampling_counts, on="Intensity", how="left"
-            ).with_columns(
-                pl.col("len").fill_null(0).alias("Count")
-            ).select(["Intensity", "Count"]).sort("Intensity")
+            sampling_dist = (
+                all_options_df.join(sampling_counts, on="Intensity", how="left")
+                .with_columns(pl.col("len").fill_null(0).alias("Count"))
+                .select(["Intensity", "Count"])
+                .sort("Intensity")
+            )
         else:
-            points_cumulative = pl.DataFrame({
-                "Intensity": [],
-                "Hit Rate": [],
-                "n_trials": [],
-            })
-            sampling_dist = pl.DataFrame({
-                "Intensity": all_options,
-                "Count": [0] * len(all_options),
-            })
-        
+            points_cumulative = pl.DataFrame(
+                {
+                    "Intensity": [],
+                    "Hit Rate": [],
+                    "n_trials": [],
+                }
+            )
+            sampling_dist = pl.DataFrame(
+                {
+                    "Intensity": all_options,
+                    "Count": [0] * len(all_options),
+                }
+            )
+
         # Get ground truth parameters for this block
-        _gt_params = ground_truth_params.get((first_subject, first_block))
-        
+        _gt_params = ground_truth_params.get((selected_subject, selected_block))
+
         # Create x values for fitted curve
         _x_curve = np.linspace(min_x, max_x, 100)
-        
+
         # === MAIN PSYCHOMETRIC CHART ===
         _chart_layers = []
-        
+
         # Ground truth curve (dashed)
         if _gt_params is not None:
             _gt_intercept = -_gt_params["x_0"] * _gt_params["k"]
             _gt_slope = _gt_params["k"]
             _y_gt = expit(_gt_slope * _x_curve + _gt_intercept)
-            _gt_df = pl.DataFrame({
-                "Intensity": _x_curve,
-                "Hit Rate": _y_gt,
-                "Type": ["Ground Truth"] * len(_x_curve),
-            }).to_pandas()
-            _gt_line = alt.Chart(_gt_df).mark_line(
-                strokeDash=[5, 5],
-                color="gray",
-                strokeWidth=2,
-            ).encode(
-                x=alt.X("Intensity:Q", title="Intensity"),
-                y=alt.Y("Hit Rate:Q", title="Hit Rate", scale=alt.Scale(domain=[0, 1])),
+            _gt_df = pl.DataFrame(
+                {
+                    "Intensity": _x_curve,
+                    "Hit Rate": _y_gt,
+                    "Type": ["Ground Truth"] * len(_x_curve),
+                }
+            ).to_pandas()
+            _gt_line = (
+                alt.Chart(_gt_df)
+                .mark_line(
+                    strokeDash=[5, 5],
+                    color="gray",
+                    strokeWidth=2,
+                )
+                .encode(
+                    x=alt.X("Intensity:Q", title="Intensity"),
+                    y=alt.Y("Hit Rate:Q", title="Hit Rate", scale=alt.Scale(domain=[0, 1])),
+                )
             )
             _chart_layers.append(_gt_line)
-        
+
         # Cumulative points (sized by n_trials)
         if len(points_cumulative) > 0:
             _points_pd = points_cumulative.to_pandas()
-            _points_scatter = alt.Chart(_points_pd).mark_point(
-                filled=True,
-                color="steelblue",
-            ).encode(
-                x=alt.X("Intensity:Q"),
-                y=alt.Y("Hit Rate:Q"),
-                size=alt.Size("n_trials:Q", scale=alt.Scale(range=[50, 300]), title="Trials"),
-                tooltip=["Intensity:Q", "Hit Rate:Q", "n_trials:Q"],
+            _points_scatter = (
+                alt.Chart(_points_pd)
+                .mark_point(
+                    filled=True,
+                    color="steelblue",
+                )
+                .encode(
+                    x=alt.X("Intensity:Q"),
+                    y=alt.Y("Hit Rate:Q"),
+                    size=alt.Size(
+                        "n_trials:Q", scale=alt.Scale(range=[50, 300]), title="Trials"
+                    ),
+                    tooltip=["Intensity:Q", "Hit Rate:Q", "n_trials:Q"],
+                )
             )
             _chart_layers.append(_points_scatter)
-        
+
         # Current trial highlight (large marker with different color)
         if len(current_trial) > 0:
             _current_intensity = float(current_trial["Intensity"][0])
             _current_result = int(current_trial["Result"][0])
-            _current_pd = pl.DataFrame({
-                "Intensity": [_current_intensity],
-                "Result": [_current_result],
-                "label": [f"Trial {current_step}: {'Hit' if _current_result else 'Miss'}"],
-            }).to_pandas()
-            
+            _current_pd = pl.DataFrame(
+                {
+                    "Intensity": [_current_intensity],
+                    "Result": [_current_result],
+                    "label": [
+                        f"Trial {current_step}: {'Hit' if _current_result else 'Miss'}"
+                    ],
+                }
+            ).to_pandas()
+
             # Vertical line at current intensity
-            _vline = alt.Chart(_current_pd).mark_rule(
-                color="red",
-                strokeWidth=2,
-                strokeDash=[4, 4],
-            ).encode(
-                x=alt.X("Intensity:Q"),
+            _vline = (
+                alt.Chart(_current_pd)
+                .mark_rule(
+                    color="red",
+                    strokeWidth=2,
+                    strokeDash=[4, 4],
+                )
+                .encode(
+                    x=alt.X("Intensity:Q"),
+                )
             )
             _chart_layers.append(_vline)
-            
+
             # Current trial marker
-            _current_marker = alt.Chart(_current_pd).mark_point(
-                filled=True,
-                size=200,
-                color="red",
-                shape="diamond",
-            ).encode(
-                x=alt.X("Intensity:Q"),
-                y=alt.Y("Result:Q", scale=alt.Scale(domain=[0, 1])),
-                tooltip=["label:N", "Intensity:Q"],
+            _current_marker = (
+                alt.Chart(_current_pd)
+                .mark_point(
+                    filled=True,
+                    size=200,
+                    color="red",
+                    shape="diamond",
+                )
+                .encode(
+                    x=alt.X("Intensity:Q"),
+                    y=alt.Y("Result:Q", scale=alt.Scale(domain=[0, 1])),
+                    tooltip=["label:N", "Intensity:Q"],
+                )
             )
             _chart_layers.append(_current_marker)
-        
+
         # === SAMPLING DISTRIBUTION HISTOGRAM ===
         _sampling_pd = sampling_dist.to_pandas()
         # Highlight current intensity in histogram
@@ -484,22 +575,29 @@ def step_chart(
             )
         else:
             _sampling_pd["is_current"] = False
-        
-        _histogram = alt.Chart(_sampling_pd).mark_bar().encode(
-            x=alt.X("Intensity:Q", title="Intensity", scale=alt.Scale(domain=[min_x, max_x])),
-            y=alt.Y("Count:Q", title="Samples"),
-            color=alt.condition(
-                alt.datum.is_current,
-                alt.value("red"),
-                alt.value("steelblue"),
-            ),
-            tooltip=["Intensity:Q", "Count:Q"],
-        ).properties(
-            width=500,
-            height=100,
-            title="Sampling Distribution",
+
+        _histogram = (
+            alt.Chart(_sampling_pd)
+            .mark_bar()
+            .encode(
+                x=alt.X(
+                    "Intensity:Q", title="Intensity", scale=alt.Scale(domain=[min_x, max_x])
+                ),
+                y=alt.Y("Count:Q", title="Samples"),
+                color=alt.condition(
+                    alt.datum.is_current,
+                    alt.value("red"),
+                    alt.value("steelblue"),
+                ),
+                tooltip=["Intensity:Q", "Count:Q"],
+            )
+            .properties(
+                width=500,
+                height=100,
+                title="Sampling Distribution",
+            )
         )
-        
+
         # Create main chart from layers (wigglystuff HTMLRefreshWidget + altair2svg)
         if _chart_layers:
             _main_chart = alt.layer(*_chart_layers).properties(
@@ -508,22 +606,23 @@ def step_chart(
                 title=f"Trial {current_step} of {len(block_trials)}",
             )
             step_chart = HTMLRefreshWidget(
-                html=f'<div>{altair2svg(_main_chart)}</div><div>{altair2svg(_histogram)}</div>',
+                html=f"<div>{altair2svg(_main_chart)}</div><div>{altair2svg(_histogram)}</div>",
             )
         else:
             step_chart = HTMLRefreshWidget(html=altair2svg(_histogram))
-        
+
         # Info about current trial
         if len(current_trial) > 0:
             _info_intensity = float(current_trial["Intensity"][0])
             _info_result = "Hit ✓" if int(current_trial["Result"][0]) else "Miss ✗"
             step_info = mo.callout(
-                mo.md(f"**Trial {current_step}**: Intensity = {_info_intensity:.2f} → {_info_result}"),
+                mo.md(
+                    f"**Trial {current_step}**: Intensity = {_info_intensity:.2f} → {_info_result}"
+                ),
                 kind="success" if "Hit" in _info_result else "warn",
             )
         else:
             step_info = mo.md("")
-    
     return step_chart, step_info
 
 
@@ -574,17 +673,17 @@ def simulation_params_ui(mo, preset_dropdown):
         )
         .form(submit_button_label="Generate")
     )
-    return (
-        input_form,
-        n_blocks,
-        n_levels,
-        n_subjects,
-        n_trials,
-    )
+    return input_form, n_blocks, n_levels, n_subjects, n_trials
 
 
 @app.cell
-def fit_params(fit_chains, fit_draws, fit_random_seed, fit_target_accept, fit_tune):
+def fit_params(
+    fit_chains,
+    fit_draws,
+    fit_random_seed,
+    fit_target_accept,
+    fit_tune,
+):
     random_seed = int(fit_random_seed.value)
     fit_params: dict[str, float | int | None] = {
         "draws": int(fit_draws.value),
@@ -609,7 +708,7 @@ def stimulus_range(logit):
 def stimulus_info(max_x, min_x, mo):
     # Stimulus range info for display in left column
     stimulus_info = mo.md(f"**Stimulus range:** {min_x:.2f} to {max_x:.2f}")
-    return (stimulus_info,)
+    return
 
 
 @app.cell
@@ -687,9 +786,7 @@ def trials_data(
             n_blocks=n_blocks.value,
             n_subjects=n_subjects.value,
             use_random_params=use_random_params,
-            random_seed=int(fit_random_seed.value)
-            if fit_random_seed.value > 0
-            else None,
+            random_seed=int(fit_random_seed.value) if fit_random_seed.value > 0 else None,
             sampling_method=sampling_method,
         )
     else:
@@ -804,16 +901,20 @@ def hierarchical_fit_and_blocks(
 
             # Add ground truth columns if available
             if _gt_params is not None:
-                _gt_intercept = -_gt_params["x_0"] / _gt_params["k"] if _gt_params["k"] != 0 else 0.0
+                _gt_intercept = (
+                    -_gt_params["x_0"] / _gt_params["k"] if _gt_params["k"] != 0 else 0.0
+                )
                 _gt_slope = _gt_params["k"]
-                _block_dict.update({
-                    "x_0 (actual)": _gt_params["x_0"],
-                    "k (actual)": _gt_params["k"],
-                    "gamma (actual)": _gt_params["gamma"],
-                    "lambda (actual)": _gt_params["lambda"],
-                    "intercept (actual)": _gt_intercept,
-                    "slope (actual)": _gt_slope,
-                })
+                _block_dict.update(
+                    {
+                        "x_0 (actual)": _gt_params["x_0"],
+                        "k (actual)": _gt_params["k"],
+                        "gamma (actual)": _gt_params["gamma"],
+                        "lambda (actual)": _gt_params["lambda"],
+                        "intercept (actual)": _gt_intercept,
+                        "slope (actual)": _gt_slope,
+                    }
+                )
 
             blocks_list.append(_block_dict)
         blocks_df = pl.from_dicts(blocks_list)
@@ -846,25 +947,23 @@ def selection_to_pl_helper(pl):
             except Exception:
                 return None
         return None
-
     return (selection_to_pl,)
 
 
 @app.cell
 def block_rows_for_plot(
-    block,
     block_idx_by_subject_block: dict[tuple[str, int], int],
-    blocks_df,
     blocks_chart,
+    blocks_df,
     ground_truth_params,
     pl,
     selection_to_pl,
-    subject,
 ):
     # Selected block rows for plot (include ground truth per block)
     selected_blocks_df = selection_to_pl(getattr(blocks_chart, "value", None))
     if selected_blocks_df is None or len(selected_blocks_df) == 0:
         selected_blocks_df = blocks_df
+
 
     def block_label(row: dict) -> str:
         subject = row.get("Subject")
@@ -872,6 +971,7 @@ def block_rows_for_plot(
         if subject is None or subject == "":
             return str(block)
         return f"{subject}-{block}"
+
 
     block_rows = []
     if isinstance(selected_blocks_df, pl.DataFrame) and len(selected_blocks_df) > 0:
@@ -893,7 +993,9 @@ def block_rows_for_plot(
             # Add ground truth curve if available
             _gt_params = ground_truth_params.get((_subject, _block))
             if _gt_params is not None:
-                _gt_intercept = -_gt_params["x_0"] / _gt_params["k"] if _gt_params["k"] != 0 else 0.0
+                _gt_intercept = (
+                    -_gt_params["x_0"] / _gt_params["k"] if _gt_params["k"] != 0 else 0.0
+                )
                 _gt_slope = _gt_params["k"]
                 block_rows.append(
                     {
@@ -923,7 +1025,9 @@ def block_rows_for_plot(
             # Add ground truth curve if available
             _gt_params = ground_truth_params.get((_subject, _block))
             if _gt_params is not None:
-                _gt_intercept = -_gt_params["x_0"] / _gt_params["k"] if _gt_params["k"] != 0 else 0.0
+                _gt_intercept = (
+                    -_gt_params["x_0"] / _gt_params["k"] if _gt_params["k"] != 0 else 0.0
+                )
                 _gt_slope = _gt_params["k"]
                 block_rows.append(
                     {
@@ -964,7 +1068,14 @@ def link_fn(expit, link_function):
 
 
 @app.cell
-def blocks_chart_cell(alt, blocks_df, HTMLRefreshWidget, mo, pl, refresh_altair):
+def blocks_chart_cell(
+    HTMLRefreshWidget,
+    alt,
+    blocks_df,
+    mo,
+    pl,
+    refresh_altair,
+):
     # Blocks chart: Actual vs Estimated overlaid, x = blocks grouped by subject
     # Use wigglystuff HTMLRefreshWidget + @refresh_altair for refreshable static SVG
     @refresh_altair
@@ -1001,10 +1112,15 @@ def blocks_chart_cell(alt, blocks_df, HTMLRefreshWidget, mo, pl, refresh_altair)
                 color=alt.Color("Subject:N", scale=alt.Scale(scheme="category10")),
             )
         )
-        return (error_bars + points).properties(
-            height=220,
-            width=max(400, len(block_order) * 28),
-        ).resolve_scale(color="shared")
+        return (
+            (error_bars + points)
+            .properties(
+                height=220,
+                width=max(400, len(block_order) * 28),
+            )
+            .resolve_scale(color="shared")
+        )
+
 
     if len(blocks_df) > 0 and "x_0 (est)" in blocks_df.columns:
         chart_rows = []
@@ -1048,13 +1164,21 @@ def blocks_chart_cell(alt, blocks_df, HTMLRefreshWidget, mo, pl, refresh_altair)
         if chart_rows:
             chart_df = pl.from_dicts(chart_rows)
             chart_df = chart_df.with_columns(
-                (pl.col("Subject").cast(pl.Utf8) + " · Block " + pl.col("Block").cast(pl.Utf8)).alias("BlockLabel"),
+                (
+                    pl.col("Subject").cast(pl.Utf8)
+                    + " · Block "
+                    + pl.col("Block").cast(pl.Utf8)
+                ).alias("BlockLabel"),
             )
             block_order = (
                 chart_df.unique(["Subject", "Block"])
                 .sort(["Subject", "Block"])
                 .with_columns(
-                    (pl.col("Subject").cast(pl.Utf8) + " · Block " + pl.col("Block").cast(pl.Utf8)).alias("BlockLabel"),
+                    (
+                        pl.col("Subject").cast(pl.Utf8)
+                        + " · Block "
+                        + pl.col("Block").cast(pl.Utf8)
+                    ).alias("BlockLabel"),
                 )["BlockLabel"]
                 .to_list()
             )
@@ -1069,14 +1193,13 @@ def blocks_chart_cell(alt, blocks_df, HTMLRefreshWidget, mo, pl, refresh_altair)
 
 @app.cell
 def main_psychometric_plot(
+    HTMLRefreshWidget,
     alt,
     block_rows,
     fit_idata,
-    HTMLRefreshWidget,
     link_fn,
     max_x,
     min_x,
-    mo,
     np,
     pa_hierarchical,
     pl,
@@ -1132,6 +1255,7 @@ def main_psychometric_plot(
             plot_layers.insert(0, band_chart)
         return alt.layer(*plot_layers).resolve_scale(color="shared")
 
+
     x = np.linspace(min_x, max_x, 100)
     fits_list = []
     bands_list = []
@@ -1143,7 +1267,10 @@ def main_psychometric_plot(
                     "Intensity": x,
                     "Hit Rate": y,
                     "Series": [blk["Block"]] * len(x),
-                    "Type": ["Ground Truth" if blk.get("is_ground_truth", False) else "Fitted"] * len(x),
+                    "Type": [
+                        "Ground Truth" if blk.get("is_ground_truth", False) else "Fitted"
+                    ]
+                    * len(x),
                 },
             ),
         )
@@ -1208,7 +1335,14 @@ def format_dropdown(mo):
 
 
 @app.cell
-def data_downloads_cell(blocks_df, format_dropdown, mo, pa_export, points_filtered_df, trials_df: object):
+def data_downloads_cell(
+    blocks_df,
+    format_dropdown,
+    mo,
+    pa_export,
+    points_filtered_df,
+    trials_df,
+):
     from datetime import datetime
 
     # Use refactored export functions from pa_export module
@@ -1253,7 +1387,9 @@ def input_tabs(
     preset_dropdown,
     sampling_method_dropdown,
     show_equation,
+    step_block_dropdown,
     step_mode_toggle,
+    step_subject_dropdown,
     trial_step_slider,
 ):
     # Build tab content based on selected mode
@@ -1276,24 +1412,17 @@ def input_tabs(
         gap=1,
     )
 
-    # Sampling method info callout
-    sampling_method_info = mo.callout(
-        mo.md("""
-**Method of Constant Stimuli:** Randomly samples from fixed intensity levels. Classic approach used in traditional psychophysics.
-
-**Adaptive (Fisher Information):** Fits a logistic model and samples where Fisher Information about the threshold is highest (near the estimated threshold).
-
-**QUEST/Psi (Bayesian):** Maintains a full probability distribution over threshold values and selects stimuli that maximize expected information gain. Classic algorithm from Watson & Pelli (1983).
-        """),
-        kind="info",
-    )
-
-    # Step-by-step controls
+    # Step-by-step controls with subject/block selection
     step_controls = mo.vstack(
         [
             mo.md("### Step-by-Step Visualization"),
             step_mode_toggle,
-            mo.hstack([trial_step_slider, auto_play_button], gap=1) if step_mode_toggle.value else mo.md(""),
+            mo.hstack([step_subject_dropdown, step_block_dropdown], gap=1)
+            if step_mode_toggle.value
+            else mo.md(""),
+            mo.hstack([trial_step_slider, auto_play_button], gap=1)
+            if step_mode_toggle.value
+            else mo.md(""),
         ],
         gap=1,
     )
@@ -1303,7 +1432,6 @@ def input_tabs(
             mo.md("### Simulation Mode"),
             mo.md("### Sampling Method"),
             sampling_method_dropdown,
-            sampling_method_info,
             step_controls,
             mo.md("### Link Function"),
             link_function,
