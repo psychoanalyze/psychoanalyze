@@ -11,7 +11,7 @@ app = marimo.App(width="full", app_title="PsychoAnalyze")
 
 
 @app.cell
-def _(
+def main_layout(
     blocks_chart,
     data_downloads,
     input_tabs,
@@ -96,7 +96,7 @@ def _(
 
 
 @app.cell
-def _():
+def imports():
     import hashlib
     import io
     import json
@@ -140,7 +140,7 @@ def _():
 
 
 @app.cell
-def _(Path, az, cache_root, hashlib, io, json, mo, np, pa_hierarchical, pl):
+def cache_helpers(Path, az, cache_root, hashlib, io, json, mo, np, pa_hierarchical, pl):
     def normalize_trials_for_hash(trials_df: pl.DataFrame) -> pl.DataFrame:
         preferred_cols = [
             col
@@ -183,7 +183,7 @@ def _(Path, az, cache_root, hashlib, io, json, mo, np, pa_hierarchical, pl):
 
 
 @app.cell
-def _(pa_io, pa_points, pa_trials, pl, subject_utils):
+def data_helpers(pa_io, pa_points, pa_trials, pl, subject_utils):
     # Import functions from refactored modules
     generate_index = pa_points.generate_index
     generate_trials = pa_trials.generate_multi_subject
@@ -197,7 +197,7 @@ def _(pa_io, pa_points, pa_trials, pl, subject_utils):
 
 
 @app.cell
-def _(mo):
+def header(mo):
     # Header
     mo.md(r"""
     # PsychoAnalyze
@@ -208,7 +208,7 @@ def _(mo):
 
 
 @app.cell
-def _(mo):
+def file_upload_ui(mo):
     # File upload
     file_upload = mo.ui.file(
         filetypes=[".csv", ".zip", ".parquet", ".pq"],
@@ -219,13 +219,13 @@ def _(mo):
 
 
 @app.cell
-def _(mo):
+def load_sample_button(mo):
     load_sample_button = mo.ui.run_button(label="Load Sample Data")
     return (load_sample_button,)
 
 
 @app.cell
-def _(mo):
+def preset_and_link_ui(mo):
     preset_dropdown = mo.ui.dropdown(
         options={
             "standard": "Standard",
@@ -247,7 +247,7 @@ def _(mo):
 
 
 @app.cell
-def _(mo):
+def fit_settings_ui(mo):
     fit_draws = mo.ui.number(value=300, start=50, stop=5000, step=50, label="draws")
     fit_tune = mo.ui.number(value=300, start=50, stop=5000, step=50, label="tune")
     fit_chains = mo.ui.number(value=4, start=1, stop=4, step=1, label="chains")
@@ -288,7 +288,7 @@ def _(mo):
 
 
 @app.cell
-def _(mo):
+def sampling_method_ui(mo):
     sampling_method_dropdown = mo.ui.dropdown(
         options={
             "constant_stimuli": "Method of Constant Stimuli",
@@ -302,14 +302,14 @@ def _(mo):
 
 
 @app.cell
-def _(mo):
+def step_mode_toggle(mo):
     # Step-by-step visualization controls
     step_mode_toggle = mo.ui.checkbox(label="Step-by-step mode", value=False)
     return (step_mode_toggle,)
 
 
 @app.cell
-def _(mo, n_trials, step_mode_toggle):
+def trial_step_controls(mo, n_trials, step_mode_toggle):
     # Trial step slider - only active when step mode is enabled
     max_trials = n_trials.value if hasattr(n_trials, 'value') else 100
     trial_step_slider = mo.ui.slider(
@@ -326,7 +326,7 @@ def _(mo, n_trials, step_mode_toggle):
 
 
 @app.cell
-def _(
+def step_chart(
     alt,
     expit,
     generate_index,
@@ -523,7 +523,7 @@ def _(
 
 
 @app.cell
-def _(mo, preset_dropdown):
+def simulation_params_ui(mo, preset_dropdown):
     _presets = {
         "standard": [0.0, 1.0, 0.0, 0.0],
         "non-standard": [10.0, 2.0, 0.2, 0.1],
@@ -579,7 +579,7 @@ def _(mo, preset_dropdown):
 
 
 @app.cell
-def _(fit_chains, fit_draws, fit_random_seed, fit_target_accept, fit_tune):
+def fit_params(fit_chains, fit_draws, fit_random_seed, fit_target_accept, fit_tune):
     random_seed = int(fit_random_seed.value)
     fit_params: dict[str, float | int | None] = {
         "draws": int(fit_draws.value),
@@ -592,7 +592,7 @@ def _(fit_chains, fit_draws, fit_random_seed, fit_target_accept, fit_tune):
 
 
 @app.cell
-def _(logit):
+def stimulus_range(logit):
     # Default stimulus range for random parameter generation
     # Using reasonable defaults: x_0=0, k=1 as baseline
     min_x = logit(0.01)
@@ -601,14 +601,14 @@ def _(logit):
 
 
 @app.cell
-def _(max_x, min_x, mo):
+def stimulus_info(max_x, min_x, mo):
     # Stimulus range info for display in left column
     stimulus_info = mo.md(f"**Stimulus range:** {min_x:.2f} to {max_x:.2f}")
     return (stimulus_info,)
 
 
 @app.cell
-def _(mo, show_equation):
+def plot_equation_cell(mo, show_equation):
     equation_abstracted = r"""
     $$
     \psi(x) = \gamma + (1 - \gamma - \lambda)F(x)
@@ -626,14 +626,14 @@ def _(mo, show_equation):
 
 
 @app.cell
-def _(pa_trials):
+def load_sample_trials_ref(pa_trials):
     # Use refactored sample data loader from trials module
     load_sample_trials = pa_trials.load_sample
     return (load_sample_trials,)
 
 
 @app.cell
-def _(
+def trials_data(
     file_upload,
     fit_random_seed,
     generate_index,
@@ -695,8 +695,7 @@ def _(
 
 
 @app.cell
-@app.cell
-def _(mo):
+def fit_button(mo):
     fit_button = mo.ui.run_button(
         label="Fit Model",
         kind="success",
@@ -705,20 +704,20 @@ def _(mo):
 
 
 @app.cell
-def _(Path):
+def cache_root(Path):
     cache_root = Path("__marimo__") / "cache" / "psychoanalyze"
     cache_root.mkdir(parents=True, exist_ok=True)
     return (cache_root,)
 
 
 @app.cell
-def _(fit_button, input_tabs):
+def should_fit(fit_button, input_tabs):
     should_fit = fit_button.value or input_tabs.value == "Simulation"
     return (should_fit,)
 
 
 @app.cell
-def _(
+def hierarchical_fit_and_blocks(
     cached_hierarchical_fit,
     fit_params: dict[str, float | int | None],
     from_trials,
@@ -821,7 +820,7 @@ def _(
 
 
 @app.cell
-def _(pl):
+def selection_to_pl_helper(pl):
     def selection_to_pl(selection: object) -> pl.DataFrame | None:
         if selection is None:
             return None
@@ -847,7 +846,7 @@ def _(pl):
 
 
 @app.cell
-def _(
+def block_rows_for_plot(
     block,
     block_idx_by_subject_block: dict[tuple[str, int], int],
     blocks_df,
@@ -934,7 +933,7 @@ def _(
 
 
 @app.cell
-def _(blocks_chart, pl, points_df, selection_to_pl):
+def points_filtered(blocks_chart, pl, points_df, selection_to_pl):
     # Filter points by selected blocks
     sel = selection_to_pl(getattr(blocks_chart, "value", None))
     if sel is not None and len(sel) > 0 and "Block" in sel.columns:
@@ -954,13 +953,13 @@ def _(blocks_chart, pl, points_df, selection_to_pl):
 
 
 @app.cell
-def _(expit, link_function):
+def link_fn(expit, link_function):
     link_fn = expit if link_function.value == "expit" else expit
     return (link_fn,)
 
 
 @app.cell
-def _(alt, blocks_df, mo, pl):
+def blocks_chart_cell(alt, blocks_df, mo, pl):
     # Blocks chart: Actual vs Estimated overlaid, x = blocks grouped by subject
     if len(blocks_df) > 0 and "x_0 (est)" in blocks_df.columns:
         chart_rows = []
@@ -1068,7 +1067,7 @@ def _(alt, blocks_df, mo, pl):
 
 
 @app.cell
-def _(
+def main_psychometric_plot(
     alt,
     block_rows,
     fit_idata,
@@ -1188,7 +1187,7 @@ def _(
 
 
 @app.cell
-def _(mo):
+def format_dropdown(mo):
     format_dropdown = mo.ui.dropdown(
         options={
             "csv_zip": "CSV (zip)",
@@ -1203,7 +1202,7 @@ def _(mo):
 
 
 @app.cell
-def _(blocks_df, format_dropdown, mo, pa_export, points_filtered_df, trials_df: object):
+def data_downloads_cell(blocks_df, format_dropdown, mo, pa_export, points_filtered_df, trials_df: object):
     from datetime import datetime
 
     # Use refactored export functions from pa_export module
@@ -1236,7 +1235,7 @@ def _(blocks_df, format_dropdown, mo, pa_export, points_filtered_df, trials_df: 
 
 
 @app.cell
-def _(
+def input_tabs(
     auto_play_button,
     file_upload,
     fit_button,
