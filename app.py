@@ -119,7 +119,9 @@ def imports():
     from psychoanalyze.data import subject as subject_utils
     from psychoanalyze.data import trials as pa_trials
     from psychoanalyze.data.logistic import to_intercept, to_slope
+    from psychoanalyze.data.trials import BOEDSampler, psi as psi_func
     return (
+        BOEDSampler,
         HTMLRefreshWidget,
         Path,
         TangleSlider,
@@ -139,6 +141,7 @@ def imports():
         pa_points,
         pa_trials,
         pl,
+        psi_func,
         refresh_altair,
         subject_utils,
     )
@@ -312,8 +315,7 @@ def sampling_method_ui(mo):
     sampling_method_dropdown = mo.ui.dropdown(
         options={
             "Method of Constant Stimuli": "constant_stimuli",
-            "Adaptive (Fisher Information)": "adaptive",
-            "QUEST/Psi (Bayesian)": "quest",
+            "Bayesian Optimal Design": "boed",
         },
         value="Method of Constant Stimuli",
         label="Sampling Method",
@@ -361,7 +363,7 @@ def step_block_selection(mo, n_blocks, n_subjects):
 def trial_step_controls(TangleSlider, mo, n_trials):
     # Trial step slider - only active when step mode is enabled
     # Uses wigglystuff TangleSlider for interactive inline control
-    max_trials = n_trials.value if hasattr(n_trials, "value") else 100
+    _max_trials = n_trials.value if hasattr(n_trials, "value") else 100
 
     # Create TangleSlider wrapped in mo.ui.anywidget for marimo compatibility
     # Starts at trial 1 and goes up to max trial number
@@ -369,10 +371,10 @@ def trial_step_controls(TangleSlider, mo, n_trials):
         TangleSlider(
             value=1,
             min_val=1,
-            max_val=max(max_trials, 1),
+            max_val=max(_max_trials, 1),
             step=1,
             prefix="Trial ",
-            suffix=f" of {max_trials}",
+            suffix=f" of {_max_trials}",
         )
     )
     # Auto-play button for animation
@@ -382,6 +384,7 @@ def trial_step_controls(TangleSlider, mo, n_trials):
 
 @app.cell
 def step_chart(
+    BOEDSampler,
     HTMLRefreshWidget,
     alt,
     altair2svg,
@@ -394,15 +397,18 @@ def step_chart(
     n_levels,
     np,
     pl,
+    psi_func,
+    sampling_method_dropdown,
     step_block_dropdown,
     step_mode_toggle,
     step_subject_dropdown,
     trial_step_slider,
     trials_df,
 ):
-    """Create step-by-step visualization showing trials accumulating one at a time.
+    """Create step-by-step BOED visualization showing posterior updates after each trial.
     
-    Fixed to a single subject + block selected via dropdowns.
+    For BOED mode: Runs the sampler sequentially and shows the evolving posterior.
+    For constant stimuli: Shows trials accumulating with hit rates.
     """
 
     # Only compute if step mode is enabled and we're in simulation mode
@@ -411,6 +417,7 @@ def step_chart(
         step_info = mo.md("")
     else:
         current_step = trial_step_slider.value
+        _sampling_method = sampling_method_dropdown.value or "constant_stimuli"
 
         # Use selected subject and block from dropdowns
         selected_subject = step_subject_dropdown.value
@@ -420,79 +427,57 @@ def step_chart(
             (pl.col("Subject") == selected_subject) & (pl.col("Block") == selected_block)
         ).sort("Trial")
 
-        # Filter to trials up to current step
-        trials_up_to_step = block_trials.filter(pl.col("Trial") < current_step)
-        current_trial = block_trials.filter(pl.col("Trial") == current_step - 1)
-
-        # Get all intensity options for the histogram
+        # Get all intensity options
         all_options = generate_index(n_levels.value, [min_x, max_x])
-
-        # Compute cumulative hit rates at each intensity
-        if len(trials_up_to_step) > 0:
-            points_cumulative = (
-                trials_up_to_step.group_by("Intensity")
-                .agg(
-                    [
-                        pl.mean("Result").alias("Hit Rate"),
-                        pl.len().alias("n_trials"),
-                    ]
-                )
-                .sort("Intensity")
-            )
-
-            # Create sampling distribution for histogram (include all options)
-            sampling_counts = trials_up_to_step.group_by("Intensity").len()
-            # Merge with all options to show zeros
-            all_options_df = pl.DataFrame({"Intensity": all_options})
-            sampling_dist = (
-                all_options_df.join(sampling_counts, on="Intensity", how="left")
-                .with_columns(pl.col("len").fill_null(0).alias("Count"))
-                .select(["Intensity", "Count"])
-                .sort("Intensity")
-            )
-        else:
-            points_cumulative = pl.DataFrame(
-                {
-                    "Intensity": [],
-                    "Hit Rate": [],
-                    "n_trials": [],
-                }
-            )
-            sampling_dist = pl.DataFrame(
-                {
-                    "Intensity": all_options,
-                    "Count": [0] * len(all_options),
-                }
-            )
+        options_arr = np.array(all_options)
 
         # Get ground truth parameters for this block
         _gt_params = ground_truth_params.get((selected_subject, selected_block))
 
-        # Create x values for fitted curve
+        # Filter to trials up to current step
+        trials_up_to_step = block_trials.filter(pl.col("Trial") < current_step)
+        current_trial = block_trials.filter(pl.col("Trial") == current_step - 1)
+
+        # === BOED MODE: Run sequential posterior updates ===
+        if _sampling_method == "boed":
+            # Initialize BOED sampler
+            boed = BOEDSampler(options=options_arr, n_threshold_bins=40, n_slope_bins=15)
+            
+            # Replay trials up to current step to build posterior
+            for _row in trials_up_to_step.iter_rows(named=True):
+                intensity = float(_row["Intensity"])
+                result = int(_row["Result"])
+                # Find closest option index
+                stim_idx = int(np.argmin(np.abs(options_arr - intensity)))
+                boed.update(stim_idx, result)
+            
+            # Get posterior estimates
+            estimates = boed.get_estimates()
+            threshold_grid, threshold_marginal = boed.get_marginal_threshold()
+            slope_grid, slope_marginal = boed.get_marginal_slope()
+            
+            # Get expected curve with credible band
+            x_fine, mean_curve, lower_ci, upper_ci = boed.get_expected_curve()
+
+        # Create x values for curves
         _x_curve = np.linspace(min_x, max_x, 100)
 
-        # === MAIN PSYCHOMETRIC CHART ===
+        # === BUILD VISUALIZATION ===
         _chart_layers = []
 
-        # Ground truth curve (dashed)
+        # Ground truth curve (dashed gray)
         if _gt_params is not None:
             _gt_intercept = -_gt_params["x_0"] * _gt_params["k"]
             _gt_slope = _gt_params["k"]
             _y_gt = expit(_gt_slope * _x_curve + _gt_intercept)
-            _gt_df = pl.DataFrame(
-                {
-                    "Intensity": _x_curve,
-                    "Hit Rate": _y_gt,
-                    "Type": ["Ground Truth"] * len(_x_curve),
-                }
-            ).to_pandas()
+            _gt_df = pl.DataFrame({
+                "Intensity": _x_curve,
+                "Hit Rate": _y_gt,
+                "Type": ["Ground Truth"] * len(_x_curve),
+            }).to_pandas()
             _gt_line = (
                 alt.Chart(_gt_df)
-                .mark_line(
-                    strokeDash=[5, 5],
-                    color="gray",
-                    strokeWidth=2,
-                )
+                .mark_line(strokeDash=[5, 5], color="gray", strokeWidth=2)
                 .encode(
                     x=alt.X("Intensity:Q", title="Intensity"),
                     y=alt.Y("Hit Rate:Q", title="Hit Rate", scale=alt.Scale(domain=[0, 1])),
@@ -500,63 +485,85 @@ def step_chart(
             )
             _chart_layers.append(_gt_line)
 
-        # Cumulative points (sized by n_trials)
-        if len(points_cumulative) > 0:
-            _points_pd = points_cumulative.to_pandas()
-            _points_scatter = (
-                alt.Chart(_points_pd)
-                .mark_point(
-                    filled=True,
-                    color="steelblue",
+        # BOED: Expected curve with credible band
+        if _sampling_method == "boed" and current_step > 0:
+            # Credible band
+            _band_df = pl.DataFrame({
+                "Intensity": x_fine,
+                "lower": lower_ci,
+                "upper": upper_ci,
+            }).to_pandas()
+            _band = (
+                alt.Chart(_band_df)
+                .mark_area(opacity=0.3, color="steelblue")
+                .encode(
+                    x=alt.X("Intensity:Q"),
+                    y=alt.Y("lower:Q", scale=alt.Scale(domain=[0, 1])),
+                    y2="upper:Q",
                 )
+            )
+            _chart_layers.append(_band)
+            
+            # Expected curve
+            _expected_df = pl.DataFrame({
+                "Intensity": x_fine,
+                "Hit Rate": mean_curve,
+            }).to_pandas()
+            _expected_line = (
+                alt.Chart(_expected_df)
+                .mark_line(color="steelblue", strokeWidth=2)
                 .encode(
                     x=alt.X("Intensity:Q"),
                     y=alt.Y("Hit Rate:Q"),
-                    size=alt.Size(
-                        "n_trials:Q", scale=alt.Scale(range=[50, 300]), title="Trials"
-                    ),
+                )
+            )
+            _chart_layers.append(_expected_line)
+
+        # Cumulative points (hit rate at each intensity)
+        if len(trials_up_to_step) > 0:
+            points_cumulative = (
+                trials_up_to_step.group_by("Intensity")
+                .agg([
+                    pl.mean("Result").alias("Hit Rate"),
+                    pl.len().alias("n_trials"),
+                ])
+                .sort("Intensity")
+            )
+            _points_pd = points_cumulative.to_pandas()
+            _points_scatter = (
+                alt.Chart(_points_pd)
+                .mark_point(filled=True, color="darkorange")
+                .encode(
+                    x=alt.X("Intensity:Q"),
+                    y=alt.Y("Hit Rate:Q"),
+                    size=alt.Size("n_trials:Q", scale=alt.Scale(range=[50, 300]), title="Trials"),
                     tooltip=["Intensity:Q", "Hit Rate:Q", "n_trials:Q"],
                 )
             )
             _chart_layers.append(_points_scatter)
 
-        # Current trial highlight (large marker with different color)
+        # Current trial highlight
         if len(current_trial) > 0:
             _current_intensity = float(current_trial["Intensity"][0])
             _current_result = int(current_trial["Result"][0])
-            _current_pd = pl.DataFrame(
-                {
-                    "Intensity": [_current_intensity],
-                    "Result": [_current_result],
-                    "label": [
-                        f"Trial {current_step}: {'Hit' if _current_result else 'Miss'}"
-                    ],
-                }
-            ).to_pandas()
+            _current_pd = pl.DataFrame({
+                "Intensity": [_current_intensity],
+                "Result": [_current_result],
+                "label": [f"Trial {current_step}: {'Hit' if _current_result else 'Miss'}"],
+            }).to_pandas()
 
             # Vertical line at current intensity
             _vline = (
                 alt.Chart(_current_pd)
-                .mark_rule(
-                    color="red",
-                    strokeWidth=2,
-                    strokeDash=[4, 4],
-                )
-                .encode(
-                    x=alt.X("Intensity:Q"),
-                )
+                .mark_rule(color="red", strokeWidth=2, strokeDash=[4, 4])
+                .encode(x=alt.X("Intensity:Q"))
             )
             _chart_layers.append(_vline)
 
             # Current trial marker
             _current_marker = (
                 alt.Chart(_current_pd)
-                .mark_point(
-                    filled=True,
-                    size=200,
-                    color="red",
-                    shape="diamond",
-                )
+                .mark_point(filled=True, size=200, color="red", shape="diamond")
                 .encode(
                     x=alt.X("Intensity:Q"),
                     y=alt.Y("Result:Q", scale=alt.Scale(domain=[0, 1])),
@@ -565,9 +572,82 @@ def step_chart(
             )
             _chart_layers.append(_current_marker)
 
+        # === POSTERIOR DISTRIBUTION (BOED mode) ===
+        if _sampling_method == "boed":
+            # Threshold posterior
+            _threshold_df = pl.DataFrame({
+                "Threshold": threshold_grid,
+                "Probability": threshold_marginal,
+            }).to_pandas()
+            
+            _threshold_chart = (
+                alt.Chart(_threshold_df)
+                .mark_area(opacity=0.6, color="steelblue")
+                .encode(
+                    x=alt.X("Threshold:Q", title="Threshold (x₀)", 
+                           scale=alt.Scale(domain=[min_x, max_x])),
+                    y=alt.Y("Probability:Q", title="Posterior Density"),
+                )
+                .properties(width=250, height=100, title="Threshold Posterior")
+            )
+            
+            # Add ground truth line to threshold posterior if available
+            if _gt_params is not None:
+                _gt_thresh_df = pl.DataFrame({
+                    "x0": [_gt_params["x_0"]],
+                }).to_pandas()
+                _gt_thresh_line = (
+                    alt.Chart(_gt_thresh_df)
+                    .mark_rule(color="red", strokeDash=[4, 4], strokeWidth=2)
+                    .encode(x="x0:Q")
+                )
+                _threshold_chart = _threshold_chart + _gt_thresh_line
+            
+            # Slope posterior
+            _slope_df = pl.DataFrame({
+                "Slope": slope_grid,
+                "Probability": slope_marginal,
+            }).to_pandas()
+            
+            _slope_chart = (
+                alt.Chart(_slope_df)
+                .mark_area(opacity=0.6, color="green")
+                .encode(
+                    x=alt.X("Slope:Q", title="Slope (k)"),
+                    y=alt.Y("Probability:Q", title="Posterior Density"),
+                )
+                .properties(width=250, height=100, title="Slope Posterior")
+            )
+            
+            # Add ground truth line to slope posterior if available
+            if _gt_params is not None:
+                _gt_slope_df = pl.DataFrame({
+                    "k": [_gt_params["k"]],
+                }).to_pandas()
+                _gt_slope_line = (
+                    alt.Chart(_gt_slope_df)
+                    .mark_rule(color="red", strokeDash=[4, 4], strokeWidth=2)
+                    .encode(x="k:Q")
+                )
+                _slope_chart = _slope_chart + _gt_slope_line
+
         # === SAMPLING DISTRIBUTION HISTOGRAM ===
+        if len(trials_up_to_step) > 0:
+            sampling_counts = trials_up_to_step.group_by("Intensity").len()
+            all_options_df = pl.DataFrame({"Intensity": all_options})
+            sampling_dist = (
+                all_options_df.join(sampling_counts, on="Intensity", how="left")
+                .with_columns(pl.col("len").fill_null(0).alias("Count"))
+                .select(["Intensity", "Count"])
+                .sort("Intensity")
+            )
+        else:
+            sampling_dist = pl.DataFrame({
+                "Intensity": all_options,
+                "Count": [0] * len(all_options),
+            })
+
         _sampling_pd = sampling_dist.to_pandas()
-        # Highlight current intensity in histogram
         if len(current_trial) > 0:
             _current_intensity = float(current_trial["Intensity"][0])
             _sampling_pd["is_current"] = _sampling_pd["Intensity"].apply(
@@ -580,47 +660,63 @@ def step_chart(
             alt.Chart(_sampling_pd)
             .mark_bar()
             .encode(
-                x=alt.X(
-                    "Intensity:Q", title="Intensity", scale=alt.Scale(domain=[min_x, max_x])
-                ),
+                x=alt.X("Intensity:Q", title="Intensity", scale=alt.Scale(domain=[min_x, max_x])),
                 y=alt.Y("Count:Q", title="Samples"),
-                color=alt.condition(
-                    alt.datum.is_current,
-                    alt.value("red"),
-                    alt.value("steelblue"),
-                ),
+                color=alt.condition(alt.datum.is_current, alt.value("red"), alt.value("steelblue")),
                 tooltip=["Intensity:Q", "Count:Q"],
             )
-            .properties(
-                width=500,
-                height=100,
-                title="Sampling Distribution",
-            )
+            .properties(width=500, height=80, title="Sampling Distribution")
         )
 
-        # Create main chart from layers (wigglystuff HTMLRefreshWidget + altair2svg)
+        # === ASSEMBLE FINAL VISUALIZATION ===
+        _max_trials = len(block_trials)
+        
         if _chart_layers:
             _main_chart = alt.layer(*_chart_layers).properties(
                 width=500,
                 height=250,
-                title=f"Trial {current_step} of {len(block_trials)}",
+                title=f"Trial {current_step} of {_max_trials}",
             )
-            step_chart = HTMLRefreshWidget(
-                html=f"<div>{altair2svg(_main_chart)}</div><div>{altair2svg(_histogram)}</div>",
-            )
+            
+            if _sampling_method == "boed":
+                # BOED mode: Show main chart, posteriors, and histogram
+                _posterior_row = alt.hconcat(_threshold_chart, _slope_chart)
+                html_content = (
+                    f"<div>{altair2svg(_main_chart)}</div>"
+                    f"<div>{altair2svg(_posterior_row)}</div>"
+                    f"<div>{altair2svg(_histogram)}</div>"
+                )
+            else:
+                # Constant stimuli mode
+                html_content = (
+                    f"<div>{altair2svg(_main_chart)}</div>"
+                    f"<div>{altair2svg(_histogram)}</div>"
+                )
+            step_chart = HTMLRefreshWidget(html=html_content)
         else:
             step_chart = HTMLRefreshWidget(html=altair2svg(_histogram))
 
-        # Info about current trial
+        # Info about current trial and estimates
         if len(current_trial) > 0:
             _info_intensity = float(current_trial["Intensity"][0])
             _info_result = "Hit ✓" if int(current_trial["Result"][0]) else "Miss ✗"
-            step_info = mo.callout(
-                mo.md(
-                    f"**Trial {current_step}**: Intensity = {_info_intensity:.2f} → {_info_result}"
-                ),
-                kind="success" if "Hit" in _info_result else "warn",
-            )
+            
+            if _sampling_method == "boed":
+                thresh_mean, thresh_std = estimates["threshold"]
+                slope_mean, slope_std = estimates["slope"]
+                step_info = mo.callout(
+                    mo.md(
+                        f"**Trial {current_step}**: Intensity = {_info_intensity:.2f} → {_info_result}\n\n"
+                        f"**Posterior estimates**: x₀ = {thresh_mean:.2f} ± {thresh_std:.2f}, "
+                        f"k = {slope_mean:.2f} ± {slope_std:.2f}"
+                    ),
+                    kind="success" if "Hit" in _info_result else "warn",
+                )
+            else:
+                step_info = mo.callout(
+                    mo.md(f"**Trial {current_step}**: Intensity = {_info_intensity:.2f} → {_info_result}"),
+                    kind="success" if "Hit" in _info_result else "warn",
+                )
         else:
             step_info = mo.md("")
     return step_chart, step_info

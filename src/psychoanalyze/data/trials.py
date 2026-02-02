@@ -52,8 +52,7 @@ def generate(
         n_blocks: Number of blocks to generate
         sampling_method: One of:
             - "constant_stimuli": Random sampling from fixed levels (classic MoCS)
-            - "adaptive": Fisher Information-based adaptive sampling
-            - "quest": QUEST/Psi Bayesian adaptive method
+            - "boed": Bayesian Optimal Experimental Design
         random_seed: Random seed for reproducibility
         
     Returns:
@@ -64,18 +63,9 @@ def generate(
     for i in range(n_blocks):
         block_seed = None if random_seed is None else (random_seed + i * 1000)
         
-        if sampling_method == "adaptive":
-            # Fisher Information-based adaptive sampling
-            df = adaptive_sample(
-                n_trials=n_trials,
-                options=options,
-                params=params,
-                n_initial=max(5, min(n_trials // 5, len(options))),
-                random_seed=block_seed,
-            )
-        elif sampling_method == "quest":
-            # QUEST/Psi Bayesian adaptive sampling
-            df = quest_sample(
+        if sampling_method == "boed":
+            # Bayesian Optimal Experimental Design
+            df, _ = boed_sample(
                 n_trials=n_trials,
                 options=options,
                 params=params,
@@ -117,8 +107,7 @@ def generate_multi_subject(
         random_seed: Random seed for reproducibility
         sampling_method: Sampling method passed to generate():
             - "constant_stimuli": Random sampling from fixed levels
-            - "adaptive": Fisher Information-based adaptive sampling
-            - "quest": QUEST/Psi Bayesian adaptive method
+            - "boed": Bayesian Optimal Experimental Design
 
     Returns:
         Tuple of (trials_df, ground_truth_params_map) where:
@@ -338,156 +327,96 @@ def moc_sample(n_trials: int, model_params: dict[str, float]) -> pl.DataFrame:
     return pl.DataFrame({"Intensity": intensities, "Result": results})
 
 
-def _fit_sigmoid_mle(
-    x_obs: np.ndarray,
-    hits: np.ndarray,
-    n_trials: np.ndarray,
-    x_range: tuple[float, float],
-) -> tuple[float, float, float, float]:
-    """Fit sigmoid parameters using maximum likelihood estimation.
+class BOEDSampler:
+    """Bayesian Optimal Experimental Design sampler for psychometric functions.
     
-    Fits a 2-parameter logistic function (threshold and slope) with fixed
-    guess rate (gamma=0) and lapse rate (lambda=0) for speed.
+    Maintains a full Bayesian posterior over all model parameters (threshold, slope,
+    gamma, lambda) and selects stimuli that maximize expected information gain.
     
-    Args:
-        x_obs: Observed intensity levels
-        hits: Number of hits at each level
-        n_trials: Number of trials at each level
-        x_range: (min, max) of intensity range for prior bounds
-        
-    Returns:
-        Tuple of (threshold_estimate, threshold_std, slope_estimate, slope_std)
-    """
-    from scipy.optimize import minimize
-    from scipy.special import expit
+    Unlike QUEST which only estimates threshold with a fixed slope, BOED jointly
+    estimates all parameters, providing a more complete picture of uncertainty.
     
-    if len(x_obs) == 0:
-        # No data - return prior centered in range
-        mid = (x_range[0] + x_range[1]) / 2
-        width = x_range[1] - x_range[0]
-        return mid, width / 2, 1.0, 1.0
-    
-    # Negative log-likelihood for logistic regression
-    def neg_log_likelihood(params: np.ndarray) -> float:
-        threshold, slope = params
-        # Ensure slope is positive
-        slope = max(slope, 0.1)
-        p = expit(slope * (x_obs - threshold))
-        p = np.clip(p, 1e-10, 1 - 1e-10)
-        # Binomial log-likelihood
-        ll = np.sum(hits * np.log(p) + (n_trials - hits) * np.log(1 - p))
-        return -ll
-    
-    # Initial guess: threshold at midpoint, slope = 1
-    x0 = np.array([(x_range[0] + x_range[1]) / 2, 1.0])
-    
-    # Bounds
-    bounds = [(x_range[0], x_range[1]), (0.1, 10.0)]
-    
-    try:
-        result = minimize(neg_log_likelihood, x0, method='L-BFGS-B', bounds=bounds)
-        threshold_est = result.x[0]
-        slope_est = max(result.x[1], 0.1)
-        
-        # Estimate uncertainty from Hessian (Fisher Information)
-        # For simplicity, use a rough approximation based on data
-        n_total = np.sum(n_trials)
-        threshold_std = max(1.0 / (slope_est * np.sqrt(n_total + 1)), 0.1)
-        slope_std = max(slope_est / np.sqrt(n_total + 1), 0.1)
-    except Exception:
-        # Fallback to simple estimates
-        threshold_est = (x_range[0] + x_range[1]) / 2
-        threshold_std = (x_range[1] - x_range[0]) / 4
-        slope_est = 1.0
-        slope_std = 1.0
-    
-    return threshold_est, threshold_std, slope_est, slope_std
-
-
-def _sigmoid_fisher_information(
-    x: np.ndarray,
-    threshold: float,
-    slope: float,
-) -> np.ndarray:
-    """Calculate Fisher Information about threshold at each intensity.
-    
-    For a sigmoid, the Fisher Information about the threshold parameter
-    is proportional to p(x) * (1 - p(x)) * slope^2, which is maximized
-    at the threshold where p = 0.5.
-    
-    Args:
-        x: Candidate intensities
-        threshold: Current threshold estimate
-        slope: Current slope estimate
-        
-    Returns:
-        Fisher Information values at each intensity
-    """
-    from scipy.special import expit
-    
-    p = expit(slope * (x - threshold))
-    # Fisher Information for threshold in logistic model
-    fisher_info = slope**2 * p * (1 - p)
-    return fisher_info
-
-
-class QuestSampler:
-    """QUEST/Psi adaptive sampling algorithm for threshold estimation.
-    
-    Maintains a Bayesian posterior distribution over threshold values and
-    selects stimuli that maximize expected information gain (minimize
-    expected posterior entropy).
-    
-    Based on Watson & Pelli (1983) QUEST and Kontsevich & Tyler (1999) Psi.
+    Uses a grid-based approximation for computational efficiency while capturing
+    the full joint posterior structure.
     """
     
     def __init__(
         self,
         options: np.ndarray,
-        slope: float = 1.0,
-        gamma: float = 0.0,
-        lapse: float = 0.02,
-        n_threshold_bins: int = 100,
+        n_threshold_bins: int = 50,
+        n_slope_bins: int = 20,
+        n_gamma_bins: int = 10,
+        n_lambda_bins: int = 10,
     ):
-        """Initialize QUEST sampler.
+        """Initialize BOED sampler.
         
         Args:
             options: Available stimulus intensity levels
-            slope: Assumed slope of psychometric function
-            gamma: Guess rate (lower asymptote)
-            lapse: Lapse rate (1 - upper asymptote)
-            n_threshold_bins: Number of bins for threshold prior/posterior
+            n_threshold_bins: Number of bins for threshold parameter
+            n_slope_bins: Number of bins for slope parameter
+            n_gamma_bins: Number of bins for gamma (guess rate)
+            n_lambda_bins: Number of bins for lambda (lapse rate)
         """
         from scipy.special import expit
         
         self.options = options
-        self.slope = slope
-        self.gamma = gamma
-        self.lapse = lapse
+        self.n_threshold = n_threshold_bins
+        self.n_slope = n_slope_bins
+        self.n_gamma = n_gamma_bins
+        self.n_lambda = n_lambda_bins
         
-        # Create threshold grid spanning the stimulus range
+        # Create parameter grids
         x_min, x_max = options.min(), options.max()
-        margin = (x_max - x_min) * 0.2
-        self.threshold_grid = np.linspace(
-            x_min - margin, x_max + margin, n_threshold_bins
-        )
+        margin = (x_max - x_min) * 0.3
+        self.threshold_grid = np.linspace(x_min - margin, x_max + margin, n_threshold_bins)
+        self.slope_grid = np.linspace(0.1, 5.0, n_slope_bins)  # Positive slopes
+        self.gamma_grid = np.linspace(0.0, 0.2, n_gamma_bins)  # Guess rate 0-20%
+        self.lambda_grid = np.linspace(0.0, 0.2, n_lambda_bins)  # Lapse rate 0-20%
         
-        # Initialize uniform prior over threshold
-        self.log_prior = np.zeros(n_threshold_bins)
-        self.log_prior -= np.log(n_threshold_bins)  # Normalize
+        # Total number of parameter combinations
+        self.n_params = n_threshold_bins * n_slope_bins * n_gamma_bins * n_lambda_bins
         
-        # Precompute psychometric function values for all (threshold, stimulus) pairs
-        # Shape: (n_thresholds, n_stimuli)
+        # Initialize log prior (uniform, but could be informed by hierarchical model)
+        self.log_prior = np.zeros(self.n_params) - np.log(self.n_params)
+        
+        # Store trial history for posterior extraction
+        self.trial_history: list[tuple[float, int]] = []
+        
+        # Precompute psi for all parameter combinations and stimuli
         self._precompute_psi(expit)
     
+    def _param_idx(self, t: int, s: int, g: int, l: int) -> int:
+        """Convert multi-dimensional indices to flat index."""
+        return (
+            t * (self.n_slope * self.n_gamma * self.n_lambda)
+            + s * (self.n_gamma * self.n_lambda)
+            + g * self.n_lambda
+            + l
+        )
+    
     def _precompute_psi(self, expit):
-        """Precompute p(correct | threshold, stimulus) for efficiency."""
-        # Outer subtraction: options[j] - threshold_grid[i]
-        diff = self.options[np.newaxis, :] - self.threshold_grid[:, np.newaxis]
-        # Psychometric function: gamma + (1 - gamma - lapse) * sigmoid
-        p_core = expit(self.slope * diff)
-        self.psi = self.gamma + (1 - self.gamma - self.lapse) * p_core
-        # Clip to avoid log(0)
+        """Precompute p(correct | params, stimulus) for all combinations."""
+        n_stimuli = len(self.options)
+        
+        # Create meshgrid for all parameters
+        T, S, G, L = np.meshgrid(
+            self.threshold_grid, self.slope_grid,
+            self.gamma_grid, self.lambda_grid,
+            indexing='ij'
+        )
+        
+        # Reshape to (n_params, 1) for broadcasting with options
+        T_flat = T.ravel()[:, np.newaxis]  # (n_params, 1)
+        S_flat = S.ravel()[:, np.newaxis]
+        G_flat = G.ravel()[:, np.newaxis]
+        L_flat = L.ravel()[:, np.newaxis]
+        
+        # options has shape (n_stimuli,), broadcast to (n_params, n_stimuli)
+        logits = S_flat * (self.options[np.newaxis, :] - T_flat)
+        f_x = expit(logits)
+        
+        # Psychometric function: gamma + (1 - gamma - lambda) * sigmoid
+        self.psi = G_flat + (1 - G_flat - L_flat) * f_x
         self.psi = np.clip(self.psi, 1e-10, 1 - 1e-10)
     
     def update(self, stimulus_idx: int, response: int):
@@ -497,7 +426,10 @@ class QuestSampler:
             stimulus_idx: Index of stimulus in options array
             response: 1 for hit/correct, 0 for miss/incorrect
         """
-        # Likelihood: p(response | threshold)
+        intensity = float(self.options[stimulus_idx])
+        self.trial_history.append((intensity, response))
+        
+        # Likelihood: p(response | params)
         if response == 1:
             log_likelihood = np.log(self.psi[:, stimulus_idx])
         else:
@@ -506,29 +438,83 @@ class QuestSampler:
         # Bayes update in log space
         self.log_prior = self.log_prior + log_likelihood
         
-        # Normalize (log-sum-exp trick for numerical stability)
+        # Normalize (log-sum-exp trick)
         max_log = np.max(self.log_prior)
         self.log_prior = self.log_prior - max_log - np.log(
             np.sum(np.exp(self.log_prior - max_log))
         )
     
-    def get_threshold_estimate(self) -> tuple[float, float]:
-        """Get current threshold estimate and uncertainty.
+    def get_posterior(self) -> np.ndarray:
+        """Get the current posterior distribution (normalized probabilities)."""
+        return np.exp(self.log_prior)
+    
+    def get_marginal_threshold(self) -> tuple[np.ndarray, np.ndarray]:
+        """Get marginal posterior over threshold parameter.
         
         Returns:
-            (mean_threshold, std_threshold)
+            (threshold_grid, marginal_probs)
         """
-        posterior = np.exp(self.log_prior)
-        mean = np.sum(posterior * self.threshold_grid)
-        var = np.sum(posterior * (self.threshold_grid - mean) ** 2)
-        return mean, np.sqrt(max(var, 1e-10))
+        # Reshape posterior to 4D and sum over slope, gamma, lambda dimensions
+        posterior_4d = self.get_posterior().reshape(
+            self.n_threshold, self.n_slope, self.n_gamma, self.n_lambda
+        )
+        marginal = posterior_4d.sum(axis=(1, 2, 3))
+        return self.threshold_grid, marginal
+    
+    def get_marginal_slope(self) -> tuple[np.ndarray, np.ndarray]:
+        """Get marginal posterior over slope parameter."""
+        # Reshape posterior to 4D and sum over threshold, gamma, lambda dimensions
+        posterior_4d = self.get_posterior().reshape(
+            self.n_threshold, self.n_slope, self.n_gamma, self.n_lambda
+        )
+        marginal = posterior_4d.sum(axis=(0, 2, 3))
+        return self.slope_grid, marginal
+    
+    def get_estimates(self) -> dict[str, tuple[float, float]]:
+        """Get posterior mean and std for all parameters.
+        
+        Returns:
+            Dictionary with keys 'threshold', 'slope', 'gamma', 'lambda',
+            each containing (mean, std) tuple.
+        """
+        # Reshape posterior to 4D for efficient marginalization
+        posterior_4d = self.get_posterior().reshape(
+            self.n_threshold, self.n_slope, self.n_gamma, self.n_lambda
+        )
+        
+        results = {}
+        
+        # Threshold (dim 0)
+        marginal_t = posterior_4d.sum(axis=(1, 2, 3))
+        mean_t = np.sum(marginal_t * self.threshold_grid)
+        var_t = np.sum(marginal_t * (self.threshold_grid - mean_t) ** 2)
+        results['threshold'] = (mean_t, np.sqrt(max(var_t, 1e-10)))
+        
+        # Slope (dim 1)
+        marginal_s = posterior_4d.sum(axis=(0, 2, 3))
+        mean_s = np.sum(marginal_s * self.slope_grid)
+        var_s = np.sum(marginal_s * (self.slope_grid - mean_s) ** 2)
+        results['slope'] = (mean_s, np.sqrt(max(var_s, 1e-10)))
+        
+        # Gamma (dim 2)
+        marginal_g = posterior_4d.sum(axis=(0, 1, 3))
+        mean_g = np.sum(marginal_g * self.gamma_grid)
+        var_g = np.sum(marginal_g * (self.gamma_grid - mean_g) ** 2)
+        results['gamma'] = (mean_g, np.sqrt(max(var_g, 1e-10)))
+        
+        # Lambda (dim 3)
+        marginal_l = posterior_4d.sum(axis=(0, 1, 2))
+        mean_l = np.sum(marginal_l * self.lambda_grid)
+        var_l = np.sum(marginal_l * (self.lambda_grid - mean_l) ** 2)
+        results['lambda'] = (mean_l, np.sqrt(max(var_l, 1e-10)))
+        
+        return results
     
     def select_stimulus(self, rng: np.random.Generator) -> int:
         """Select next stimulus that maximizes expected information gain.
         
-        Uses the Psi method: selects stimulus that minimizes expected
-        posterior entropy, which is equivalent to maximizing expected
-        information gain about the threshold.
+        Computes the expected reduction in posterior entropy for each possible
+        stimulus choice and selects the one that maximizes information gain.
         
         Args:
             rng: Random number generator for tie-breaking
@@ -536,14 +522,16 @@ class QuestSampler:
         Returns:
             Index of selected stimulus in options array
         """
-        posterior = np.exp(self.log_prior)
+        posterior = self.get_posterior()
         n_stimuli = len(self.options)
+        
+        # Current entropy
+        current_entropy = -np.sum(posterior * self.log_prior)
         
         expected_entropy = np.zeros(n_stimuli)
         
         for j in range(n_stimuli):
-            # Probability of each response given current posterior
-            # p(response=1) = sum_theta p(response=1|theta) * p(theta)
+            # Probability of hit given current posterior
             p_hit = np.sum(self.psi[:, j] * posterior)
             p_miss = 1 - p_hit
             
@@ -552,25 +540,24 @@ class QuestSampler:
             entropy_if_miss = 0.0
             
             if p_hit > 1e-10:
-                # Posterior if hit: p(theta|hit) ∝ p(hit|theta) * p(theta)
+                # Posterior if hit: p(params|hit) ∝ p(hit|params) * p(params)
                 log_post_hit = self.log_prior + np.log(self.psi[:, j])
                 max_log = np.max(log_post_hit)
-                log_post_hit = log_post_hit - max_log - np.log(
+                log_post_hit_norm = log_post_hit - max_log - np.log(
                     np.sum(np.exp(log_post_hit - max_log))
                 )
-                post_hit = np.exp(log_post_hit)
-                # Entropy: -sum p log p
-                entropy_if_hit = -np.sum(post_hit * log_post_hit)
+                post_hit = np.exp(log_post_hit_norm)
+                entropy_if_hit = -np.sum(post_hit * log_post_hit_norm)
             
             if p_miss > 1e-10:
                 # Posterior if miss
                 log_post_miss = self.log_prior + np.log(1 - self.psi[:, j])
                 max_log = np.max(log_post_miss)
-                log_post_miss = log_post_miss - max_log - np.log(
+                log_post_miss_norm = log_post_miss - max_log - np.log(
                     np.sum(np.exp(log_post_miss - max_log))
                 )
-                post_miss = np.exp(log_post_miss)
-                entropy_if_miss = -np.sum(post_miss * log_post_miss)
+                post_miss = np.exp(log_post_miss_norm)
+                entropy_if_miss = -np.sum(post_miss * log_post_miss_norm)
             
             # Expected entropy = p(hit) * H(post|hit) + p(miss) * H(post|miss)
             expected_entropy[j] = p_hit * entropy_if_hit + p_miss * entropy_if_miss
@@ -579,22 +566,78 @@ class QuestSampler:
         # Add small noise to break ties
         expected_entropy = expected_entropy + rng.uniform(0, 1e-10, n_stimuli)
         return int(np.argmin(expected_entropy))
+    
+    def get_expected_curve(self) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """Get the expected psychometric curve with credible intervals.
+        
+        Returns:
+            (x_values, mean_curve, lower_95, upper_95)
+        """
+        from scipy.special import expit
+        
+        posterior = self.get_posterior()
+        x_fine = np.linspace(self.options.min(), self.options.max(), 100)
+        n_x = len(x_fine)
+        
+        # Vectorized computation of all curves
+        # Create meshgrid for all parameters
+        T, S, G, L = np.meshgrid(
+            self.threshold_grid, self.slope_grid, 
+            self.gamma_grid, self.lambda_grid,
+            indexing='ij'
+        )
+        
+        # Reshape to (n_params, 1) for broadcasting
+        T_flat = T.ravel()[:, np.newaxis]  # (n_params, 1)
+        S_flat = S.ravel()[:, np.newaxis]
+        G_flat = G.ravel()[:, np.newaxis]
+        L_flat = L.ravel()[:, np.newaxis]
+        
+        # Compute curves for all parameter combinations at once
+        # x_fine has shape (n_x,), broadcast to (n_params, n_x)
+        logits = S_flat * (x_fine[np.newaxis, :] - T_flat)
+        f_x = expit(logits)
+        curves = G_flat + (1 - G_flat - L_flat) * f_x  # (n_params, n_x)
+        
+        # Weighted mean curve
+        mean_curve = np.sum(posterior[:, np.newaxis] * curves, axis=0)
+        
+        # For credible intervals, use weighted percentiles
+        # Sort curves at each x position and find weighted quantiles
+        sorted_indices = np.argsort(curves, axis=0)
+        
+        lower = np.zeros(n_x)
+        upper = np.zeros(n_x)
+        
+        for i in range(n_x):
+            sorted_probs = posterior[sorted_indices[:, i]]
+            sorted_vals = curves[sorted_indices[:, i], i]
+            cumsum = np.cumsum(sorted_probs)
+            
+            # Find 2.5% and 97.5% quantiles
+            lower_idx = np.searchsorted(cumsum, 0.025)
+            upper_idx = np.searchsorted(cumsum, 0.975)
+            
+            lower[i] = sorted_vals[min(lower_idx, len(sorted_vals) - 1)]
+            upper[i] = sorted_vals[min(upper_idx, len(sorted_vals) - 1)]
+        
+        return x_fine, mean_curve, lower, upper
 
 
-def quest_sample(
+def boed_sample(
     n_trials: int,
     options: list[float],
     params: dict[str, float],
     random_seed: int | None = None,
-) -> pl.DataFrame:
-    """Sample trials using the QUEST/Psi adaptive algorithm.
+) -> tuple[pl.DataFrame, BOEDSampler]:
+    """Sample trials using Bayesian Optimal Experimental Design.
     
-    QUEST (Quick Estimation by Sequential Testing) maintains a Bayesian
-    posterior over threshold values and selects each stimulus to maximize
-    expected information gain about the threshold.
+    BOED maintains a full Bayesian posterior over all psychometric function
+    parameters (threshold, slope, gamma, lambda) and selects each stimulus
+    to maximize expected information gain.
     
-    This is a classic algorithm from Watson & Pelli (1983), extended by
-    Kontsevich & Tyler (1999) as the Psi method.
+    Unlike QUEST which only estimates threshold, BOED jointly estimates all
+    parameters, providing a more complete picture of uncertainty.
     
     Args:
         n_trials: Number of trials to generate
@@ -603,172 +646,62 @@ def quest_sample(
         random_seed: Random seed for reproducibility
         
     Returns:
-        DataFrame with 'Intensity' and 'Result' columns
+        Tuple of (DataFrame with trials, BOEDSampler with final posterior)
     """
     rng = np.random.default_rng(random_seed)
     options_arr = np.array(options)
     
-    # Initialize QUEST with assumed slope (can be estimated from data if needed)
-    # Use a reasonable default slope, or could be parameterized
-    assumed_slope = params.get("k", 1.0)
-    assumed_gamma = params.get("gamma", 0.0)
-    assumed_lapse = params.get("lambda", 0.02)
-    
-    quest = QuestSampler(
-        options=options_arr,
-        slope=assumed_slope,
-        gamma=assumed_gamma,
-        lapse=assumed_lapse,
-    )
+    # Initialize BOED sampler
+    boed = BOEDSampler(options=options_arr)
     
     intensities: list[float] = []
     results: list[int] = []
     
     for _ in range(n_trials):
-        # Select stimulus using Psi criterion
-        stim_idx = quest.select_stimulus(rng)
+        # Select stimulus using BOED criterion (max expected info gain)
+        stim_idx = boed.select_stimulus(rng)
         intensity = float(options_arr[stim_idx])
         
         # Generate outcome from true psychometric function
         result = int(rng.random() <= psi(intensity, params))
         
-        # Update QUEST posterior
-        quest.update(stim_idx, result)
+        # Update BOED posterior
+        boed.update(stim_idx, result)
         
         intensities.append(intensity)
         results.append(result)
     
-    return pl.DataFrame({
+    df = pl.DataFrame({
         "Trial": list(range(len(intensities))),
         "Intensity": intensities,
         "Result": results,
     })
+    
+    return df, boed
 
 
-def adaptive_sample(
-    n_trials: int,
+def boed_sample_sequential(
     options: list[float],
     params: dict[str, float],
-    n_initial: int = 5,
     random_seed: int | None = None,
-) -> pl.DataFrame:
-    """Sample trials using Fisher Information-based adaptive sampling.
+) -> BOEDSampler:
+    """Create a BOED sampler for sequential trial-by-trial sampling.
     
-    This algorithm exploits knowledge that the psychometric function is a
-    sigmoid. It adaptively selects stimulus intensities to efficiently
-    estimate the threshold by:
-    
-    1. Starting with a few samples spread across the intensity range
-    2. Fitting a sigmoid (logistic) model to estimate threshold
-    3. Sampling where Fisher Information about threshold is highest
-       (which is near the estimated threshold for sigmoids)
-    4. Adding exploration to avoid getting stuck
-    
-    This is more efficient than GP-based methods because it uses the
-    known parametric form of the psychometric function.
+    This function returns a sampler that can be stepped through one trial
+    at a time, useful for visualizing the posterior evolution.
     
     Args:
-        n_trials: Total number of trials to generate
         options: Available intensity levels to sample from
         params: True psychometric function parameters (for generating outcomes)
-        n_initial: Number of initial exploratory trials
         random_seed: Random seed for reproducibility
         
     Returns:
-        DataFrame with 'Intensity' and 'Result' columns
+        BOEDSampler instance ready for sequential sampling
     """
-    rng = np.random.default_rng(random_seed)
     options_arr = np.array(options)
-    x_range = (float(options_arr.min()), float(options_arr.max()))
-    
-    intensities: list[float] = []
-    results: list[int] = []
-    
-    # Phase 1: Initial sampling - spread across the range
-    n_init = min(n_initial, n_trials, len(options))
-    if n_init > 0:
-        # Select evenly spaced initial points
-        init_indices = np.linspace(0, len(options) - 1, n_init, dtype=int)
-        init_intensities = options_arr[init_indices].tolist()
-        
-        for intensity in init_intensities:
-            result = int(rng.random() <= psi(intensity, params))
-            intensities.append(float(intensity))
-            results.append(result)
-    
-    # Phase 2: Adaptive sampling using Fisher Information
-    remaining_trials = n_trials - len(intensities)
-    
-    for trial_idx in range(remaining_trials):
-        # Aggregate observed data
-        obs_df = pl.DataFrame({"Intensity": intensities, "Result": results})
-        agg = obs_df.group_by("Intensity").agg([
-            pl.sum("Result").alias("hits"),
-            pl.len().alias("n"),
-        ])
-        x_obs = agg["Intensity"].to_numpy()
-        hits = agg["hits"].to_numpy()
-        n_obs = agg["n"].to_numpy()
-        
-        # Fit sigmoid to current data
-        threshold_est, threshold_std, slope_est, _ = _fit_sigmoid_mle(
-            x_obs, hits, n_obs, x_range
-        )
-        
-        # Calculate Fisher Information at each candidate intensity
-        fisher_info = _sigmoid_fisher_information(options_arr, threshold_est, slope_est)
-        
-        # Penalize already-sampled locations (diminishing returns)
-        sampling_value = fisher_info.copy()
-        for i, x_cand in enumerate(options_arr):
-            match_idx = np.where(np.abs(x_obs - x_cand) < 1e-10)[0]
-            if len(match_idx) > 0:
-                n_at_loc = n_obs[match_idx[0]]
-                # Diminishing returns: sqrt scaling
-                sampling_value[i] = sampling_value[i] / np.sqrt(1 + n_at_loc)
-        
-        # Add exploration bonus based on threshold uncertainty
-        # Sample more broadly when uncertain about threshold location
-        exploration_weight = min(threshold_std / (x_range[1] - x_range[0]), 0.5)
-        
-        # Distance from estimated threshold (normalized)
-        dist_from_threshold = np.abs(options_arr - threshold_est)
-        max_dist = max(dist_from_threshold.max(), 1e-10)
-        
-        # Exploration term: prefer points we haven't sampled much
-        # that are within reasonable range of threshold uncertainty
-        within_uncertainty = dist_from_threshold < 2 * threshold_std
-        exploration_bonus = np.zeros_like(sampling_value)
-        for i, x_cand in enumerate(options_arr):
-            match_idx = np.where(np.abs(x_obs - x_cand) < 1e-10)[0]
-            if len(match_idx) == 0:
-                # Unsampled point - bonus if within uncertainty range
-                if within_uncertainty[i]:
-                    exploration_bonus[i] = 0.3
-                else:
-                    exploration_bonus[i] = 0.1 * (1 - dist_from_threshold[i] / max_dist)
-        
-        # Combine exploitation (Fisher Info) and exploration
-        acquisition = (1 - exploration_weight) * sampling_value + exploration_weight * exploration_bonus
-        
-        # Add small noise to break ties
-        acquisition = acquisition + rng.uniform(0, 1e-6, len(acquisition))
-        
-        # Select intensity with maximum acquisition value
-        best_idx = np.argmax(acquisition)
-        next_intensity = float(options_arr[best_idx])
-        
-        # Generate outcome
-        next_result = int(rng.random() <= psi(next_intensity, params))
-        
-        intensities.append(next_intensity)
-        results.append(next_result)
-    
-    return pl.DataFrame({
-        "Trial": list(range(len(intensities))),
-        "Intensity": intensities,
-        "Result": results,
-    })
+    return BOEDSampler(options=options_arr)
+
+
 
 
 def fit(
