@@ -18,7 +18,6 @@ def _(
     mo,
     plot_equation,
     plot_ui,
-    trial_crop_slider,
 ):
     # 3-column layout: Input | Visualization | Output
     left_column = mo.vstack(
@@ -36,7 +35,6 @@ def _(
             [
                 mo.md("## Batch Analysis"),
                 plot_equation,
-                trial_crop_slider,
                 plot_ui,
             ],
             gap=1,
@@ -60,7 +58,6 @@ def _(
             [
                 mo.md("## Simulation Results"),
                 plot_equation,
-                trial_crop_slider,
                 plot_ui,
             ],
             gap=1,
@@ -555,20 +552,6 @@ def _(
 
 
 @app.cell
-def _(mo, trials_df):
-    # Slider to crop dataset at a specific trial number
-    total_trials = len(trials_df)
-    trial_crop_slider = mo.ui.slider(
-        start=1,
-        stop=total_trials,
-        value=total_trials,
-        step=1,
-        label="Crop at trial",
-        show_value=True,
-    )
-    return (trial_crop_slider,)
-
-
 @app.cell
 def _(mo):
     fit_button = mo.ui.run_button(
@@ -576,14 +559,6 @@ def _(mo):
         kind="success",
     )
     return (fit_button,)
-
-
-@app.cell
-def _(trial_crop_slider, trials_df):
-    # Apply trial crop
-    crop_at = trial_crop_slider.value
-    trials_cropped_df = trials_df.head(crop_at)
-    return (trials_cropped_df,)
 
 
 @app.cell
@@ -608,18 +583,18 @@ def _(
     pl,
     should_fit,
     trials_cache_key,
-    trials_cropped_df,
+    trials_df,
 ):
     # Points always computed from trials
-    points_df = from_trials(trials_cropped_df)
+    points_df = from_trials(trials_df)
 
     # Only run fitting if button clicked or on Simulation tab
     if should_fit:
         composite_block = (
             pl.col("Subject").cast(pl.Utf8) + "__" + pl.col("Block").cast(pl.Utf8)
         )
-        fit_trials_df = trials_cropped_df.with_columns(composite_block.alias("Block"))
-        cache_key = trials_cache_key(trials_cropped_df, fit_params)
+        fit_trials_df = trials_df.with_columns(composite_block.alias("Block"))
+        cache_key = trials_cache_key(trials_df, fit_params)
         fit_summary, fit_idata = cached_hierarchical_fit(
             fit_trials_df,
             cache_key,
@@ -630,7 +605,7 @@ def _(
 
         blocks_list = []
         block_idx_by_subject_block: dict[tuple[str, int], int] = {}
-        block_keys = trials_cropped_df.select(["Subject", "Block"]).unique()
+        block_keys = trials_df.select(["Subject", "Block"]).unique()
         for block_key_row in block_keys.iter_rows(named=True):
             subject_id = str(block_key_row["Subject"])
             block_id = int(block_key_row["Block"])
@@ -1065,7 +1040,7 @@ def _(
 
 
 @app.cell
-def _(blocks_df, mo, pl, points_filtered_df, trials_cropped_df):
+def _(blocks_df, mo, pl, points_filtered_df, trials_df: object):
     import io as _io
     import zipfile as _zipfile
     from datetime import datetime
@@ -1117,7 +1092,7 @@ def _(blocks_df, mo, pl, points_filtered_df, trials_cropped_df):
             return db_path.read_bytes()
 
     timestamp = datetime.now().astimezone().strftime("%Y-%m-%d_%H%M")
-    csv_zip = build_csv_zip(points_filtered_df, blocks_df, trials_cropped_df)
+    csv_zip = build_csv_zip(points_filtered_df, blocks_df, trials_df)
     json_bytes = build_json(points_filtered_df)
     parquet_bytes = build_parquet(points_filtered_df)
     duckdb_bytes = build_duckdb(points_filtered_df)
