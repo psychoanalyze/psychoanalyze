@@ -108,6 +108,8 @@ def imports():
     import numpy as np
     import polars as pl
     from scipy.special import expit, logit
+    from wigglystuff import HTMLRefreshWidget
+    from wigglystuff.utils import altair2svg, refresh_altair
 
     from psychoanalyze.data import export as pa_export
     from psychoanalyze.data import hierarchical as pa_hierarchical
@@ -119,6 +121,7 @@ def imports():
     return (
         Path,
         alt,
+        altair2svg,
         az,
         expit,
         hashlib,
@@ -133,9 +136,11 @@ def imports():
         pa_points,
         pa_trials,
         pl,
+        refresh_altair,
         subject_utils,
         to_intercept,
         to_slope,
+        HTMLRefreshWidget,
     )
 
 
@@ -328,9 +333,11 @@ def trial_step_controls(mo, n_trials, step_mode_toggle):
 @app.cell
 def step_chart(
     alt,
+    altair2svg,
     expit,
     generate_index,
     ground_truth_params,
+    HTMLRefreshWidget,
     max_x,
     min_x,
     mo,
@@ -493,20 +500,18 @@ def step_chart(
             title="Sampling Distribution",
         )
         
-        # Create main chart from layers
+        # Create main chart from layers (wigglystuff HTMLRefreshWidget + altair2svg)
         if _chart_layers:
             _main_chart = alt.layer(*_chart_layers).properties(
                 width=500,
                 height=250,
                 title=f"Trial {current_step} of {len(block_trials)}",
             )
-            # Display charts separately using mo.vstack to avoid Vega signal conflicts
-            step_chart = mo.vstack([
-                mo.as_html(_main_chart),
-                mo.as_html(_histogram),
-            ], gap=0)
+            step_chart = HTMLRefreshWidget(
+                html=f'<div>{altair2svg(_main_chart)}</div><div>{altair2svg(_histogram)}</div>',
+            )
         else:
-            step_chart = mo.as_html(_histogram)
+            step_chart = HTMLRefreshWidget(html=altair2svg(_histogram))
         
         # Info about current trial
         if len(current_trial) > 0:
@@ -959,8 +964,48 @@ def link_fn(expit, link_function):
 
 
 @app.cell
-def blocks_chart_cell(alt, blocks_df, mo, pl):
+def blocks_chart_cell(alt, blocks_df, HTMLRefreshWidget, mo, pl, refresh_altair):
     # Blocks chart: Actual vs Estimated overlaid, x = blocks grouped by subject
+    # Use wigglystuff HTMLRefreshWidget + @refresh_altair for refreshable static SVG
+    @refresh_altair
+    def _blocks_chart_svg(chart_pd, block_order):
+        selection = alt.selection_point(fields=["Subject", "Block"], toggle=True)
+        points = (
+            alt.Chart(chart_pd)
+            .mark_point(filled=True, size=80)
+            .encode(
+                x=alt.X(
+                    "BlockLabel:N",
+                    sort=block_order,
+                    title="Block (by subject)",
+                ),
+                y=alt.Y("Threshold:Q", title="Threshold (x₀)"),
+                shape=alt.Shape("Type:N", title="", legend=alt.Legend(orient="top")),
+                color=alt.condition(
+                    selection,
+                    alt.Color("Subject:N", scale=alt.Scale(scheme="category10")),
+                    alt.value("#d3d3d3"),
+                ),
+                tooltip=["Subject:N", "Block:Q", "Type:N", "Threshold:Q"],
+            )
+            .add_params(selection)
+        )
+        estimated_pd = chart_pd[chart_pd["Type"] == "Estimated"]
+        error_bars = (
+            alt.Chart(estimated_pd)
+            .mark_rule()
+            .encode(
+                x=alt.X("BlockLabel:N", sort=block_order),
+                y=alt.Y("Conf_Low:Q"),
+                y2=alt.Y2("Conf_High:Q"),
+                color=alt.Color("Subject:N", scale=alt.Scale(scheme="category10")),
+            )
+        )
+        return (error_bars + points).properties(
+            height=220,
+            width=max(400, len(block_order) * 28),
+        ).resolve_scale(color="shared")
+
     if len(blocks_df) > 0 and "x_0 (est)" in blocks_df.columns:
         chart_rows = []
 
@@ -1002,11 +1047,9 @@ def blocks_chart_cell(alt, blocks_df, mo, pl):
 
         if chart_rows:
             chart_df = pl.from_dicts(chart_rows)
-            # Block label for x-axis: blocks grouped by subject (Subject · Block N)
             chart_df = chart_df.with_columns(
                 (pl.col("Subject").cast(pl.Utf8) + " · Block " + pl.col("Block").cast(pl.Utf8)).alias("BlockLabel"),
             )
-            # Sort order: by subject then block so x-axis groups blocks by subject
             block_order = (
                 chart_df.unique(["Subject", "Block"])
                 .sort(["Subject", "Block"])
@@ -1016,49 +1059,7 @@ def blocks_chart_cell(alt, blocks_df, mo, pl):
                 .to_list()
             )
             chart_pd = chart_df.to_pandas()
-
-            selection = alt.selection_point(fields=["Subject", "Block"], toggle=True)
-
-            # Points: overlay Actual vs Estimated with different marker shapes
-            points = (
-                alt.Chart(chart_pd)
-                .mark_point(filled=True, size=80)
-                .encode(
-                    x=alt.X(
-                        "BlockLabel:N",
-                        sort=block_order,
-                        title="Block (by subject)",
-                    ),
-                    y=alt.Y("Threshold:Q", title="Threshold (x₀)"),
-                    shape=alt.Shape("Type:N", title="", legend=alt.Legend(orient="top")),
-                    color=alt.condition(
-                        selection,
-                        alt.Color("Subject:N", scale=alt.Scale(scheme="category10")),
-                        alt.value("#d3d3d3"),
-                    ),
-                    tooltip=["Subject:N", "Block:Q", "Type:N", "Threshold:Q"],
-                )
-                .add_params(selection)
-            )
-
-            # Vertical error bars for estimated (confidence intervals), using rule for pre-computed bounds
-            estimated_pd = chart_pd[chart_pd["Type"] == "Estimated"]
-            error_bars = (
-                alt.Chart(estimated_pd)
-                .mark_rule()
-                .encode(
-                    x=alt.X("BlockLabel:N", sort=block_order),
-                    y=alt.Y("Conf_Low:Q"),
-                    y2=alt.Y2("Conf_High:Q"),
-                    color=alt.Color("Subject:N", scale=alt.Scale(scheme="category10")),
-                )
-            )
-
-            chart = (error_bars + points).properties(
-                height=220,
-                width=max(400, len(block_order) * 28),
-            ).resolve_scale(color="shared")
-            blocks_chart = mo.ui.altair_chart(chart)
+            blocks_chart = HTMLRefreshWidget(html=_blocks_chart_svg(chart_pd, block_order))
         else:
             blocks_chart = mo.md("No block data to display.")
     else:
@@ -1071,6 +1072,7 @@ def main_psychometric_plot(
     alt,
     block_rows,
     fit_idata,
+    HTMLRefreshWidget,
     link_fn,
     max_x,
     min_x,
@@ -1079,8 +1081,57 @@ def main_psychometric_plot(
     pa_hierarchical,
     pl,
     points_filtered_df,
+    refresh_altair,
 ):
-    # Plot: scatter points + logistic curves
+    # Plot: scatter points + logistic curves (wigglystuff HTMLRefreshWidget + @refresh_altair)
+    @refresh_altair
+    def _psychometric_chart(bands_pd, fitted_pd, ground_truth_pd, points_pd):
+        band_chart = (
+            alt.Chart(bands_pd)
+            .mark_area(opacity=0.2)
+            .encode(
+                x=alt.X("Intensity:Q"),
+                y=alt.Y("lower:Q"),
+                y2=alt.Y2("upper:Q"),
+                color=alt.Color("Series:N"),
+            )
+        )
+        fitted_line_chart = (
+            alt.Chart(fitted_pd)
+            .mark_line()
+            .encode(
+                x=alt.X("Intensity:Q"),
+                y=alt.Y("Hit Rate:Q"),
+                color=alt.Color("BlockGroup:N"),
+            )
+        )
+        ground_truth_line_chart = (
+            alt.Chart(ground_truth_pd)
+            .mark_line(strokeDash=[5, 5], strokeWidth=2)
+            .encode(
+                x=alt.X("Intensity:Q"),
+                y=alt.Y("Hit Rate:Q"),
+                color=alt.Color("BlockGroup:N"),
+            )
+        )
+        points_chart = (
+            alt.Chart(points_pd)
+            .mark_point(filled=True)
+            .encode(
+                x=alt.X("Intensity:Q"),
+                y=alt.Y("Hit Rate:Q"),
+                size=alt.Size("n trials:Q"),
+                color=alt.Color("Series:N"),
+                tooltip=["Series:N", "Intensity:Q", "Hit Rate:Q", "n trials:Q"],
+            )
+        )
+        plot_layers = [fitted_line_chart, points_chart]
+        if len(ground_truth_pd) > 0:
+            plot_layers.insert(0, ground_truth_line_chart)
+        if len(bands_pd) > 0:
+            plot_layers.insert(0, band_chart)
+        return alt.layer(*plot_layers).resolve_scale(color="shared")
+
     x = np.linspace(min_x, max_x, 100)
     fits_list = []
     bands_list = []
@@ -1126,63 +1177,18 @@ def main_psychometric_plot(
         ),
     )
     fits_df = fits_df.with_columns(pl.col("Series").cast(pl.Utf8))
-    # Extract base block name (without " (GT)" suffix) for consistent coloring
     fits_df = fits_df.with_columns(
         pl.col("Series").str.replace(r" \(GT\)$", "").alias("BlockGroup"),
     )
-    # Separate ground truth vs fitted curves for different styling
     ground_truth_df = fits_df.filter(pl.col("Type") == "Ground Truth")
     fitted_df = fits_df.filter(pl.col("Type") == "Fitted")
     fitted_pd = fitted_df.to_pandas()
     ground_truth_pd = ground_truth_df.to_pandas()
     bands_pd = bands_df.to_pandas()
     points_pd = points_plot_df.to_pandas()
-    band_chart = (
-        alt.Chart(bands_pd)
-        .mark_area(opacity=0.2)
-        .encode(
-            x=alt.X("Intensity:Q"),
-            y=alt.Y("lower:Q"),
-            y2=alt.Y2("upper:Q"),
-            color=alt.Color("Series:N"),
-        )
+    plot_ui = HTMLRefreshWidget(
+        html=_psychometric_chart(bands_pd, fitted_pd, ground_truth_pd, points_pd),
     )
-    fitted_line_chart = (
-        alt.Chart(fitted_pd)
-        .mark_line()
-        .encode(
-            x=alt.X("Intensity:Q"),
-            y=alt.Y("Hit Rate:Q"),
-            color=alt.Color("BlockGroup:N"),
-        )
-    )
-    ground_truth_line_chart = (
-        alt.Chart(ground_truth_pd)
-        .mark_line(strokeDash=[5, 5], strokeWidth=2)
-        .encode(
-            x=alt.X("Intensity:Q"),
-            y=alt.Y("Hit Rate:Q"),
-            color=alt.Color("BlockGroup:N"),
-        )
-    )
-    points_chart = (
-        alt.Chart(points_pd)
-        .mark_point(filled=True)
-        .encode(
-            x=alt.X("Intensity:Q"),
-            y=alt.Y("Hit Rate:Q"),
-            size=alt.Size("n trials:Q"),
-            color=alt.Color("Series:N"),
-            tooltip=["Series:N", "Intensity:Q", "Hit Rate:Q", "n trials:Q"],
-        )
-    )
-    plot_layers = [fitted_line_chart, points_chart]
-    if len(ground_truth_pd) > 0:
-        plot_layers.insert(0, ground_truth_line_chart)
-    if len(bands_pd) > 0:
-        plot_layers.insert(0, band_chart)
-    plot_chart = alt.layer(*plot_layers).resolve_scale(color="shared")
-    plot_ui = mo.ui.altair_chart(plot_chart)
     return (plot_ui,)
 
 
