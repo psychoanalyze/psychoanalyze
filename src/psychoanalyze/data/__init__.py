@@ -4,6 +4,9 @@
 Submodules:
 
 - [`psychoanalyze.data.blocks`][psychoanalyze.data.blocks]
+- [`psychoanalyze.data.export`][psychoanalyze.data.export]
+- [`psychoanalyze.data.hierarchical`][psychoanalyze.data.hierarchical]
+- [`psychoanalyze.data.io`][psychoanalyze.data.io]
 - [`psychoanalyze.data.points`][psychoanalyze.data.points]
 - [`psychoanalyze.data.trials`][psychoanalyze.data.trials]
 - [`psychoanalyze.data.sessions`][psychoanalyze.data.sessions]
@@ -13,6 +16,9 @@ Submodules:
 
 from psychoanalyze.data import (
 	blocks,
+	export,
+	hierarchical,
+	io,
 	points,
 	sessions,
 	subject,
@@ -23,6 +29,9 @@ from psychoanalyze.data import (
 
 __all__ = [
 	"blocks",
+	"export",
+	"hierarchical",
+	"io",
 	"points",
 	"sessions",
 	"subject",

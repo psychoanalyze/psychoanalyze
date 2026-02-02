@@ -39,6 +39,66 @@ import pytensor.tensor as pt
 from scipy.special import expit
 
 
+def sample_params_from_priors(random_seed: int | None = None) -> dict[str, float]:
+    """Sample psychometric function parameters from hierarchical model priors.
+
+    This function samples parameters from the same prior distributions used in
+    the hierarchical fitting model, making it useful for:
+    - Generating realistic simulated data
+    - Prior predictive checks
+    - Testing model recovery
+
+    The sampling process:
+    1. Sample hyperparameters (group-level means and standard deviations)
+    2. Sample block-level intercept and slope from the hyperpriors
+    3. Sample guess rate (γ) and lapse rate (λ) from Beta(1, 19)
+    4. Convert intercept/slope to threshold (x_0) / steepness (k) parameterization
+
+    Args:
+        random_seed: Random seed for reproducibility
+
+    Returns:
+        Dictionary with keys:
+            - x_0: Threshold (intensity at which F(x) = 0.5)
+            - k: Steepness (slope of the psychometric function)
+            - gamma: Guess rate (lower asymptote)
+            - lambda: Lapse rate (1 - upper asymptote)
+
+    Example:
+        >>> params = sample_params_from_priors(random_seed=42)
+        >>> params.keys()
+        dict_keys(['x_0', 'k', 'gamma', 'lambda'])
+    """
+    rng = np.random.default_rng(random_seed)
+
+    # Sample hyperparameters (matching priors in fit())
+    mu_intercept = rng.normal(0.0, 2.5)
+    sigma_intercept = np.abs(rng.normal(0.0, 2.5))
+    mu_slope = np.abs(rng.normal(0.0, 2.5))
+    sigma_slope = np.abs(rng.normal(0.0, 2.5))
+
+    # Sample block-level params from hyperpriors
+    intercept = rng.normal(mu_intercept, sigma_intercept)
+    slope = np.abs(rng.normal(mu_slope, sigma_slope))
+
+    # Sample gamma and lambda from Beta(1, 19) - mode near 0.05
+    gamma = rng.beta(1.0, 19.0)
+    lambda_ = rng.beta(1.0, 19.0)
+
+    # Convert intercept/slope to x_0/k parameterization
+    # threshold x_0 = -intercept / slope
+    # k = slope (steepness)
+    k = slope
+    x_0 = -intercept / slope if slope != 0 else 0.0
+
+    return {
+        "x_0": x_0,
+        "k": k,
+        "gamma": gamma,
+        "lambda": lambda_,
+    }
+
+
 def fit(
     trials: pl.DataFrame,
     draws: int = 1000,

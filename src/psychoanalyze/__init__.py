@@ -6,6 +6,9 @@ Modules:
 - [`plot`][psychoanalyze.plot]: Global plot settings and generic plot utilities.
 - [`sigmoids`][psychoanalyze.sigmoids]: Implementations of psychometric sigmoid
 functions.
+- [`presets`][psychoanalyze.presets]: Preset parameter configurations for common
+psychophysics paradigms.
+- [`params`][psychoanalyze.params]: Psychometric function parameter conversions.
 
 Subpackages:
 

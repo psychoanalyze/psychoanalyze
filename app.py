@@ -100,7 +100,6 @@ def _():
     import hashlib
     import io
     import json
-    import zipfile
     from pathlib import Path
 
     import altair as alt
@@ -110,7 +109,9 @@ def _():
     import polars as pl
     from scipy.special import expit, logit
 
+    from psychoanalyze.data import export as pa_export
     from psychoanalyze.data import hierarchical as pa_hierarchical
+    from psychoanalyze.data import io as pa_io
     from psychoanalyze.data import points as pa_points
     from psychoanalyze.data import subject as subject_utils
     from psychoanalyze.data import trials as pa_trials
@@ -126,14 +127,15 @@ def _():
         logit,
         mo,
         np,
+        pa_export,
         pa_hierarchical,
+        pa_io,
         pa_points,
         pa_trials,
         pl,
         subject_utils,
         to_intercept,
         to_slope,
-        zipfile,
     )
 
 
@@ -181,118 +183,16 @@ def _(Path, az, cache_root, hashlib, io, json, mo, np, pa_hierarchical, pl):
 
 
 @app.cell
-def _(io, np, pa_points, pa_trials, pl, subject_utils, zipfile):
+def _(pa_io, pa_points, pa_trials, pl, subject_utils):
+    # Import functions from refactored modules
     generate_index = pa_points.generate_index
-
-    def sample_params_from_priors(random_seed: int | None = None) -> dict[str, float]:
-        """Sample parameters from hierarchical model priors.
-
-        Returns a dict with keys: x_0, k, gamma, lambda
-        """
-        rng = np.random.default_rng(random_seed)
-
-        # Sample hyperparameters
-        mu_intercept = rng.normal(0.0, 2.5)
-        sigma_intercept = np.abs(rng.normal(0.0, 2.5))
-        mu_slope = np.abs(rng.normal(0.0, 2.5))
-        sigma_slope = np.abs(rng.normal(0.0, 2.5))
-
-        # Sample block-level params from hyperpriors
-        intercept = rng.normal(mu_intercept, sigma_intercept)
-        slope = np.abs(rng.normal(mu_slope, sigma_slope))
-
-        # Sample gamma and lambda from Beta(1, 19) - mode near 0.05
-        gamma = rng.beta(1.0, 19.0)
-        lambda_ = rng.beta(1.0, 19.0)
-
-        # Convert intercept/slope to x_0/k parameterization
-        # threshold x_0 = -intercept / slope
-        # k = slope (steepness)
-        k = slope
-        x_0 = -intercept / slope if slope != 0 else 0.0
-
-        return {
-            "x_0": x_0,
-            "k": k,
-            "gamma": gamma,
-            "lambda": lambda_,
-        }
-
-    def generate_trials(
-        n_trials: int,
-        options: list[float],
-        params: dict,
-        n_blocks: int,
-        n_subjects: int = 1,
-        use_random_params: bool = False,
-        random_seed: int | None = None,
-        sampling_method: str = "constant_stimuli",
-    ) -> tuple[pl.DataFrame, dict[tuple[str, int], dict]]:
-        """Generate trials and return both data and block-specific parameters.
-
-        Args:
-            use_random_params: If True, ignore params and generate from priors
-            random_seed: Random seed for parameter generation
-            sampling_method: Either "constant_stimuli" (random from options) 
-                            or "adaptive" (Expected Improvement)
-
-        Returns:
-            (trials_df, ground_truth_params_map)
-            where ground_truth_params_map keys are (subject_id, block_id) tuples
-        """
-        frames = []
-        ground_truth_params_map = {}
-        rng = np.random.default_rng(random_seed)
-
-        for subject_idx in range(n_subjects):
-            subject_id = (
-                chr(ord("A") + subject_idx) if subject_idx < 26 else f"S{subject_idx}"
-            )
-
-            for block_id in range(n_blocks):
-                # Generate parameters for this block
-                if use_random_params:
-                    block_seed = None if random_seed is None else (random_seed + subject_idx * 1000 + block_id)
-                    block_params = sample_params_from_priors(block_seed)
-                else:
-                    # Use provided params with random variation per block
-                    block_params = params.copy()
-                    block_params["x_0"] = params["x_0"] + rng.normal(0, 0.5)
-
-                ground_truth_params_map[(subject_id, block_id)] = block_params
-
-                # Generate trials for this block using specified sampling method
-                trial_seed = None if random_seed is None else (random_seed + subject_idx * 10000 + block_id * 100)
-                block_trials = pa_trials.generate(
-                    n_trials=n_trials,
-                    options=options,
-                    params=block_params,
-                    n_blocks=1,
-                    sampling_method=sampling_method,
-                    random_seed=trial_seed,
-                )
-                block_trials = block_trials.with_columns(
-                    pl.lit(subject_id).alias("Subject"),
-                    pl.lit(block_id).alias("Block"),
-                )
-                frames.append(block_trials)
-
-        return (
-            pl.concat(frames) if frames else pl.DataFrame(),
-            ground_truth_params_map,
-        )
+    generate_trials = pa_trials.generate_multi_subject
+    process_upload_bytes = pa_io.read_from_bytes
 
     def from_trials(trials_df: pl.DataFrame) -> pl.DataFrame:
         trials_df = subject_utils.ensure_subject_column(trials_df)
         return pa_points.from_trials(trials_df)
 
-    def process_upload_bytes(contents: bytes, filename: str) -> pl.DataFrame:
-        if "zip" in filename:
-            with zipfile.ZipFile(io.BytesIO(contents)) as z:
-                return pl.read_csv(z.open("trials.csv"))
-        if "parquet" in filename or filename.endswith(".pq"):
-            return pl.read_parquet(io.BytesIO(contents))
-        return pl.read_csv(io.BytesIO(contents))
     return from_trials, generate_index, generate_trials, process_upload_bytes
 
 
@@ -726,26 +626,9 @@ def _(mo, show_equation):
 
 
 @app.cell
-def _(pl):
-    from pathlib import Path as _Path
-
-    def load_sample_trials() -> pl.DataFrame:
-        """Load sample experimental data from data/trials.csv."""
-        sample_path = _Path(__file__).parent / "data" / "trials.csv"
-        df = pl.read_csv(sample_path)
-        # Transform to expected format: Subject, Block, Intensity, Result
-        df = df.with_columns(
-            (pl.col("Date").cast(pl.Utf8) + "_" + pl.col("Amp2").cast(pl.Utf8)).alias(
-                "block_key",
-            ),
-        )
-        df = df.with_columns(
-            pl.col("block_key").rank("dense").cast(pl.Int64).alias("Block") - 1,
-        )
-        df = df.with_columns(pl.col("Amp1").alias("Intensity"))
-        df = df.with_columns((pl.col("Result") == 1).cast(pl.Int64).alias("Result"))
-        df = df.select(["Subject", "Block", "Intensity", "Result"])
-        return df
+def _(pa_trials):
+    # Use refactored sample data loader from trials module
+    load_sample_trials = pa_trials.load_sample
     return (load_sample_trials,)
 
 
@@ -1320,62 +1203,15 @@ def _(mo):
 
 
 @app.cell
-def _(blocks_df, format_dropdown, mo, pl, points_filtered_df, trials_df: object):
-    import io as _io
-    import zipfile as _zipfile
+def _(blocks_df, format_dropdown, mo, pa_export, points_filtered_df, trials_df: object):
     from datetime import datetime
-    from pathlib import Path as _Path
 
-    import duckdb
-
-    def build_csv_zip(
-        points_df: pl.DataFrame,
-        blocks_df: pl.DataFrame,
-        trials_df: pl.DataFrame,
-    ) -> bytes:
-        zip_buffer = _io.BytesIO()
-        with _zipfile.ZipFile(
-            zip_buffer,
-            mode="a",
-            compression=_zipfile.ZIP_DEFLATED,
-            allowZip64=False,
-        ) as zip_file:
-            for level, level_df in {
-                "points": points_df,
-                "blocks": blocks_df,
-                "trials": trials_df,
-            }.items():
-                csv_buffer = _io.StringIO()
-                level_df.write_csv(csv_buffer)
-                zip_file.writestr(f"{level}.csv", csv_buffer.getvalue())
-        zip_buffer.seek(0)
-        return zip_buffer.read()
-
-    def build_json(points_df: pl.DataFrame) -> bytes:
-        return points_df.to_pandas().to_json().encode("utf-8")
-
-    def build_parquet(points_df: pl.DataFrame) -> bytes:
-        buffer = _io.BytesIO()
-        points_df.write_parquet(buffer)
-        buffer.seek(0)
-        return buffer.read()
-
-    def build_duckdb(points_df: pl.DataFrame) -> bytes:
-        import tempfile
-
-        with tempfile.TemporaryDirectory() as temp_dir:
-            db_path = _Path(temp_dir) / "psychoanalyze.duckdb"
-            connection = duckdb.connect(str(db_path))
-            connection.register("points_df", points_df.to_pandas())
-            connection.execute("CREATE TABLE points AS SELECT * FROM points_df")
-            connection.close()
-            return db_path.read_bytes()
-
+    # Use refactored export functions from pa_export module
     timestamp = datetime.now().astimezone().strftime("%Y-%m-%d_%H%M")
-    csv_zip = build_csv_zip(points_filtered_df, blocks_df, trials_df)
-    json_bytes = build_json(points_filtered_df)
-    parquet_bytes = build_parquet(points_filtered_df)
-    duckdb_bytes = build_duckdb(points_filtered_df)
+    csv_zip = pa_export.to_csv_zip(trials_df, points_filtered_df, blocks_df)
+    json_bytes = pa_export.to_json(points_filtered_df)
+    parquet_bytes = pa_export.to_parquet(points_filtered_df)
+    duckdb_bytes = pa_export.to_duckdb(trials_df, points_filtered_df, blocks_df)
 
     format_to_content: dict[str, tuple[bytes, str]] = {
         "csv_zip": (csv_zip, f"{timestamp}_psychoanalyze.zip"),

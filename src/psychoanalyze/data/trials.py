@@ -90,6 +90,111 @@ def generate(
     return pl.concat(frames).select(["Trial", "Block", "Intensity", "Result"])
 
 
+def generate_multi_subject(
+    n_trials: int,
+    options: list[float],
+    params: dict[str, float],
+    n_blocks: int,
+    n_subjects: int = 1,
+    use_random_params: bool = False,
+    random_seed: int | None = None,
+    sampling_method: str = "constant_stimuli",
+) -> tuple[pl.DataFrame, dict[tuple[str, int], dict[str, float]]]:
+    """Generate trials for multiple subjects and return both data and ground truth parameters.
+
+    This function extends `generate()` to support multiple subjects, each with
+    multiple blocks. It can either use fixed parameters or sample random parameters
+    from the hierarchical model priors for each block.
+
+    Args:
+        n_trials: Number of trials per block
+        options: Available intensity levels to sample from
+        params: Psychometric function parameters (used if use_random_params=False)
+        n_blocks: Number of blocks per subject
+        n_subjects: Number of subjects to simulate
+        use_random_params: If True, sample parameters from hierarchical priors
+            for each block. If False, use provided params with small random variation.
+        random_seed: Random seed for reproducibility
+        sampling_method: Sampling method passed to generate():
+            - "constant_stimuli": Random sampling from fixed levels
+            - "adaptive": Fisher Information-based adaptive sampling
+            - "quest": QUEST/Psi Bayesian adaptive method
+
+    Returns:
+        Tuple of (trials_df, ground_truth_params_map) where:
+            - trials_df: DataFrame with Subject, Block, Trial, Intensity, Result columns
+            - ground_truth_params_map: Dict mapping (subject_id, block_id) tuples to
+              the parameters used to generate that block's data
+
+    Example:
+        >>> from psychoanalyze.data.points import generate_index
+        >>> options = generate_index(7, [-4.0, 4.0])
+        >>> trials_df, params_map = generate_multi_subject(
+        ...     n_trials=50,
+        ...     options=options,
+        ...     params={},
+        ...     n_blocks=2,
+        ...     n_subjects=3,
+        ...     use_random_params=True,
+        ...     random_seed=42,
+        ... )
+        >>> trials_df.columns
+        ['Subject', 'Block', 'Trial', 'Intensity', 'Result']
+        >>> len(params_map)  # 3 subjects * 2 blocks
+        6
+    """
+    from psychoanalyze.data.hierarchical import sample_params_from_priors
+
+    frames = []
+    ground_truth_params_map: dict[tuple[str, int], dict[str, float]] = {}
+    rng = np.random.default_rng(random_seed)
+
+    for subject_idx in range(n_subjects):
+        # Generate subject ID: A, B, C, ... Z, S26, S27, ...
+        subject_id = (
+            chr(ord("A") + subject_idx) if subject_idx < 26 else f"S{subject_idx}"
+        )
+
+        for block_id in range(n_blocks):
+            # Generate parameters for this block
+            if use_random_params:
+                block_seed = (
+                    None
+                    if random_seed is None
+                    else (random_seed + subject_idx * 1000 + block_id)
+                )
+                block_params = sample_params_from_priors(block_seed)
+            else:
+                # Use provided params with random variation per block
+                block_params = params.copy()
+                block_params["x_0"] = params["x_0"] + rng.normal(0, 0.5)
+
+            ground_truth_params_map[(subject_id, block_id)] = block_params
+
+            # Generate trials for this block using specified sampling method
+            trial_seed = (
+                None
+                if random_seed is None
+                else (random_seed + subject_idx * 10000 + block_id * 100)
+            )
+            block_trials = generate(
+                n_trials=n_trials,
+                options=options,
+                params=block_params,
+                n_blocks=1,
+                sampling_method=sampling_method,
+                random_seed=trial_seed,
+            )
+            block_trials = block_trials.with_columns(
+                pl.lit(subject_id).alias("Subject"),
+                pl.lit(block_id).alias("Block"),
+            )
+            frames.append(block_trials)
+
+    trials_df = pl.concat(frames) if frames else pl.DataFrame()
+    return trials_df, ground_truth_params_map
+
+
 def load(data_path: Path) -> pl.DataFrame:
     """Load trials data from csv."""
     return pl.read_csv(
@@ -100,6 +205,62 @@ def load(data_path: Path) -> pl.DataFrame:
             "Block": pl.Int64,
         },
     )
+
+
+def load_sample(data_dir: Path | None = None) -> pl.DataFrame:
+    """Load sample experimental data for demos and testing.
+
+    Loads the bundled sample dataset and transforms it to the standard format
+    with columns: Subject, Block, Intensity, Result.
+
+    The sample data is from psychophysics experiments and includes multiple
+    subjects and blocks with varying parameters.
+
+    Args:
+        data_dir: Optional path to data directory. If None, uses the default
+            location relative to the package installation.
+
+    Returns:
+        DataFrame with columns: Subject, Block, Intensity, Result
+
+    Example:
+        >>> trials_df = load_sample()
+        >>> trials_df.columns
+        ['Subject', 'Block', 'Intensity', 'Result']
+        >>> trials_df["Subject"].n_unique()  # Number of subjects
+        3
+    """
+    if data_dir is None:
+        # Default to package's data directory
+        data_dir = Path(__file__).parent.parent.parent.parent / "data"
+
+    sample_path = data_dir / "trials.csv"
+
+    if not sample_path.exists():
+        msg = f"Sample data not found at {sample_path}"
+        raise FileNotFoundError(msg)
+
+    df = pl.read_csv(sample_path)
+
+    # Transform to expected format: Subject, Block, Intensity, Result
+    # Create unique block key from Date and Amp2 (reference amplitude)
+    df = df.with_columns(
+        (pl.col("Date").cast(pl.Utf8) + "_" + pl.col("Amp2").cast(pl.Utf8)).alias(
+            "block_key",
+        ),
+    )
+    # Convert block_key to sequential block numbers
+    df = df.with_columns(
+        pl.col("block_key").rank("dense").cast(pl.Int64).alias("Block") - 1,
+    )
+    # Amp1 is the test stimulus intensity
+    df = df.with_columns(pl.col("Amp1").alias("Intensity"))
+    # Ensure Result is binary integer
+    df = df.with_columns((pl.col("Result") == 1).cast(pl.Int64).alias("Result"))
+    # Select standard columns
+    df = df.select(["Subject", "Block", "Intensity", "Result"])
+
+    return df
 
 
 def from_store(store_data: str) -> pl.DataFrame:
