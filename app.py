@@ -248,18 +248,18 @@ def load_sample_button(mo):
 def preset_and_link_ui(mo):
     preset_dropdown = mo.ui.dropdown(
         options={
-            "standard": "Standard",
-            "non-standard": "Non Standard",
+            "Standard": "standard",
+            "Non Standard": "non-standard",
             "2AFC": "2AFC",
         },
-        value="standard",
+        value="Standard",
         label="Preset",
     )
     link_function = mo.ui.dropdown(
         options={
-            "expit": "Logistic",
+            "Logistic": "expit",
         },
-        value="expit",
+        value="Logistic",
         label="Link function",
     )
     show_equation = mo.ui.checkbox(label="Show F(x)", value=False)
@@ -311,11 +311,11 @@ def fit_settings_ui(mo):
 def sampling_method_ui(mo):
     sampling_method_dropdown = mo.ui.dropdown(
         options={
-            "constant_stimuli": "Method of Constant Stimuli",
-            "adaptive": "Adaptive (Fisher Information)",
-            "quest": "QUEST/Psi (Bayesian)",
+            "Method of Constant Stimuli": "constant_stimuli",
+            "Adaptive (Fisher Information)": "adaptive",
+            "QUEST/Psi (Bayesian)": "quest",
         },
-        value="constant_stimuli",
+        value="Method of Constant Stimuli",
         label="Sampling Method",
     )
     return (sampling_method_dropdown,)
@@ -347,10 +347,10 @@ def step_block_selection(mo, n_blocks, n_subjects):
     # Generate block options from n_blocks parameter
     _n_blk = n_blocks.value if hasattr(n_blocks, "value") else 2
     blocks = list(range(_n_blk))
-    block_options = {str(b): f"Block {b}" for b in blocks}
+    block_options = {f"Block {b}": str(b) for b in blocks}
     step_block_dropdown = mo.ui.dropdown(
         options=block_options,
-        value=str(blocks[0]) if blocks else None,
+        value=f"Block {blocks[0]}" if blocks else None,
         label="Block",
     )
 
@@ -1323,12 +1323,12 @@ def main_psychometric_plot(
 def format_dropdown(mo):
     format_dropdown = mo.ui.dropdown(
         options={
-            "csv_zip": "CSV (zip)",
-            "json": "JSON",
-            "parquet": "Parquet",
-            "duckdb": "DuckDB",
+            "CSV (zip)": "csv_zip",
+            "JSON": "json",
+            "Parquet": "parquet",
+            "DuckDB": "duckdb",
         },
-        value="csv_zip",
+        value="CSV (zip)",
         label="Format",
     )
     return (format_dropdown,)
@@ -1358,7 +1358,7 @@ def data_downloads_cell(
         "parquet": (parquet_bytes, "data.parquet"),
         "duckdb": (duckdb_bytes, "psychoanalyze.duckdb"),
     }
-    _selected_key = format_dropdown.selected_key or format_dropdown.value or "csv_zip"
+    _selected_key = format_dropdown.value or "csv_zip"
     _selected_bytes, _selected_filename = format_to_content.get(
         _selected_key, format_to_content["csv_zip"]
     )
