@@ -3,7 +3,6 @@
 import numpy as np
 import polars as pl
 import pytest
-from scipy import stats
 
 from psychoanalyze.analysis import sdt
 
@@ -12,13 +11,13 @@ class TestDPrime:
     """Tests for d' (d-prime) calculation."""
 
     def test_equal_rates_gives_zero(self) -> None:
-        """d' should be 0 when hit rate equals false alarm rate (chance performance)."""
+        """D' should be 0 when hit rate equals false alarm rate (chance performance)."""
         assert sdt.d_prime(0.5, 0.5) == pytest.approx(0.0, abs=1e-6)
         assert sdt.d_prime(0.3, 0.3) == pytest.approx(0.0, abs=1e-6)
         assert sdt.d_prime(0.8, 0.8) == pytest.approx(0.0, abs=1e-6)
 
     def test_perfect_discrimination(self) -> None:
-        """d' should be large for perfect discrimination (HR=1, FAR=0)."""
+        """D' should be large for perfect discrimination (HR=1, FAR=0)."""
         # With clipping to 0.999 and 0.001, we get a large but finite value
         result = sdt.d_prime(1.0, 0.0)
         assert result > 6.0  # Very large d'
@@ -29,7 +28,7 @@ class TestDPrime:
         # Z(0.8) ≈ 0.842, Z(0.2) ≈ -0.842
         # d' = 0.842 - (-0.842) ≈ 1.684
         assert sdt.d_prime(0.8, 0.2) == pytest.approx(1.684, abs=0.01)
-        
+
         # When HR = 0.9 and FAR = 0.3
         # Z(0.9) ≈ 1.282, Z(0.3) ≈ -0.524
         # d' = 1.282 - (-0.524) ≈ 1.806
@@ -55,7 +54,7 @@ class TestDPrime:
         result = sdt.d_prime(1.0, 0.0)
         assert np.isfinite(result)
         assert result > 0
-        
+
         result = sdt.d_prime(0.0, 1.0)
         assert np.isfinite(result)
         assert result < 0
@@ -116,9 +115,9 @@ class TestComputeHRFAR:
             "Intensity": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0],
             "Result": [0, 0, 1, 1, 1, 1, 1, 0],  # FAR=0.5, HR=0.75
         })
-        
+
         rates = sdt.compute_hr_far(trials, criterion=0.5)
-        
+
         assert rates["hit_rate"] == 0.75  # 3/4 hits at high intensity
         assert rates["false_alarm_rate"] == 0.5  # 2/4 false alarms at low
         assert rates["n_signal_trials"] == 4
@@ -130,7 +129,7 @@ class TestComputeHRFAR:
             "Intensity": [1.0, 1.0, 1.0, 1.0],
             "Result": [1, 1, 0, 1],
         })
-        
+
         with pytest.raises(ValueError, match="need trials both above and below"):
             sdt.compute_hr_far(trials, criterion=0.0)  # All above criterion
 
@@ -140,14 +139,14 @@ class TestComputeHRFAR:
             "stim_level": [0.0, 0.0, 1.0, 1.0],
             "response": [0, 1, 1, 1],
         })
-        
+
         rates = sdt.compute_hr_far(
-            trials, 
+            trials,
             criterion=0.5,
             intensity_col="stim_level",
             result_col="response",
         )
-        
+
         assert rates["hit_rate"] == 1.0
         assert rates["false_alarm_rate"] == 0.5
 
@@ -161,9 +160,9 @@ class TestSDTFromTrials:
             "Intensity": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0],
             "Result": [0, 0, 1, 0, 1, 1, 1, 0],  # FAR=0.25, HR=0.75
         })
-        
+
         metrics = sdt.sdt_from_trials(trials, criterion_threshold=0.5)
-        
+
         # Check all expected keys are present
         expected_keys = {
             "hit_rate", "false_alarm_rate",
@@ -171,7 +170,7 @@ class TestSDTFromTrials:
             "d_prime", "criterion_c", "beta",
         }
         assert set(metrics.keys()) == expected_keys
-        
+
         # Check values are sensible
         assert 0 <= metrics["hit_rate"] <= 1
         assert 0 <= metrics["false_alarm_rate"] <= 1
@@ -186,9 +185,9 @@ class TestSDTFromTrials:
             "Intensity": [0.0] * 10 + [1.0] * 10,
             "Result": [0] * 10 + [1] * 10,
         })
-        
+
         metrics = sdt.sdt_from_trials(trials, criterion_threshold=0.5)
-        
+
         assert metrics["hit_rate"] == 1.0
         assert metrics["false_alarm_rate"] == 0.0
         assert metrics["d_prime"] > 6.0  # Very high sensitivity
@@ -205,9 +204,9 @@ class TestSDTFromParams:
             "gamma": 0.1,
             "lambda": 0.05,
         }
-        
+
         sdt_metrics = sdt.sdt_from_params(params)
-        
+
         expected_keys = {
             "d_prime_approx", "threshold", "far_approx",
             "lapse_rate", "sensitivity_range",
@@ -242,9 +241,9 @@ class TestROCCurve:
             "Intensity": np.linspace(-2, 2, 100),
             "Result": np.random.binomial(1, 0.5, 100),
         })
-        
+
         roc = sdt.roc_curve(trials, n_points=10)
-        
+
         assert isinstance(roc, pl.DataFrame)
         assert set(roc.columns) == {"criterion", "hit_rate", "false_alarm_rate", "d_prime"}
         assert len(roc) > 0  # Should have some valid points
@@ -256,17 +255,17 @@ class TestROCCurve:
         intensities = np.linspace(-2, 2, 200)
         probs = 1 / (1 + np.exp(-2 * intensities))  # Logistic function
         results = (np.random.random(200) < probs).astype(int)
-        
+
         trials = pl.DataFrame({
             "Intensity": intensities,
             "Result": results,
         })
-        
+
         roc = sdt.roc_curve(trials, n_points=15)
-        
+
         # Sort by criterion
         roc = roc.sort("criterion")
-        
+
         # Hit rate should generally decrease as criterion increases
         # (though not strictly monotonic due to sampling)
         hit_rates = roc["hit_rate"].to_numpy()
@@ -279,14 +278,14 @@ class TestROCCurve:
             "stim": np.linspace(0, 1, 50),
             "resp": np.random.binomial(1, 0.5, 50),
         })
-        
+
         roc = sdt.roc_curve(
-            trials, 
+            trials,
             n_points=5,
             intensity_col="stim",
             result_col="resp",
         )
-        
+
         assert len(roc) > 0
 
 
@@ -297,7 +296,7 @@ class TestAUC:
         """Perfect ROC (HR=1, FAR=0) should give AUC=1.0."""
         hrs = [0.0, 1.0, 1.0]
         fars = [0.0, 0.0, 1.0]
-        
+
         result = sdt.auc(hrs, fars)
         assert result == pytest.approx(1.0, abs=0.01)
 
@@ -305,7 +304,7 @@ class TestAUC:
         """Diagonal ROC (HR=FAR) should give AUC=0.5."""
         hrs = [0.0, 0.5, 1.0]
         fars = [0.0, 0.5, 1.0]
-        
+
         result = sdt.auc(hrs, fars)
         assert result == pytest.approx(0.5, abs=0.01)
 
@@ -313,7 +312,7 @@ class TestAUC:
         """Intermediate ROC should give 0.5 < AUC < 1.0."""
         hrs = [0.0, 0.5, 0.8, 1.0]
         fars = [0.0, 0.1, 0.3, 1.0]
-        
+
         result = sdt.auc(hrs, fars)
         assert 0.5 < result < 1.0
 
@@ -322,7 +321,7 @@ class TestAUC:
         # Provide points in random order
         hrs = [0.8, 1.0, 0.0, 0.5]
         fars = [0.3, 1.0, 0.0, 0.1]
-        
+
         result = sdt.auc(hrs, fars)
         assert np.isfinite(result)
         assert 0 <= result <= 1
@@ -338,15 +337,15 @@ class TestAUCFromROC:
         intensities = np.linspace(-2, 2, 200)
         probs = 1 / (1 + np.exp(-3 * intensities))  # Strong logistic
         results = (np.random.random(200) < probs).astype(int)
-        
+
         trials = pl.DataFrame({
             "Intensity": intensities,
             "Result": results,
         })
-        
+
         roc = sdt.roc_curve(trials, n_points=20)
         auc_value = sdt.auc_from_roc(roc)
-        
+
         # Should have good discrimination
         assert auc_value > 0.8
         assert auc_value <= 1.0
@@ -358,9 +357,9 @@ class TestAUCFromROC:
             "Intensity": np.random.random(100),
             "Result": np.random.binomial(1, 0.5, 100),
         })
-        
+
         roc = sdt.roc_curve(trials, n_points=15)
         auc_value = sdt.auc_from_roc(roc)
-        
+
         # Should be near chance (within reasonable error for random data)
         assert 0.3 < auc_value < 0.7
