@@ -182,12 +182,12 @@ def _(io, np, pa_points, pa_trials, pl, subject_utils, zipfile):
         # Sample hyperparameters
         mu_intercept = rng.normal(0.0, 2.5)
         sigma_intercept = np.abs(rng.normal(0.0, 2.5))
-        mu_slope = rng.normal(0.0, 2.5)
+        mu_slope = np.abs(rng.normal(0.0, 2.5))
         sigma_slope = np.abs(rng.normal(0.0, 2.5))
 
         # Sample block-level params from hyperpriors
         intercept = rng.normal(mu_intercept, sigma_intercept)
-        slope = rng.normal(mu_slope, sigma_slope)
+        slope = np.abs(rng.normal(mu_slope, sigma_slope))
 
         # Sample gamma and lambda from Beta(1, 19) - mode near 0.05
         gamma = rng.beta(1.0, 19.0)
