@@ -21,8 +21,38 @@ When editing marimo notebooks, use the marimo MCP tools to guide changes and val
 
 You can also run `marimo check app.py` (and `marimo check app.py --fix` where supported) in the terminal to double-check or auto-fix lint issues.
 
+## Debugging runtime errors
+
+When debugging errors in a running notebook:
+
+1. **Get the session ID first**: Call `get_active_notebooks` with `{"args": {}}` to retrieve the `session_id` for the notebook. This is required for all other debugging tools.
+
+2. **View all errors**: Call `get_notebook_errors` with `{"args": {"session_id": "..."}}` to see runtime errors across all cells.
+
+3. **Inspect specific cells**: Call `get_cell_runtime_data` with `{"args": {"session_id": "...", "cell_id": "..."}}` to see:
+   - The actual code being executed
+   - Runtime errors with tracebacks
+   - **Variable values and types** — invaluable for debugging type mismatches
+
+4. **Find cell IDs**: Cells use short hash IDs (e.g., "Hstk", "Vxnm"), not function names. Call `get_lightweight_cell_map` to find cell IDs by preview content.
+
+### Important: Stale state
+
+The MCP shows state from the **last execution**. If you edit the file but the notebook hasn't re-run the cells:
+- Errors and variables will be stale
+- The user must manually refresh/re-run the notebook for changes to take effect
+- Code shown in `get_cell_runtime_data` reflects file changes, but `variables` and `errors` reflect the last run
+
+### Tool argument format
+
+All MCP tools require arguments wrapped in an `args` object:
+```json
+{"args": {"session_id": "s_abc123", "cell_id": "Hstk"}}
+```
+
 ## Summary
 
 - **Guide edits**: Use `get_marimo_rules` before changing the notebook.
 - **Validate**: Use `lint_notebook` after changes and fix all reported errors.
+- **Debug runtime errors**: Use `get_active_notebooks` → `get_notebook_errors` → `get_cell_runtime_data` workflow.
 - Prefer MCP tools when the marimo server is running; use `marimo check` as a fallback or extra check.

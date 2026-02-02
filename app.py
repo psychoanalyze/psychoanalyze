@@ -109,7 +109,7 @@ def imports():
     import numpy as np
     import polars as pl
     from scipy.special import expit, logit
-    from wigglystuff import HTMLRefreshWidget, TangleSlider
+    from wigglystuff import HTMLRefreshWidget
     from wigglystuff.utils import altair2svg, refresh_altair
 
     from psychoanalyze.data import export as pa_export
@@ -124,7 +124,6 @@ def imports():
         BOEDSampler,
         HTMLRefreshWidget,
         Path,
-        TangleSlider,
         alt,
         altair2svg,
         az,
@@ -148,60 +147,16 @@ def imports():
 
 
 @app.cell
-def cache_helpers(
-    Path,
-    az,
-    cache_root,
-    hashlib,
-    io,
-    json,
-    mo,
-    np,
-    pa_hierarchical,
-    pl,
-):
-    def normalize_trials_for_hash(trials_df: pl.DataFrame) -> pl.DataFrame:
-        preferred_cols = [
-            col
-            for col in ["Subject", "Block", "Intensity", "Result"]
-            if col in trials_df.columns
-        ]
-        cols = preferred_cols if preferred_cols else trials_df.columns
-        return trials_df.select(cols).sort(cols)
-
-
-    def trials_cache_key(
-        trials_df: pl.DataFrame,
-        fit_params: dict[str, float | int | None],
-    ) -> str:
-        normalized = normalize_trials_for_hash(trials_df)
-        buffer = io.BytesIO()
-        normalized.write_csv(buffer)
-        digest = hashlib.sha256()
-        digest.update(buffer.getvalue())
-        digest.update(json.dumps(fit_params, sort_keys=True).encode())
-        return digest.hexdigest()
-
-
-    def idata_cache_path(cache_key: str) -> Path:
-        return cache_root / f"idata-{cache_key}.nc"
-
-
-    @mo.cache
+def cached_fit_cell(az, mo, np, pa_hierarchical, pl):
+    @mo.persistent_cache
     def cached_hierarchical_fit(
         trials_df: pl.DataFrame,
-        cache_key: str,
         fit_params: dict[str, float | int | None],
     ) -> tuple[dict[str, float | np.ndarray], az.InferenceData]:
-        cache_path = idata_cache_path(cache_key)
-        if cache_path.exists():
-            idata = az.from_netcdf(cache_path)
-        else:
-            idata = pa_hierarchical.fit(trials_df, **fit_params)
-            idata.to_netcdf(cache_path)
+        idata = pa_hierarchical.fit(trials_df, **fit_params)
         summary = pa_hierarchical.summarize_fit(idata)
         return summary, idata
-    return cached_hierarchical_fit, trials_cache_key
+    return (cached_hierarchical_fit,)
 
 
 @app.cell
@@ -337,8 +292,12 @@ def step_block_selection(mo, n_blocks, n_subjects):
     Uses simulation parameters to generate subject/block options to avoid circular deps.
     """
     # Generate subject options from n_subjects parameter
+    # Match the format used by generate_multi_subject: A, B, C, ... Z, S26, S27, ...
     _n_subj = n_subjects.value if hasattr(n_subjects, "value") else 2
-    subjects = [f"S{i+1}" for i in range(_n_subj)]
+    subjects = [
+        chr(ord("A") + i) if i < 26 else f"S{i}"
+        for i in range(_n_subj)
+    ]
     subject_options = {s: s for s in subjects}
     step_subject_dropdown = mo.ui.dropdown(
         options=subject_options,
@@ -360,22 +319,17 @@ def step_block_selection(mo, n_blocks, n_subjects):
 
 
 @app.cell
-def trial_step_controls(TangleSlider, mo, n_trials):
+def trial_step_controls(mo, n_trials):
     # Trial step slider - only active when step mode is enabled
-    # Uses wigglystuff TangleSlider for interactive inline control
     _max_trials = n_trials.value if hasattr(n_trials, "value") else 100
 
-    # Create TangleSlider wrapped in mo.ui.anywidget for marimo compatibility
-    # Starts at trial 1 and goes up to max trial number
-    trial_step_slider = mo.ui.anywidget(
-        TangleSlider(
-            value=1,
-            min_val=1,
-            max_val=max(_max_trials, 1),
-            step=1,
-            prefix="Trial ",
-            suffix=f" of {_max_trials}",
-        )
+    # Create slider for stepping through trials
+    trial_step_slider = mo.ui.slider(
+        value=1,
+        start=1,
+        stop=max(_max_trials, 1),
+        step=1,
+        label=f"Trial (of {_max_trials})",
     )
     # Auto-play button for animation
     auto_play_button = mo.ui.run_button(label="▶ Play", kind="neutral")
@@ -889,6 +843,11 @@ def trials_data(
         trials_df = load_sample_trials()
     trials_df = subject_utils.ensure_subject_column(trials_df)
     trials_df = trials_df.with_columns(pl.col("Intensity").cast(pl.Float64))
+    # Ensure ID columns are integers for consistent sorting/filtering
+    if "Trial" in trials_df.columns:
+        trials_df = trials_df.with_columns(pl.col("Trial").cast(pl.Int64))
+    if "Block" in trials_df.columns:
+        trials_df = trials_df.with_columns(pl.col("Block").cast(pl.Int64))
     return ground_truth_params, trials_df
 
 
@@ -901,11 +860,6 @@ def fit_button(mo):
     return (fit_button,)
 
 
-@app.cell
-def cache_root(Path):
-    cache_root = Path("__marimo__") / "cache" / "psychoanalyze"
-    cache_root.mkdir(parents=True, exist_ok=True)
-    return (cache_root,)
 
 
 @app.cell
@@ -922,7 +876,6 @@ def hierarchical_fit_and_blocks(
     ground_truth_params,
     pl,
     should_fit,
-    trials_cache_key,
     trials_df,
 ):
     # Points always computed from trials
@@ -934,10 +887,8 @@ def hierarchical_fit_and_blocks(
             pl.col("Subject").cast(pl.Utf8) + "__" + pl.col("Block").cast(pl.Utf8)
         )
         fit_trials_df = trials_df.with_columns(composite_block.alias("Block"))
-        cache_key = trials_cache_key(trials_df, fit_params)
         fit_summary, fit_idata = cached_hierarchical_fit(
             fit_trials_df,
-            cache_key,
             fit_params,
         )
         fit_blocks = fit_trials_df["Block"].unique().sort().to_list()
