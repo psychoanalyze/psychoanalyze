@@ -1,0 +1,28 @@
+---
+description: 'Workflow for editing marimo notebooks using MCP tools'
+globs: app.py
+alwaysApply: false
+---
+
+# Marimo notebook workflow
+
+When editing marimo notebooks, use the marimo MCP tools to guide changes and validate format. The marimo MCP server must be running (e.g. `uv run marimo edit app.py --mcp --no-token`) for these tools to be available.
+
+## Before making changes
+
+1. **Call `get_marimo_rules`** (MCP tool) to load official marimo guidelines and best practices. Use the returned rules and source URL to follow marimo-specific conventions (cell structure, reactivity, `mo.ui` usage, etc.) so edits stay within marimo’s expectations.
+
+## After making changes
+
+2. **Call `lint_notebook`** (MCP tool) to fetch all marimo lint errors for the notebook. Address any reported issues:
+   - **Breaking (MB001–MB005)**: unparsable cells, multiple definitions, cycle dependencies, setup-cell dependencies, invalid syntax — fix before considering the edit done.
+   - **Runtime (MR001–MR002)**: self-import, branch-expression — resolve to avoid runtime problems.
+   - **Formatting (MF001–MF007)**: general formatting, empty cells, markdown indentation, etc. — fix for consistency.
+
+You can also run `marimo check app.py` (and `marimo check app.py --fix` where supported) in the terminal to double-check or auto-fix lint issues.
+
+## Summary
+
+- **Guide edits**: Use `get_marimo_rules` before changing the notebook.
+- **Validate**: Use `lint_notebook` after changes and fix all reported errors.
+- Prefer MCP tools when the marimo server is running; use `marimo check` as a fallback or extra check.
