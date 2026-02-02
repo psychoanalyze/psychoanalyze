@@ -211,12 +211,15 @@ def _(io, np, pa_points, pa_trials, pl, subject_utils, zipfile):
         n_subjects: int = 1,
         use_random_params: bool = False,
         random_seed: int | None = None,
+        sampling_method: str = "constant_stimuli",
     ) -> tuple[pl.DataFrame, dict[tuple[str, int], dict]]:
         """Generate trials and return both data and block-specific parameters.
 
         Args:
             use_random_params: If True, ignore params and generate from priors
             random_seed: Random seed for parameter generation
+            sampling_method: Either "constant_stimuli" (random from options) 
+                            or "adaptive" (Expected Improvement)
 
         Returns:
             (trials_df, ground_truth_params_map)
@@ -243,12 +246,15 @@ def _(io, np, pa_points, pa_trials, pl, subject_utils, zipfile):
 
                 ground_truth_params_map[(subject_id, block_id)] = block_params
 
-                # Generate trials for this block
+                # Generate trials for this block using specified sampling method
+                trial_seed = None if random_seed is None else (random_seed + subject_idx * 10000 + block_id * 100)
                 block_trials = pa_trials.generate(
                     n_trials=n_trials,
                     options=options,
                     params=block_params,
                     n_blocks=1,
+                    sampling_method=sampling_method,
+                    random_seed=trial_seed,
                 )
                 block_trials = block_trials.with_columns(
                     pl.lit(subject_id).alias("Subject"),
@@ -364,6 +370,20 @@ def _(mo):
         fit_target_accept,
         fit_tune,
     )
+
+
+@app.cell
+def _(mo):
+    sampling_method_dropdown = mo.ui.dropdown(
+        options={
+            "constant_stimuli": "Method of Constant Stimuli",
+            "adaptive": "Adaptive (Fisher Information)",
+            "quest": "QUEST/Psi (Bayesian)",
+        },
+        value="constant_stimuli",
+        label="Sampling Method",
+    )
+    return (sampling_method_dropdown,)
 
 
 @app.cell
@@ -509,11 +529,13 @@ def _(
     n_trials,
     pl,
     process_upload_bytes,
+    sampling_method_dropdown,
     subject_utils,
 ):
     # Trials: upload if provided, otherwise default to sample in Batch/Online
     ground_truth_params = {}
     use_random_params = input_tabs.value == "Simulation"
+    sampling_method = sampling_method_dropdown.value or "constant_stimuli"
 
     if file_upload.value and len(file_upload.value) > 0:
         raw = file_upload.contents(0)
@@ -531,6 +553,7 @@ def _(
                 random_seed=int(fit_random_seed.value)
                 if fit_random_seed.value > 0
                 else None,
+                sampling_method=sampling_method,
             )
     elif input_tabs.value == "Simulation":
         trials_df, ground_truth_params = generate_trials(
@@ -543,6 +566,7 @@ def _(
             random_seed=int(fit_random_seed.value)
             if fit_random_seed.value > 0
             else None,
+            sampling_method=sampling_method,
         )
     else:
         trials_df = load_sample_trials()
@@ -1162,6 +1186,7 @@ def _(
     load_sample_button,
     mo,
     preset_dropdown,
+    sampling_method_dropdown,
     show_equation,
 ):
     # Build tab content based on selected mode
@@ -1184,9 +1209,24 @@ def _(
         gap=1,
     )
 
+    # Sampling method info callout
+    sampling_method_info = mo.callout(
+        mo.md("""
+**Method of Constant Stimuli:** Randomly samples from fixed intensity levels. Classic approach used in traditional psychophysics.
+
+**Adaptive (Fisher Information):** Fits a logistic model and samples where Fisher Information about the threshold is highest (near the estimated threshold).
+
+**QUEST/Psi (Bayesian):** Maintains a full probability distribution over threshold values and selects stimuli that maximize expected information gain. Classic algorithm from Watson & Pelli (1983).
+        """),
+        kind="info",
+    )
+
     simulation_content = mo.vstack(
         [
             mo.md("### Simulation Mode"),
+            mo.md("### Sampling Method"),
+            sampling_method_dropdown,
+            sampling_method_info,
             mo.md("### Link Function"),
             link_function,
             show_equation,
