@@ -120,6 +120,7 @@ def imports():
     from psychoanalyze.data import trials as pa_trials
     from psychoanalyze.data.logistic import to_intercept, to_slope
     from psychoanalyze.data.trials import BOEDSampler, psi as psi_func
+    from psychoanalyze.features import is_adaptive_sampling_enabled
     return (
         BOEDSampler,
         HTMLRefreshWidget,
@@ -130,6 +131,7 @@ def imports():
         expit,
         hashlib,
         io,
+        is_adaptive_sampling_enabled,
         json,
         logit,
         mo,
@@ -266,12 +268,14 @@ def fit_settings_ui(mo):
 
 
 @app.cell
-def sampling_method_ui(mo):
+def sampling_method_ui(is_adaptive_sampling_enabled, mo):
+    # Build options dict, only including BOED if the feature flag is enabled
+    options = {"Method of Constant Stimuli": "constant_stimuli"}
+    if is_adaptive_sampling_enabled():
+        options["Bayesian Optimal Design"] = "boed"
+    
     sampling_method_dropdown = mo.ui.dropdown(
-        options={
-            "Method of Constant Stimuli": "constant_stimuli",
-            "Bayesian Optimal Design": "boed",
-        },
+        options=options,
         value="Method of Constant Stimuli",
         label="Sampling Method",
     )
