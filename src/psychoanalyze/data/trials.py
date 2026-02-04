@@ -815,7 +815,7 @@ def summarize_fit(idata: az.InferenceData) -> dict[str, float]:
             "Threshold": float(hier_summary["threshold"][0]),
             "Slope": float(hier_summary["slope"][0]),
         }
-    # Should not happen with current implementation, but handle gracefully
+    # Should not happen with current implementation, but handle gracefully  # noqa: RET503
     return {
         "Threshold": float(hier_summary["threshold"]),
         "Slope": float(hier_summary["slope"]),
