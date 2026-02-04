@@ -11,6 +11,17 @@ app = marimo.App(width="full", app_title="PsychoAnalyze")
 
 
 @app.cell
+def header(mo):
+    # Header
+    mo.md(r"""
+    # PsychoAnalyze
+    *Interactive data simulation & analysis for psychophysics.*
+
+    [Notebooks](https://nb.psychoanalyze.io) · [GitHub](https://github.com/psychoanalyze/psychoanalyze) · [Docs](https://docs.psychoanalyze.io)
+    """)
+
+
+@app.cell
 def main_layout(
     blocks_chart,
     data_downloads,
@@ -21,6 +32,8 @@ def main_layout(
     step_chart,
     step_info,
     step_mode_toggle,
+    strength_duration_plots,
+    weber_plots,
 ):
     # 3-column layout: Input | Visualization | Output
     left_column = mo.vstack(
@@ -42,6 +55,30 @@ def main_layout(
             ],
             gap=1,
         )
+    elif selected_mode == "Strength-Duration":
+        center_column = mo.vstack(
+            [
+                mo.md("## Strength-Duration Curves"),
+                mo.md(
+                    "These plots show the relationship between stimulus amplitude "
+                    "and pulse width at detection threshold.",
+                ),
+                strength_duration_plots,
+            ],
+            gap=1,
+        )
+    elif selected_mode == "Weber's Law":
+        center_column = mo.vstack(
+            [
+                mo.md("## Weber's Law Analysis"),
+                mo.md(
+                    "These plots demonstrate Weber's Law: "
+                    "the difference threshold is proportional to the reference intensity.",
+                ),
+                weber_plots,
+            ],
+            gap=1,
+        )
     elif selected_mode == "Online":
         center_column = mo.vstack(
             [
@@ -56,27 +93,26 @@ def main_layout(
             ],
             gap=1,
         )
-    else:  # Simulation (default)
-        # Show step-by-step view or regular view based on toggle
-        if step_mode_toggle.value and step_chart is not None:
-            center_column = mo.vstack(
-                [
-                    mo.md("## Step-by-Step Simulation"),
-                    step_info,
-                    step_chart,
-                    plot_equation,
-                ],
-                gap=1,
-            )
-        else:
-            center_column = mo.vstack(
-                [
-                    mo.md("## Simulation Results"),
-                    plot_equation,
-                    plot_ui,
-                ],
-                gap=1,
-            )
+    # Show step-by-step view or regular view based on toggle
+    elif step_mode_toggle.value and step_chart is not None:
+        center_column = mo.vstack(
+            [
+                mo.md("## Step-by-Step Simulation"),
+                step_info,
+                step_chart,
+                plot_equation,
+            ],
+            gap=1,
+        )
+    else:
+        center_column = mo.vstack(
+            [
+                mo.md("## Simulation Results"),
+                plot_equation,
+                plot_ui,
+            ],
+            gap=1,
+        )
 
     right_column = mo.vstack(
         [
@@ -93,8 +129,6 @@ def main_layout(
         widths=[1, 2, 1],
         gap=2,
     )
-
-    return
 
 
 @app.cell
@@ -114,8 +148,7 @@ def imports():
     from psychoanalyze.data import points as pa_points
     from psychoanalyze.data import subject as subject_utils
     from psychoanalyze.data import trials as pa_trials
-    from psychoanalyze.data.logistic import to_intercept, to_slope
-    from psychoanalyze.data.trials import BOEDSampler, psi as psi_func
+    from psychoanalyze.data.trials import BOEDSampler
 
     return (
         BOEDSampler,
@@ -159,25 +192,11 @@ def data_helpers(pa_io, pa_points, pa_trials, pl, subject_utils):
     generate_trials = pa_trials.generate_multi_subject
     process_upload_bytes = pa_io.read_from_bytes
 
-
     def from_trials(trials_df: pl.DataFrame) -> pl.DataFrame:
         trials_df = subject_utils.ensure_subject_column(trials_df)
         return pa_points.from_trials(trials_df)
 
     return from_trials, generate_index, generate_trials, process_upload_bytes
-
-
-@app.cell
-def header(mo):
-    # Header
-    mo.md(r"""
-    # PsychoAnalyze
-    *Interactive data simulation & analysis for psychophysics.*
-
-    [Notebooks](https://nb.psychoanalyze.io) · [GitHub](https://github.com/psychoanalyze/psychoanalyze) · [Docs](https://docs.psychoanalyze.io)
-    """)
-
-    return
 
 
 @app.cell
@@ -188,14 +207,12 @@ def file_upload_ui(mo):
         kind="area",
         label="Upload CSV/parquet with columns: **Block, Intensity, Result** (optional: **Subject**). Data stays on this machine.",
     )
-
     return (file_upload,)
 
 
 @app.cell
 def load_sample_button(mo):
     load_sample_button = mo.ui.run_button(label="Load Sample Data")
-
     return (load_sample_button,)
 
 
@@ -218,7 +235,6 @@ def preset_and_link_ui(mo):
         label="Link function",
     )
     show_equation = mo.ui.checkbox(label="Show F(x)", value=False)
-
     return link_function, preset_dropdown, show_equation
 
 
@@ -253,7 +269,6 @@ def fit_settings_ui(mo):
         ],
         gap=1,
     )
-
     return (
         fit_chains,
         fit_draws,
@@ -274,7 +289,6 @@ def sampling_method_ui(mo):
         value="Method of Constant Stimuli",
         label="Sampling Method",
     )
-
     return (sampling_method_dropdown,)
 
 
@@ -282,7 +296,6 @@ def sampling_method_ui(mo):
 def step_mode_toggle(mo):
     # Step-by-step visualization controls
     step_mode_toggle = mo.ui.checkbox(label="Step-by-step mode", value=False)
-
     return (step_mode_toggle,)
 
 
@@ -295,10 +308,7 @@ def step_block_selection(mo, n_blocks, n_subjects):
     # Generate subject options from n_subjects parameter
     # Match the format used by generate_multi_subject: A, B, C, ... Z, S26, S27, ...
     _n_subj = n_subjects.value if hasattr(n_subjects, "value") else 2
-    subjects = [
-        chr(ord("A") + i) if i < 26 else f"S{i}"
-        for i in range(_n_subj)
-    ]
+    subjects = [chr(ord("A") + i) if i < 26 else f"S{i}" for i in range(_n_subj)]
     subject_options = {s: s for s in subjects}
     step_subject_dropdown = mo.ui.dropdown(
         options=subject_options,
@@ -315,7 +325,6 @@ def step_block_selection(mo, n_blocks, n_subjects):
         value=f"Block {blocks[0]}" if blocks else None,
         label="Block",
     )
-
     return step_block_dropdown, step_subject_dropdown
 
 
@@ -334,7 +343,6 @@ def trial_step_controls(mo, n_trials):
     )
     # Auto-play button for animation
     auto_play_button = mo.ui.run_button(label="▶ Play", kind="neutral")
-
     return auto_play_button, trial_step_slider
 
 
@@ -365,7 +373,6 @@ def step_chart(
     For BOED mode: Runs the sampler sequentially and shows the evolving posterior.
     For constant stimuli: Shows trials accumulating with hit rates.
     """
-
     # Only compute if step mode is enabled and we're in simulation mode
     if not step_mode_toggle.value or "Trial" not in trials_df.columns:
         step_chart = None
@@ -379,7 +386,8 @@ def step_chart(
         selected_block = int(step_block_dropdown.value) if step_block_dropdown.value else 0
 
         block_trials = trials_df.filter(
-            (pl.col("Subject") == selected_subject) & (pl.col("Block") == selected_block)
+            (pl.col("Subject") == selected_subject)
+            & (pl.col("Block") == selected_block),
         ).sort("Trial")
 
         # Get all intensity options
@@ -425,11 +433,13 @@ def step_chart(
             _gt_intercept = -_gt_params["x_0"] * _gt_params["k"]
             _gt_slope = _gt_params["k"]
             _y_gt = expit(_gt_slope * _x_curve + _gt_intercept)
-            _gt_df = pl.DataFrame({
-                "Intensity": _x_curve,
-                "Hit Rate": _y_gt,
-                "Type": ["Ground Truth"] * len(_x_curve),
-            }).to_pandas()
+            _gt_df = pl.DataFrame(
+                {
+                    "Intensity": _x_curve,
+                    "Hit Rate": _y_gt,
+                    "Type": ["Ground Truth"] * len(_x_curve),
+                },
+            ).to_pandas()
             _gt_line = (
                 alt.Chart(_gt_df)
                 .mark_line(strokeDash=[5, 5], color="gray", strokeWidth=2)
@@ -443,11 +453,13 @@ def step_chart(
         # BOED: Expected curve with credible band
         if _sampling_method == "boed" and current_step > 0:
             # Credible band
-            _band_df = pl.DataFrame({
-                "Intensity": x_fine,
-                "lower": lower_ci,
-                "upper": upper_ci,
-            }).to_pandas()
+            _band_df = pl.DataFrame(
+                {
+                    "Intensity": x_fine,
+                    "lower": lower_ci,
+                    "upper": upper_ci,
+                },
+            ).to_pandas()
             _band = (
                 alt.Chart(_band_df)
                 .mark_area(opacity=0.3, color="steelblue")
@@ -460,10 +472,12 @@ def step_chart(
             _chart_layers.append(_band)
 
             # Expected curve
-            _expected_df = pl.DataFrame({
-                "Intensity": x_fine,
-                "Hit Rate": mean_curve,
-            }).to_pandas()
+            _expected_df = pl.DataFrame(
+                {
+                    "Intensity": x_fine,
+                    "Hit Rate": mean_curve,
+                },
+            ).to_pandas()
             _expected_line = (
                 alt.Chart(_expected_df)
                 .mark_line(color="steelblue", strokeWidth=2)
@@ -478,10 +492,12 @@ def step_chart(
         if len(trials_up_to_step) > 0:
             points_cumulative = (
                 trials_up_to_step.group_by("Intensity")
-                .agg([
-                    pl.mean("Result").alias("Hit Rate"),
-                    pl.len().alias("n_trials"),
-                ])
+                .agg(
+                    [
+                        pl.mean("Result").alias("Hit Rate"),
+                        pl.len().alias("n_trials"),
+                    ],
+                )
                 .sort("Intensity")
             )
             _points_pd = points_cumulative.to_pandas()
@@ -491,7 +507,11 @@ def step_chart(
                 .encode(
                     x=alt.X("Intensity:Q"),
                     y=alt.Y("Hit Rate:Q"),
-                    size=alt.Size("n_trials:Q", scale=alt.Scale(range=[50, 300]), title="Trials"),
+                    size=alt.Size(
+                        "n_trials:Q",
+                        scale=alt.Scale(range=[50, 300]),
+                        title="Trials",
+                    ),
                     tooltip=["Intensity:Q", "Hit Rate:Q", "n_trials:Q"],
                 )
             )
@@ -501,11 +521,15 @@ def step_chart(
         if len(current_trial) > 0:
             _current_intensity = float(current_trial["Intensity"][0])
             _current_result = int(current_trial["Result"][0])
-            _current_pd = pl.DataFrame({
-                "Intensity": [_current_intensity],
-                "Result": [_current_result],
-                "label": [f"Trial {current_step}: {'Hit' if _current_result else 'Miss'}"],
-            }).to_pandas()
+            _current_pd = pl.DataFrame(
+                {
+                    "Intensity": [_current_intensity],
+                    "Result": [_current_result],
+                    "label": [
+                        f"Trial {current_step}: {'Hit' if _current_result else 'Miss'}",
+                    ],
+                },
+            ).to_pandas()
 
             # Vertical line at current intensity
             _vline = (
@@ -530,17 +554,22 @@ def step_chart(
         # === POSTERIOR DISTRIBUTION (BOED mode) ===
         if _sampling_method == "boed":
             # Threshold posterior
-            _threshold_df = pl.DataFrame({
-                "Threshold": threshold_grid,
-                "Probability": threshold_marginal,
-            }).to_pandas()
+            _threshold_df = pl.DataFrame(
+                {
+                    "Threshold": threshold_grid,
+                    "Probability": threshold_marginal,
+                },
+            ).to_pandas()
 
             _threshold_chart = (
                 alt.Chart(_threshold_df)
                 .mark_area(opacity=0.6, color="steelblue")
                 .encode(
-                    x=alt.X("Threshold:Q", title="Threshold (x₀)",
-                           scale=alt.Scale(domain=[min_x, max_x])),
+                    x=alt.X(
+                        "Threshold:Q",
+                        title="Threshold (x₀)",
+                        scale=alt.Scale(domain=[min_x, max_x]),
+                    ),
                     y=alt.Y("Probability:Q", title="Posterior Density"),
                 )
                 .properties(width=250, height=100, title="Threshold Posterior")
@@ -548,9 +577,11 @@ def step_chart(
 
             # Add ground truth line to threshold posterior if available
             if _gt_params is not None:
-                _gt_thresh_df = pl.DataFrame({
-                    "x0": [_gt_params["x_0"]],
-                }).to_pandas()
+                _gt_thresh_df = pl.DataFrame(
+                    {
+                        "x0": [_gt_params["x_0"]],
+                    },
+                ).to_pandas()
                 _gt_thresh_line = (
                     alt.Chart(_gt_thresh_df)
                     .mark_rule(color="red", strokeDash=[4, 4], strokeWidth=2)
@@ -559,10 +590,12 @@ def step_chart(
                 _threshold_chart = _threshold_chart + _gt_thresh_line
 
             # Slope posterior
-            _slope_df = pl.DataFrame({
-                "Slope": slope_grid,
-                "Probability": slope_marginal,
-            }).to_pandas()
+            _slope_df = pl.DataFrame(
+                {
+                    "Slope": slope_grid,
+                    "Probability": slope_marginal,
+                },
+            ).to_pandas()
 
             _slope_chart = (
                 alt.Chart(_slope_df)
@@ -576,9 +609,11 @@ def step_chart(
 
             # Add ground truth line to slope posterior if available
             if _gt_params is not None:
-                _gt_slope_df = pl.DataFrame({
-                    "k": [_gt_params["k"]],
-                }).to_pandas()
+                _gt_slope_df = pl.DataFrame(
+                    {
+                        "k": [_gt_params["k"]],
+                    },
+                ).to_pandas()
                 _gt_slope_line = (
                     alt.Chart(_gt_slope_df)
                     .mark_rule(color="red", strokeDash=[4, 4], strokeWidth=2)
@@ -597,16 +632,18 @@ def step_chart(
                 .sort("Intensity")
             )
         else:
-            sampling_dist = pl.DataFrame({
-                "Intensity": all_options,
-                "Count": [0] * len(all_options),
-            })
+            sampling_dist = pl.DataFrame(
+                {
+                    "Intensity": all_options,
+                    "Count": [0] * len(all_options),
+                },
+            )
 
         _sampling_pd = sampling_dist.to_pandas()
         if len(current_trial) > 0:
             _current_intensity = float(current_trial["Intensity"][0])
             _sampling_pd["is_current"] = _sampling_pd["Intensity"].apply(
-                lambda x: abs(x - _current_intensity) < 0.01
+                lambda x: abs(x - _current_intensity) < 0.01,
             )
         else:
             _sampling_pd["is_current"] = False
@@ -615,9 +652,17 @@ def step_chart(
             alt.Chart(_sampling_pd)
             .mark_bar()
             .encode(
-                x=alt.X("Intensity:Q", title="Intensity", scale=alt.Scale(domain=[min_x, max_x])),
+                x=alt.X(
+                    "Intensity:Q",
+                    title="Intensity",
+                    scale=alt.Scale(domain=[min_x, max_x]),
+                ),
                 y=alt.Y("Count:Q", title="Samples"),
-                color=alt.condition(alt.datum.is_current, alt.value("red"), alt.value("steelblue")),
+                color=alt.condition(
+                    alt.datum.is_current,
+                    alt.value("red"),
+                    alt.value("steelblue"),
+                ),
                 tooltip=["Intensity:Q", "Count:Q"],
             )
             .properties(width=500, height=80, title="Sampling Distribution")
@@ -663,18 +708,19 @@ def step_chart(
                     mo.md(
                         f"**Trial {current_step}**: Intensity = {_info_intensity:.2f} → {_info_result}\n\n"
                         f"**Posterior estimates**: x₀ = {thresh_mean:.2f} ± {thresh_std:.2f}, "
-                        f"k = {slope_mean:.2f} ± {slope_std:.2f}"
+                        f"k = {slope_mean:.2f} ± {slope_std:.2f}",
                     ),
                     kind="success" if "Hit" in _info_result else "warn",
                 )
             else:
                 step_info = mo.callout(
-                    mo.md(f"**Trial {current_step}**: Intensity = {_info_intensity:.2f} → {_info_result}"),
+                    mo.md(
+                        f"**Trial {current_step}**: Intensity = {_info_intensity:.2f} → {_info_result}",
+                    ),
                     kind="success" if "Hit" in _info_result else "warn",
                 )
         else:
             step_info = mo.md("")
-
     return step_chart, step_info
 
 
@@ -725,7 +771,6 @@ def simulation_params_ui(mo, preset_dropdown):
         )
         .form(submit_button_label="Generate")
     )
-
     return input_form, n_blocks, n_levels, n_subjects, n_trials
 
 
@@ -745,7 +790,6 @@ def fit_params(
         "target_accept": float(fit_target_accept.value),
         "random_seed": None if random_seed <= 0 else random_seed,
     }
-
     return (fit_params,)
 
 
@@ -755,7 +799,6 @@ def stimulus_range(logit):
     # Using reasonable defaults: x_0=0, k=1 as baseline
     min_x = logit(0.01)
     max_x = logit(0.99)
-
     return max_x, min_x
 
 
@@ -763,8 +806,6 @@ def stimulus_range(logit):
 def stimulus_info(max_x, min_x, mo):
     # Stimulus range info for display in left column
     stimulus_info = mo.md(f"**Stimulus range:** {min_x:.2f} to {max_x:.2f}")
-
-    return
 
 
 @app.cell
@@ -782,7 +823,6 @@ def plot_equation_cell(mo, show_equation):
     plot_equation = mo.md(
         equation_expanded if show_equation.value else equation_abstracted,
     )
-
     return (plot_equation,)
 
 
@@ -790,7 +830,6 @@ def plot_equation_cell(mo, show_equation):
 def load_sample_trials_ref(pa_trials):
     # Use refactored sample data loader from trials module
     load_sample_trials = pa_trials.load_sample
-
     return (load_sample_trials,)
 
 
@@ -856,7 +895,6 @@ def trials_data(
         trials_df = trials_df.with_columns(pl.col("Trial").cast(pl.Int64))
     if "Block" in trials_df.columns:
         trials_df = trials_df.with_columns(pl.col("Block").cast(pl.Int64))
-
     return ground_truth_params, trials_df
 
 
@@ -866,14 +904,12 @@ def fit_button(mo):
         label="Fit Model",
         kind="success",
     )
-
     return (fit_button,)
 
 
 @app.cell
 def should_fit(fit_button, input_tabs):
     should_fit = fit_button.value or input_tabs.value == "Simulation"
-
     return (should_fit,)
 
 
@@ -969,7 +1005,7 @@ def hierarchical_fit_and_blocks(
                         "lambda (actual)": _gt_params["lambda"],
                         "intercept (actual)": _gt_intercept,
                         "slope (actual)": _gt_slope,
-                    }
+                    },
                 )
 
             blocks_list.append(_block_dict)
@@ -978,7 +1014,6 @@ def hierarchical_fit_and_blocks(
         fit_idata = None
         block_idx_by_subject_block = {}
         blocks_df = pl.DataFrame()
-
     return block_idx_by_subject_block, blocks_df, fit_idata, points_df
 
 
@@ -1004,7 +1039,6 @@ def selection_to_pl_helper(pl):
             except Exception:
                 return None
         return None
-
     return (selection_to_pl,)
 
 
@@ -1096,7 +1130,6 @@ def block_rows_for_plot(
                         "is_ground_truth": True,
                     },
                 )
-
     return (block_rows,)
 
 
@@ -1117,14 +1150,12 @@ def points_filtered(blocks_chart, pl, points_df, selection_to_pl):
             )
     else:
         points_filtered_df = points_df
-
     return (points_filtered_df,)
 
 
 @app.cell
 def link_fn(expit, link_function):
     link_fn = expit if link_function.value == "expit" else expit
-
     return (link_fn,)
 
 
@@ -1249,7 +1280,6 @@ def blocks_chart_cell(
             blocks_chart = mo.md("No block data to display.")
     else:
         blocks_chart = mo.md("No block fits available yet.")
-
     return (blocks_chart,)
 
 
@@ -1330,7 +1360,9 @@ def main_psychometric_plot(
                     "Hit Rate": y,
                     "Series": [blk["Block"]] * len(x),
                     "Type": [
-                        "Ground Truth" if blk.get("is_ground_truth", False) else "Fitted"
+                        "Ground Truth"
+                        if blk.get("is_ground_truth", False)
+                        else "Fitted",
                     ]
                     * len(x),
                 },
@@ -1378,7 +1410,6 @@ def main_psychometric_plot(
     plot_ui = HTMLRefreshWidget(
         html=_psychometric_chart(bands_pd, fitted_pd, ground_truth_pd, points_pd),
     )
-
     return (plot_ui,)
 
 
@@ -1394,7 +1425,6 @@ def format_dropdown(mo):
         value="CSV (zip)",
         label="Format",
     )
-
     return (format_dropdown,)
 
 
@@ -1424,7 +1454,8 @@ def data_downloads_cell(
     }
     _selected_key = format_dropdown.value or "csv_zip"
     _selected_bytes, _selected_filename = format_to_content.get(
-        _selected_key, format_to_content["csv_zip"]
+        _selected_key,
+        format_to_content["csv_zip"],
     )
     download_button = mo.download(
         _selected_bytes,
@@ -1435,8 +1466,33 @@ def data_downloads_cell(
         [format_dropdown, download_button],
         gap=1,
     )
-
     return (data_downloads,)
+
+
+@app.cell
+def strength_duration_vis(mo):
+    # Strength-duration visualization placeholder
+    strength_duration_plots = mo.callout(
+        mo.md(
+            "**Strength-Duration Analysis** features analysis of stimulus amplitude and pulse width relationships. "
+            "[Learn more](../dashboard/strength_duration.md) about strength-duration curves and their interpretation.",
+        ),
+        kind="info",
+    )
+    return (strength_duration_plots,)
+
+
+@app.cell
+def weber_vis(mo):
+    # Weber's Law visualization placeholder
+    weber_plots = mo.callout(
+        mo.md(
+            "**Weber's Law Analysis** investigates how discriminability relates to stimulus intensity. "
+            "[Learn more](../dashboard/weber.md) about Weber's Law and logarithmic sensory encoding.",
+        ),
+        kind="info",
+    )
+    return (weber_plots,)
 
 
 @app.cell
@@ -1524,14 +1580,43 @@ def input_tabs(
         gap=1,
     )
 
+    strength_duration_content = mo.md(
+        """
+        ### Strength-Duration Analysis
+
+        Analyze the relationship between stimulus amplitude and pulse width at detection threshold.
+
+        - **Strength-Duration curves** show how minimum detectable amplitude varies with stimulus duration
+        - **Temporal integration**: Longer stimuli require less amplitude to reach threshold
+        - **Applications**: Electrical stimulation, psychophysical studies, sensory substitution
+
+        [Read more about strength-duration analysis →](../dashboard/strength_duration.md)
+        """,
+    )
+
+    weber_content = mo.md(
+        """
+        ### Weber's Law Analysis
+
+        Investigate how sensory discriminability relates to baseline stimulus intensity.
+
+        - **Weber's Law**: Difference threshold is proportional to reference intensity
+        - **Logarithmic encoding**: The nervous system uses proportional coding
+        - **Weber fraction**: Measure of discriminability for different sensory modalities
+
+        [Read more about Weber's Law →](../dashboard/weber.md)
+        """,
+    )
+
     input_tabs = mo.ui.tabs(
         {
             "Simulation": simulation_content,
             "Batch": batch_content,
+            "Strength-Duration": strength_duration_content,
+            "Weber's Law": weber_content,
             "Online": online_content,
         },
     )
-
     return (input_tabs,)
 
 

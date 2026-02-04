@@ -73,6 +73,8 @@ nav:
       - Input Panel: 'dashboard/input.md'
       - Visualization Panel: 'dashboard/viz.md'
       - Output Panel: 'dashboard/output.md'
+      - Strength-Duration Analysis: 'dashboard/strength_duration.md'
+      - Weber's Law Analysis: 'dashboard/weber.md'
     - Notebooks: 'notebooks.md'
     - Contributing: 'contributing.md'
     - Developers:
