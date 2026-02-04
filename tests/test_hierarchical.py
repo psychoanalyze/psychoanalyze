@@ -25,21 +25,20 @@ def test_fit_with_multiple_blocks() -> None:
     )
 
     # Check that group-level parameters exist
-    assert "mu_intercept" in idata.posterior
-    assert "sigma_intercept" in idata.posterior
-    assert "mu_slope" in idata.posterior
-    assert "sigma_slope" in idata.posterior
-    assert "mu_gamma" in idata.posterior
-    assert "kappa_gamma" in idata.posterior
-    assert "mu_lambda" in idata.posterior
-    assert "kappa_lambda" in idata.posterior
+    group_params = {
+        "mu_intercept",
+        "sigma_intercept",
+        "mu_slope",
+        "sigma_slope",
+        "mu_gamma",
+        "kappa_gamma",
+        "mu_lambda",
+        "kappa_lambda",
+    }
+    assert hasattr(idata, "posterior")
+    assert group_params <= idata.posterior
 
-    # Check that block-level parameters exist with correct shape
-    assert "intercept" in idata.posterior
-    assert "slope" in idata.posterior
-    assert "gamma" in idata.posterior
-    assert "lam" in idata.posterior
-    assert "threshold" in idata.posterior
+    assert {"intercept", "slope", "gamma", "lam", "threshold"} <= idata.posterior
     assert idata.posterior["intercept"].shape[-1] == 2  # 2 blocks
     assert idata.posterior["gamma"].shape[-1] == 2  # 2 blocks
     assert idata.posterior["lam"].shape[-1] == 2  # 2 blocks
@@ -76,14 +75,16 @@ def test_summarize_fit() -> None:
     summary = hierarchical.summarize_fit(idata)
 
     # Check group-level parameters
-    assert "mu_intercept" in summary
-    assert "sigma_intercept" in summary
-    assert "mu_slope" in summary
-    assert "sigma_slope" in summary
-    assert "mu_gamma" in summary
-    assert "kappa_gamma" in summary
-    assert "mu_lambda" in summary
-    assert "kappa_lambda" in summary
+    assert {
+        "mu_intercept",
+        "sigma_intercept",
+        "mu_slope",
+        "sigma_slope",
+        "mu_gamma",
+        "kappa_gamma",
+        "mu_lambda",
+        "kappa_lambda",
+    } <= summary.keys()
 
     # Check block-level arrays
     assert "intercept" in summary
