@@ -93,16 +93,12 @@ def main_layout(
         widths=[1, 2, 1],
         gap=2,
     )
+
     return
 
 
 @app.cell
 def imports():
-    import hashlib
-    import io
-    import json
-    from pathlib import Path
-
     import altair as alt
     import arviz as az
     import marimo as mo
@@ -120,17 +116,14 @@ def imports():
     from psychoanalyze.data import trials as pa_trials
     from psychoanalyze.data.logistic import to_intercept, to_slope
     from psychoanalyze.data.trials import BOEDSampler, psi as psi_func
+
     return (
         BOEDSampler,
         HTMLRefreshWidget,
-        Path,
         alt,
         altair2svg,
         az,
         expit,
-        hashlib,
-        io,
-        json,
         logit,
         mo,
         np,
@@ -140,7 +133,6 @@ def imports():
         pa_points,
         pa_trials,
         pl,
-        psi_func,
         refresh_altair,
         subject_utils,
     )
@@ -156,6 +148,7 @@ def cached_fit_cell(az, mo, np, pa_hierarchical, pl):
         idata = pa_hierarchical.fit(trials_df, **fit_params)
         summary = pa_hierarchical.summarize_fit(idata)
         return summary, idata
+
     return (cached_hierarchical_fit,)
 
 
@@ -170,6 +163,7 @@ def data_helpers(pa_io, pa_points, pa_trials, pl, subject_utils):
     def from_trials(trials_df: pl.DataFrame) -> pl.DataFrame:
         trials_df = subject_utils.ensure_subject_column(trials_df)
         return pa_points.from_trials(trials_df)
+
     return from_trials, generate_index, generate_trials, process_upload_bytes
 
 
@@ -182,6 +176,7 @@ def header(mo):
 
     [Notebooks](https://nb.psychoanalyze.io) · [GitHub](https://github.com/psychoanalyze/psychoanalyze) · [Docs](https://docs.psychoanalyze.io)
     """)
+
     return
 
 
@@ -193,12 +188,14 @@ def file_upload_ui(mo):
         kind="area",
         label="Upload CSV/parquet with columns: **Block, Intensity, Result** (optional: **Subject**). Data stays on this machine.",
     )
+
     return (file_upload,)
 
 
 @app.cell
 def load_sample_button(mo):
     load_sample_button = mo.ui.run_button(label="Load Sample Data")
+
     return (load_sample_button,)
 
 
@@ -221,6 +218,7 @@ def preset_and_link_ui(mo):
         label="Link function",
     )
     show_equation = mo.ui.checkbox(label="Show F(x)", value=False)
+
     return link_function, preset_dropdown, show_equation
 
 
@@ -255,6 +253,7 @@ def fit_settings_ui(mo):
         ],
         gap=1,
     )
+
     return (
         fit_chains,
         fit_draws,
@@ -275,6 +274,7 @@ def sampling_method_ui(mo):
         value="Method of Constant Stimuli",
         label="Sampling Method",
     )
+
     return (sampling_method_dropdown,)
 
 
@@ -282,13 +282,14 @@ def sampling_method_ui(mo):
 def step_mode_toggle(mo):
     # Step-by-step visualization controls
     step_mode_toggle = mo.ui.checkbox(label="Step-by-step mode", value=False)
+
     return (step_mode_toggle,)
 
 
 @app.cell
 def step_block_selection(mo, n_blocks, n_subjects):
     """Subject and block selection for step-by-step view (fixed to one subject+block).
-    
+
     Uses simulation parameters to generate subject/block options to avoid circular deps.
     """
     # Generate subject options from n_subjects parameter
@@ -333,6 +334,7 @@ def trial_step_controls(mo, n_trials):
     )
     # Auto-play button for animation
     auto_play_button = mo.ui.run_button(label="▶ Play", kind="neutral")
+
     return auto_play_button, trial_step_slider
 
 
@@ -351,7 +353,6 @@ def step_chart(
     n_levels,
     np,
     pl,
-    psi_func,
     sampling_method_dropdown,
     step_block_dropdown,
     step_mode_toggle,
@@ -360,7 +361,7 @@ def step_chart(
     trials_df,
 ):
     """Create step-by-step BOED visualization showing posterior updates after each trial.
-    
+
     For BOED mode: Runs the sampler sequentially and shows the evolving posterior.
     For constant stimuli: Shows trials accumulating with hit rates.
     """
@@ -376,7 +377,7 @@ def step_chart(
         # Use selected subject and block from dropdowns
         selected_subject = step_subject_dropdown.value
         selected_block = int(step_block_dropdown.value) if step_block_dropdown.value else 0
-        
+
         block_trials = trials_df.filter(
             (pl.col("Subject") == selected_subject) & (pl.col("Block") == selected_block)
         ).sort("Trial")
@@ -396,7 +397,7 @@ def step_chart(
         if _sampling_method == "boed":
             # Initialize BOED sampler
             boed = BOEDSampler(options=options_arr, n_threshold_bins=40, n_slope_bins=15)
-            
+
             # Replay trials up to current step to build posterior
             for _row in trials_up_to_step.iter_rows(named=True):
                 intensity = float(_row["Intensity"])
@@ -404,12 +405,12 @@ def step_chart(
                 # Find closest option index
                 stim_idx = int(np.argmin(np.abs(options_arr - intensity)))
                 boed.update(stim_idx, result)
-            
+
             # Get posterior estimates
             estimates = boed.get_estimates()
             threshold_grid, threshold_marginal = boed.get_marginal_threshold()
             slope_grid, slope_marginal = boed.get_marginal_slope()
-            
+
             # Get expected curve with credible band
             x_fine, mean_curve, lower_ci, upper_ci = boed.get_expected_curve()
 
@@ -457,7 +458,7 @@ def step_chart(
                 )
             )
             _chart_layers.append(_band)
-            
+
             # Expected curve
             _expected_df = pl.DataFrame({
                 "Intensity": x_fine,
@@ -533,18 +534,18 @@ def step_chart(
                 "Threshold": threshold_grid,
                 "Probability": threshold_marginal,
             }).to_pandas()
-            
+
             _threshold_chart = (
                 alt.Chart(_threshold_df)
                 .mark_area(opacity=0.6, color="steelblue")
                 .encode(
-                    x=alt.X("Threshold:Q", title="Threshold (x₀)", 
+                    x=alt.X("Threshold:Q", title="Threshold (x₀)",
                            scale=alt.Scale(domain=[min_x, max_x])),
                     y=alt.Y("Probability:Q", title="Posterior Density"),
                 )
                 .properties(width=250, height=100, title="Threshold Posterior")
             )
-            
+
             # Add ground truth line to threshold posterior if available
             if _gt_params is not None:
                 _gt_thresh_df = pl.DataFrame({
@@ -556,13 +557,13 @@ def step_chart(
                     .encode(x="x0:Q")
                 )
                 _threshold_chart = _threshold_chart + _gt_thresh_line
-            
+
             # Slope posterior
             _slope_df = pl.DataFrame({
                 "Slope": slope_grid,
                 "Probability": slope_marginal,
             }).to_pandas()
-            
+
             _slope_chart = (
                 alt.Chart(_slope_df)
                 .mark_area(opacity=0.6, color="green")
@@ -572,7 +573,7 @@ def step_chart(
                 )
                 .properties(width=250, height=100, title="Slope Posterior")
             )
-            
+
             # Add ground truth line to slope posterior if available
             if _gt_params is not None:
                 _gt_slope_df = pl.DataFrame({
@@ -624,14 +625,14 @@ def step_chart(
 
         # === ASSEMBLE FINAL VISUALIZATION ===
         _max_trials = len(block_trials)
-        
+
         if _chart_layers:
             _main_chart = alt.layer(*_chart_layers).properties(
                 width=500,
                 height=250,
                 title=f"Trial {current_step} of {_max_trials}",
             )
-            
+
             if _sampling_method == "boed":
                 # BOED mode: Show main chart, posteriors, and histogram
                 _posterior_row = alt.hconcat(_threshold_chart, _slope_chart)
@@ -654,7 +655,7 @@ def step_chart(
         if len(current_trial) > 0:
             _info_intensity = float(current_trial["Intensity"][0])
             _info_result = "Hit ✓" if int(current_trial["Result"][0]) else "Miss ✗"
-            
+
             if _sampling_method == "boed":
                 thresh_mean, thresh_std = estimates["threshold"]
                 slope_mean, slope_std = estimates["slope"]
@@ -673,6 +674,7 @@ def step_chart(
                 )
         else:
             step_info = mo.md("")
+
     return step_chart, step_info
 
 
@@ -723,6 +725,7 @@ def simulation_params_ui(mo, preset_dropdown):
         )
         .form(submit_button_label="Generate")
     )
+
     return input_form, n_blocks, n_levels, n_subjects, n_trials
 
 
@@ -742,6 +745,7 @@ def fit_params(
         "target_accept": float(fit_target_accept.value),
         "random_seed": None if random_seed <= 0 else random_seed,
     }
+
     return (fit_params,)
 
 
@@ -751,6 +755,7 @@ def stimulus_range(logit):
     # Using reasonable defaults: x_0=0, k=1 as baseline
     min_x = logit(0.01)
     max_x = logit(0.99)
+
     return max_x, min_x
 
 
@@ -758,6 +763,7 @@ def stimulus_range(logit):
 def stimulus_info(max_x, min_x, mo):
     # Stimulus range info for display in left column
     stimulus_info = mo.md(f"**Stimulus range:** {min_x:.2f} to {max_x:.2f}")
+
     return
 
 
@@ -776,6 +782,7 @@ def plot_equation_cell(mo, show_equation):
     plot_equation = mo.md(
         equation_expanded if show_equation.value else equation_abstracted,
     )
+
     return (plot_equation,)
 
 
@@ -783,6 +790,7 @@ def plot_equation_cell(mo, show_equation):
 def load_sample_trials_ref(pa_trials):
     # Use refactored sample data loader from trials module
     load_sample_trials = pa_trials.load_sample
+
     return (load_sample_trials,)
 
 
@@ -848,6 +856,7 @@ def trials_data(
         trials_df = trials_df.with_columns(pl.col("Trial").cast(pl.Int64))
     if "Block" in trials_df.columns:
         trials_df = trials_df.with_columns(pl.col("Block").cast(pl.Int64))
+
     return ground_truth_params, trials_df
 
 
@@ -857,14 +866,14 @@ def fit_button(mo):
         label="Fit Model",
         kind="success",
     )
+
     return (fit_button,)
-
-
 
 
 @app.cell
 def should_fit(fit_button, input_tabs):
     should_fit = fit_button.value or input_tabs.value == "Simulation"
+
     return (should_fit,)
 
 
@@ -969,6 +978,7 @@ def hierarchical_fit_and_blocks(
         fit_idata = None
         block_idx_by_subject_block = {}
         blocks_df = pl.DataFrame()
+
     return block_idx_by_subject_block, blocks_df, fit_idata, points_df
 
 
@@ -994,6 +1004,7 @@ def selection_to_pl_helper(pl):
             except Exception:
                 return None
         return None
+
     return (selection_to_pl,)
 
 
@@ -1085,6 +1096,7 @@ def block_rows_for_plot(
                         "is_ground_truth": True,
                     },
                 )
+
     return (block_rows,)
 
 
@@ -1105,12 +1117,14 @@ def points_filtered(blocks_chart, pl, points_df, selection_to_pl):
             )
     else:
         points_filtered_df = points_df
+
     return (points_filtered_df,)
 
 
 @app.cell
 def link_fn(expit, link_function):
     link_fn = expit if link_function.value == "expit" else expit
+
     return (link_fn,)
 
 
@@ -1235,6 +1249,7 @@ def blocks_chart_cell(
             blocks_chart = mo.md("No block data to display.")
     else:
         blocks_chart = mo.md("No block fits available yet.")
+
     return (blocks_chart,)
 
 
@@ -1363,6 +1378,7 @@ def main_psychometric_plot(
     plot_ui = HTMLRefreshWidget(
         html=_psychometric_chart(bands_pd, fitted_pd, ground_truth_pd, points_pd),
     )
+
     return (plot_ui,)
 
 
@@ -1378,6 +1394,7 @@ def format_dropdown(mo):
         value="CSV (zip)",
         label="Format",
     )
+
     return (format_dropdown,)
 
 
@@ -1418,6 +1435,7 @@ def data_downloads_cell(
         [format_dropdown, download_button],
         gap=1,
     )
+
     return (data_downloads,)
 
 
@@ -1513,6 +1531,7 @@ def input_tabs(
             "Online": online_content,
         },
     )
+
     return (input_tabs,)
 
 
