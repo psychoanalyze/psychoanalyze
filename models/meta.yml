@@ -1,9 +1,0 @@
-version: 2
-
-sources:
-  - name: Cuff
-    identifier: Cuff_YN_MOC
-    tables:
-      - name: Trials
-        meta:
-          external_location: 'data/test/trials.csv'
