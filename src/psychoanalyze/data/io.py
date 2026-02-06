@@ -1,11 +1,5 @@
-"""I/O utilities for loading psychophysics data from various file formats.
-
-This module provides functions for reading trial data from different file formats
-including CSV, Parquet, and ZIP archives. These are particularly useful for
-loading data from file uploads or batch processing pipelines.
-"""
-
 import io
+import tempfile
 import zipfile
 from pathlib import Path
 
@@ -17,32 +11,7 @@ def read_from_bytes(
     filename: str,
     csv_entry: str = "trials.csv",
 ) -> pl.DataFrame:
-    """Read trial data from bytes based on filename extension.
 
-    Supports multiple file formats:
-    - CSV (.csv): Plain CSV files
-    - Parquet (.parquet, .pq): Apache Parquet files
-    - ZIP (.zip): ZIP archives containing a CSV file
-
-    Args:
-        contents: Raw bytes of the file
-        filename: Original filename (used for format detection)
-        csv_entry: Name of CSV file to extract from ZIP archives
-
-    Returns:
-        DataFrame with trial data
-
-    Raises:
-        FileNotFoundError: If ZIP archive doesn't contain the expected CSV file
-        ValueError: If file format cannot be determined
-
-    Example:
-        >>> with open("trials.csv", "rb") as f:
-        ...     contents = f.read()
-        >>> df = read_from_bytes(contents, "trials.csv")
-        >>> df.columns
-        ['Block', 'Intensity', 'Result']
-    """
     filename_lower = filename.lower()
 
     if filename_lower.endswith(".zip") or "zip" in filename_lower:
@@ -57,28 +26,14 @@ def read_from_bytes(
 
 
 def _read_from_csv(contents: bytes) -> pl.DataFrame:
-    """Read trial data from CSV bytes."""
     return pl.read_csv(io.BytesIO(contents))
 
 
 def _read_from_parquet(contents: bytes) -> pl.DataFrame:
-    """Read trial data from Parquet bytes."""
     return pl.read_parquet(io.BytesIO(contents))
 
 
 def _read_from_zip(contents: bytes, csv_entry: str = "trials.csv") -> pl.DataFrame:
-    """Read trial data from a ZIP archive containing a CSV file.
-
-    Args:
-        contents: Raw bytes of the ZIP file
-        csv_entry: Name of the CSV file to extract from the archive
-
-    Returns:
-        DataFrame with trial data
-
-    Raises:
-        FileNotFoundError: If the CSV file is not found in the archive
-    """
     with zipfile.ZipFile(io.BytesIO(contents)) as z:
         if csv_entry not in z.namelist():
             # Try to find any CSV file
@@ -91,23 +46,109 @@ def _read_from_zip(contents: bytes, csv_entry: str = "trials.csv") -> pl.DataFra
 
 
 def read_file(path: str | Path) -> pl.DataFrame:
-    """Read trial data from a file path.
-
-    Supports the same formats as read_from_bytes():
-    - CSV (.csv)
-    - Parquet (.parquet, .pq)
-    - ZIP (.zip)
-
-    Args:
-        path: Path to the file
-
-    Returns:
-        DataFrame with trial data
-
-    Example:
-        >>> df = read_file("data/trials.csv")
-        >>> df = read_file("data/experiment.parquet")
-    """
     path = Path(path)
     contents = path.read_bytes()
     return read_from_bytes(contents, path.name)
+
+
+def to_csv_zip(
+    trials: pl.DataFrame,
+    points: pl.DataFrame | None = None,
+    blocks: pl.DataFrame | None = None,
+) -> bytes:
+
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(
+        zip_buffer,
+        mode="a",
+        compression=zipfile.ZIP_DEFLATED,
+        allowZip64=False,
+    ) as zip_file:
+        # Always include trials
+        csv_buffer = io.StringIO()
+        trials.write_csv(csv_buffer)
+        zip_file.writestr("trials.csv", csv_buffer.getvalue())
+
+        # Include points if provided
+        if points is not None:
+            csv_buffer = io.StringIO()
+            points.write_csv(csv_buffer)
+            zip_file.writestr("points.csv", csv_buffer.getvalue())
+
+        # Include blocks if provided
+        if blocks is not None:
+            csv_buffer = io.StringIO()
+            blocks.write_csv(csv_buffer)
+            zip_file.writestr("blocks.csv", csv_buffer.getvalue())
+
+    zip_buffer.seek(0)
+    return zip_buffer.read()
+
+
+def to_json(df: pl.DataFrame) -> bytes:
+
+    return df.to_pandas().to_json().encode("utf-8")
+
+
+def to_parquet(df: pl.DataFrame) -> bytes:
+
+    buffer = io.BytesIO()
+    df.write_parquet(buffer)
+    buffer.seek(0)
+    return buffer.read()
+
+
+def to_duckdb(
+    trials: pl.DataFrame,
+    points: pl.DataFrame | None = None,
+    blocks: pl.DataFrame | None = None,
+    db_name: str = "psychoanalyze",
+) -> bytes:
+
+    import duckdb
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        db_path = Path(temp_dir) / f"{db_name}.duckdb"
+        connection = duckdb.connect(str(db_path))
+
+        # Register and create trials table
+        connection.register("trials_df", trials.to_pandas())
+        connection.execute("CREATE TABLE trials AS SELECT * FROM trials_df")
+
+        # Register and create points table if provided
+        if points is not None:
+            connection.register("points_df", points.to_pandas())
+            connection.execute("CREATE TABLE points AS SELECT * FROM points_df")
+
+        # Register and create blocks table if provided
+        if blocks is not None:
+            connection.register("blocks_df", blocks.to_pandas())
+            connection.execute("CREATE TABLE blocks AS SELECT * FROM blocks_df")
+
+        connection.close()
+        return db_path.read_bytes()
+
+
+def write_csv_zip(
+    path: str | Path,
+    trials: pl.DataFrame,
+    points: pl.DataFrame | None = None,
+    blocks: pl.DataFrame | None = None,
+) -> None:
+
+    Path(path).write_bytes(to_csv_zip(trials, points, blocks))
+
+
+def write_parquet(path: str | Path, df: pl.DataFrame) -> None:
+
+    Path(path).write_bytes(to_parquet(df))
+
+
+def write_duckdb(
+    path: str | Path,
+    trials: pl.DataFrame,
+    points: pl.DataFrame | None = None,
+    blocks: pl.DataFrame | None = None,
+) -> None:
+
+    Path(path).write_bytes(to_duckdb(trials, points, blocks))

@@ -9,7 +9,6 @@ from pathlib import Path
 import polars as pl
 
 from psychoanalyze.data import blocks
-from psychoanalyze.data import subject as subject_utils
 
 dims = ["Subject", "Date"]
 index_levels = dims
@@ -28,14 +27,11 @@ def cache_results(sessions: pl.DataFrame) -> None:
 def from_trials_csv(path: Path) -> pl.DataFrame:
     """Aggregate to session level from trial-level data."""
     trials = pl.read_csv(path)
-    trials = subject_utils.ensure_subject_column(trials)
     return trials.select(["Subject", "Date"]).unique()
 
 
 def day_marks(subjects: pl.DataFrame, sessions: pl.DataFrame, monkey: str) -> dict:
     """Calculate days since surgery date for a given subject."""
-    subjects = subject_utils.ensure_subject_column(subjects)
-    sessions = subject_utils.ensure_subject_column(sessions)
     surgery_date_str = subjects.filter(pl.col("Subject") == monkey)["Surgery Date"][0]
     surgery_date = pl.Series([surgery_date_str]).str.to_datetime()[0]
     sessions = sessions.filter(pl.col("Subject") == monkey)
@@ -47,8 +43,6 @@ def day_marks(subjects: pl.DataFrame, sessions: pl.DataFrame, monkey: str) -> di
 
 def days(sessions: pl.DataFrame, subjects: pl.DataFrame) -> pl.Series:
     """Calculate days since surgery date."""
-    sessions = subject_utils.ensure_subject_column(sessions)
-    subjects = subject_utils.ensure_subject_column(subjects)
     sessions_subjects = sessions.join(subjects, on="Subject")
     return (
         sessions_subjects["Date"] - sessions_subjects["Surgery Date"]
@@ -57,7 +51,6 @@ def days(sessions: pl.DataFrame, subjects: pl.DataFrame) -> pl.Series:
 
 def n_trials(trials: pl.DataFrame) -> pl.DataFrame:
     """Count trials per session."""
-    trials = subject_utils.ensure_subject_column(trials)
     return trials.group_by(["Subject", "Date"]).agg(pl.len().alias("n_trials"))
 
 
@@ -74,7 +67,6 @@ def generate_trials(
     """Generate trial-level data for session-level context."""
     frames = []
     for day in range(n_days):
-        df = blocks.generate_trials(n_trials, model_params)
-        df = df.with_columns(pl.lit(day).alias("Block"))
+        df = blocks.generate_trials(n_trials, model_params).with_columns(pl.lit(day).alias("Block"))
         frames.append(df)
     return pl.concat(frames)

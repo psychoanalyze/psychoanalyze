@@ -11,29 +11,14 @@ app = marimo.App(width="full", app_title="PsychoAnalyze")
 
 
 @app.cell
-def header(mo):
-    # Header
-    mo.md(r"""
-    # PsychoAnalyze
-    *Interactive data simulation & analysis for psychophysics.*
-
-    [Notebooks](https://nb.psychoanalyze.io) · [GitHub](https://github.com/psychoanalyze/psychoanalyze) · [Docs](https://docs.psychoanalyze.io)
-    """)
-
-
-@app.cell
-def main_layout(
+def _(
     blocks_chart,
     data_downloads,
     input_tabs,
     mo,
     plot_equation,
     plot_ui,
-    step_chart,
-    step_info,
-    step_mode_toggle,
-    strength_duration_plots,
-    weber_plots,
+    trial_crop_slider,
 ):
     # 3-column layout: Input | Visualization | Output
     left_column = mo.vstack(
@@ -51,31 +36,8 @@ def main_layout(
             [
                 mo.md("## Batch Analysis"),
                 plot_equation,
+                trial_crop_slider,
                 plot_ui,
-            ],
-            gap=1,
-        )
-    elif selected_mode == "Strength-Duration":
-        center_column = mo.vstack(
-            [
-                mo.md("## Strength-Duration Curves"),
-                mo.md(
-                    "These plots show the relationship between stimulus amplitude "
-                    "and pulse width at detection threshold.",
-                ),
-                strength_duration_plots,
-            ],
-            gap=1,
-        )
-    elif selected_mode == "Weber's Law":
-        center_column = mo.vstack(
-            [
-                mo.md("## Weber's Law Analysis"),
-                mo.md(
-                    "These plots demonstrate Weber's Law: "
-                    "the difference threshold is proportional to the reference intensity.",
-                ),
-                weber_plots,
             ],
             gap=1,
         )
@@ -93,22 +55,12 @@ def main_layout(
             ],
             gap=1,
         )
-    # Show step-by-step view or regular view based on toggle
-    elif step_mode_toggle.value and step_chart is not None:
-        center_column = mo.vstack(
-            [
-                mo.md("## Step-by-Step Simulation"),
-                step_info,
-                step_chart,
-                plot_equation,
-            ],
-            gap=1,
-        )
-    else:
+    else:  # Simulation (default)
         center_column = mo.vstack(
             [
                 mo.md("## Simulation Results"),
                 plot_equation,
+                trial_crop_slider,
                 plot_ui,
             ],
             gap=1,
@@ -132,75 +84,213 @@ def main_layout(
 
 
 @app.cell
-def imports():
+def _():
+    import hashlib
+    import io
+    import json
+    import zipfile
+    from pathlib import Path
+
     import altair as alt
     import arviz as az
     import marimo as mo
     import numpy as np
     import polars as pl
     from scipy.special import expit, logit
-    from wigglystuff import HTMLRefreshWidget
-    from wigglystuff.utils import altair2svg, refresh_altair
 
-    from psychoanalyze.data import export as pa_export
     from psychoanalyze.data import hierarchical as pa_hierarchical
-    from psychoanalyze.data import io as pa_io
     from psychoanalyze.data import points as pa_points
     from psychoanalyze.data import subject as subject_utils
     from psychoanalyze.data import trials as pa_trials
-    from psychoanalyze.data.trials import BOEDSampler
-
+    from psychoanalyze.data.logistic import to_intercept, to_slope
     return (
-        BOEDSampler,
-        HTMLRefreshWidget,
+        Path,
         alt,
-        altair2svg,
         az,
         expit,
+        hashlib,
+        io,
+        json,
         logit,
         mo,
         np,
-        pa_export,
         pa_hierarchical,
-        pa_io,
         pa_points,
         pa_trials,
         pl,
-        refresh_altair,
         subject_utils,
+        to_intercept,
+        to_slope,
+        zipfile,
     )
 
 
 @app.cell
-def cached_fit_cell(az, mo, np, pa_hierarchical, pl):
-    @mo.persistent_cache
-    def cached_hierarchical_fit(
+def _(Path, az, cache_root, hashlib, io, json, mo, np, pa_hierarchical, pl):
+    def normalize_trials_for_hash(trials_df: pl.DataFrame) -> pl.DataFrame:
+        preferred_cols = [
+            col
+            for col in ["Subject", "Block", "Intensity", "Result"]
+            if col in trials_df.columns
+        ]
+        cols = preferred_cols if preferred_cols else trials_df.columns
+        return trials_df.select(cols).sort(cols)
+
+    def trials_cache_key(
         trials_df: pl.DataFrame,
         fit_params: dict[str, float | int | None],
+    ) -> str:
+        normalized = normalize_trials_for_hash(trials_df)
+        buffer = io.BytesIO()
+        normalized.write_csv(buffer)
+        digest = hashlib.sha256()
+        digest.update(buffer.getvalue())
+        digest.update(json.dumps(fit_params, sort_keys=True).encode())
+        return digest.hexdigest()
+
+    def idata_cache_path(cache_key: str) -> Path:
+        return cache_root / f"idata-{cache_key}.nc"
+
+    @mo.cache
+    def cached_hierarchical_fit(
+        trials_df: pl.DataFrame,
+        cache_key: str,
+        fit_params: dict[str, float | int | None],
     ) -> tuple[dict[str, float | np.ndarray], az.InferenceData]:
-        idata = pa_hierarchical.fit(trials_df, **fit_params)
+        cache_path = idata_cache_path(cache_key)
+        if cache_path.exists():
+            idata = az.from_netcdf(cache_path)
+        else:
+            idata = pa_hierarchical.fit(trials_df, **fit_params)
+            idata.to_netcdf(cache_path)
         summary = pa_hierarchical.summarize_fit(idata)
         return summary, idata
-
-    return (cached_hierarchical_fit,)
+    return cached_hierarchical_fit, trials_cache_key
 
 
 @app.cell
-def data_helpers(pa_io, pa_points, pa_trials, pl, subject_utils):
-    # Import functions from refactored modules
+def _(io, np, pa_points, pa_trials, pl, subject_utils, zipfile):
     generate_index = pa_points.generate_index
-    generate_trials = pa_trials.generate_multi_subject
-    process_upload_bytes = pa_io.read_from_bytes
+
+    def sample_params_from_priors(random_seed: int | None = None) -> dict[str, float]:
+        """Sample parameters from hierarchical model priors.
+
+        Returns a dict with keys: x_0, k, gamma, lambda
+        """
+        rng = np.random.default_rng(random_seed)
+
+        # Sample hyperparameters
+        mu_intercept = rng.normal(0.0, 2.5)
+        sigma_intercept = np.abs(rng.normal(0.0, 2.5))
+        mu_slope = rng.normal(0.0, 2.5)
+        sigma_slope = np.abs(rng.normal(0.0, 2.5))
+
+        # Sample block-level params from hyperpriors
+        intercept = rng.normal(mu_intercept, sigma_intercept)
+        slope = rng.normal(mu_slope, sigma_slope)
+
+        # Sample gamma and lambda from Beta(1, 19) - mode near 0.05
+        gamma = rng.beta(1.0, 19.0)
+        lambda_ = rng.beta(1.0, 19.0)
+
+        # Convert intercept/slope to x_0/k parameterization
+        # threshold x_0 = -intercept / slope
+        # k = slope (steepness)
+        k = slope
+        x_0 = -intercept / slope if slope != 0 else 0.0
+
+        return {
+            "x_0": x_0,
+            "k": k,
+            "gamma": gamma,
+            "lambda": lambda_,
+        }
+
+    def generate_trials(
+        n_trials: int,
+        options: list[float],
+        params: dict,
+        n_blocks: int,
+        n_subjects: int = 1,
+        use_random_params: bool = False,
+        random_seed: int | None = None,
+    ) -> tuple[pl.DataFrame, dict[tuple[str, int], dict]]:
+        """Generate trials and return both data and block-specific parameters.
+
+        Args:
+            use_random_params: If True, ignore params and generate from priors
+            random_seed: Random seed for parameter generation
+
+        Returns:
+            (trials_df, ground_truth_params_map)
+            where ground_truth_params_map keys are (subject_id, block_id) tuples
+        """
+        frames = []
+        ground_truth_params_map = {}
+        rng = np.random.default_rng(random_seed)
+
+        for subject_idx in range(n_subjects):
+            subject_id = (
+                chr(ord("A") + subject_idx) if subject_idx < 26 else f"S{subject_idx}"
+            )
+
+            for block_id in range(n_blocks):
+                # Generate parameters for this block
+                if use_random_params:
+                    block_seed = None if random_seed is None else (random_seed + subject_idx * 1000 + block_id)
+                    block_params = sample_params_from_priors(block_seed)
+                else:
+                    # Use provided params with random variation per block
+                    block_params = params.copy()
+                    block_params["x_0"] = params["x_0"] + rng.normal(0, 0.5)
+
+                ground_truth_params_map[(subject_id, block_id)] = block_params
+
+                # Generate trials for this block
+                block_trials = pa_trials.generate(
+                    n_trials=n_trials,
+                    options=options,
+                    params=block_params,
+                    n_blocks=1,
+                )
+                block_trials = block_trials.with_columns(
+                    pl.lit(subject_id).alias("Subject"),
+                    pl.lit(block_id).alias("Block"),
+                )
+                frames.append(block_trials)
+
+        return (
+            pl.concat(frames) if frames else pl.DataFrame(),
+            ground_truth_params_map,
+        )
 
     def from_trials(trials_df: pl.DataFrame) -> pl.DataFrame:
         trials_df = subject_utils.ensure_subject_column(trials_df)
         return pa_points.from_trials(trials_df)
 
+    def process_upload_bytes(contents: bytes, filename: str) -> pl.DataFrame:
+        if "zip" in filename:
+            with zipfile.ZipFile(io.BytesIO(contents)) as z:
+                return pl.read_csv(z.open("trials.csv"))
+        if "parquet" in filename or filename.endswith(".pq"):
+            return pl.read_parquet(io.BytesIO(contents))
+        return pl.read_csv(io.BytesIO(contents))
     return from_trials, generate_index, generate_trials, process_upload_bytes
 
 
 @app.cell
-def file_upload_ui(mo):
+def _(mo):
+    # Header
+    mo.md(r"""
+    # PsychoAnalyze
+    *Interactive data simulation & analysis for psychophysics.*
+
+    [Notebooks](https://nb.psychoanalyze.io) · [GitHub](https://github.com/psychoanalyze/psychoanalyze) · [Docs](https://docs.psychoanalyze.io)
+    """)
+
+
+@app.cell
+def _(mo):
     # File upload
     file_upload = mo.ui.file(
         filetypes=[".csv", ".zip", ".parquet", ".pq"],
@@ -211,27 +301,27 @@ def file_upload_ui(mo):
 
 
 @app.cell
-def load_sample_button(mo):
+def _(mo):
     load_sample_button = mo.ui.run_button(label="Load Sample Data")
     return (load_sample_button,)
 
 
 @app.cell
-def preset_and_link_ui(mo):
+def _(mo):
     preset_dropdown = mo.ui.dropdown(
         options={
-            "Standard": "standard",
-            "Non Standard": "non-standard",
+            "standard": "Standard",
+            "non-standard": "Non Standard",
             "2AFC": "2AFC",
         },
-        value="Standard",
+        value="standard",
         label="Preset",
     )
     link_function = mo.ui.dropdown(
         options={
-            "Logistic": "expit",
+            "expit": "Logistic",
         },
-        value="Logistic",
+        value="expit",
         label="Link function",
     )
     show_equation = mo.ui.checkbox(label="Show F(x)", value=False)
@@ -239,7 +329,7 @@ def preset_and_link_ui(mo):
 
 
 @app.cell
-def fit_settings_ui(mo):
+def _(mo):
     fit_draws = mo.ui.number(value=300, start=50, stop=5000, step=50, label="draws")
     fit_tune = mo.ui.number(value=300, start=50, stop=5000, step=50, label="tune")
     fit_chains = mo.ui.number(value=4, start=1, stop=4, step=1, label="chains")
@@ -280,438 +370,7 @@ def fit_settings_ui(mo):
 
 
 @app.cell
-def sampling_method_ui(mo):
-    sampling_method_dropdown = mo.ui.dropdown(
-        options={
-            "Method of Constant Stimuli": "constant_stimuli",
-            "Bayesian Optimal Design": "boed",
-        },
-        value="Method of Constant Stimuli",
-        label="Sampling Method",
-    )
-    return (sampling_method_dropdown,)
-
-
-@app.cell
-def step_block_selection(mo, n_blocks, n_subjects):
-    """Subject and block selection for step-by-step view (fixed to one subject+block).
-
-    Uses simulation parameters to generate subject/block options to avoid circular deps.
-    """
-    # Generate subject options from n_subjects parameter
-    # Match the format used by generate_multi_subject: A, B, C, ... Z, S26, S27, ...
-    _n_subj = n_subjects.value if hasattr(n_subjects, "value") else 2
-    subjects = [chr(ord("A") + i) if i < 26 else f"S{i}" for i in range(_n_subj)]
-    subject_options = {s: s for s in subjects}
-    step_subject_dropdown = mo.ui.dropdown(
-        options=subject_options,
-        value=subjects[0] if subjects else None,
-        label="Subject",
-    )
-
-    # Generate block options from n_blocks parameter
-    _n_blk = n_blocks.value if hasattr(n_blocks, "value") else 2
-    blocks = list(range(_n_blk))
-    block_options = {f"Block {b}": str(b) for b in blocks}
-    step_block_dropdown = mo.ui.dropdown(
-        options=block_options,
-        value=f"Block {blocks[0]}" if blocks else None,
-        label="Block",
-    )
-    return step_block_dropdown, step_subject_dropdown
-
-
-@app.cell
-def trial_step_controls(mo, n_trials):
-    # Trial step slider - only active when step mode is enabled
-    _max_trials = n_trials.value if hasattr(n_trials, "value") else 100
-
-    # Create slider for stepping through trials
-    trial_step_slider = mo.ui.slider(
-        value=1,
-        start=1,
-        stop=max(_max_trials, 1),
-        step=1,
-        label=f"Trial (of {_max_trials})",
-    )
-    # Auto-play button for animation
-    auto_play_button = mo.ui.run_button(label="▶ Play", kind="neutral")
-    return auto_play_button, trial_step_slider
-
-
-@app.cell
-def step_chart(
-    BOEDSampler,
-    HTMLRefreshWidget,
-    alt,
-    altair2svg,
-    expit,
-    generate_index,
-    ground_truth_params,
-    max_x,
-    min_x,
-    mo,
-    n_levels,
-    np,
-    pl,
-    sampling_method_dropdown,
-    step_block_dropdown,
-    step_subject_dropdown,
-    trial_step_slider,
-    trials_df,
-):
-    """Create step-by-step BOED visualization showing posterior updates after each trial.
-
-    For BOED mode: Runs the sampler sequentially and shows the evolving posterior.
-    For constant stimuli: Shows trials accumulating with hit rates.
-    """
-    current_step = trial_step_slider.value
-    _sampling_method = sampling_method_dropdown.value or "constant_stimuli"
-
-    # Use selected subject and block from dropdowns
-    selected_subject = step_subject_dropdown.value
-    selected_block = int(step_block_dropdown.value) if step_block_dropdown.value else 0
-
-    block_trials = trials_df.filter(
-        (pl.col("Subject") == selected_subject) & (pl.col("Block") == selected_block),
-    ).sort("Trial")
-
-    # Get all intensity options
-    all_options = generate_index(n_levels.value, [min_x, max_x])
-    options_arr = np.array(all_options)
-
-    # Get ground truth parameters for this block
-    _gt_params = ground_truth_params.get((selected_subject, selected_block))
-
-    # Filter to trials up to current step
-    trials_up_to_step = block_trials.filter(pl.col("Trial") < current_step)
-    current_trial = block_trials.filter(pl.col("Trial") == current_step - 1)
-
-    # === BOED MODE: Run sequential posterior updates ===
-    if _sampling_method == "boed":
-        # Initialize BOED sampler
-        boed = BOEDSampler(options=options_arr, n_threshold_bins=40, n_slope_bins=15)
-
-        # Replay trials up to current step to build posterior
-        for _row in trials_up_to_step.iter_rows(named=True):
-            intensity = float(_row["Intensity"])
-            result = int(_row["Result"])
-            # Find closest option index
-            stim_idx = int(np.argmin(np.abs(options_arr - intensity)))
-            boed.update(stim_idx, result)
-
-        # Get posterior estimates
-        estimates = boed.get_estimates()
-        threshold_grid, threshold_marginal = boed.get_marginal_threshold()
-        slope_grid, slope_marginal = boed.get_marginal_slope()
-
-        # Get expected curve with credible band
-        x_fine, mean_curve, lower_ci, upper_ci = boed.get_expected_curve()
-
-    # Create x values for curves
-    _x_curve = np.linspace(min_x, max_x, 100)
-
-    # === BUILD VISUALIZATION ===
-    _chart_layers = []
-
-    # Ground truth curve (dashed gray)
-    if _gt_params is not None:
-        _gt_intercept = -_gt_params["x_0"] * _gt_params["k"]
-        _gt_slope = _gt_params["k"]
-        _y_gt = expit(_gt_slope * _x_curve + _gt_intercept)
-        _gt_df = pl.DataFrame(
-            {
-                "Intensity": _x_curve,
-                "Hit Rate": _y_gt,
-                "Type": ["Ground Truth"] * len(_x_curve),
-            },
-        ).to_pandas()
-        _gt_line = (
-            alt.Chart(_gt_df)
-            .mark_line(strokeDash=[5, 5], color="gray", strokeWidth=2)
-            .encode(
-                x=alt.X("Intensity:Q", title="Intensity"),
-                y=alt.Y("Hit Rate:Q", title="Hit Rate", scale=alt.Scale(domain=[0, 1])),
-            )
-        )
-        _chart_layers.append(_gt_line)
-
-    # BOED: Expected curve with credible band
-    if _sampling_method == "boed" and current_step > 0:
-        # Credible band
-        _band_df = pl.DataFrame(
-            {
-                "Intensity": x_fine,
-                "lower": lower_ci,
-                "upper": upper_ci,
-            },
-        ).to_pandas()
-        _band = (
-            alt.Chart(_band_df)
-            .mark_area(opacity=0.3, color="steelblue")
-            .encode(
-                x=alt.X("Intensity:Q"),
-                y=alt.Y("lower:Q", scale=alt.Scale(domain=[0, 1])),
-                y2="upper:Q",
-            )
-        )
-        _chart_layers.append(_band)
-
-        # Expected curve
-        _expected_df = pl.DataFrame(
-            {
-                "Intensity": x_fine,
-                "Hit Rate": mean_curve,
-            },
-        ).to_pandas()
-        _expected_line = (
-            alt.Chart(_expected_df)
-            .mark_line(color="steelblue", strokeWidth=2)
-            .encode(
-                x=alt.X("Intensity:Q"),
-                y=alt.Y("Hit Rate:Q"),
-            )
-        )
-        _chart_layers.append(_expected_line)
-
-    # Cumulative points (hit rate at each intensity)
-    if len(trials_up_to_step) > 0:
-        points_cumulative = (
-            trials_up_to_step.group_by("Intensity")
-            .agg(
-                [
-                    pl.mean("Result").alias("Hit Rate"),
-                    pl.len().alias("n_trials"),
-                ],
-            )
-            .sort("Intensity")
-        )
-        _points_pd = points_cumulative.to_pandas()
-        _points_scatter = (
-            alt.Chart(_points_pd)
-            .mark_point(filled=True, color="darkorange")
-            .encode(
-                x=alt.X("Intensity:Q"),
-                y=alt.Y("Hit Rate:Q"),
-                size=alt.Size(
-                    "n_trials:Q",
-                    scale=alt.Scale(range=[50, 300]),
-                    title="Trials",
-                ),
-                tooltip=["Intensity:Q", "Hit Rate:Q", "n_trials:Q"],
-            )
-        )
-        _chart_layers.append(_points_scatter)
-
-    # Current trial highlight
-    if len(current_trial) > 0:
-        _current_intensity = float(current_trial["Intensity"][0])
-        _current_result = int(current_trial["Result"][0])
-        _current_pd = pl.DataFrame(
-            {
-                "Intensity": [_current_intensity],
-                "Result": [_current_result],
-                "label": [
-                    f"Trial {current_step}: {'Hit' if _current_result else 'Miss'}",
-                ],
-            },
-        ).to_pandas()
-
-        # Vertical line at current intensity
-        _vline = (
-            alt.Chart(_current_pd)
-            .mark_rule(color="red", strokeWidth=2, strokeDash=[4, 4])
-            .encode(x=alt.X("Intensity:Q"))
-        )
-        _chart_layers.append(_vline)
-
-        # Current trial marker
-        _current_marker = (
-            alt.Chart(_current_pd)
-            .mark_point(filled=True, size=200, color="red", shape="diamond")
-            .encode(
-                x=alt.X("Intensity:Q"),
-                y=alt.Y("Result:Q", scale=alt.Scale(domain=[0, 1])),
-                tooltip=["label:N", "Intensity:Q"],
-            )
-        )
-        _chart_layers.append(_current_marker)
-
-    # === POSTERIOR DISTRIBUTION (BOED mode) ===
-    if _sampling_method == "boed":
-        # Threshold posterior
-        _threshold_df = pl.DataFrame(
-            {
-                "Threshold": threshold_grid,
-                "Probability": threshold_marginal,
-            },
-        ).to_pandas()
-
-        _threshold_chart = (
-            alt.Chart(_threshold_df)
-            .mark_area(opacity=0.6, color="steelblue")
-            .encode(
-                x=alt.X(
-                    "Threshold:Q",
-                    title="Threshold (x₀)",
-                    scale=alt.Scale(domain=[min_x, max_x]),
-                ),
-                y=alt.Y("Probability:Q", title="Posterior Density"),
-            )
-            .properties(width=250, height=100, title="Threshold Posterior")
-        )
-
-        # Add ground truth line to threshold posterior if available
-        if _gt_params is not None:
-            _gt_thresh_df = pl.DataFrame(
-                {
-                    "x0": [_gt_params["x_0"]],
-                },
-            ).to_pandas()
-            _gt_thresh_line = (
-                alt.Chart(_gt_thresh_df)
-                .mark_rule(color="red", strokeDash=[4, 4], strokeWidth=2)
-                .encode(x="x0:Q")
-            )
-            _threshold_chart = _threshold_chart + _gt_thresh_line
-
-        # Slope posterior
-        _slope_df = pl.DataFrame(
-            {
-                "Slope": slope_grid,
-                "Probability": slope_marginal,
-            },
-        ).to_pandas()
-
-        _slope_chart = (
-            alt.Chart(_slope_df)
-            .mark_area(opacity=0.6, color="green")
-            .encode(
-                x=alt.X("Slope:Q", title="Slope (k)"),
-                y=alt.Y("Probability:Q", title="Posterior Density"),
-            )
-            .properties(width=250, height=100, title="Slope Posterior")
-        )
-
-        # Add ground truth line to slope posterior if available
-        if _gt_params is not None:
-            _gt_slope_df = pl.DataFrame(
-                {
-                    "k": [_gt_params["k"]],
-                },
-            ).to_pandas()
-            _gt_slope_line = (
-                alt.Chart(_gt_slope_df)
-                .mark_rule(color="red", strokeDash=[4, 4], strokeWidth=2)
-                .encode(x="k:Q")
-            )
-            _slope_chart = _slope_chart + _gt_slope_line
-
-    # === SAMPLING DISTRIBUTION HISTOGRAM ===
-    if len(trials_up_to_step) > 0:
-        sampling_counts = trials_up_to_step.group_by("Intensity").len()
-        all_options_df = pl.DataFrame({"Intensity": all_options})
-        sampling_dist = (
-            all_options_df.join(sampling_counts, on="Intensity", how="left")
-            .with_columns(pl.col("len").fill_null(0).alias("Count"))
-            .select(["Intensity", "Count"])
-            .sort("Intensity")
-        )
-    else:
-        sampling_dist = pl.DataFrame(
-            {
-                "Intensity": all_options,
-                "Count": [0] * len(all_options),
-            },
-        )
-
-    _sampling_pd = sampling_dist.to_pandas()
-    if len(current_trial) > 0:
-        _current_intensity = float(current_trial["Intensity"][0])
-        _sampling_pd["is_current"] = _sampling_pd["Intensity"].apply(
-            lambda x: abs(x - _current_intensity) < 0.01,
-        )
-    else:
-        _sampling_pd["is_current"] = False
-
-    _histogram = (
-        alt.Chart(_sampling_pd)
-        .mark_bar()
-        .encode(
-            x=alt.X(
-                "Intensity:Q",
-                title="Intensity",
-                scale=alt.Scale(domain=[min_x, max_x]),
-            ),
-            y=alt.Y("Count:Q", title="Samples"),
-            color=alt.condition(
-                alt.datum.is_current,
-                alt.value("red"),
-                alt.value("steelblue"),
-            ),
-            tooltip=["Intensity:Q", "Count:Q"],
-        )
-        .properties(width=500, height=80, title="Sampling Distribution")
-    )
-
-    # === ASSEMBLE FINAL VISUALIZATION ===
-    _max_trials = len(block_trials)
-
-    if _chart_layers:
-        _main_chart = alt.layer(*_chart_layers).properties(
-            width=500,
-            height=250,
-            title=f"Trial {current_step} of {_max_trials}",
-        )
-
-        if _sampling_method == "boed":
-            # BOED mode: Show main chart, posteriors, and histogram
-            _posterior_row = alt.hconcat(_threshold_chart, _slope_chart)
-            html_content = (
-                f"<div>{altair2svg(_main_chart)}</div>"
-                f"<div>{altair2svg(_posterior_row)}</div>"
-                f"<div>{altair2svg(_histogram)}</div>"
-            )
-        else:
-            # Constant stimuli mode
-            html_content = (
-                f"<div>{altair2svg(_main_chart)}</div>"
-                f"<div>{altair2svg(_histogram)}</div>"
-            )
-        step_chart = HTMLRefreshWidget(html=html_content)
-    else:
-        step_chart = HTMLRefreshWidget(html=altair2svg(_histogram))
-
-    # Info about current trial and estimates
-    if len(current_trial) > 0:
-        _info_intensity = float(current_trial["Intensity"][0])
-        _info_result = "Hit ✓" if int(current_trial["Result"][0]) else "Miss ✗"
-
-        if _sampling_method == "boed":
-            thresh_mean, thresh_std = estimates["threshold"]
-            slope_mean, slope_std = estimates["slope"]
-            step_info = mo.callout(
-                mo.md(
-                    f"**Trial {current_step}**: Intensity = {_info_intensity:.2f} → {_info_result}\n\n"
-                    f"**Posterior estimates**: x₀ = {thresh_mean:.2f} ± {thresh_std:.2f}, "
-                    f"k = {slope_mean:.2f} ± {slope_std:.2f}",
-                ),
-                kind="success" if "Hit" in _info_result else "warn",
-            )
-        else:
-            step_info = mo.callout(
-                mo.md(
-                    f"**Trial {current_step}**: Intensity = {_info_intensity:.2f} → {_info_result}",
-                ),
-                kind="success" if "Hit" in _info_result else "warn",
-            )
-    else:
-        step_info = mo.md("")
-    return step_chart, step_info
-
-
-@app.cell
-def simulation_params_ui(mo, preset_dropdown):
+def _(mo, preset_dropdown):
     _presets = {
         "standard": [0.0, 1.0, 0.0, 0.0],
         "non-standard": [10.0, 2.0, 0.2, 0.1],
@@ -757,17 +416,17 @@ def simulation_params_ui(mo, preset_dropdown):
         )
         .form(submit_button_label="Generate")
     )
-    return input_form, n_blocks, n_levels, n_subjects, n_trials
+    return (
+        input_form,
+        n_blocks,
+        n_levels,
+        n_subjects,
+        n_trials,
+    )
 
 
 @app.cell
-def fit_params(
-    fit_chains,
-    fit_draws,
-    fit_random_seed,
-    fit_target_accept,
-    fit_tune,
-):
+def _(fit_chains, fit_draws, fit_random_seed, fit_target_accept, fit_tune):
     random_seed = int(fit_random_seed.value)
     fit_params: dict[str, float | int | None] = {
         "draws": int(fit_draws.value),
@@ -780,7 +439,7 @@ def fit_params(
 
 
 @app.cell
-def stimulus_range(logit):
+def _(logit):
     # Default stimulus range for random parameter generation
     # Using reasonable defaults: x_0=0, k=1 as baseline
     min_x = logit(0.01)
@@ -789,13 +448,14 @@ def stimulus_range(logit):
 
 
 @app.cell
-def stimulus_info(max_x, min_x, mo):
+def _(max_x, min_x, mo):
     # Stimulus range info for display in left column
     stimulus_info = mo.md(f"**Stimulus range:** {min_x:.2f} to {max_x:.2f}")
+    return (stimulus_info,)
 
 
 @app.cell
-def plot_equation_cell(mo, show_equation):
+def _(mo, show_equation):
     equation_abstracted = r"""
     $$
     \psi(x) = \gamma + (1 - \gamma - \lambda)F(x)
@@ -813,14 +473,31 @@ def plot_equation_cell(mo, show_equation):
 
 
 @app.cell
-def load_sample_trials_ref(pa_trials):
-    # Use refactored sample data loader from trials module
-    load_sample_trials = pa_trials.load_sample
+def _(pl):
+    from pathlib import Path as _Path
+
+    def load_sample_trials() -> pl.DataFrame:
+        """Load sample experimental data from data/trials.csv."""
+        sample_path = _Path(__file__).parent / "data" / "trials.csv"
+        df = pl.read_csv(sample_path)
+        # Transform to expected format: Subject, Block, Intensity, Result
+        df = df.with_columns(
+            (pl.col("Date").cast(pl.Utf8) + "_" + pl.col("Amp2").cast(pl.Utf8)).alias(
+                "block_key",
+            ),
+        )
+        df = df.with_columns(
+            pl.col("block_key").rank("dense").cast(pl.Int64).alias("Block") - 1,
+        )
+        df = df.with_columns(pl.col("Amp1").alias("Intensity"))
+        df = df.with_columns((pl.col("Result") == 1).cast(pl.Int64).alias("Result"))
+        df = df.select(["Subject", "Block", "Intensity", "Result"])
+        return df
     return (load_sample_trials,)
 
 
 @app.cell
-def trials_data(
+def _(
     file_upload,
     fit_random_seed,
     generate_index,
@@ -835,13 +512,11 @@ def trials_data(
     n_trials,
     pl,
     process_upload_bytes,
-    sampling_method_dropdown,
     subject_utils,
 ):
     # Trials: upload if provided, otherwise default to sample in Batch/Online
     ground_truth_params = {}
     use_random_params = input_tabs.value == "Simulation"
-    sampling_method = sampling_method_dropdown.value or "constant_stimuli"
 
     if file_upload.value and len(file_upload.value) > 0:
         raw = file_upload.contents(0)
@@ -859,7 +534,6 @@ def trials_data(
                 random_seed=int(fit_random_seed.value)
                 if fit_random_seed.value > 0
                 else None,
-                sampling_method=sampling_method,
             )
     elif input_tabs.value == "Simulation":
         trials_df, ground_truth_params = generate_trials(
@@ -869,23 +543,34 @@ def trials_data(
             n_blocks=n_blocks.value,
             n_subjects=n_subjects.value,
             use_random_params=use_random_params,
-            random_seed=int(fit_random_seed.value) if fit_random_seed.value > 0 else None,
-            sampling_method=sampling_method,
+            random_seed=int(fit_random_seed.value)
+            if fit_random_seed.value > 0
+            else None,
         )
     else:
         trials_df = load_sample_trials()
     trials_df = subject_utils.ensure_subject_column(trials_df)
     trials_df = trials_df.with_columns(pl.col("Intensity").cast(pl.Float64))
-    # Ensure ID columns are integers for consistent sorting/filtering
-    if "Trial" in trials_df.columns:
-        trials_df = trials_df.with_columns(pl.col("Trial").cast(pl.Int64))
-    if "Block" in trials_df.columns:
-        trials_df = trials_df.with_columns(pl.col("Block").cast(pl.Int64))
     return ground_truth_params, trials_df
 
 
 @app.cell
-def fit_button(mo):
+def _(mo, trials_df):
+    # Slider to crop dataset at a specific trial number
+    total_trials = len(trials_df)
+    trial_crop_slider = mo.ui.slider(
+        start=1,
+        stop=total_trials,
+        value=total_trials,
+        step=1,
+        label="Crop at trial",
+        show_value=True,
+    )
+    return (trial_crop_slider,)
+
+
+@app.cell
+def _(mo):
     fit_button = mo.ui.run_button(
         label="Fit Model",
         kind="success",
@@ -894,32 +579,50 @@ def fit_button(mo):
 
 
 @app.cell
-def should_fit(fit_button, input_tabs):
+def _(trial_crop_slider, trials_df):
+    # Apply trial crop
+    crop_at = trial_crop_slider.value
+    trials_cropped_df = trials_df.head(crop_at)
+    return (trials_cropped_df,)
+
+
+@app.cell
+def _(Path):
+    cache_root = Path("__marimo__") / "cache" / "psychoanalyze"
+    cache_root.mkdir(parents=True, exist_ok=True)
+    return (cache_root,)
+
+
+@app.cell
+def _(fit_button, input_tabs):
     should_fit = fit_button.value or input_tabs.value == "Simulation"
     return (should_fit,)
 
 
 @app.cell
-def hierarchical_fit_and_blocks(
+def _(
     cached_hierarchical_fit,
     fit_params: dict[str, float | int | None],
     from_trials,
     ground_truth_params,
     pl,
     should_fit,
-    trials_df,
+    trials_cache_key,
+    trials_cropped_df,
 ):
     # Points always computed from trials
-    points_df = from_trials(trials_df)
+    points_df = from_trials(trials_cropped_df)
 
     # Only run fitting if button clicked or on Simulation tab
     if should_fit:
         composite_block = (
             pl.col("Subject").cast(pl.Utf8) + "__" + pl.col("Block").cast(pl.Utf8)
         )
-        fit_trials_df = trials_df.with_columns(composite_block.alias("Block"))
+        fit_trials_df = trials_cropped_df.with_columns(composite_block.alias("Block"))
+        cache_key = trials_cache_key(trials_cropped_df, fit_params)
         fit_summary, fit_idata = cached_hierarchical_fit(
             fit_trials_df,
+            cache_key,
             fit_params,
         )
         fit_blocks = fit_trials_df["Block"].unique().sort().to_list()
@@ -927,7 +630,7 @@ def hierarchical_fit_and_blocks(
 
         blocks_list = []
         block_idx_by_subject_block: dict[tuple[str, int], int] = {}
-        block_keys = trials_df.select(["Subject", "Block"]).unique()
+        block_keys = trials_cropped_df.select(["Subject", "Block"]).unique()
         for block_key_row in block_keys.iter_rows(named=True):
             subject_id = str(block_key_row["Subject"])
             block_id = int(block_key_row["Block"])
@@ -979,20 +682,16 @@ def hierarchical_fit_and_blocks(
 
             # Add ground truth columns if available
             if _gt_params is not None:
-                _gt_intercept = (
-                    -_gt_params["x_0"] / _gt_params["k"] if _gt_params["k"] != 0 else 0.0
-                )
+                _gt_intercept = -_gt_params["x_0"] / _gt_params["k"] if _gt_params["k"] != 0 else 0.0
                 _gt_slope = _gt_params["k"]
-                _block_dict.update(
-                    {
-                        "x_0 (actual)": _gt_params["x_0"],
-                        "k (actual)": _gt_params["k"],
-                        "gamma (actual)": _gt_params["gamma"],
-                        "lambda (actual)": _gt_params["lambda"],
-                        "intercept (actual)": _gt_intercept,
-                        "slope (actual)": _gt_slope,
-                    },
-                )
+                _block_dict.update({
+                    "x_0 (actual)": _gt_params["x_0"],
+                    "k (actual)": _gt_params["k"],
+                    "gamma (actual)": _gt_params["gamma"],
+                    "lambda (actual)": _gt_params["lambda"],
+                    "intercept (actual)": _gt_intercept,
+                    "slope (actual)": _gt_slope,
+                })
 
             blocks_list.append(_block_dict)
         blocks_df = pl.from_dicts(blocks_list)
@@ -1004,7 +703,7 @@ def hierarchical_fit_and_blocks(
 
 
 @app.cell
-def selection_to_pl_helper(pl):
+def _(pl):
     def selection_to_pl(selection: object) -> pl.DataFrame | None:
         if selection is None:
             return None
@@ -1025,23 +724,25 @@ def selection_to_pl_helper(pl):
             except Exception:
                 return None
         return None
+
     return (selection_to_pl,)
 
 
 @app.cell
-def block_rows_for_plot(
+def _(
+    block,
     block_idx_by_subject_block: dict[tuple[str, int], int],
-    blocks_chart,
     blocks_df,
+    blocks_chart,
     ground_truth_params,
     pl,
     selection_to_pl,
+    subject,
 ):
     # Selected block rows for plot (include ground truth per block)
     selected_blocks_df = selection_to_pl(getattr(blocks_chart, "value", None))
     if selected_blocks_df is None or len(selected_blocks_df) == 0:
         selected_blocks_df = blocks_df
-
 
     def block_label(row: dict) -> str:
         subject = row.get("Subject")
@@ -1049,7 +750,6 @@ def block_rows_for_plot(
         if subject is None or subject == "":
             return str(block)
         return f"{subject}-{block}"
-
 
     block_rows = []
     if isinstance(selected_blocks_df, pl.DataFrame) and len(selected_blocks_df) > 0:
@@ -1071,9 +771,7 @@ def block_rows_for_plot(
             # Add ground truth curve if available
             _gt_params = ground_truth_params.get((_subject, _block))
             if _gt_params is not None:
-                _gt_intercept = (
-                    -_gt_params["x_0"] / _gt_params["k"] if _gt_params["k"] != 0 else 0.0
-                )
+                _gt_intercept = -_gt_params["x_0"] / _gt_params["k"] if _gt_params["k"] != 0 else 0.0
                 _gt_slope = _gt_params["k"]
                 block_rows.append(
                     {
@@ -1103,9 +801,7 @@ def block_rows_for_plot(
             # Add ground truth curve if available
             _gt_params = ground_truth_params.get((_subject, _block))
             if _gt_params is not None:
-                _gt_intercept = (
-                    -_gt_params["x_0"] / _gt_params["k"] if _gt_params["k"] != 0 else 0.0
-                )
+                _gt_intercept = -_gt_params["x_0"] / _gt_params["k"] if _gt_params["k"] != 0 else 0.0
                 _gt_slope = _gt_params["k"]
                 block_rows.append(
                     {
@@ -1116,11 +812,24 @@ def block_rows_for_plot(
                         "is_ground_truth": True,
                     },
                 )
+            gt_params = ground_truth_params.get((subject, block))
+            if gt_params is not None:
+                gt_intercept = -gt_params["x_0"] / gt_params["k"] if gt_params["k"] != 0 else 0.0
+                gt_slope = gt_params["k"]
+                block_rows.append(
+                    {
+                        "Block": f"{subject}-{block} (GT)",
+                        "intercept": gt_intercept,
+                        "slope": gt_slope,
+                        "block_idx": None,
+                        "is_ground_truth": True,
+                    },
+                )
     return (block_rows,)
 
 
 @app.cell
-def points_filtered(blocks_chart, pl, points_df, selection_to_pl):
+def _(blocks_chart, pl, points_df, selection_to_pl):
     # Filter points by selected blocks
     sel = selection_to_pl(getattr(blocks_chart, "value", None))
     if sel is not None and len(sel) > 0 and "Block" in sel.columns:
@@ -1140,67 +849,16 @@ def points_filtered(blocks_chart, pl, points_df, selection_to_pl):
 
 
 @app.cell
-def link_fn(expit, link_function):
+def _(expit, link_function):
     link_fn = expit if link_function.value == "expit" else expit
     return (link_fn,)
 
 
 @app.cell
-def blocks_chart_cell(
-    HTMLRefreshWidget,
-    alt,
-    blocks_df,
-    mo,
-    pl,
-    refresh_altair,
-):
-    # Blocks chart: Actual vs Estimated overlaid, x = blocks grouped by subject
-    # Use wigglystuff HTMLRefreshWidget + @refresh_altair for refreshable static SVG
-    @refresh_altair
-    def _blocks_chart_svg(chart_pd, block_order):
-        selection = alt.selection_point(fields=["Subject", "Block"], toggle=True)
-        points = (
-            alt.Chart(chart_pd)
-            .mark_point(filled=True, size=80)
-            .encode(
-                x=alt.X(
-                    "BlockLabel:N",
-                    sort=block_order,
-                    title="Block (by subject)",
-                ),
-                y=alt.Y("Threshold:Q", title="Threshold (x₀)"),
-                shape=alt.Shape("Type:N", title="", legend=alt.Legend(orient="top")),
-                color=alt.condition(
-                    selection,
-                    alt.Color("Subject:N", scale=alt.Scale(scheme="category10")),
-                    alt.value("#d3d3d3"),
-                ),
-                tooltip=["Subject:N", "Block:Q", "Type:N", "Threshold:Q"],
-            )
-            .add_params(selection)
-        )
-        estimated_pd = chart_pd[chart_pd["Type"] == "Estimated"]
-        error_bars = (
-            alt.Chart(estimated_pd)
-            .mark_rule()
-            .encode(
-                x=alt.X("BlockLabel:N", sort=block_order),
-                y=alt.Y("Conf_Low:Q"),
-                y2=alt.Y2("Conf_High:Q"),
-                color=alt.Color("Subject:N", scale=alt.Scale(scheme="category10")),
-            )
-        )
-        return (
-            (error_bars + points)
-            .properties(
-                height=220,
-                width=max(400, len(block_order) * 28),
-            )
-            .resolve_scale(color="shared")
-        )
-
-
+def _(alt, blocks_df, mo, pl):
+    # Blocks chart: Actual vs Estimated with confidence intervals (scatter plot)
     if len(blocks_df) > 0 and "x_0 (est)" in blocks_df.columns:
+        # Prepare data for scatter plot: actual vs estimated
         chart_rows = []
 
         for row in blocks_df.iter_rows(named=True):
@@ -1208,6 +866,7 @@ def blocks_chart_cell(
             block = int(row["Block"])
             x_est = float(row["x_0 (est)"])
 
+            # Get confidence interval if available
             conf_low = x_est
             conf_high = x_est
             if "x_0_ci_lower" in row and row["x_0_ci_lower"] is not None:
@@ -1223,9 +882,10 @@ def blocks_chart_cell(
                     "Threshold": x_est,
                     "Conf_Low": conf_low,
                     "Conf_High": conf_high,
-                },
+                }
             )
 
+            # Add actual threshold if available (ground truth)
             if "x_0 (actual)" in row and row["x_0 (actual)"] is not None:
                 x_actual = float(row["x_0 (actual)"])
                 chart_rows.append(
@@ -1236,32 +896,47 @@ def blocks_chart_cell(
                         "Threshold": x_actual,
                         "Conf_Low": x_actual,
                         "Conf_High": x_actual,
-                    },
+                    }
                 )
 
         if chart_rows:
             chart_df = pl.from_dicts(chart_rows)
-            chart_df = chart_df.with_columns(
-                (
-                    pl.col("Subject").cast(pl.Utf8)
-                    + " · Block "
-                    + pl.col("Block").cast(pl.Utf8)
-                ).alias("BlockLabel"),
-            )
-            block_order = (
-                chart_df.unique(["Subject", "Block"])
-                .sort(["Subject", "Block"])
-                .with_columns(
-                    (
-                        pl.col("Subject").cast(pl.Utf8)
-                        + " · Block "
-                        + pl.col("Block").cast(pl.Utf8)
-                    ).alias("BlockLabel"),
-                )["BlockLabel"]
-                .to_list()
-            )
             chart_pd = chart_df.to_pandas()
-            blocks_chart = HTMLRefreshWidget(html=_blocks_chart_svg(chart_pd, block_order))
+
+            # Create scatter plot with error bars
+            selection = alt.selection_point(fields=["Subject", "Block"], toggle=True)
+
+            # Points
+            points = (
+                alt.Chart(chart_pd)
+                .mark_point(filled=True, size=100)
+                .encode(
+                    x=alt.X("Threshold:Q", title="Threshold (x₀)"),
+                    y=alt.Y("Type:N", title=""),
+                    color=alt.condition(
+                        selection,
+                        alt.Color("Subject:N", scale=alt.Scale(scheme="category10")),
+                        alt.value("#d3d3d3"),
+                    ),
+                    tooltip=["Subject:N", "Block:Q", "Type:N", "Threshold:Q"],
+                )
+                .add_params(selection)
+            )
+
+            # Error bars for estimated (confidence intervals)
+            error_bars = (
+                alt.Chart(chart_pd[chart_pd["Type"] == "Estimated"])
+                .mark_errorbar(extent="ci")
+                .encode(
+                    x=alt.X("Conf_Low:Q"),
+                    x2=alt.X2("Conf_High:Q"),
+                    y=alt.Y("Type:N"),
+                    color=alt.Color("Subject:N", scale=alt.Scale(scheme="category10")),
+                )
+            )
+
+            chart = (error_bars + points).properties(height=200, width=400).resolve_scale(color="shared")
+            blocks_chart = mo.ui.altair_chart(chart)
         else:
             blocks_chart = mo.md("No block data to display.")
     else:
@@ -1270,70 +945,20 @@ def blocks_chart_cell(
 
 
 @app.cell
-def main_psychometric_plot(
-    HTMLRefreshWidget,
+def _(
     alt,
     block_rows,
     fit_idata,
     link_fn,
     max_x,
     min_x,
+    mo,
     np,
     pa_hierarchical,
     pl,
     points_filtered_df,
-    refresh_altair,
 ):
-    # Plot: scatter points + logistic curves (wigglystuff HTMLRefreshWidget + @refresh_altair)
-    @refresh_altair
-    def _psychometric_chart(bands_pd, fitted_pd, ground_truth_pd, points_pd):
-        band_chart = (
-            alt.Chart(bands_pd)
-            .mark_area(opacity=0.2)
-            .encode(
-                x=alt.X("Intensity:Q"),
-                y=alt.Y("lower:Q"),
-                y2=alt.Y2("upper:Q"),
-                color=alt.Color("Series:N"),
-            )
-        )
-        fitted_line_chart = (
-            alt.Chart(fitted_pd)
-            .mark_line()
-            .encode(
-                x=alt.X("Intensity:Q"),
-                y=alt.Y("Hit Rate:Q"),
-                color=alt.Color("BlockGroup:N"),
-            )
-        )
-        ground_truth_line_chart = (
-            alt.Chart(ground_truth_pd)
-            .mark_line(strokeDash=[5, 5], strokeWidth=2)
-            .encode(
-                x=alt.X("Intensity:Q"),
-                y=alt.Y("Hit Rate:Q"),
-                color=alt.Color("BlockGroup:N"),
-            )
-        )
-        points_chart = (
-            alt.Chart(points_pd)
-            .mark_point(filled=True)
-            .encode(
-                x=alt.X("Intensity:Q"),
-                y=alt.Y("Hit Rate:Q"),
-                size=alt.Size("n trials:Q"),
-                color=alt.Color("Series:N"),
-                tooltip=["Series:N", "Intensity:Q", "Hit Rate:Q", "n trials:Q"],
-            )
-        )
-        plot_layers = [fitted_line_chart, points_chart]
-        if len(ground_truth_pd) > 0:
-            plot_layers.insert(0, ground_truth_line_chart)
-        if len(bands_pd) > 0:
-            plot_layers.insert(0, band_chart)
-        return alt.layer(*plot_layers).resolve_scale(color="shared")
-
-
+    # Plot: scatter points + logistic curves
     x = np.linspace(min_x, max_x, 100)
     fits_list = []
     bands_list = []
@@ -1345,12 +970,7 @@ def main_psychometric_plot(
                     "Intensity": x,
                     "Hit Rate": y,
                     "Series": [blk["Block"]] * len(x),
-                    "Type": [
-                        "Ground Truth"
-                        if blk.get("is_ground_truth", False)
-                        else "Fitted",
-                    ]
-                    * len(x),
+                    "Type": ["Ground Truth" if blk.get("is_ground_truth", False) else "Fitted"] * len(x),
                 },
             ),
         )
@@ -1384,108 +1004,146 @@ def main_psychometric_plot(
         ),
     )
     fits_df = fits_df.with_columns(pl.col("Series").cast(pl.Utf8))
-    fits_df = fits_df.with_columns(
-        pl.col("Series").str.replace(r" \(GT\)$", "").alias("BlockGroup"),
-    )
+    # Separate ground truth vs fitted curves for different styling
     ground_truth_df = fits_df.filter(pl.col("Type") == "Ground Truth")
     fitted_df = fits_df.filter(pl.col("Type") == "Fitted")
     fitted_pd = fitted_df.to_pandas()
     ground_truth_pd = ground_truth_df.to_pandas()
     bands_pd = bands_df.to_pandas()
     points_pd = points_plot_df.to_pandas()
-    plot_ui = HTMLRefreshWidget(
-        html=_psychometric_chart(bands_pd, fitted_pd, ground_truth_pd, points_pd),
+    band_chart = (
+        alt.Chart(bands_pd)
+        .mark_area(opacity=0.2)
+        .encode(
+            x=alt.X("Intensity:Q"),
+            y=alt.Y("lower:Q"),
+            y2=alt.Y2("upper:Q"),
+            color=alt.Color("Series:N"),
+        )
     )
+    fitted_line_chart = (
+        alt.Chart(fitted_pd)
+        .mark_line()
+        .encode(
+            x=alt.X("Intensity:Q"),
+            y=alt.Y("Hit Rate:Q"),
+            color=alt.Color("Series:N"),
+        )
+    )
+    ground_truth_line_chart = (
+        alt.Chart(ground_truth_pd)
+        .mark_line(strokeDash=[5, 5], strokeWidth=2)
+        .encode(
+            x=alt.X("Intensity:Q"),
+            y=alt.Y("Hit Rate:Q"),
+            color=alt.Color("Series:N"),
+        )
+    )
+    points_chart = (
+        alt.Chart(points_pd)
+        .mark_point(filled=True)
+        .encode(
+            x=alt.X("Intensity:Q"),
+            y=alt.Y("Hit Rate:Q"),
+            size=alt.Size("n trials:Q"),
+            color=alt.Color("Series:N"),
+            tooltip=["Series:N", "Intensity:Q", "Hit Rate:Q", "n trials:Q"],
+        )
+    )
+    plot_layers = [fitted_line_chart, points_chart]
+    if len(ground_truth_pd) > 0:
+        plot_layers.insert(0, ground_truth_line_chart)
+    if len(bands_pd) > 0:
+        plot_layers.insert(0, band_chart)
+    plot_chart = alt.layer(*plot_layers).resolve_scale(color="shared")
+    plot_ui = mo.ui.altair_chart(plot_chart)
     return (plot_ui,)
 
 
 @app.cell
-def format_dropdown(mo):
-    format_dropdown = mo.ui.dropdown(
-        options={
-            "CSV (zip)": "csv_zip",
-            "JSON": "json",
-            "Parquet": "parquet",
-            "DuckDB": "duckdb",
-        },
-        value="CSV (zip)",
-        label="Format",
-    )
-    return (format_dropdown,)
-
-
-@app.cell
-def data_downloads_cell(
-    blocks_df,
-    format_dropdown,
-    mo,
-    pa_export,
-    points_filtered_df,
-    trials_df,
-):
+def _(blocks_df, mo, pl, points_filtered_df, trials_cropped_df):
+    import io as _io
+    import zipfile as _zipfile
     from datetime import datetime
+    from pathlib import Path as _Path
 
-    # Use refactored export functions from pa_export module
+    import duckdb
+
+    def build_csv_zip(
+        points_df: pl.DataFrame,
+        blocks_df: pl.DataFrame,
+        trials_df: pl.DataFrame,
+    ) -> bytes:
+        zip_buffer = _io.BytesIO()
+        with _zipfile.ZipFile(
+            zip_buffer,
+            mode="a",
+            compression=_zipfile.ZIP_DEFLATED,
+            allowZip64=False,
+        ) as zip_file:
+            for level, level_df in {
+                "points": points_df,
+                "blocks": blocks_df,
+                "trials": trials_df,
+            }.items():
+                csv_buffer = _io.StringIO()
+                level_df.write_csv(csv_buffer)
+                zip_file.writestr(f"{level}.csv", csv_buffer.getvalue())
+        zip_buffer.seek(0)
+        return zip_buffer.read()
+
+    def build_json(points_df: pl.DataFrame) -> bytes:
+        return points_df.to_pandas().to_json().encode("utf-8")
+
+    def build_parquet(points_df: pl.DataFrame) -> bytes:
+        buffer = _io.BytesIO()
+        points_df.write_parquet(buffer)
+        buffer.seek(0)
+        return buffer.read()
+
+    def build_duckdb(points_df: pl.DataFrame) -> bytes:
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            db_path = _Path(temp_dir) / "psychoanalyze.duckdb"
+            connection = duckdb.connect(str(db_path))
+            connection.register("points_df", points_df.to_pandas())
+            connection.execute("CREATE TABLE points AS SELECT * FROM points_df")
+            connection.close()
+            return db_path.read_bytes()
+
     timestamp = datetime.now().astimezone().strftime("%Y-%m-%d_%H%M")
-    safe_points = points_filtered_df if len(points_filtered_df.columns) > 0 else None
-    safe_blocks = blocks_df if len(blocks_df.columns) > 0 else None
-    csv_zip = pa_export.to_csv_zip(trials_df, safe_points, safe_blocks)
-    json_bytes = pa_export.to_json(points_filtered_df)
-    parquet_bytes = pa_export.to_parquet(points_filtered_df)
-    duckdb_bytes = pa_export.to_duckdb(trials_df, safe_points, safe_blocks)
+    csv_zip = build_csv_zip(points_filtered_df, blocks_df, trials_cropped_df)
+    json_bytes = build_json(points_filtered_df)
+    parquet_bytes = build_parquet(points_filtered_df)
+    duckdb_bytes = build_duckdb(points_filtered_df)
 
-    format_to_content: dict[str, tuple[bytes, str]] = {
-        "csv_zip": (csv_zip, f"{timestamp}_psychoanalyze.zip"),
-        "json": (json_bytes, "data.json"),
-        "parquet": (parquet_bytes, "data.parquet"),
-        "duckdb": (duckdb_bytes, "psychoanalyze.duckdb"),
-    }
-    _selected_key = format_dropdown.value or "csv_zip"
-    _selected_bytes, _selected_filename = format_to_content.get(
-        _selected_key,
-        format_to_content["csv_zip"],
-    )
-    download_button = mo.download(
-        _selected_bytes,
-        filename=_selected_filename,
-        label="Download",
-    )
     data_downloads = mo.vstack(
-        [format_dropdown, download_button],
+        [
+            mo.download(
+                csv_zip,
+                filename=f"{timestamp}_psychoanalyze.zip",
+                label="Download CSV (zip)",
+            ),
+            mo.download(json_bytes, filename="data.json", label="Download JSON"),
+            mo.download(
+                parquet_bytes,
+                filename="data.parquet",
+                label="Download Parquet",
+            ),
+            mo.download(
+                duckdb_bytes,
+                filename="psychoanalyze.duckdb",
+                label="Download DuckDB",
+            ),
+        ],
         gap=1,
     )
     return (data_downloads,)
 
 
 @app.cell
-def strength_duration_vis(mo):
-    # Strength-duration visualization placeholder
-    strength_duration_plots = mo.callout(
-        mo.md(
-            "**Strength-Duration Analysis** features analysis of stimulus amplitude and pulse width relationships. "
-            "[Learn more](../dashboard/strength_duration.md) about strength-duration curves and their interpretation.",
-        ),
-        kind="info",
-    )
-    return (strength_duration_plots,)
-
-
-@app.cell
-def weber_vis(mo):
-    # Weber's Law visualization placeholder
-    weber_plots = mo.callout(
-        mo.md(
-            "**Weber's Law Analysis** investigates how discriminability relates to stimulus intensity. "
-            "[Learn more](../dashboard/weber.md) about Weber's Law and logarithmic sensory encoding.",
-        ),
-        kind="info",
-    )
-    return (weber_plots,)
-
-
-@app.cell
-def input_tabs(
-    auto_play_button,
+def _(
     file_upload,
     fit_button,
     fit_settings,
@@ -1494,12 +1152,7 @@ def input_tabs(
     load_sample_button,
     mo,
     preset_dropdown,
-    sampling_method_dropdown,
     show_equation,
-    step_block_dropdown,
-    step_mode_toggle,
-    step_subject_dropdown,
-    trial_step_slider,
 ):
     # Build tab content based on selected mode
     batch_content = mo.vstack(
@@ -1521,27 +1174,9 @@ def input_tabs(
         gap=1,
     )
 
-    # Step-by-step controls with subject/block selection
-    step_controls = mo.vstack(
-        [
-            mo.md("### Step-by-Step Visualization"),
-            step_mode_toggle,
-            mo.hstack([step_subject_dropdown, step_block_dropdown], gap=1)
-            if step_mode_toggle.value
-            else mo.md(""),
-            mo.hstack([trial_step_slider, auto_play_button], gap=1)
-            if step_mode_toggle.value
-            else mo.md(""),
-        ],
-        gap=1,
-    )
-
     simulation_content = mo.vstack(
         [
             mo.md("### Simulation Mode"),
-            mo.md("### Sampling Method"),
-            sampling_method_dropdown,
-            step_controls,
             mo.md("### Link Function"),
             link_function,
             show_equation,
@@ -1568,40 +1203,10 @@ def input_tabs(
         gap=1,
     )
 
-    strength_duration_content = mo.md(
-        """
-        ### Strength-Duration Analysis
-
-        Analyze the relationship between stimulus amplitude and pulse width at detection threshold.
-
-        - **Strength-Duration curves** show how minimum detectable amplitude varies with stimulus duration
-        - **Temporal integration**: Longer stimuli require less amplitude to reach threshold
-        - **Applications**: Electrical stimulation, psychophysical studies, sensory substitution
-
-        [Read more about strength-duration analysis →](../dashboard/strength_duration.md)
-        """,
-    )
-
-    weber_content = mo.md(
-        """
-        ### Weber's Law Analysis
-
-        Investigate how sensory discriminability relates to baseline stimulus intensity.
-
-        - **Weber's Law**: Difference threshold is proportional to reference intensity
-        - **Logarithmic encoding**: The nervous system uses proportional coding
-        - **Weber fraction**: Measure of discriminability for different sensory modalities
-
-        [Read more about Weber's Law →](../dashboard/weber.md)
-        """,
-    )
-
     input_tabs = mo.ui.tabs(
         {
             "Simulation": simulation_content,
             "Batch": batch_content,
-            "Strength-Duration": strength_duration_content,
-            "Weber's Law": weber_content,
             "Online": online_content,
         },
     )

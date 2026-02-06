@@ -9,15 +9,14 @@ from psychoanalyze.data import hierarchical
 
 def test_fit_with_multiple_blocks() -> None:
     """Hierarchical fit should work with multiple blocks."""
-    trials_df = pl.DataFrame(
-        {
-            "Intensity": [0.0, 1.0, 2.0, 3.0, 0.0, 1.0, 2.0, 3.0],
-            "Result": [0, 0, 1, 1, 0, 0, 1, 1],
-            "Block": [0, 0, 0, 0, 1, 1, 1, 1],
-        },
-    )
     idata = hierarchical.fit(
-        trials_df,
+        trials=pl.DataFrame(
+            {
+                "Intensity": [0.0, 1.0, 2.0, 3.0, 0.0, 1.0, 2.0, 3.0],
+                "Result": [0, 0, 1, 1, 0, 0, 1, 1],
+                "Block": [0, 0, 0, 0, 1, 1, 1, 1],
+            },
+        ),
         draws=50,
         tune=50,
         chains=1,

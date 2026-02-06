@@ -213,6 +213,13 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/5c/45/2bd99d76ee0c6cb304a7542db7f0e13a844f2c2c5febf9cf6dd7b19405c2/arviz-0.23.1-py3-none-any.whl", hash = "sha256:2b52c6327a158cbef9970647c8056e453c7e788e97a4446afb1f6a3ba2e0cbe0", size = 1673608, upload-time = "2026-01-16T15:07:22.106Z" },
 ]
 
+[package.optional-dependencies]
+preview = [
+    { name = "arviz-base", extra = ["h5netcdf"] },
+    { name = "arviz-plots" },
+    { name = "arviz-stats", extra = ["xarray"] },
+]
+
 [[package]]
 name = "arviz-base"
 version = "0.8.2"
@@ -225,6 +232,11 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/d5/b7/6567bb2fff93232635f0ba1c6f8dceee9b1271e94165a4d9dd6c40ff5636/arviz_base-0.8.2.tar.gz", hash = "sha256:4d77142c6396c648fef3624b2d3f76fc9f326b88e513b34eff15ac06489cf840", size = 1403232, upload-time = "2026-01-16T14:00:48.184Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8f/31/0491ae7431f50708a0d60d54adf363b8e874d09af9d867e813fb4751c590/arviz_base-0.8.2-py3-none-any.whl", hash = "sha256:84f8c72d1454e21198f9188537d10fedba8db23ee4abc54200c38c808b76e05c", size = 1420673, upload-time = "2026-01-16T14:00:46.408Z" },
+]
+
+[package.optional-dependencies]
+h5netcdf = [
+    { name = "h5netcdf", extra = ["h5py"] },
 ]
 
 [[package]]
@@ -1185,6 +1197,11 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ef/03/92d6cc02c0055158167255980461155d6e17f1c4143c03f8bcc18d3e3f3a/h5netcdf-1.8.1.tar.gz", hash = "sha256:9b396a4cc346050fc1a4df8523bc1853681ec3544e0449027ae397cb953c7a16", size = 78679, upload-time = "2026-01-23T07:35:31.233Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b1/8b/88f16936a8e8070a83d36239555227ecd91728f9ef222c5382cda07e0fd6/h5netcdf-1.8.1-py3-none-any.whl", hash = "sha256:a76ed7cfc9b8a8908ea7057c4e57e27307acff1049b7f5ed52db6c2247636879", size = 62915, upload-time = "2026-01-23T07:35:30.195Z" },
+]
+
+[package.optional-dependencies]
+h5py = [
+    { name = "h5py" },
 ]
 
 [[package]]
@@ -2734,7 +2751,7 @@ version = "1.0.0a1"
 source = { editable = "." }
 dependencies = [
     { name = "altair" },
-    { name = "arviz" },
+    { name = "arviz", extra = ["preview"] },
     { name = "bambi" },
     { name = "dash" },
     { name = "dash-bootstrap-components" },
@@ -2743,6 +2760,7 @@ dependencies = [
     { name = "kaleido" },
     { name = "marimo", extra = ["mcp"] },
     { name = "numpy" },
+    { name = "pandas" },
     { name = "patito" },
     { name = "plotly" },
     { name = "polars" },
@@ -2754,6 +2772,7 @@ dependencies = [
     { name = "scipy" },
     { name = "ty" },
     { name = "wigglystuff" },
+    { name = "xarray" },
 ]
 
 [package.dev-dependencies]
@@ -2776,7 +2795,7 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "altair", specifier = ">=5.2.0" },
-    { name = "arviz", specifier = ">=0.18.0" },
+    { name = "arviz", extras = ["preview"], specifier = ">=0.18.0" },
     { name = "bambi", specifier = ">=0.14.0" },
     { name = "dash", specifier = ">=2.11.1" },
     { name = "dash-bootstrap-components", specifier = ">=1.4.1" },
@@ -2785,6 +2804,7 @@ requires-dist = [
     { name = "kaleido", specifier = ">=1.2.0" },
     { name = "marimo", extras = ["mcp"], specifier = ">=0.19.7" },
     { name = "numpy", specifier = ">=1.25.0" },
+    { name = "pandas", specifier = ">=3.0.0" },
     { name = "patito", specifier = ">=0.7.0" },
     { name = "plotly", specifier = ">=5.18.0" },
     { name = "polars", specifier = ">=1.0.0" },
@@ -2796,6 +2816,7 @@ requires-dist = [
     { name = "scipy", specifier = ">=1.10.1" },
     { name = "ty", specifier = ">=0.0.14" },
     { name = "wigglystuff", specifier = ">=0.2.0" },
+    { name = "xarray", specifier = ">=2026.1.0" },
 ]
 
 [package.metadata.requires-dev]

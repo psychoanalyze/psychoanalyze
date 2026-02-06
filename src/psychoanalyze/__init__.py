@@ -1,21 +1,18 @@
+import numpy as np
+import pymc as pm
+import xarray as xr
 
-"""Top-level package for `psychoanalyze`.
 
-Modules:
+def fit(
+) -> xr.DataTree:
+    with pm.Model():
+        intercept = pm.Normal("intercept")
+        slope = pm.HalfNormal("slope")
 
-- [`plot`][psychoanalyze.plot]: Global plot settings and generic plot utilities.
-- [`sigmoids`][psychoanalyze.sigmoids]: Implementations of psychometric sigmoid
-functions.
-- [`presets`][psychoanalyze.presets]: Preset parameter configurations for common
-psychophysics paradigms.
-- [`params`][psychoanalyze.params]: Psychometric function parameter conversions.
+        logit_p = intercept + slope * np.linspace(-4, 4, 7)
 
-Subpackages:
+        pm.Bernoulli("result", logit_p=logit_p)
 
-- [`data`][psychoanalyze.data]: Submodules in [`psychoanalyze.data`][psychoanalyze.data]
-contain data manipulation and transformation functions that relate to a level in the
-data hierarchy.
-- [`analysis`][psychoanalyze.analysis]: Submodules in
-[`psychoanalyze.analysis`][psychoanalyze.analysis] contain data manipulation and
-transformation functions, often corresponding to a level in the data hierarchy.
-"""
+        idata = pm.sample_prior_predictive()
+
+    return idata.to_datatree()

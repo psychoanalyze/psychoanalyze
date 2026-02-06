@@ -28,7 +28,7 @@ dependencies = [
     "patito>=0.7.0",
     "plotly>=5.18.0",
     "scipy>=1.10.1",
-    "arviz>=0.18.0",
+    "arviz[preview]>=0.18.0",
     "bambi>=0.14.0",
     "dash>=2.11.1",
     "dash-bootstrap-components>=1.4.1",
@@ -48,6 +48,8 @@ dependencies = [
     "pyarrow>=23.0.0",
     "kaleido>=1.2.0",
     "wigglystuff>=0.2.0",
+    "xarray>=2026.1.0",
+    "pandas>=3.0.0",
 ]
 
 [project.scripts]
@@ -118,7 +120,6 @@ skips = ["B311", "B104"]
 
 [tool.ruff]
 fix = true
-select = ["ALL"]
 ignore = ["S101", "S311", "D211", "D213", "RUF002", "CPY001"]
 
 [tool.ruff.pydocstyle]

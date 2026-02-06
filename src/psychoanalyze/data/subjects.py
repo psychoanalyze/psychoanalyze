@@ -33,3 +33,41 @@ def generate_trials(
         df = df.with_columns(pl.lit(subj).alias("Subject"))
         frames.append(df)
     return pl.concat(frames)
+
+def generate_multi_subject(
+    n_trials: int,
+    options: list[float],
+    params: dict[str, float],
+    n_blocks: int,
+    n_subjects: int = 1,
+    use_random_params: bool = False,
+) -> tuple[pl.DataFrame, dict[tuple[str, int], dict[str, float]]]:
+    frames = []
+    ground_truth_params_map: dict[tuple[str, int], dict[str, float]] = {}
+    rng = np.random.default_rng()
+
+    for subject_idx in range(n_subjects):
+        subject_id = (
+            chr(ord("A") + subject_idx) if subject_idx < 26 else f"S{subject_idx}"
+        )
+
+        for block_id in range(n_blocks):
+            block_params = params.copy()
+            block_params["x_0"] = params["x_0"] + rng.normal(0, 0.5)
+
+            ground_truth_params_map[(subject_id, block_id)] = block_params
+
+            block_trials = generate(
+                n_trials=n_trials,
+                options=options,
+                params=block_params,
+                n_blocks=1,
+            )
+            block_trials = block_trials.with_columns(
+                pl.lit(subject_id).alias("Subject"),
+                pl.lit(block_id).alias("Block"),
+            )
+            frames.append(block_trials)
+
+    trials_df = pl.concat(frames) if frames else pl.DataFrame()
+    return trials_df, ground_truth_params_map
