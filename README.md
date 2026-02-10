@@ -3,6 +3,7 @@
 Interactive data simulation and analysis for psychophysics with PyMC-based Bayesian fitting.
 
 [![GitHub Discussions](https://img.shields.io/github/discussions/psychoanalyze/psychoanalyze)](https://github.com/orgs/psychoanalyze/discussions)
+[![CI](https://github.com/psychoanalyze/psychoanalyze/actions/workflows/ci.yaml/badge.svg)](https://github.com/psychoanalyze/psychoanalyze/actions/workflows/ci.yaml)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/psychoanalyze/notebooks/main?urlpath=git-pull%3Frepo%3Dhttps%253A%252F%252Fgithub.com%252Fpsychoanalyze%252Fnotebooks%26urlpath%3Dlab%252Ftree%252Fnotebooks%252Ftutorial.ipynb%26branch%3Dmain)
 [![PyPI - Status](https://img.shields.io/pypi/status/psychoanalyze)](https://pypi.org/project/psychoanalyze/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/psychoanalyze)](https://pypi.org/project/psychoanalyze/)
