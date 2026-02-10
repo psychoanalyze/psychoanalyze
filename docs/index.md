@@ -2,7 +2,7 @@
 
 ## Introduction
 
-**PsychoAnalyze** was developed to support research[^1] in the [Moran Lab](https://moranlab.wustl.edu/) at Washington University in St. Louis. It is a multi-purpose data platform to assist researchers analyzing data from psychophysical experiments, providing prepackaged libraries for helpful data transformation methods, model-fitting routines, and data visualization features specific to psychophysics research and behavioral psychology/neuroscience.
+**PsychoAnalyze** was developed to support research[^1] in the [Moran Lab](https://moranlab.wustl.edu/) at Washington University in St. Louis. It is a multi-purpose data platform to assist researchers analyzing data from psychophysical experiments, providing prepackaged libraries for data transformation methods, PyMC-based Bayesian model-fitting routines, and data visualization features specific to psychophysics research and behavioral psychology/neuroscience.
 
 [^1]: [T C Schlichenmeyer et al 2022 J. Neural Eng. 19 066009](https://iopscience.iop.org/article/10.1088/1741-2552/ac9e76/meta)
 

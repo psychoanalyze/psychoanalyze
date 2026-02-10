@@ -1,0 +1,42 @@
+[[repos]]
+repo = "local"
+
+[[repos.hooks]]
+id = "datacontract-lint"
+name = "Data Contract Lint"
+entry = "datacontract lint"
+language = "system"
+files = "data-contract.odcs.yaml"
+
+[[repos]]
+repo = "builtin"
+
+[[repos.hooks]]
+id = "trailing-whitespace"
+
+[[repos]]
+repo = "builtin"
+
+[[repos.hooks]]
+id = "end-of-file-fixer"
+
+[[repos]]
+repo = "https://github.com/astral-sh/ruff-pre-commit"
+rev = "v0.15.0"
+
+[[repos.hooks]]
+id = "ruff-check"
+args = ["--fix"]
+
+[[repos.hooks]]
+id = "ruff-format"
+
+[[repos]]
+repo = "local"
+
+[[repos.hooks]]
+id = "marimo-check"
+name = "Marimo Check"
+entry = "marimo check nbs/*.py"
+language = "system"
+files = "nbs/.*.py"

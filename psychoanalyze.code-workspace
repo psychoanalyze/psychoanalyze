@@ -1,0 +1,32 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings":{
+        "files.exclude": {
+            "**/__pycache__": true,
+            "**/*.pyc": true,
+            "__marimo__": true,
+            "_site": true,
+            ".hypothesis": true,
+            ".pytest_cache": true,
+            ".venv": true,
+            ".ruff_cache": true,
+            ".jj":true,
+            "allure-results": true,
+            "allure-report": true,
+            "node_modules": true
+
+        },
+        "python.testing.pytestEnabled": true,
+        "python.terminal.activateEnvInCurrentTerminal": true
+    },
+    "extensions": {
+        "recommendations": [
+            "tamasfe.even-better-toml",
+            "alexkrechik.cucumberautocomplete"
+        ]
+    }
+}

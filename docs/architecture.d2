@@ -1,0 +1,394 @@
+direction: down
+
+title: "PsychoAnalyze Architecture: Three Pillars" {
+  shape: text
+  near: top-center
+  style: {
+    font-size: 24
+    bold: true
+  }
+}
+
+# ============================================================================
+# PILLAR 1: Real-time/Online Data Processing
+# ============================================================================
+data_processing: {
+  label: "1. Real-time/Online Data Processing"
+  style.fill: "#e8f4f8"
+  style.stroke: "#1e88e5"
+  style.stroke-width: 3
+
+  psychopy_integration: {
+    label: "PsychoPy Integration"
+    tooltip: "Live experiment interface, trial streaming"
+
+    live_trials: "Stream trials from experiments"
+    adaptive_staircase: "Adaptive threshold estimation"
+    real_time_aggregation: "Online trial → points conversion"
+  }
+
+  pipeline: {
+    label: "Data Pipeline"
+    link: "./data-pipeline.feature"
+
+    trial_to_points: "Aggregate trials → points\n(group by intensity, calc hit rate)"
+    fit_blocks: "Fit psychometric curves → blocks\n(logistic regression, estimate x₀, k)"
+    join_sessions: "Join blocks across sessions\n(longitudinal time series)"
+    intensity_scaling: "Transform intensity scales\n(log, z-score, Weber fractions)"
+    modeling: {
+      label: "Advanced Modeling"
+      weber_fit: "Weber power-law fit\n(JND = k × I^n)"
+      sd_fit: "Strength-duration fit\n(Weiss/Lapicque models)"
+      bayesian_hierarchical: "Hierarchical Bayesian models\n(PyMC, subject-level + population)"
+    }
+  }
+
+  validation: {
+    label: "Data Contract & QA"
+    link: "../data-contract.odcs.yaml"
+
+    schema_validation: "Pandera schema checks"
+    type_safety: "Enforce column types & ranges"
+    missing_data_handling: "Detect & handle missing values"
+    edge_case_detection: "Flag outliers & anomalies"
+  }
+
+  batch_processing: {
+    label: "Batch Processing"
+
+    file_import: "Import CSV/Parquet/HDF5"
+    bulk_fitting: "Batch fit multiple sessions"
+    parallel_execution: "Parallel processing (Dask/Joblib)"
+    export_results: "Export fitted parameters"
+  }
+
+  psychopy_integration -> pipeline
+  pipeline -> validation
+  validation -> batch_processing
+}
+
+# ============================================================================
+# PILLAR 2: Interactive Dashboard & Bayesian Workflow
+# ============================================================================
+dashboard: {
+  label: "2. Interactive Dashboard & Bayesian Workflow"
+  style.fill: "#f3e8f8"
+  style.stroke: "#8e24aa"
+  style.stroke-width: 3
+
+  app: {
+    label: "Marimo App (app.py)"
+    tooltip: "Reactive notebook interface"
+
+    notebook_interface: "Reactive cells with live updates"
+    state_management: "Persistent UI state across sessions"
+    data_loading: "File upload & sample data loader"
+  }
+
+  plots: {
+    label: "Visualization Suite"
+    grid-columns: 2
+
+    psychometric: {
+      label: "Psychometric Function"
+      link: "./psychometric-function.d2"
+      tooltip: "Sigmoid curve with data points"
+    }
+    threshold_time: {
+      label: "Threshold vs Time"
+      link: "./threshold-vs-time.d2"
+      tooltip: "Longitudinal threshold tracking"
+    }
+    weber_curves: {
+      label: "Weber Curves"
+      link: "./weber-curves.d2"
+      tooltip: "JND vs intensity power law"
+    }
+    strength_duration: {
+      label: "Strength-Duration"
+      link: "./strength-duration.d2"
+      tooltip: "Rheobase & chronaxie fits"
+    }
+    bayes_diagnostics: {
+      label: "Bayesian Diagnostics"
+      link: "./bayes-analysis.d2"
+      tooltip: "Trace plots, posteriors, PPCs"
+    }
+  }
+
+  controls: {
+    label: "Interactive Controls"
+
+    scale_toggles: "Scale controls (linear/log)"
+    unit_conversion: "Unit switchers (mA/μC, ms/μs)"
+    subject_filters: "Subject selection (U, Y, Z)"
+    time_range_slider: "Date range selection"
+    parameter_sliders: "Prior/model parameter inputs"
+  }
+
+  bayesian_workflow: {
+    label: "Gelman Bayesian Workflow"
+    link: "./gelman-workflow.feature"
+    grid-columns: 3
+
+    prior_setup: {
+      label: "Prior Setup"
+      define_priors: "Define priors (x₀, k, λ, γ)"
+      hierarchical_config: "Configure hierarchical structure"
+      prior_predictive: "Prior predictive checks"
+    }
+
+    fitting: {
+      label: "Model Fitting"
+      mcmc_config: "MCMC sampler settings"
+      run_inference: "Execute PyMC sampling"
+      handle_errors: "Divergence/convergence warnings"
+    }
+
+    diagnostics: {
+      label: "Diagnostics"
+      trace_plots: "Trace plots (mixing)"
+      rhat_check: "R-hat convergence"
+      ess_check: "Effective sample size"
+      posterior_plots: "Posterior densities"
+    }
+
+    validation: {
+      label: "Model Validation"
+      posterior_predictive: "Posterior predictive checks"
+      ppc_pvalue: "Bayesian p-values"
+      observed_vs_predicted: "Fit quality assessment"
+    }
+
+    comparison: {
+      label: "Model Comparison"
+      fit_alternatives: "Fit alternative models"
+      waic: "WAIC comparison"
+      loo_cv: "LOO-CV comparison"
+    }
+
+    sensitivity: {
+      label: "Sensitivity Analysis"
+      vary_priors: "Vary prior specifications"
+      evaluate_robustness: "Assess prior sensitivity"
+      shrinkage_viz: "Hierarchical shrinkage plots"
+    }
+
+    export: {
+      label: "Export & Report"
+      generate_report: "Generate PDF reports"
+      export_samples: "Export posteriors (NetCDF/CSV)"
+      subject_exploration: "Drill down to subject-level"
+    }
+  }
+
+  mcmc_live_updates: {
+    label: "Live MCMC Monitoring"
+
+    progress_bar: "Real-time sampling progress"
+    chain_stats: "Live convergence metrics"
+    auto_refresh: "Auto-refresh diagnostics"
+  }
+
+  app -> plots
+  app -> controls
+  plots -> bayesian_workflow
+  controls -> bayesian_workflow
+  bayesian_workflow -> mcmc_live_updates
+}
+
+# ============================================================================
+# PILLAR 3: Python Package for Custom Scripting
+# ============================================================================
+python_api: {
+  label: "3. Ergonomic Python Package"
+  style.fill: "#e8f8e8"
+  style.stroke: "#43a047"
+  style.stroke-width: 3
+
+  library_structure: {
+    label: "Library Structure (src/psychoanalyze/)"
+    grid-columns: 2
+
+    data_module: {
+      label: "data/"
+      trials: "trials.py (aggregate, validate)"
+      points: "points.py (fit, transform)"
+      blocks: "blocks.py (longitudinal ops)"
+      types: "types.py (Pandera schemas)"
+    }
+
+    analysis_module: {
+      label: "analysis/"
+      bayesian: "bayesian.py (PyMC models)"
+      ecdf: "ecdf.py (empirical CDFs)"
+      weber: "weber.py (power-law fitting)"
+      strength_duration: "sd.py (rheobase/chronaxie)"
+    }
+
+    utils_module: {
+      label: "Core Utils"
+      sigmoids: "sigmoids.py (link functions)"
+      plot_template: "plot.py (Plotly config)"
+      transforms: "transforms.py (scale conversions)"
+    }
+  }
+
+  api_surface: {
+    label: "High-Level API"
+    tooltip: "Public functions for scripting"
+
+    fit: {
+      label: ".fit()"
+      description: "One-line psychometric fitting\npsychoanalyze.fit(trials_df)"
+    }
+    plot: {
+      label: ".plot()"
+      description: "Quick plotting utilities\npsychoanalyze.plot.psychometric(points_df)"
+    }
+    analyze: {
+      label: ".analyze()"
+      description: "Statistical analysis pipelines\npsychoanalyze.analyze.weber(blocks_df)"
+    }
+  }
+
+  scripting_patterns: {
+    label: "Scripting Use Cases"
+    grid-columns: 2
+
+    automation: {
+      label: "Automation"
+      batch_scripts: "Batch process experiments"
+      cron_jobs: "Scheduled analysis tasks"
+      CI_integration: "Test suite integration"
+    }
+
+    research_workflows: {
+      label: "Research Workflows"
+      jupyter_notebooks: "Jupyter/IPython notebooks"
+      reproducible_analysis: "Version-controlled scripts"
+      paper_figures: "Generate publication plots"
+    }
+
+    custom_analysis: {
+      label: "Custom Analysis"
+      extend_models: "Subclass/extend models"
+      custom_priors: "Define domain-specific priors"
+      algorithm_comparison: "A/B test fitting methods"
+    }
+
+    integration: {
+      label: "Integration"
+      pandas_interop: "Seamless Pandas integration"
+      polars_support: "Polars DataFrame support"
+      numpy_arrays: "Raw NumPy array inputs"
+      export_formats: "CSV/Parquet/HDF5 I/O"
+    }
+  }
+
+  cli: {
+    label: "Command-Line Interface"
+
+    cli_commands: "psychoanalyze [fit|plot|analyze]"
+    config_files: "Config via TOML/YAML"
+    pipeline_orchestration: "Chain commands in shell scripts"
+  }
+
+  type_safety: {
+    label: "Developer Experience"
+
+    type_hints: "Full type annotations (mypy/pyright)"
+    docstrings: "NumPy-style docstrings"
+    error_messages: "Clear error messages with fixes"
+    examples: "Example scripts in docs/"
+  }
+
+  library_structure -> api_surface
+  api_surface -> scripting_patterns
+  scripting_patterns -> cli
+  cli -> type_safety
+}
+
+# ============================================================================
+# CROSS-PILLAR CONNECTIONS
+# ============================================================================
+
+# Data processing feeds dashboard
+data_processing.pipeline -> dashboard.app: "DataFrames\n(trials, points, blocks)" {
+  style.stroke: "#ff9800"
+  style.stroke-width: 2
+}
+
+# Dashboard uses Python API
+dashboard.bayesian_workflow -> python_api.library_structure: "Import psychoanalyze\n(PyMC models, fitting)" {
+  style.stroke: "#ff9800"
+  style.stroke-width: 2
+}
+
+# Python API enables data processing
+python_api.api_surface -> data_processing.pipeline: "Programmatic control\n(fit(), analyze())" {
+  style.stroke: "#ff9800"
+  style.stroke-width: 2
+}
+
+# PsychoPy integration exports to package
+data_processing.psychopy_integration -> python_api.scripting_patterns: "Export experiment data\n(CSV, real-time)" {
+  style.stroke: "#607d8b"
+  style.stroke-dash: 3
+}
+
+# CLI orchestrates pipelines
+python_api.cli -> data_processing.batch_processing: "Batch CLI commands" {
+  style.stroke: "#607d8b"
+  style.stroke-dash: 3
+}
+
+# Dashboard provides user-facing plotting
+dashboard.plots -> python_api.library_structure: "Uses plot.py template" {
+  style.stroke: "#607d8b"
+  style.stroke-dash: 3
+}
+
+# ============================================================================
+# NEW FEATURES TO CONSIDER
+# ============================================================================
+
+future_features: {
+  label: "Potential Features" {
+    style.opacity: 0.6
+  }
+  style.fill: "#fff9e6"
+  style.stroke: "#fbc02d"
+  style.stroke-dash: 5
+
+  grid-columns: 3
+
+  rest_api: "REST API\n(Flask/FastAPI server)"
+  web_app: "Standalone web app\n(Svelte/React frontend)"
+  cloud_deployment: "Cloud deployment\n(AWS Lambda, Fly.io)"
+  database_backend: "Database backend\n(PostgreSQL, DuckDB)"
+  ml_integration: "ML integration\n(scikit-learn pipelines)"
+  mobile_app: "Mobile companion app\n(trial collection)"
+  collaborative: "Collaborative mode\n(shared sessions)"
+  version_control: "Analysis versioning\n(DVC, Git-tracked)"
+  plugin_system: "Plugin architecture\n(custom link functions)"
+}
+
+# Connections for future features
+python_api.library_structure -> future_features.rest_api: "Serve API" {
+  style.stroke: "#9e9e9e"
+  style.stroke-dash: 5
+  style.opacity: 0.5
+}
+
+dashboard.bayesian_workflow -> future_features.collaborative: "Share sessions" {
+  style.stroke: "#9e9e9e"
+  style.stroke-dash: 5
+  style.opacity: 0.5
+}
+
+data_processing.batch_processing -> future_features.database_backend: "Persistent storage" {
+  style.stroke: "#9e9e9e"
+  style.stroke-dash: 5
+  style.opacity: 0.5
+}

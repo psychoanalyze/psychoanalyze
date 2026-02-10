@@ -1,0 +1,96 @@
+direction: right
+
+threshold_vs_time: {
+  label: "Threshold vs Time"
+
+  plot: {
+    label: "Plot"
+
+    axes: {
+      label: "Axes"
+      x_axis: "Time (selectable scale)"
+      y_axis: "Threshold Amplitude (μA)"
+    }
+
+    controls: {
+      label: "View controls"
+      x_scale: "linear | log"
+      x_units: "raw | z-score"
+    }
+
+    markers: {
+      label: "Markers"
+      threshold_points: "Scatter: x₀ per block, colored by subject"
+      trend_line: "Optional: LOESS smooth or moving average"
+      confidence_bands: "95% CI from Bayesian fit or bootstrap"
+    }
+
+    visual: {
+      label: "Visual elements"
+      colors: "Subject colormap (U=#e41a1c, Y=#377eb8, Z=#4daf4a)"
+      error_bars: "95% CI from posterior"
+      facets: "Optional: separate panels by PW or condition"
+    }
+  }
+
+  data: {
+    label: "Data"
+
+    blocks_schema: {
+      shape: sql_table
+      label: "Blocks"
+      Block: int {constraint: "index"}
+      threshold: "float (x₀)"
+      slope: "float (k)"
+      Subject: "str (U/Y/Z)"
+    }
+
+    sessions_schema: {
+      shape: sql_table
+      label: "Sessions"
+      Session: int {constraint: "index"}
+      Date: date
+      "Days Since Implant": int
+      Subject: "str (U/Y/Z)"
+      "Block IDs": "list[int]"
+    }
+
+    time_views: {
+      shape: sql_table
+      label: "Time views"
+      Days_raw: int
+      Days_log: float {constraint: "log(Days_raw)"}
+      Days_z: float {constraint: "z-score(Days_raw)"}
+    }
+
+    longitudinal_schema: {
+      shape: sql_table
+      label: "Longitudinal"
+      Days: int {constraint: "index"}
+      threshold_mean: float
+      threshold_ci_low: float
+      threshold_ci_high: float
+      Subject: "str (U/Y/Z)"
+    }
+
+    blocks_schema -> sessions_schema: "join on Block → Session"
+    sessions_schema -> time_views: "derive views"
+    time_views -> longitudinal_schema: "aggregate by Days"
+  }
+
+  data -> plot: "Blocks → Sessions → longitudinal trend"
+
+  # Data-to-plot mappings
+  data.longitudinal_schema.Days -> plot.axes.x_axis
+  data.time_views.Days_log -> plot.axes.x_axis
+  data.time_views.Days_z -> plot.axes.x_axis
+  plot.controls.x_scale -> plot.axes.x_axis
+  plot.controls.x_units -> plot.axes.x_axis
+  data.longitudinal_schema.threshold_mean -> plot.axes.y_axis
+  data.longitudinal_schema.threshold_mean -> plot.markers.threshold_points
+  data.longitudinal_schema.threshold_ci_low -> plot.markers.confidence_bands
+  data.longitudinal_schema.threshold_ci_high -> plot.markers.confidence_bands
+  data.longitudinal_schema.Subject -> plot.visual.colors
+  data.longitudinal_schema.threshold_ci_low -> plot.visual.error_bars
+  data.longitudinal_schema.threshold_ci_high -> plot.visual.error_bars
+}

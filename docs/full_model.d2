@@ -1,0 +1,167 @@
+direction: right
+
+Experiment {
+  label: "EXPERIMENTAL DESIGN"
+  style.fill: "#f6f6f6"
+
+  Stimulus {
+    label: "Stimulus Parameters"
+    Amp: "Amplitude (8 electrodes)"
+    PW: "Pulse Width"
+    Freq: "Frequency"
+    Dur: "Duration"
+    Waveform: "Square / Sinusoid"
+    Pattern: "Monopolar / Steering"
+  }
+
+  Task {
+    label: "Behavioral Task"
+    GoNoGo: "Go / No-Go"
+    AFC: "2AFC"
+    Continuous: "Continuous Tracking"
+  }
+}
+
+Peripheral {
+  label: "PERIPHERAL FORWARD MODEL"
+  style.fill: "#eef7ff"
+
+  Field {
+    label: "Electric Field Model"
+    Basis: "Spatial Basis φ_e(s)"
+    Steering: "Current Steering Constraints"
+    PDE: "Optional PDE Surrogate (offline)"
+  }
+
+  Architecture {
+    label: "Neural Architecture"
+    Density: "Spatial Density ρ_m(s)"
+    Fiber: "Fiber Types (Aβ, Aδ)"
+    Receptor: "Mechanoreceptors (3-cat)"
+    Coupling: "Fiber ↔ Receptor Coupling"
+  }
+
+  Recruitment {
+    label: "Recruitment Model"
+    Threshold: "Type-specific Thresholds"
+    Temporal: "Temporal Sensitivity (Spectral)"
+    Activation: "A_f(s; stimulus)"
+  }
+
+  Evidence {
+    label: "Peripheral Evidence"
+    Magnitude: "Magnitude Feature M_t"
+    Timing: "Timing / Spectral Feature T_t"
+  }
+}
+
+Dynamics {
+  label: "TEMPORAL NONSTATIONARITY"
+  style.fill: "#fff4e6"
+
+  Adaptation {
+    Gain: "Gain Drift"
+    Fatigue: "Habituation"
+  }
+
+  Criterion {
+    Gamma: "Criterion / False Alarm Drift"
+  }
+}
+
+CNS {
+  label: "CNS INTEGRATION HYPOTHESES"
+  style.fill: "#f0fff0"
+
+  H1 {
+    label: "H1: Magnitude-only"
+    Uses: "M_t"
+  }
+
+  H2 {
+    label: "H2: Timing-only"
+    Uses: "T_t"
+  }
+
+  H3 {
+    label: "H3: Timing + Magnitude Bias"
+    Uses: "T_t + M_t"
+  }
+
+  H4 {
+    label: "H4: Temporal Filter Bank"
+    Uses: "Filtered Timing Features"
+  }
+}
+
+Inference {
+  label: "BAYESIAN INFERENCE ENGINE"
+  style.fill: "#f9f0ff"
+
+  Posterior {
+    label: "Posterior over Latents"
+    ArchitectureP: "ρ(s), Fiber/Receptor Mix"
+    DynamicsP: "Gain, Criterion States"
+    CNSP: "Model Index / Weights"
+  }
+
+  Methods {
+    label: "Inference Methods"
+    SVI: "NumPyro SVI"
+    SMC: "Particle Filter / SVMC"
+    GenJAX: "Programmable Inference"
+  }
+}
+
+BOED {
+  label: "INFORMATION-OPTIMAL DESIGN"
+  style.fill: "#fff0f0"
+
+  Candidate {
+    label: "Candidate Stimuli"
+    Grid: "Pattern × Amp × PW × Freq"
+    Waveform: "Square vs Sinusoid"
+  }
+
+  Objective {
+    label: "Objective"
+    EIG: "Expected Information Gain"
+    ModelDisc: "CNS Model Discrimination"
+  }
+
+  Selection {
+    label: "Next Stimulus"
+  }
+}
+
+Visualization {
+  label: "VISUALIZATION / APP"
+  style.fill: "#e8f8f5"
+
+  Views {
+    Map: "Activation / Density Maps"
+    Curves: "SD Curves / Bias Plots"
+    Time: "Adaptation Trajectories"
+  }
+}
+
+# Connections
+Experiment.Stimulus -> Peripheral.Field
+Experiment.Task -> CNS
+
+Peripheral.Field -> Peripheral.Recruitment
+Peripheral.Architecture -> Peripheral.Recruitment
+Peripheral.Recruitment -> Peripheral.Evidence
+
+Peripheral.Evidence -> CNS
+Dynamics -> CNS
+
+CNS -> Inference.Posterior
+Inference.Methods -> Inference.Posterior
+
+Inference.Posterior -> BOED.Objective
+BOED.Candidate -> BOED.Objective
+BOED.Objective -> BOED.Selection
+BOED.Selection -> Experiment.Stimulus
+
+Inference.Posterior -> Visualization.Views

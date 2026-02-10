@@ -1,0 +1,40 @@
+kind: DataContract
+apiVersion: v3.1.0
+
+id: psychoanalyze-data-contract
+name: PsychoAnalyze Data Contract
+version: 2026.02.1
+status: draft
+servers:
+- server: production
+  type: local
+  format: csv
+  path: data/trials.csv
+schema:
+- name: trials
+  logicalType: object
+  properties:
+  - name: Subject
+    logicalType: string
+    required: false
+    unique: false
+    examples:
+    - U
+    - Y
+  - name: Date
+    logicalType: date
+    required: false
+    unique: false
+    examples:
+    - '2017-05-15'
+    - '2018-04-13'
+    - '2017-03-30'
+    - '2017-08-04'
+    - '2017-06-05'
+  - name: Result
+    required: true
+    unique: false
+    examples:
+    - 0
+    - 1
+    - 3

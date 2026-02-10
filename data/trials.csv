@@ -1,4 +1,4 @@
-Monkey,Date,Amp2,Width2,Freq2,Dur2,Active Channels,Return Channels,Amp1,Width1,Freq1,Dur1,Trial ID,Result
+Subject,Date,Amp2,Width2,Freq2,Dur2,Active Channels,Return Channels,Amp1,Width1,Freq1,Dur1,Trial ID,Result
 Y,2017-08-04,0.0,200.0,50.0,200.0,15,16,150.0,200.0,50.0,200.0,156806,2
 Y,2017-08-04,0.0,200.0,50.0,200.0,15,16,0.0,200.0,50.0,200.0,156807,3
 Y,2017-08-04,0.0,200.0,50.0,200.0,15,16,0.0,200.0,50.0,200.0,156808,2

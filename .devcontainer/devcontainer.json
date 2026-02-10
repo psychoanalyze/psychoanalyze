@@ -3,16 +3,11 @@
   "image": "mcr.microsoft.com/devcontainers/python:0-3.11",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "features": {
-    "ghcr.io/devcontainers-contrib/features/poetry:2": {
-      "version": "1.5.1"
-    },
-    "ghcr.io/devcontainers-contrib/features/pre-commit:1": {},
-    "ghcr.io/eitsupi/devcontainer-features/duckdb-cli:1": {},
     "ghcr.io/devcontainers/features/node:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
   "remoteUser": "vscode",
-  "onCreateCommand": "poetry install && pre-commit install",
+  "onCreateCommand": "uv sync",
   "customizations": {
     "vscode": {
       "settings": {
@@ -26,13 +21,7 @@
           "tests"
         ],
         "python.testing.unittestEnabled": false,
-        "python.testing.pytestEnabled": true,
-        "mypy-type-checker.path": [
-          ".venv/bin/mypy"
-        ],
-        "mypy-type-checker.interpreter": [
-          ".venv/bin/python"
-        ]
+        "python.testing.pytestEnabled": true
       },
       "extensions": [
         "ms-python.python",
@@ -42,7 +31,6 @@
         "ms-azuretools.vscode-docker",
         "ivan-bocharov.stan-vscode",
         "ms-toolsai.jupyter",
-        "ms-python.mypy-type-checker",
         "GitHub.copilot",
         "GitHub.copilot-chat",
         "eamodio.gitlens",

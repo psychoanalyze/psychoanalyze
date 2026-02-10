@@ -3,15 +3,15 @@ name = "psychoanalyze"
 version = "1.0.0-alpha.1"
 description = "Interactive data analysis and simulation for psychophysics."
 authors = [{ name = "Ty Schlichenmeyer", email = "t.schlic@wustl.edu" }]
-license = { text = "GPL-3.0-or-later" }
+license = { text = "MIT" }
 readme = "README.md"
 keywords = ["psychophysics", "neuroscience", "psychology", "python"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Web Environment",
-    "Framework :: Dash",
+    "Framework :: marimo",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering :: Visualization",
@@ -22,20 +22,37 @@ urls = { JupyterHub = "https://nb.psychoanalyze.io" }
 requires-python = ">=3.14"
 
 dependencies = [
-    # "pandas>=2.0.2",
-    # "scipy>=1.10.1",
-    # "numpy>=1.25.0",
-    # "dash-bootstrap-components>=1.4.1",
+    "altair>=5.2.0",
+    "numpy>=1.25.0",
+    "polars>=1.0.0",
+    "patito>=0.7.0",
+    "plotly>=5.18.0",
+    "scipy>=1.10.1",
+    "arviz[preview]>=0.18.0",
+    "bambi>=0.14.0",
+    "dash>=2.11.1",
+    "dash-bootstrap-components>=1.4.1",
+    "duckdb>=0.8.1",
+    "pymc>=5.18.0",
+    "pytz>=2023.3",
     # "statsmodels>=0.14.0",
-    # "dash>=2.11.1",
-    # "scikit-learn>=1.2.2",
-    # "pandera>=0.15.1",
     # "gunicorn>=20.1.0",
     # "click>=8.1.3",
     # "typer[all]>=0.9.0",
     # "kaleido==0.2.1",
-    # "pyarrow>=12.0.1",
-    # "duckdb>=0.8.1",
+    "ty>=0.0.14",
+    "marimo[mcp]>=0.19.7",
+    "pyzmq>=27.1.0",
+    "google-genai>=1.61.0",
+    "pydantic-ai>=1.50.0",
+    "pyarrow>=23.0.0",
+    "kaleido>=1.2.0",
+    "wigglystuff>=0.2.0",
+    "xarray>=2026.1.0",
+    "pandas>=3.0.0",
+    "pytest>=9.0.2",
+    "pandera>=0.29.0",
+    "allure-pytest-bdd>=2.15.3",
 ]
 
 [project.scripts]
@@ -43,9 +60,7 @@ psychoanalyze = "psychoanalyze.main:app"
 
 [dependency-groups]
 dev = [
-    "marimo>=0.19.2",
-    # "pandera[mypy]>=0.15.1",
-    # "mypy>=1.4.1",
+    "marimo>=0.19.7",
     # "ipykernel>=6.24.0",
     # "ipywidgets>=8.0.7",
     # "jupyter>=1.0.0",
@@ -57,10 +72,20 @@ dev = [
     # "pytest>=7.3.2",
     # "types-pytz>=2023.3.0.0",
     # "types-setuptools>=68.0.0.3",
-    # "hypothesis>=6.79.0",
     # "pandas-stubs>=2.0.2.230605",
     # "datatest>=0.11.1",
     # "dash[testing]>=2.11.1",
+    "pytest>=9.0.2",
+    "ruff>=0.14.14",
+    "hypothesis>=6.79.0",
+    "python-lsp-server>=1.14.0",
+    "websockets>=15.0.1",
+    "python-lsp-ruff>=2.3.0",
+    "vegafusion>=2.0.3",
+    "vl-convert-python>=1.9.0.post1",
+    "datacontract-cli>=0.11.4",
+    "pytest-watcher>=0.6.3",
+    "pytest-bdd>=8.1.0",
 ]
 
 docs = [
@@ -99,37 +124,21 @@ allowed_tags = [
 targets = ["psychoanalyze/"]
 skips = ["B311", "B104"]
 
-[tool.mypy]
-exclude = ['target']
-
-[[tool.mypy.overrides]]
-module = [
-    'dash',
-    'plotly.*',
-    'dash_bootstrap_components',
-    'plotly.express',
-    'scipy.stats',
-    'scipy.special',
-    'sklearn.linear_model',
-    'dash_daq',
-    'datatest',
-    'bambi',
-    'hypothesis',
-    'statsmodels.*',
-    'pytz',
-]
-ignore_missing_imports = true
-
 [tool.ruff]
 fix = true
-select = ["ALL", "CPY001"]
-ignore = ["S101", "S311", "D211", "D213", "RUF002"]
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint]
+ignore = ["S101", "S311", "D211", "D213", "RUF002", "CPY001"]
+
+[tool.ruff.lint.pydocstyle]
 convention = "google"
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "tests/*.py" = ["D100", "D103", "ANN201"]
+"nbs/*.py" = ["F841"]
+
+[tool.pytest.ini_options]
+addopts = ["--import-mode=importlib", "--alluredir=allure-results"]
 
 [build-system]
 requires = ["uv_build>=0.9.27,<0.10.0"]

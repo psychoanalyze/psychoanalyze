@@ -1,0 +1,97 @@
+direction: right
+
+strength_duration: {
+  label: "Strength-duration"
+
+  plot: {
+    label: "Plot"
+
+    axes: {
+      label: "Axes"
+      x_axis: "Pulse Width (selectable scale)"
+      y_axis: "Threshold Current (μA)"
+    }
+
+    controls: {
+      label: "View controls"
+      x_scale: "linear | log"
+      x_units: "raw | z-score"
+    }
+
+    markers: {
+      label: "Markers"
+      threshold_points: "Scatter: threshold at each PW"
+      sd_curve: "Line: I = Irh + (Irh·τ / PW)"
+      chronaxie_marker: "Vertical line at τ (2×Irh point)"
+    }
+
+    visual: {
+      label: "Visual elements"
+      colors: "Subject colormap (U/Y/Z)"
+      asymptotes: "Horizontal: Irh (rheobase)"
+      annotations: "τ value, Irh value"
+    }
+  }
+
+  data: {
+    label: "Data"
+
+    pw_trials: {
+      shape: sql_table
+      label: "PW trials"
+      Intensity: float
+      "Pulse Width": "int (μs)"
+      Result: "0 | 1"
+      Block: int
+    }
+
+    pw_thresholds: {
+      shape: sql_table
+      label: "PW thresholds"
+      "Pulse Width": "int (μs)" {constraint: "index"}
+      threshold: "float (μA)"
+      ci_low: float
+      ci_high: float
+      Subject: "str (U/Y/Z)"
+    }
+
+    pw_views: {
+      shape: sql_table
+      label: "PW views"
+      PW_raw: int
+      PW_log: float {constraint: "log(PW_raw)"}
+      PW_z: float {constraint: "z-score(PW_raw)"}
+    }
+
+    sd_params: {
+      shape: sql_table
+      label: "S-D parameters"
+      Subject: "str (U/Y/Z)" {constraint: "index"}
+      Irh: "float (rheobase, μA)"
+      τ: "float (chronaxie, μs)"
+      charge_threshold: "float (Q = I·PW at asymptote)"
+    }
+
+    pw_trials -> pw_views: "derive views"
+    pw_views -> pw_thresholds: "psychometric fit per PW"
+    pw_thresholds -> sd_params: "nonlinear fit: Weiss-Lapicque"
+  }
+
+  data -> plot: "PW trials → thresholds → S-D curve"
+
+  # Data-to-plot mappings
+  data.pw_thresholds."Pulse Width" -> plot.axes.x_axis
+  data.pw_views.PW_log -> plot.axes.x_axis
+  data.pw_views.PW_z -> plot.axes.x_axis
+  plot.controls.x_scale -> plot.axes.x_axis
+  plot.controls.x_units -> plot.axes.x_axis
+  data.pw_thresholds.threshold -> plot.axes.y_axis
+  data.pw_thresholds.threshold -> plot.markers.threshold_points
+  data.sd_params.Irh -> plot.markers.sd_curve
+  data.sd_params.τ -> plot.markers.sd_curve
+  data.sd_params.τ -> plot.markers.chronaxie_marker
+  data.sd_params.Irh -> plot.visual.asymptotes
+  data.sd_params.τ -> plot.visual.annotations
+  data.sd_params.Irh -> plot.visual.annotations
+  data.pw_thresholds.Subject -> plot.visual.colors
+}

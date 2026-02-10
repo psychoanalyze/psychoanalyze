@@ -1,0 +1,270 @@
+direction: right
+
+
+requirements: {
+
+	desired_plots: {
+		label: "Target plots"
+        "Psychometric function": {
+			link: "./psychometric-function.d2"
+		}
+		"Threshold vs Time": {
+			link: "./threshold-vs-time.d2"
+		}
+		"Weber curves": {
+			link: "./weber-curves.d2"
+		}
+		"Strength-duration": {
+			link: "./strength-duration.d2"
+		}
+		"Bayes analysis": {
+			link: "./bayes-analysis.d2"
+		}
+	}
+
+	required_data: {
+		link: "./psychoanalyze-data-contract.odcs.yaml"
+		label: "Data Model"
+
+		grid-columns: 3
+
+		core_tables: {
+			label: "Core tables"
+			"Trials"
+			"Points"
+			"Blocks"
+			"Sessions"
+		}
+
+		plot_aggregates: {
+			label: "Plot aggregates"
+			"Longitudinal"
+			"JND estimates"
+			"Weber parameters"
+			"PW thresholds"
+			"S-D parameters"
+		}
+
+		bayes_outputs: {
+			label: "Bayes outputs"
+			"PyMC samples"
+			"Posterior summary"
+			"Hierarchical params"
+		}
+
+		derived_views: {
+			label: "Derived views"
+			"Intensity"
+			"Time"
+			"Standard"
+			"Pulse Width"
+			"Parameter"
+		}
+	}
+
+	use_cases: {
+		label: "Use Cases"
+
+		dashboard: {
+			label: "Interactive Dashboard"
+			marimo_app: "Marimo notebook (app.py)"
+			workflow: {
+				link: "./gelman-workflow.feature"
+				label: "Gelman Bayesian workflow"
+			}
+			features: "Real-time plots, MCMC diagnostics, scale toggles"
+			psychopy_integration: "PsychoPy experiment interface"
+		}
+
+		python_api: {
+			label: "Python API/Package"
+			library: "src/psychoanalyze/"
+			usage: "Scripted analysis, batch processing, automation"
+			api_surface: "fit(), plot(), analyze() functions"
+		}
+	}
+
+	bdd_scenarios: {
+		label: "BDD Scenarios"
+		grid-columns: 2
+
+		data_pipeline: {
+			label: "Data Pipeline"
+			link: "./data-pipeline.feature"
+
+			"Transform trials to points"
+			"Fit psychometric function"
+			"Generate intensity views"
+			"Join blocks to sessions"
+			"Compute Weber parameters"
+			"Compute S-D parameters"
+			"Run Bayesian hierarchical model"
+		}
+
+		plots: {
+			label: "Plot Generation"
+			link: "./data-pipeline.feature"
+
+			"Psychometric function plot"
+			"Threshold vs time plot"
+			"Weber curves plot"
+			"Strength-duration plot"
+			"Bayes analysis plot"
+			"Toggle plot scale controls"
+		}
+
+		contract: {
+			label: "Contract"
+			link: "./data-pipeline.feature"
+
+			"Validate data contract compliance"
+		}
+
+		gelman_workflow: {
+			label: "Gelman Bayesian Workflow"
+			link: "./gelman-workflow.feature"
+			grid-columns: 5
+
+			"Define priors"
+			"Configure hierarchical model"
+			"Prior predictive simulation"
+			"Evaluate prior predictive fit"
+			"Configure MCMC sampler"
+			"Execute PyMC inference"
+			"Handle sampling errors"
+			"View trace plots"
+			"Check R-hat convergence"
+			"Check effective sample size"
+			"Examine posteriors"
+			"Posterior predictive simulation"
+			"Compare observed vs predicted"
+			"Posterior predictive p-value"
+			"Fit alternative models"
+			"Compare models (WAIC)"
+			"Compare models (LOO-CV)"
+			"Sensitivity analysis"
+			"Evaluate sensitivity results"
+			"Generate report"
+			"Export posterior samples"
+			"Explore subject-level params"
+			"Visualize shrinkage"
+			"Handle insufficient data"
+			"Handle numerical stability"
+		}
+	}
+
+	desired_plots -> required_data -> use_cases -> bdd_scenarios
+}
+
+test_hierarchy: {
+	label: "Test Hierarchy"
+	direction: down
+
+	data_pipeline: {
+		label: "Data Pipeline"
+		link: "./data-pipeline.feature"
+
+		trial_aggregation: "Trial aggregation"
+		psychometric_fitting: "Psychometric fitting"
+		longitudinal_join: "Longitudinal join"
+		intensity_scaling: "Intensity scaling"
+		weber_modeling: "Weber modeling"
+		strength_duration_modeling: "Strength-duration modeling"
+		bayesian_inference: "Bayesian inference"
+
+		trial_aggregation -> psychometric_fitting -> longitudinal_join
+		psychometric_fitting -> intensity_scaling
+		intensity_scaling -> weber_modeling -> strength_duration_modeling
+		weber_modeling -> bayesian_inference
+	}
+
+	plot_rendering: {
+		label: "Plot Rendering"
+		link: "./data-pipeline.feature"
+
+		psychometric_function_plot: "Psychometric function plot"
+		threshold_time_plot: "Threshold vs time plot"
+		weber_plot: "Weber plot"
+		strength_duration_plot: "Strength-duration plot"
+		bayes_plot: "Bayes plot"
+		plot_controls: "Plot controls (scale/units)"
+	}
+
+	contract_compliance: {
+		label: "Contract validation"
+		link: "./data-pipeline.feature"
+	}
+
+	bayesian_workflow: {
+		label: "Bayesian Workflow"
+		link: "./bayesian-workflow.d2"
+	}
+
+	data_pipeline -> plot_rendering -> contract_compliance
+	contract_compliance -> bayesian_workflow
+}
+
+jj_planning: {
+	label: "JJ Revisions (each node = red/green/refactor cycle)"
+	direction: down
+
+	main: "main"
+	data_schema: "data schema + contract"
+
+	trial_aggregation: "trials → points"
+	psychometric_fit: "logistic fit → blocks"
+	intensity_scaling: "log / z-score views"
+	longitudinal_join: "blocks + sessions join"
+	weber_fit: "Weber power-law fit"
+	sd_fit: "strength-duration fit"
+	bayes_model: "PyMC hierarchical model"
+
+	contract_validation: "pandera schema check"
+
+	psych_plot: "psychometric plot"
+	threshold_plot: "threshold vs time plot"
+	weber_plot: "Weber plot"
+	sd_plot: "S-D plot"
+	bayes_plot: "posterior diagnostics plot"
+	plot_controls: "scale/unit toggles"
+
+	bayesian_workflow: "full Gelman workflow"
+	docs: "docs + examples"
+
+	main -> data_schema
+
+	data_schema -> trial_aggregation
+	data_schema -> psychometric_fit
+	data_schema -> intensity_scaling
+	data_schema -> longitudinal_join
+	data_schema -> weber_fit
+	data_schema -> sd_fit
+	data_schema -> bayes_model
+
+	trial_aggregation -> contract_validation
+	psychometric_fit -> contract_validation
+	intensity_scaling -> contract_validation
+	longitudinal_join -> contract_validation
+	weber_fit -> contract_validation
+	sd_fit -> contract_validation
+	bayes_model -> contract_validation
+
+	contract_validation -> psych_plot
+	contract_validation -> threshold_plot
+	contract_validation -> weber_plot
+	contract_validation -> sd_plot
+	contract_validation -> bayes_plot
+	contract_validation -> plot_controls
+
+	psych_plot -> bayesian_workflow
+	threshold_plot -> bayesian_workflow
+	weber_plot -> bayesian_workflow
+	sd_plot -> bayesian_workflow
+	bayes_plot -> bayesian_workflow
+	plot_controls -> bayesian_workflow
+
+	bayesian_workflow -> docs
+}
+
+requirements -> test_hierarchy
+test_hierarchy -> jj_planning

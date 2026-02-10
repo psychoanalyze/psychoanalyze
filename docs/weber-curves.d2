@@ -1,0 +1,96 @@
+direction: right
+
+weber_curves: {
+  label: "Weber curves"
+
+  plot: {
+    label: "Plot"
+
+    axes: {
+      label: "Axes"
+      x_axis: "Standard Intensity (selectable scale)"
+      y_axis: "ΔI (JND, μA)"
+      secondary: "Weber fraction k = ΔI/I"
+    }
+
+    controls: {
+      label: "View controls"
+      x_scale: "linear | log"
+      x_units: "raw | z-score"
+    }
+
+    markers: {
+      label: "Markers"
+      jnd_points: "Scatter: difference thresholds at each standard"
+      weber_line: "Line: Weber's law ΔI = k·I"
+      near_miss_curve: "Line: Near-miss: ΔI = k·I^β (β ≈ 0.9)"
+    }
+
+    visual: {
+      label: "Visual elements"
+      colors: "Subject colormap (U/Y/Z)"
+      log_log_scale: "Both axes log for power law"
+      reference_line: "Dashed: perfect Weber (slope=1)"
+    }
+  }
+
+  data: {
+    label: "Data"
+
+    increment_trials: {
+      shape: sql_table
+      label: "Increment trials"
+      Standard: float {constraint: "base intensity"}
+      Comparison: float {constraint: "test intensity"}
+      Result: "0 | 1"
+      Block: int
+    }
+
+    standard_views: {
+      shape: sql_table
+      label: "Standard views"
+      Standard_raw: float
+      Standard_log: float {constraint: "log(Standard_raw)"}
+      Standard_z: float {constraint: "z-score(Standard_raw)"}
+    }
+
+    jnd_estimates: {
+      shape: sql_table
+      label: "JND estimates"
+      Standard: float {constraint: "index"}
+      threshold: "float (ΔI)"
+      "Weber fraction": "float (k = ΔI/I)"
+      ci_low: float
+      ci_high: float
+      Subject: "str (U/Y/Z)"
+    }
+
+    weber_params: {
+      shape: sql_table
+      label: "Weber parameters"
+      Subject: "str (U/Y/Z)" {constraint: "index"}
+      k: "float (Weber constant)"
+      β: "float (exponent, near-miss)"
+      R²: "float (goodness of fit)"
+    }
+
+    increment_trials -> standard_views: "derive views"
+    standard_views -> jnd_estimates: "psychometric fit per Standard"
+    jnd_estimates -> weber_params: "power law fit: log(ΔI) ~ β·log(I)"
+  }
+
+  data -> plot: "Increment trials → JND → Weber curve"
+
+  # Data-to-plot mappings
+  data.jnd_estimates.Standard -> plot.axes.x_axis
+  data.standard_views.Standard_log -> plot.axes.x_axis
+  data.standard_views.Standard_z -> plot.axes.x_axis
+  plot.controls.x_scale -> plot.axes.x_axis
+  plot.controls.x_units -> plot.axes.x_axis
+  data.jnd_estimates.threshold -> plot.axes.y_axis
+  data.jnd_estimates."Weber fraction" -> plot.axes.secondary
+  data.jnd_estimates.threshold -> plot.markers.jnd_points
+  data.weber_params.k -> plot.markers.weber_line
+  data.weber_params.β -> plot.markers.near_miss_curve
+  data.jnd_estimates.Subject -> plot.visual.colors
+}

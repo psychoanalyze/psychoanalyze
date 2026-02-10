@@ -73,12 +73,15 @@ nav:
       - Input Panel: 'dashboard/input.md'
       - Visualization Panel: 'dashboard/viz.md'
       - Output Panel: 'dashboard/output.md'
+      - Strength-Duration Analysis: 'dashboard/strength_duration.md'
+      - Weber's Law Analysis: 'dashboard/weber.md'
     - Notebooks: 'notebooks.md'
     - Contributing: 'contributing.md'
     - Developers:
       - Environment: 'environment.md'
       - API Reference: 'api.md'
       - Testing Reference: 'tests.md'
+      - Agent Orchestration: 'agent-orchestration.md'
   - API Reference:
     - Psychoanalyze: 'api.md'
     - Testing Reference: 'tests.md'

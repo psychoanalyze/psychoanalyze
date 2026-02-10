@@ -1,0 +1,110 @@
+direction: right
+
+bayes_analysis: {
+  label: "Bayes analysis"
+
+  plot: {
+    label: "Plot"
+
+    axes: {
+      label: "Axes"
+      x_axis: "Parameter value (x₀, k, or hierarchical)"
+      y_axis: "Posterior density p(θ|data)"
+    }
+
+    controls: {
+      label: "View controls"
+      x_scale: "linear | log"
+      x_units: "raw | z-score"
+    }
+
+    markers: {
+      label: "Markers"
+      posterior_dist: "Area: kernel density or histogram"
+      credible_interval: "Shaded: 95% HDI or equal-tailed"
+      prior_overlay: "Dashed line: prior distribution"
+      point_estimate: "Vertical: posterior mean or MAP"
+    }
+
+    visual: {
+      label: "Visual elements"
+      colors: "Subject colormap or parameter-specific"
+      facets: "Grid: separate panels per parameter"
+      trace_plots: "Optional: MCMC trace for diagnostics"
+      plotting_lib: "ArviZ: diagnostics and posterior viz"
+    }
+  }
+
+  data: {
+    label: "Data"
+
+    trials_input: {
+      shape: sql_table
+      label: "Trials (PyMC input)"
+      Intensity: float
+      Result: "0 | 1"
+      Block: int
+      Subject: "str (U/Y/Z)"
+    }
+
+    pymc_trace: {
+      shape: sql_table
+      label: "PyMC samples"
+      iteration: int {constraint: "MCMC iteration"}
+      chain: int
+      x₀: "float (threshold)"
+      k: "float (slope)"
+      "log_lik": "float (pointwise log-likelihood)"
+    }
+
+    param_views: {
+      shape: sql_table
+      label: "Parameter views"
+      parameter: str
+      value_raw: float
+      value_log: float {constraint: "log(value_raw)"}
+      value_z: float {constraint: "z-score(value_raw)"}
+    }
+
+    posterior_summary: {
+      shape: sql_table
+      label: "Posterior summary"
+      parameter: str {constraint: "index"}
+      mean: float
+      sd: float
+      "2.5%": float {constraint: "lower CI"}
+      "97.5%": float {constraint: "upper CI"}
+      n_eff: int {constraint: "effective sample size"}
+      Rhat: float {constraint: "convergence diagnostic"}
+    }
+
+    hierarchical_params: {
+      shape: sql_table
+      label: "Hierarchical"
+      Subject: "str (U/Y/Z)" {constraint: "index"}
+      x₀_subject: "float (subject-level threshold)"
+      μ_x₀: "float (population mean)"
+      σ_x₀: "float (population SD)"
+    }
+
+    trials_input -> pymc_trace: "PyMC: Bayesian inference"
+    pymc_trace -> param_views: "derive views"
+    pymc_trace -> posterior_summary: "summarize MCMC draws"
+    pymc_trace -> hierarchical_params: "extract subject + population params"
+  }
+
+  data -> plot: "MCMC samples → posterior density"
+
+  # Data-to-plot mappings
+  data.param_views.value_raw -> plot.axes.x_axis
+  data.param_views.value_log -> plot.axes.x_axis
+  data.param_views.value_z -> plot.axes.x_axis
+  plot.controls.x_scale -> plot.axes.x_axis
+  plot.controls.x_units -> plot.axes.x_axis
+  data.pymc_trace.x₀ -> plot.markers.posterior_dist
+  data.pymc_trace.k -> plot.markers.posterior_dist
+  data.posterior_summary.mean -> plot.markers.point_estimate
+  data.posterior_summary."2.5%" -> plot.markers.credible_interval
+  data.posterior_summary."97.5%" -> plot.markers.credible_interval
+  data.hierarchical_params.Subject -> plot.visual.colors
+}

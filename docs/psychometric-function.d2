@@ -1,0 +1,97 @@
+direction: right
+
+psychometric_function: {
+  label: "Psychometric function"
+
+  plot: {
+    label: "Plot"
+
+    axes: {
+      label: "Axes"
+      x_axis: "Intensity (selectable scale)"
+      y_axis: "Hit Rate [0, 1]"
+    }
+
+    controls: {
+      label: "View controls"
+      x_scale: "linear | log"
+      x_units: "raw | z-score"
+    }
+
+    markers: {
+      label: "Markers"
+      observed_points: "Scatter: n trials at each intensity"
+      fitted_curve: "Line: ψ(x) = γ + (1-γ-λ)*F(x; x₀, k)"
+      threshold_line: "Vertical: x₀ at 50%"
+    }
+
+    visual: {
+      label: "Visual elements"
+      colors: "Subject colormap (U/Y/Z)"
+      error_bars: "Binomial CI"
+      template: "plot.template"
+    }
+  }
+
+  data: {
+    label: "Data"
+
+    trials_schema: {
+      shape: sql_table
+      label: "Trials"
+      Intensity: float {constraint: "index"}
+      Result: "0 | 1"
+      Block: int
+    }
+
+    intensity_views: {
+      shape: sql_table
+      label: "Intensity views"
+      Intensity_raw: float
+      Intensity_log: float {constraint: "log(Intensity_raw)"}
+      Intensity_z: float {constraint: "z-score(Intensity_raw)"}
+    }
+
+    points_schema: {
+      shape: sql_table
+      label: "Points"
+      Intensity: float {constraint: "index"}
+      Hits: int
+      "n trials": int
+      "Hit Rate": float {constraint: "Hits / n trials"}
+      ci_low: float {constraint: "Binomial lower CI"}
+      ci_high: float {constraint: "Binomial upper CI"}
+    }
+
+    blocks_schema: {
+      shape: sql_table
+      label: "Blocks"
+      Block: int {constraint: "index"}
+      threshold: "float (x₀)"
+      slope: "float (k)"
+      intercept: float {constraint: "-intercept/slope → x₀"}
+      Subject: "str (U/Y/Z)"
+    }
+
+    trials_schema -> intensity_views: "derive views"
+    intensity_views -> points_schema: "aggregate"
+    points_schema -> blocks_schema: "logistic fit"
+  }
+
+  data -> plot: "Trials → Points → fit → curve"
+
+  # Data-to-plot mappings
+  data.trials_schema.Intensity -> plot.axes.x_axis
+  data.intensity_views.Intensity_log -> plot.axes.x_axis
+  data.intensity_views.Intensity_z -> plot.axes.x_axis
+  plot.controls.x_scale -> plot.axes.x_axis
+  plot.controls.x_units -> plot.axes.x_axis
+  data.points_schema."Hit Rate" -> plot.axes.y_axis
+  data.points_schema."n trials" -> plot.markers.observed_points
+  data.blocks_schema.threshold -> plot.markers.threshold_line
+  data.blocks_schema.slope -> plot.markers.fitted_curve
+  data.blocks_schema.intercept -> plot.markers.fitted_curve
+  data.blocks_schema.Subject -> plot.visual.colors
+  data.points_schema.ci_low -> plot.visual.error_bars
+  data.points_schema.ci_high -> plot.visual.error_bars
+}

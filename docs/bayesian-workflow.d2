@@ -1,0 +1,190 @@
+direction: down
+
+# Phase 1: Specification
+model_specification: {
+	label: "Model Specification"
+
+	initial_model: {
+		label: "Initial model"
+		link: "./gelman-workflow.feature#Define-prior-distributions-for-psychometric-parameters"
+	}
+
+	hierarchical_config: {
+		label: "Hierarchical config"
+		link: "./gelman-workflow.feature#Configure-hierarchical-model-structure"
+	}
+
+	initial_model -> hierarchical_config
+}
+
+# Phase 2: Prior checks
+prior_predictive: {
+	label: "Prior Predictive"
+
+	prior_simulation: {
+		label: "Prior simulation"
+		link: "./gelman-workflow.feature#Run-prior-predictive-simulation"
+	}
+
+	prior_evaluation: {
+		label: "Prior evaluation"
+		link: "./gelman-workflow.feature#Evaluate-prior-predictive-fit"
+	}
+
+	prior_simulation -> prior_evaluation
+}
+
+# Phase 3: Fit & Compute
+fit_compute: {
+	label: "Fit & Compute"
+
+	sampler_config: {
+		label: "Sampler config"
+		link: "./gelman-workflow.feature#Configure-MCMC-sampler"
+	}
+
+	mcmc_execution: {
+		label: "MCMC execution"
+		link: "./gelman-workflow.feature#Execute-PyMC-inference"
+	}
+
+	sampler_config -> mcmc_execution
+}
+
+# Phase 4: Validate computation
+validate_computation: {
+	label: "Validate Computation"
+
+	error_handling: {
+		label: "Error handling"
+		link: "./gelman-workflow.feature#Handle-sampling-errors"
+	}
+
+	trace_diagnostics: {
+		label: "Trace plots"
+		link: "./gelman-workflow.feature#View-trace-plots"
+	}
+
+	rhat_test: {
+		label: "R-hat convergence"
+		link: "./gelman-workflow.feature#Check-R-hat-convergence-statistics"
+	}
+
+	neff_test: {
+		label: "n_eff adequacy"
+		link: "./gelman-workflow.feature#Check-effective-sample-size"
+	}
+
+	error_handling -> trace_diagnostics -> rhat_test -> neff_test
+}
+
+# Phase 5: Evaluate model
+evaluate_model: {
+	label: "Evaluate & Use Model"
+
+	posterior_inspection: {
+		label: "Posterior inspection"
+		link: "./gelman-workflow.feature#Examine-posterior-distributions"
+	}
+
+	posterior_simulation: {
+		label: "Posterior simulation"
+		link: "./gelman-workflow.feature#Run-posterior-predictive-simulation"
+	}
+
+	posterior_comparison: {
+		label: "Posterior comparison"
+		link: "./gelman-workflow.feature#Compare-observed-vs-posterior-predictive-data"
+	}
+
+	posterior_pvalue: {
+		label: "Posterior p-value"
+		link: "./gelman-workflow.feature#Check-posterior-predictive-p-value"
+	}
+
+	subject_exploration: {
+		label: "Subject params"
+		link: "./gelman-workflow.feature#Explore-subject-level-parameters"
+	}
+
+	shrinkage_viz: {
+		label: "Shrinkage viz"
+		link: "./gelman-workflow.feature#Visualize-hierarchical-shrinkage"
+	}
+
+	posterior_inspection -> posterior_simulation -> posterior_comparison -> posterior_pvalue
+	posterior_pvalue -> subject_exploration -> shrinkage_viz
+}
+
+# Phase 6: Modify model
+modify_model: {
+	label: "Modify Model"
+
+	alt_model_fit: {
+		label: "Alt model fit"
+		link: "./gelman-workflow.feature#Fit-alternative-models-for-comparison"
+	}
+
+	prior_sensitivity: {
+		label: "Prior sensitivity"
+		link: "./gelman-workflow.feature#Vary-priors-to-test-robustness"
+	}
+
+	sensitivity_eval: {
+		label: "Sensitivity eval"
+		link: "./gelman-workflow.feature#Evaluate-sensitivity-results"
+	}
+
+	alt_model_fit -> prior_sensitivity -> sensitivity_eval
+}
+
+# Phase 7: Compare & export
+compare_export: {
+	label: "Compare & Export"
+
+	waic_comparison: {
+		label: "WAIC comparison"
+		link: "./gelman-workflow.feature#Compare-models-using-WAIC"
+	}
+
+	loo_comparison: {
+		label: "LOO-CV comparison"
+		link: "./gelman-workflow.feature#Compare-models-using-LOO-CV"
+	}
+
+	report_generation: {
+		label: "Report generation"
+		link: "./gelman-workflow.feature#Generate-Bayesian-workflow-report"
+	}
+
+	sample_export: {
+		label: "Sample export"
+		link: "./gelman-workflow.feature#Export-posterior-samples-for-further-analysis"
+	}
+
+	waic_comparison -> loo_comparison -> report_generation -> sample_export
+}
+
+# Main workflow flow
+model_specification -> prior_predictive
+prior_predictive -> fit_compute
+fit_compute -> validate_computation
+validate_computation -> evaluate_model
+evaluate_model -> modify_model -> compare_export
+
+# Feedback loops
+prior_predictive.prior_evaluation -> model_specification.initial_model: "prior unacceptable" {
+	style.stroke-dash: 3
+}
+validate_computation.neff_test -> fit_compute.sampler_config: "convergence issues" {
+	style.stroke-dash: 3
+}
+validate_computation.error_handling -> fit_compute.sampler_config: "computation invalid" {
+	style.stroke-dash: 3
+}
+evaluate_model.posterior_pvalue -> modify_model.alt_model_fit: "model untrustworthy" {
+	style.stroke-dash: 3
+}
+compare_export.loo_comparison -> modify_model: "select better model" {
+	style.stroke-dash: 3
+}
